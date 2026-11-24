@@ -113,6 +113,44 @@ const {chromium} = require('playwright');
     for (const asset of ['glightbox/dist/js/glightbox.min.js', 'uppy/dist/dashboard.min.js']) {
       await page.addScriptTag({path: path.join(__dirname, '..', 'site', 'librairies', asset)});
     }
+    // Exercise the real GLightbox without leaving focus in the editor or closing a nested picker.
+    await page.locator('form').evaluate(form => {
+      const opener = document.createElement('button');
+      opener.type = 'button';
+      opener.id = 'image-preview';
+      opener.setAttribute('aria-label', 'Preview image');
+      const image = document.createElement('img');
+      image.src = document.createElement('canvas').toDataURL();
+      opener.append(image);
+      opener.addEventListener('click', () => FlexiUploader.previewImage(opener));
+      form.append(opener);
+    });
+    const imageOpener = page.locator('#image-preview');
+    const lightbox = page.locator('#glightbox-body');
+    const picker = page.locator('#test-preview-picker');
+    for (const nested of [false, true]) {
+      if (nested) {
+        await imageOpener.evaluate(opener => {
+          const dialog = document.createElement('dialog');
+          dialog.id = 'test-preview-picker';
+          document.body.append(dialog);
+          dialog.append(opener);
+          dialog.showModal();
+        });
+      }
+      await imageOpener.press('Enter');
+      await lightbox.locator('.gslide.current img').waitFor();
+      assert(await lightbox.evaluate(modal => modal.contains(document.activeElement)), 'The preview takes focus on open');
+      assert.equal(await imageOpener.evaluate(opener => !!opener.closest('[inert]')), true, 'The preview background is inert');
+      assert.equal(await picker.locator('#glightbox-body').count(), Number(nested));
+      await page.keyboard.press('Escape');
+      await lightbox.waitFor({state: 'detached'});
+      assert(await imageOpener.evaluate(opener => document.activeElement === opener), 'Escape restores focus to the preview button');
+      assert.equal(await imageOpener.evaluate(opener => !!opener.closest('[inert]')), false);
+    }
+    assert(await picker.evaluate(dialog => dialog.open), 'Escape leaves the enclosing picker open');
+    await picker.evaluate(dialog => { dialog.close(); dialog.remove(); });
+
     for (const file of ['form-utils.js', 'media-field-controls.js']) {
       await page.addScriptTag({path: path.join(__dirname, '..', 'site', 'assets', 'js', file)});
     }

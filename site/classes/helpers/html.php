@@ -1878,7 +1878,9 @@ class flexicontent_html
 				// It is loaded in both standard and Choices.js (jQuery-free front) modes.
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/glightbox';
 				$document->addStyleSheet($framework_path.'/dist/css/glightbox.min.css');
-				$document->addScript($framework_path.'/dist/js/glightbox.min.js');
+				$document->addScript($framework_path.'/dist/js/glightbox.min.js', array(
+					'version' => (string) filemtime(dirname(__DIR__, 2).'/librairies/glightbox/dist/js/glightbox.min.js'),
+				));
 
 				// Attaching the lightbox is left to the caller so that it creates
 				// a GLightbox instance with field specific options
