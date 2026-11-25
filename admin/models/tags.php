@@ -472,45 +472,119 @@ class FlexicontentModelTags extends FCModelAdminList
 	/**
 	 * Method to import a list of tags
 	 *
-	 * @params	string	the list of tags to import
+	 * Names that already exist (ignoring letter case and extra spaces), either in the DB or earlier in the given list,
+	 * are not imported again
 	 *
-	 * @return	array	the import logs
+	 * @param   string  $tags  The list of tags to import, one tag per line
+	 *
+	 * @return  array|null  The import logs: the counters 'success' and 'error', and the lists 'created' and 'existing'
+	 *                      (objects with 'id' and 'name') and 'failed' (names). Null if there is nothing to import
 	 *
 	 * @since	1.5
 	 */
 	public function importList($tags)
 	{
+		// Split on any line ending (textarea submits \r\n), normalize whitespace and skip empty lines
+		$tags = preg_split('/\r\n|\r|\n/', (string) $tags);
+		$tags = array_filter(array_map(array($this, '_cleanTagName'), $tags), 'strlen');
+
 		if (!$tags)
 		{
-			return;
+			return null;
 		}
 
-		// Initialize the logs counters
-		$logs            = array();
-		$logs['error']   = 0;
-		$logs['success'] = 0;
+		// Initialize the logs
+		$logs = array('success' => 0, 'error' => 0, 'created' => array(), 'existing' => array(), 'failed' => array());
 
-		// Split on any line ending (textarea submits \r\n), trim whitespace and skip empty lines
-		$tags = preg_split('/\r\n|\r|\n/', $tags);
-		$tags = array_filter(array_map('trim', $tags), 'strlen');
+		$known  = $this->_findTagsByName($tags);
+		$listed = array();
 
 		foreach ($tags as $tag)
 		{
+			$key = StringHelper::strtolower($tag);
+
+			// Repeated line of the given list
+			if (isset($listed[$key]))
+			{
+				continue;
+			}
+
+			$listed[$key] = true;
+
+			if (isset($known[$key]))
+			{
+				$logs['existing'][] = $known[$key];
+				continue;
+			}
+
 			$row            = $this->getTable($this->records_jtable, '');
 			$row->name      = $tag;
 			$row->published = 1;
-			if (!$row->check())
+
+			if ($row->check() && $row->store())
 			{
-				$logs['error'] ++;
+				$logs['success'] ++;
+				$logs['created'][] = (object) array('id' => (int) $row->id, 'name' => $tag);
 			}
 			else
 			{
-				$row->store();
-				$logs['success'] ++;
+				$logs['error'] ++;
+				$logs['failed'][] = $tag;
 			}
 		}
 
 		return $logs;
+	}
+
+
+	/**
+	 * Method to normalize a tag name: collapse whitespace and cut it to the length of the DB column
+	 *
+	 * @param   string  $name  The tag name
+	 *
+	 * @return  string
+	 */
+	protected function _cleanTagName($name)
+	{
+		$clean = preg_replace('/[\s\x{00A0}\x{FEFF}]+/u', ' ', $name);
+
+		// preg_replace() returns null for invalid UTF-8
+		return trim(StringHelper::substr($clean === null ? $name : $clean, 0, 255));
+	}
+
+
+	/**
+	 * Method to find the existing tags having any of the given names
+	 *
+	 * @param   array  $names  The tag names
+	 *
+	 * @return  array  Objects with 'id' and 'name' (the oldest tag of each name), indexed by the lowercase name
+	 */
+	protected function _findTagsByName($names)
+	{
+		$found = array();
+
+		foreach (array_chunk(array_values(array_unique($names)), 500) as $chunk)
+		{
+			$query = 'SELECT id, name'
+				. ' FROM #__flexicontent_tags'
+				. ' WHERE name IN (' . implode(',', array_map(array($this->_db, 'quote'), $chunk)) . ')'
+				. ' ORDER BY id'
+			;
+
+			foreach ($this->_db->setQuery($query)->loadObjectList() as $record)
+			{
+				// Compare in PHP too: the DB collation may also ignore accents, e.g. treat 'й' as 'и'
+				$key = StringHelper::strtolower($this->_cleanTagName($record->name));
+
+				if (!isset($found[$key]))
+				{
+					$found[$key] = (object) array('id' => (int) $record->id, 'name' => $record->name);
+				}
+			}
+		}
+
+		return $found;
 	}
 
 
