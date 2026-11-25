@@ -98,13 +98,10 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		{
 			if ($logs['success'])
 			{
-				echo '<div class="copyok">' . \Joomla\CMS\Language\Text::sprintf('FLEXI_TAG_IMPORT_SUCCESS', $logs['success']) . '</div>';
+				$this->_cleanCache();
 			}
 
-			if ($logs['error'])
-			{
-				echo '<div class="copywarn>' . \Joomla\CMS\Language\Text::sprintf('FLEXI_TAG_IMPORT_FAILED', $logs['error']) . '</div>';
-			}
+			include JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/tags/tmpl/import_report.php';
 		}
 		else
 		{

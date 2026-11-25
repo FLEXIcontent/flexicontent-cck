@@ -52,6 +52,52 @@
         finally { form.fc_result_busy = false; }
       });
     },
+    // The report dialog of a mass import: copy a list, download the report as a CSV file
+    showImportReport(container, copiedLabel) {
+      const dialog = container?.querySelector('dialog');
+      if (!dialog) return;
+      container.querySelector('[data-report-open]')?.addEventListener('click', () => dialog.showModal());
+      dialog.addEventListener('click', async event => {
+        const button = event.target.closest('button');
+        if (!button) return;
+        if (button.hasAttribute('data-report-close')) dialog.close();
+        else if (button.hasAttribute('data-report-verify')) {
+          // Run the indexer inside the report, so that the report stays available
+          let frame = dialog.querySelector('iframe');
+          if (!frame) {
+            frame = document.createElement('iframe');
+            frame.className = 'fc-import-report-verify';
+            frame.title = button.textContent.trim();
+            button.parentElement.after(frame);
+          }
+          button.disabled = true;
+          frame.src = button.getAttribute('data-report-verify');
+          frame.scrollIntoView({block: 'nearest'});
+        }
+        else if (button.hasAttribute('data-report-copy')) {
+          const list = button.parentElement.querySelector('textarea');
+          let copied = false;
+          // The Clipboard API exists only on HTTPS (and localhost) pages
+          try { await navigator.clipboard.writeText(list.value); copied = true; }
+          catch (_) { list.select(); copied = document.execCommand('copy'); }
+          if (!copied || button.fc_label) return;
+          button.fc_label = button.textContent;
+          button.textContent = copiedLabel;
+          setTimeout(() => { button.textContent = button.fc_label; button.fc_label = null; }, 1500);
+        } else if (button.hasAttribute('data-report-download')) {
+          const link = document.createElement('a');
+          // Excel needs the BOM to read the file as UTF-8
+          const csv = '\ufeff' + dialog.querySelector('.fc-import-report-file').value.replace(/\n/g, '\r\n');
+          link.href = URL.createObjectURL(new Blob([csv], {type: 'text/csv;charset=utf-8'}));
+          link.download = button.getAttribute('data-report-download');
+          dialog.append(link);
+          link.click();
+          link.remove();
+          setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+        }
+      });
+      dialog.showModal();
+    },
     async runIndexer(options) {
       const start = performance.now();
       try {
