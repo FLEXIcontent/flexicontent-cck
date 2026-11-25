@@ -107,7 +107,7 @@
 				<option value="1">FLEXI_DISPLAY_AS_DROP_DOWN</option>
 				<option value="2">FLEXI_DISPLAY_AS_SLIDER</option>
 			</field>
-			<field name="thumb_size_default" type="radio" default="200" label="FLEXI_FIELD_THUMB_SIZE_DEFAULT" description="FLEXI_FIELD_THUMB_SIZE_DEFAULT_DESC" class="btn-group group-fcinfo">
+			<field name="thumb_size_default" type="radio" default="250" label="FLEXI_FIELD_THUMB_SIZE_DEFAULT" description="FLEXI_FIELD_THUMB_SIZE_DEFAULT_DESC" class="btn-group group-fcinfo">
 				<option value="90">90</option>
 				<option value="120">120</option>
 				<option value="150">150</option>

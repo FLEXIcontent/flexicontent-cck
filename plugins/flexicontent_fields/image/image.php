@@ -172,7 +172,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$autoassign = (int) $field->parameters->get( 'autoassign', 1 );
 
 		$thumb_size_resizer = (int) $field->parameters->get('thumb_size_resizer', 0);
-		$thumb_size_default = (int) $field->parameters->get('thumb_size_default', 200);
+		$thumb_size_default = (int) $field->parameters->get('thumb_size_default', 250);
 		$thumb_method       = (int) $field->parameters->get('thumb_method', 1);
 		$preview_thumb_w    = $preview_thumb_h = 600;
 

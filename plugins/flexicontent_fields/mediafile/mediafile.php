@@ -537,7 +537,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 							($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') .
 							$uploader_html->mediaUrlBtn
 						: '') . '
-						' . $edit_btn . ($uploader_html ? ($uploader_html->clearBtn ?? '') : '') . '
+						' . $edit_btn . '
 					</div>
 				</div>';
 

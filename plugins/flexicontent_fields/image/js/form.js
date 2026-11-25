@@ -135,10 +135,10 @@ var fcfield_image = {
       box.querySelector('.fc_preview_thumb')?.setAttribute('src', FlexiMediaField.placeholder);
       const caption = box.querySelector('.fc_preview_msg');
       if (caption) {
-        caption.textContent = ' ';
+        caption.textContent = '';
         caption.removeAttribute('title');
       }
-      FlexiForm.show(preview, !box.querySelector('.fc_auto_uploader'));
+      FlexiForm.show(preview, false);
       FlexiMediaField.changeCount(key, hadValue ? -1 : 0);
     }
     if (options?.keep_props) FlexiMediaField.setValue(box, 'input, textarea', '');

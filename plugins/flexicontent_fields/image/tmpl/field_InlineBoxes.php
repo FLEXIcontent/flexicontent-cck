@@ -113,11 +113,10 @@ foreach ($field->value as $index => $value)
 	}
 	else
 	{
-		$fc_preview_msg = '
-			<span class="fc_preview_msg" id="'.$elementid_n.'_fc_preview_msg" name="'.$elementid_n.'_fc_preview_msg" title="'.htmlspecialchars(($value['isURL'] ? $image_subpath : ''), ENT_COMPAT, 'UTF-8').'">' . (
-			$value['isURL'] ? Text::_('FLEXI_FIELD_MEDIA_URL') : $image_subpath
-			) . '</span>
-		';
+		$fc_preview_msg_text = $value['isURL'] ? Text::_('FLEXI_FIELD_MEDIA_URL') : $image_subpath;
+		$fc_preview_msg = $fc_preview_msg_text !== ''
+			? '<span class="fc_preview_msg" id="'.$elementid_n.'_fc_preview_msg" name="'.$elementid_n.'_fc_preview_msg" title="'.htmlspecialchars(($value['isURL'] ? $image_subpath : ''), ENT_COMPAT, 'UTF-8').'">' . $fc_preview_msg_text . '</span>'
+			: '';
 	}
 
 
@@ -441,7 +440,6 @@ foreach ($field->value as $index => $value)
 	// Edit button, in the toolbar below the image
 	$has_edit_props = $linkto_url || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2;
 	$info_button = !$has_edit_props ? '' : '<button type="button" class="fc-flat-btn fc-image-edit-btn" data-for="' . $elementid_n . '" aria-label="' . htmlspecialchars(Text::_('FLEXI_EDIT_OPTIONS'), ENT_QUOTES, 'UTF-8') . '" aria-expanded="false" title="' . Text::_('FLEXI_EDIT_OPTIONS') . '" onclick="fcfield_image.toggleFields(\'' . $elementid_n . '\');">' . flexicontent_html::mediaActionLabel('edit') . '</button>';
-	$clear_button = '<button type="button" class="fc-flat-btn fcfield-clearvalue" aria-label="' . htmlspecialchars(Text::_('FLEXI_CLEAR'), ENT_QUOTES, 'UTF-8') . '" title="' . Text::_('FLEXI_CLEAR') . '" onclick="fcfield_image.clearField(this, {}, \'' . $field_name_js . '\');">' . flexicontent_html::mediaActionLabel('clear') . '</button>';
 
 	// Remove button shown directly in the top toolbar (no dropdown)
 	$remove_button_direct = (isset($remove_button) && $remove_button !== '') ? $remove_button : '';
@@ -456,7 +454,7 @@ foreach ($field->value as $index => $value)
 					($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') .
 					$uploader_html->mediaUrlBtn
 				: '').'
-				'.$info_button . ($use_inline_uploaders ? $clear_button : '').'
+				'.$info_button.'
 			</div>
 		</div>' : '';
 
@@ -494,7 +492,7 @@ foreach ($field->value as $index => $value)
 							' . $uploader_html->container . '
 						</div>
 					').'
-					<div class="fcfield_preview_box fc-box">
+					<div class="fcfield_preview_box fc-box"'.($img_link ? '' : ' style="display:none;"').'>
 						'.$imgpreview.'
 						<div class="fcclear"></div>
 					'.$select_existing.'

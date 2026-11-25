@@ -320,7 +320,6 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 						' . $url_btn . '
 						' . $fetch_btn . '
 						' . $edit_btn . '
-						' . $clear_btn . '
 					</div>
 				</div>';
 
