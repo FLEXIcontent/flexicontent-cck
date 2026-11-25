@@ -92,7 +92,7 @@
 	display: inline-block;
 	clear: none;
 	float: none;
-	
+
 	/* Allow responsive width*/
 	max-width: 100%;
 	width: auto;
@@ -412,7 +412,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 			vertical-align: top;
 			margin: 0px;
 		}
-		
+
 		> .fcfield-addvalue:not(.add-on):not(.input-group-addon):not(.btn):only-child {
 			margin: 0;
 		}
@@ -964,7 +964,7 @@ div.fcimg_value_props {
 }
 .fcfield_field_data_box {
 	float: left;
-	min-width: min(540px, 100%);
+	min-width: ~"min(540px, 100%)";
 	width: unset;
 	max-width: 100%;
 	padding: 0;
@@ -2222,7 +2222,9 @@ textarea.fcfield_textareaval {
   margin: .5rem 0;
   border-radius: .375rem;
 }
-#flexicontent .fc-video-card .sm_preview iframe:is(:not([src]), [src=""], [src="about:blank"]) {
+#flexicontent .fc-video-card .sm_preview iframe:not([src]),
+#flexicontent .fc-video-card .sm_preview iframe[src=""],
+#flexicontent .fc-video-card .sm_preview iframe[src="about:blank"] {
   display: none;
 }
 #flexicontent .fc-media-card .fc-field-value-properties-box:has(.fc-asset-summary) > .fc_filedata_txt,
@@ -2308,7 +2310,9 @@ textarea.fcfield_textareaval {
   text-decoration: underline;
   text-underline-offset: .15em;
 }
-#flexicontent .fc-has-assigned-file .fc-media-card div:has(> .fc_auto_uploader > .fc-native-upload):not(:has(.fc-upload-result, .fc-native-upload-row, .fc-native-upload-message:not(:empty), .fc-field-invalid)) {
+@fc-hide-empty-upload: ~"#flexicontent .fc-has-assigned-file .fc-media-card div:has(> .fc_auto_uploader > .fc-native-upload):not(:has(.fc-upload-result, .fc-native-upload-row, .fc-native-upload-message:not(:empty), .fc-field-invalid))";
+
+@{fc-hide-empty-upload} {
   display: none !important;
 }
 #flexicontent .card.fc-image-card .fc_preview_msg:not(:empty) {
@@ -2349,7 +2353,7 @@ textarea.fcfield_textareaval {
 #flexicontent .card:is(.fc-image-card, .fc-video-card) .fc-image-bottom-toolbar .fc-image-btn-group {
   padding-inline: 0;
   display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 2.75rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(~"min(100%, 2.75rem)", 1fr));
   width: 100%;
   gap: .25rem;
 }
