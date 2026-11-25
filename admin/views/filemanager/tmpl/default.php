@@ -1016,6 +1016,17 @@ if ($js)
 									<?php endif; ?>
 								</th>
 
+								<?php foreach (array(1, 2) as $n) : ?>
+									<?php if (!empty($this->cols['custom' . $n])) : ?>
+										<th class="left hideOnDemandClass hidden-phone" data-col="custom<?php echo $n; ?>" data-col-label="<?php echo htmlspecialchars($this->custom_headings[$n]['label'], ENT_QUOTES, 'UTF-8'); ?>">
+											<?php echo HTMLHelper::_('grid.sort', htmlspecialchars($this->custom_headings[$n]['label'], ENT_QUOTES, 'UTF-8'), 'a.custom' . $n, $this->lists['order_Dir'], $this->lists['order'] ); ?>
+											<?php if ($this->custom_headings[$n]['tip'] !== '') : ?>
+												<span class="icon-info-circle" tabindex="0" title="<?php echo htmlspecialchars($this->custom_headings[$n]['tip'], ENT_QUOTES, 'UTF-8'); ?>" aria-label="<?php echo htmlspecialchars($this->custom_headings[$n]['tip'], ENT_QUOTES, 'UTF-8'); ?>"></span>
+											<?php endif; ?>
+										</th>
+									<?php endif; ?>
+								<?php endforeach; ?>
+
 								<?php if (!empty($this->cols['state'])) : ?>
 									<th class="center hideOnDemandClass" data-col="state">
 										<?php echo HTMLHelper::_('grid.sort', 'FLEXI_PUBLISHED', 'a.published', $this->lists['order_Dir'], $this->lists['order'] ); ?>
@@ -1364,6 +1375,18 @@ if ($js)
 										}
 										?>
 									</td>
+
+									<?php foreach (array(1, 2) as $n) : ?>
+										<?php if (!empty($this->cols['custom' . $n])) : ?>
+											<?php
+											// Stored value is HTML, the list shows it as shortened plain text
+											$custom_text = html_entity_decode(strip_tags((string) ($row->{'custom' . $n} ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+											$custom_text = trim(preg_replace('/\s+/u', ' ', $custom_text) ?? $custom_text);
+											$custom_short = StringHelper::strlen($custom_text) > 100 ? StringHelper::substr($custom_text, 0, 100) . '...' : $custom_text;
+											?>
+											<td class="left smaller hidden-phone" data-col="custom<?php echo $n; ?>" title="<?php echo htmlspecialchars($custom_text, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($custom_short, ENT_QUOTES, 'UTF-8'); ?></td>
+										<?php endif; ?>
+									<?php endforeach; ?>
 
 									<?php if (!empty($this->cols['state'])) : ?>
 										<td class="center" data-col="state">
