@@ -87,7 +87,9 @@ class FlexicontentTasksCore
 		\Joomla\CMS\Factory::$application = $app;
 
 		// This entry point does not run initialiseApp(), so give the application its language the way Joomla does there
-		$app->loadLanguage($container->get(\Joomla\CMS\Language\LanguageFactoryInterface::class)->createLanguage($app->get('language'), $app->get('debug_lang')));
+		// Use the language of the page that sent the request, so that Text::_() translates the same way as on that page
+		$language_tag = $this->_resolveLanguageTag($container->get(\Joomla\Database\DatabaseInterface::class), $app->input->get('lang', '', 'cmd'));
+		$app->loadLanguage($container->get(\Joomla\CMS\Language\LanguageFactoryInterface::class)->createLanguage($language_tag, $app->get('debug_lang')));
 		\Joomla\CMS\Factory::$language = $app->getLanguage();
 
 		// [FIX 1 - Broken Access Control]: Task Whitelisting
@@ -156,6 +158,31 @@ class FlexicontentTasksCore
 		return strtolower($origin['scheme']) === $scheme
 			&& strtolower($origin['host']) === strtolower($request['host'])
 			&& $request_port > 0 && $request_port === $origin_port;
+	}
+
+
+	/**
+	 * Full tag of a published content language given by its tag or SEF code, e.g. "uk" => "uk-UA".
+	 * An empty or unknown value gives the default site language.
+	 */
+	private function _resolveLanguageTag($db, $lang)
+	{
+		if ($lang !== '')
+		{
+			$query = $db->getQuery(true)
+				->select($db->quoteName('lang_code'))
+				->from($db->quoteName('#__languages'))
+				->where($db->quoteName('published') . ' = 1')
+				->where('(' . $db->quoteName('lang_code') . ' = ' . $db->quote($lang) . ' OR ' . $db->quoteName('sef') . ' = ' . $db->quote($lang) . ')');
+			$tag = $db->setQuery($query)->loadResult();
+
+			if ($tag)
+			{
+				return $tag;
+			}
+		}
+
+		return \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB');
 	}
 
 
