@@ -1226,24 +1226,27 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 
 			// BOF thumbnail (one per item): extract the src of image_rendered (<picture>) or fallback to $item->image
-			$_sw_thumb_raw = '';
-			if (@ $item->image_rendered && preg_match('/src=["\'](.*?)["\' ]/i', $item->image_rendered, $_sw_m))
+			$_sw_raw = $item->image ?? '';
+			if (@ $item->image_rendered && preg_match('/\ssrc=["\'](.*?)["\']/i', $item->image_rendered, $_sw_m))
 			{
-				$_sw_raw = html_entity_decode($_sw_m[1]);
-				if (strpos($_sw_raw, 'phpThumb.php') !== false && preg_match('/[?&]src=([^&]+)/', $_sw_raw, $_sw_sm))
+				$_sw_raw = $_sw_m[1];
+			}
+
+			$_sw_thumb_raw = $img_path . $mod_default_img_path;
+			if ($_sw_raw !== '')
+			{
+				$_sw_raw = html_entity_decode($_sw_raw, ENT_QUOTES, 'UTF-8');
+				$_sw_endpoint = strtok($_sw_raw, '?');
+				if (($_sw_endpoint === flexicontent_images::phpThumbEndpoint() || $_sw_endpoint === flexicontent_images::phpThumbEndpoint(true))
+					&& preg_match('/[?&]src=([^&]+)/', $_sw_raw, $_sw_sm))
 				{
 					$_sw_thumb_raw = urldecode($_sw_sm[1]);
 				}
 				else
 				{
-					$_sw_thumb_raw = $_sw_raw;
+					$_sw_thumb_raw = preg_match('#^(?:[a-z][a-z0-9+.-]*:)?//#i', $_sw_raw) ? $_sw_raw : rawurldecode($_sw_raw);
 				}
 			}
-			elseif (@ $item->image)
-			{
-				$_sw_thumb_raw = $item->image;
-			}
-			if (!$_sw_thumb_raw) $_sw_thumb_raw = $img_path . $mod_default_img_path;
 
 			// Pre-generated image sizes (s/m/l) from the FLEXIcontent image field, when available.
 			// The module keeps the first image value of the field ('[0]').
@@ -1275,22 +1278,16 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 			}
 			else
 			{
-				$_sw_hb = (!preg_match('#^http|^https|^ftp|^/#i', $_sw_thumb_raw)) ? \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-				$_sw_thumb_raw_enc = str_replace(' ', '%20', $_sw_thumb_raw);
-				if ($sw_thumb_size === 'custom' && $sw_thumb_custom_w > 0)
-				{
-					// phpThumb: custom width, height automatic (aspect ratio preserved, no crop)
-					$_sw_conf = '&w='.$sw_thumb_custom_w.'&h=0&aoe=1&q=85&zc=0';
-				}
-				else
-				{
-					// phpThumb: fixed height (aspect ratio preserved, no crop)
-					$_sw_conf = '&h='.$_sw_h.'&w=0&aoe=1&q=85&zc=0';
-				}
-				$_sw_base = \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$_sw_hb.$_sw_thumb_raw_enc;
+				$_sw_custom_width = $sw_thumb_size === 'custom' && $sw_thumb_custom_w > 0;
+				$_sw_params = array(
+					'src' => $_sw_thumb_raw,
+					'w' => $_sw_custom_width ? $sw_thumb_custom_w : 0,
+					'h' => $_sw_custom_width ? 0 : $_sw_h,
+					'aoe' => 1, 'q' => 85, 'zc' => 0,
+				);
 				$sw_thumbs[] = '<div class="swiper-slide"><picture>'
-					. '<source type="image/webp" srcset="'.$_sw_base.$_sw_conf.'&f=webp">'
-					. '<img src="'.$_sw_base.$_sw_conf.'&amp;f=jpg" alt="" style="'.$_sw_style.'" loading="lazy" decoding="async" />'
+					. '<source type="image/webp" srcset="' . flexicontent_images::phpThumbURL($_sw_params + array('f' => 'webp')) . '">'
+					. '<img src="' . flexicontent_images::phpThumbURL($_sw_params + array('f' => 'jpg')) . '" alt="" style="'.$_sw_style.'" loading="lazy" decoding="async" />'
 					. '</picture></div>';
 			}
 			// EOF thumbnail

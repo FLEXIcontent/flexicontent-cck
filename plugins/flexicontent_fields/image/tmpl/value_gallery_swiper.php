@@ -331,10 +331,10 @@ foreach ($values as $n => $value)
 	if ($swiper_thumb_size === 'custom' && $thumb_custom_w > 0 && !$isURL)
 	{
 		// Runtime phpThumb: resize original image and cache for 30 days
-		$thumb_src = \Joomla\CMS\Uri\Uri::root(true)
-			. '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='
-			. rawurlencode('/' . ltrim($srco, '/'))
-			. '&w=' . $thumb_custom_w . '&h=0&zc=0&q=85&ar=x&f=jpg';
+		$thumb_src = flexicontent_images::phpThumbURL(array(
+			'src' => ltrim($srco, '/'), 'w' => $thumb_custom_w, 'h' => 0,
+			'zc' => 0, 'q' => 85, 'ar' => 'x', 'f' => 'jpg',
+		));
 	}
 	else
 	{

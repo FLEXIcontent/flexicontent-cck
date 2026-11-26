@@ -1650,7 +1650,7 @@ class FlexicontentTasksCore
 
 			if ($_rel !== '' && !preg_match('#(^|/)\.\.(/|$)#', $_rel) && is_file(JPATH_SITE . '/' . $_rel))
 			{
-				return $this->_acRootUrl() . '/' . str_replace(' ', '%20', $_rel);
+				return $_rel;
 			}
 		}
 
@@ -1788,7 +1788,7 @@ class FlexicontentTasksCore
 
 			if ($_rel !== '' && is_file(JPATH_SITE . '/' . $_rel))
 			{
-				return $this->_acRootUrl() . '/' . str_replace(' ', '%20', $_rel);
+				return $_rel;
 			}
 		}
 
@@ -1838,31 +1838,23 @@ class FlexicontentTasksCore
 			return $src;
 		}
 
-		$root = $this->_acRootUrl();
-		$rel  = $src;
-
-		if ($root !== '' && strpos($rel, $root . '/') === 0)
-		{
-			$rel = substr($rel, strlen($root) + 1);
-		}
-
-		$rel = ltrim($rel, '/');
+		$rel = ltrim($src, '/');
 
 		if ($rel === '')
 		{
 			return $src;
 		}
 
-		$ext  = strtolower(pathinfo(parse_url($rel, PHP_URL_PATH), PATHINFO_EXTENSION));
-		$file = in_array($ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico'), true) ? '&f=' . $ext : '';
+		class_exists('flexicontent_images', false) || require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/images.php';
 
-		return $root . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='
-			. $root . '/' . $rel
-			. '&w=' . max(16, (int) $width)
-			. '&h=' . max(16, (int) $height)
-			. '&aoe=1&q=95&ar=x'
-			. ($method ? '&zc=1' : '')
-			. $file;
+		// This direct JSON endpoint has a different Joomla base URI from a rendered page.
+		$root = $this->_acRootUrl();
+		return $root . '/' . flexicontent_images::PHPTHUMB_REL_DIR . '/phpThumb.php?' . flexicontent_images::phpThumbQuery(array(
+			'src' => $root . '/' . $rel,
+			'w' => max(16, (int) $width), 'h' => max(16, (int) $height),
+			'aoe' => 1, 'q' => 95, 'ar' => 'x', 'zc' => $method ? 1 : null,
+			'f' => flexicontent_images::phpThumbFormat($rel),
+		));
 	}
 
 

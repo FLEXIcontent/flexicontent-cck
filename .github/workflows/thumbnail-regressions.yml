@@ -1,0 +1,23 @@
+name: Thumbnail regressions
+on:
+  pull_request:
+  push:
+    branches: [feature/phpthumb-signed-urls]
+permissions:
+  contents: read
+jobs:
+  thumbnails:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4']
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+      - run: |
+          php -d error_reporting=-1 tests/thumbnail-html-boundaries.php
+          php -d error_reporting=-1 tests/thumbnail-signatures.php
+          php -d error_reporting=-1 tests/thumbnail-callers.php
