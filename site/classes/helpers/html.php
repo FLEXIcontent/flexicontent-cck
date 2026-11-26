@@ -4958,6 +4958,20 @@ class flexicontent_html
 		$stars_html_empty = str_repeat($star_svg_empty, $stars_shown);
 		$stars_html_full  = str_repeat($star_svg_full, $stars_shown);
 
+		/**
+		 * Rating microdata: only for the main rating of the item view, and only for the schema.org types for which
+		 * Google accepts a nested 'AggregateRating' (it is nested inside the 'itemscope' of the item layout)
+		 */
+		static $rating_itemtypes = array(
+			'SoftwareApplication', 'MobileApplication', 'WebApplication', 'VideoGame', 'Game', 'Product', 'Book', 'Course',
+			'Event', 'LocalBusiness', 'Movie', 'Recipe', 'Organization', 'MediaObject', 'MusicRecording', 'MusicPlaylist',
+			'Episode', 'CreativeWorkSeason', 'CreativeWorkSeries',
+		);
+
+		$add_microdata = (int) $percent && !$int_xid && $view === 'item'
+			&& isset($field->item_microdata_itemtype)
+			&& in_array($field->item_microdata_itemtype, $rating_itemtypes, true);
+
 		return '
 		<div class="'.$class.' '.$class.'_'.$xid.'">
 			<div class="fcvote fcvote-box-'.$xid.'">
@@ -4971,9 +4985,8 @@ class flexicontent_html
 							($counter_show_label ? ' '.\Joomla\CMS\Language\Text::_( $rating_count!=1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE' ) : '')
 						).'
 					</div>'.
-					(!(int)$percent || $int_xid || $view !== 'item' ? '' : '
-					<span itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
-						<meta itemprop="itemReviewed" content="'.htmlspecialchars($field->item_title, ENT_QUOTES, 'UTF-8').'" />
+					(!$add_microdata ? '' : '
+					<span itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
 						<meta itemprop="ratingValue" content="'.round($percent).'" />
 						<meta itemprop="bestRating"  content="100" />
 						<meta itemprop="ratingCount" content="'.$rating_count.'" />
