@@ -145,7 +145,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$filter_item      = $model->getState('filter_item');
 
 		$target_dir = $layout === 'image' ? 0 : 2;  // 0: Force media, 1: force secure, 2: allow selection
-		$optional_cols = array('state', 'access', 'lang', 'hits', 'target', 'stamp', 'usage', 'uploader', 'upload_time', 'file_id');
+		$optional_cols = array('state', 'access', 'lang', 'hits', 'target', 'stamp', 'usage', 'uploader', 'upload_time', 'file_id', 'custom1', 'custom2');
 		$cols = array();
 
 
@@ -206,6 +206,14 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		{
 			unset($cols['lang']);
 			unset($cols['target']);
+		}
+
+		// Custom file properties: DB columns (not available in folder mode), each one shown only if it is enabled
+		require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/fileeditor.php';
+		$custom_headings = $folder_mode ? array() : flexicontent_fileeditor::customListHeadings();
+		foreach (array(1, 2) as $n)
+		{
+			if (!isset($custom_headings[$n])) unset($cols['custom' . $n]);
 		}
 
 		// Case of uploader column not applicable or not allowed
@@ -646,6 +654,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$this->target_dir = $target_dir;
 		$this->optional_cols = $optional_cols;
 		$this->cols = $cols;
+		$this->custom_headings = $custom_headings;
 		$this->count_filters = $count_filters;
 
 		$this->params      = $cparams;

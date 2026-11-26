@@ -120,6 +120,59 @@ class flexicontent_fileeditor
 		return $props;
 	}
 
+	/**
+	 * Column headings of the 2 custom file properties in file lists, where a single heading covers files of all File fields:
+	 * - the label of the global settings, if the property is enabled and labelled there
+	 * - otherwise the label of the File fields enabling the property, only if all of them use the same one
+	 * - otherwise a generic heading, with the differing field labels listed in 'tip'
+	 *
+	 * @return  array  Only properties enabled globally or in any File field, keyed by 1, 2, of arrays ('label' => plain text, 'tip' => plain text, may be empty)
+	 */
+	static function customListHeadings()
+	{
+		$global = self::customProps();
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$rows = $db->setQuery($db->getQuery(true)
+			->select('attribs')->from('#__flexicontent_fields')
+			->where('field_type = ' . $db->quote('file'))->order('id')
+		)->loadColumn();
+
+		$field_labels = array(1 => array(), 2 => array());
+		foreach ((array) $rows as $attribs)
+		{
+			foreach (self::customProps(new \Joomla\Registry\Registry($attribs), 0) as $n => $cp)
+			{
+				$field_labels[$n][] = trim(strip_tags($cp['label']));
+			}
+		}
+
+		$headings = array();
+		foreach (array(1, 2) as $n)
+		{
+			// Not enabled anywhere: no column
+			if (!isset($global[$n]) && !$field_labels[$n])
+			{
+				continue;
+			}
+
+			$label  = isset($global[$n]) ? trim(strip_tags($global[$n]['label'])) : '';
+			$unique = array_values(array_unique($field_labels[$n]));
+
+			if ($label === '' && count($unique) === 1)
+			{
+				$label = $unique[0];
+			}
+
+			$headings[$n] = array(
+				'label' => $label !== '' ? $label : 'Custom ' . $n,
+				'tip'   => $label !== '' ? '' : implode(' / ', array_filter($unique, 'strlen')),
+			);
+		}
+
+		return $headings;
+	}
+
 	/** Filter posted custom property values (HTML allowed, per Joomla Text Filters), returns values of enabled properties only */
 	static function filterCustomPost($input)
 	{
