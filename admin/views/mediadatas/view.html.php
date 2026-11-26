@@ -14,7 +14,13 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecords' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * HTML View class for the mediadatas backend manager
@@ -36,11 +42,11 @@ class FlexicontentViewMediadatas extends FlexicontentViewBaseRecords
 		global $globalcats;
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getSession();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
@@ -56,8 +62,8 @@ class FlexicontentViewMediadatas extends FlexicontentViewBaseRecords
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
 		{
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get model
@@ -103,16 +109,16 @@ class FlexicontentViewMediadatas extends FlexicontentViewBaseRecords
 			// Add css to document
 			if ($isAdmin)
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 			}
 			else
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
@@ -279,7 +285,6 @@ class FlexicontentViewMediadatas extends FlexicontentViewBaseRecords
 		{
 			$this->sidebar = null;
 
-			if(FLEXI_J30GE && !FLEXI_J40GE) $this->sidebar = JHtmlSidebar::render();
 			if(FLEXI_J40GE) $this->sidebar = \Joomla\CMS\HTML\Helpers\Sidebar::render();
 		}
 
@@ -304,11 +309,11 @@ class FlexicontentViewMediadatas extends FlexicontentViewBaseRecords
 	 */
 	function setToolbar()
 	{
-		$user     = \Joomla\CMS\Factory::getUser();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$useAssocs= flexicontent_db::useAssociations();
 
 		$js = '';
@@ -462,7 +467,7 @@ class FlexicontentViewMediadatas extends FlexicontentViewBaseRecords
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');

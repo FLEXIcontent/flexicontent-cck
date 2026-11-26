@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_cats_item_relations` (
   PRIMARY KEY  (`catid`,`itemid`),
   KEY `catid` (`catid`),
   KEY `itemid` (`itemid`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_favourites` (
   `id` int(11) NOT NULL auto_increment,
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_favourites` (
   KEY `itemid` (`itemid`),
   KEY `userid` (`userid`),
   KEY `type` (`type`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_mediadatas` (
   `id` int(11) NOT NULL auto_increment,
@@ -44,16 +44,16 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_mediadatas` (
   UNIQUE `file_id` (`file_id`),
   KEY `state` (`state`),
   KEY `media_type` (`media_type`),
-  KEY `media_format` (`media_format`),
-  KEY `resolution` (`resolution`),
+  KEY `media_format` (`media_format`(191)),
+  KEY `resolution` (`resolution`(191)),
   KEY `fps` (`fps`),
   KEY `bit_rate` (`bit_rate`),
   KEY `bits_per_sample` (`bits_per_sample`),
   KEY `sample_rate` (`sample_rate`),
   KEY `duration` (`duration`),
-  KEY `channels` (`channels`),
-  KEY `channel_layout` (`channel_layout`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+  KEY `channels` (`channels`(191)),
+  KEY `channel_layout` (`channel_layout`(191))
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
   `average_rating` int NOT NULL,
   `custom_ratings` text NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
+  `name` varchar(255) NOT NULL DEFAULT '',
   `email` varchar(255) NOT NULL DEFAULT '',
   `title` varchar(255) NULL,
   `title_old` varchar(255) NULL,
@@ -79,8 +80,8 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
   `checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
   `attribs` mediumtext NULL,
   PRIMARY KEY  (`id`),
-  KEY (`content_id`, `user_id`, `type`),
-  KEY (`content_id`, `type`),
+  KEY (`content_id`, `user_id`, `type`(191)),
+  KEY (`content_id`, `type`(191)),
   KEY `user_id` (`user_id`),
   FULLTEXT KEY `title` (`title`),
   FULLTEXT KEY `text` (`text`),
@@ -89,7 +90,17 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
   KEY `verified` (`verified`),
   KEY `useful_yes` (`useful_yes`),
   KEY `useful_no` (`useful_no`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
+
+CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews_useful` (
+  `review_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL DEFAULT '0',
+  `ip` varchar(50) NOT NULL DEFAULT '',
+  `vote` tinyint(1) NOT NULL DEFAULT '1',
+  `vote_date` datetime NOT NULL,
+  PRIMARY KEY  (`review_id`, `user_id`, `ip`),
+  KEY `user_id` (`user_id`)
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
   `id` int(11) unsigned NOT NULL auto_increment,
@@ -115,7 +126,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
   `access` int(11) unsigned NOT NULL default '1',
   `ordering` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_item_relations` (
   `field_id` int(11) NOT NULL default '0',
@@ -136,7 +147,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_item_relations` (
   KEY `value_decimal` (`value_decimal`),
   KEY `value_datetime` (`value_datetime`)
 --  KEY `reference_1` (`value_integer`),
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_type_relations` (
   `field_id` int(11) NOT NULL default '0',
@@ -145,7 +156,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_type_relations` (
   PRIMARY KEY  (`field_id`,`type_id`),
   KEY `field_id` (`field_id`),
   KEY `type_id` (`type_id`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
   `id` int(11) NOT NULL auto_increment,
@@ -163,6 +174,8 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
   `size` int(11) unsigned NOT NULL default '0',
   `assignments` int(11) unsigned NOT NULL default '0',
   `stamp` tinyint(3) unsigned NOT NULL default '1',
+  `custom1` mediumtext NULL,
+  `custom2` mediumtext NULL,
   `uploaded` datetime NOT NULL default '1000-01-01 00:00:00',
   `uploaded_by` int(11) unsigned NOT NULL default '0',
   `checked_out` int(11) unsigned NOT NULL default '0',
@@ -171,7 +184,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
   `attribs` mediumtext NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `estorage_fieldid` (`estorage_fieldid`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_ext` (
   `item_id` int(11) unsigned NOT NULL,
@@ -188,7 +201,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_ext` (
   KEY `lang_parent_id` (`lang_parent_id`),
   KEY `type_id` (`type_id`),
   KEY `is_uptodate` (`is_uptodate`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_tmp` (
  `id` int(10) unsigned NOT NULL,
@@ -221,7 +234,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_tmp` (
  KEY `featured` (`featured`),
  KEY `type_id` (`type_id`),
  KEY `lang_parent_id` (`lang_parent_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_extravote` (
   `content_id` int(11) NOT NULL,
@@ -231,7 +244,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_extravote` (
   `rating_count` int(11) NOT NULL,
   PRIMARY KEY  (`content_id`, `field_id`),
   KEY `extravote_idx` (`content_id`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_versions` (
   `version` int(11) NOT NULL default '0',
@@ -246,7 +259,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_versions` (
   KEY `item_id` (`item_id`),
   FULLTEXT KEY `value` (`value`),
   KEY `valueorder` (`valueorder`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_tags` (
   `id` int(11) NOT NULL auto_increment,
@@ -256,12 +269,12 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_tags` (
   `checked_out` int(11) unsigned NOT NULL default '0',
   `checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
   `jtag_id` int(10) unsigned NULL,
-  KEY `name` (`name`),
-  KEY `alias` (`alias`),
+  KEY `name` (`name`(191)),
+  KEY `alias` (`alias`(191)),
   KEY `published` (`published`),
   KEY `jtag_id` (`jtag_id`),
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_tags_item_relations` (
   `tid` int(11) NOT NULL default '0',
@@ -269,7 +282,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_tags_item_relations` (
   PRIMARY KEY  (`tid`,`itemid`),
   KEY `tid` (`tid`),
   KEY `itemid` (`itemid`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_types` (
   `id` int(11) NOT NULL auto_increment,
@@ -283,12 +296,12 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_types` (
   `checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
   `access` int(11) unsigned NOT NULL default '1',
   `attribs` mediumtext NOT NULL,
-  KEY `name` (`name`),
-  KEY `alias` (`alias`),
+  KEY `name` (`name`(191)),
+  KEY `alias` (`alias`(191)),
   KEY `published` (`published`),
   KEY `access` (`access`),
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_versions` (
   `id` int(11) unsigned NOT NULL auto_increment,
@@ -298,9 +311,10 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_versions` (
   `created` datetime NOT NULL default '1000-01-01 00:00:00',
   `created_by` int(11) unsigned NOT NULL default '0',
   `state` int(3) NOT NULL default '0',
+  `keep` tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `version2item` (`item_id`,`version_id`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_templates` (
   `id` int(11) unsigned NOT NULL auto_increment,
@@ -311,15 +325,15 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_templates` (
   `fields` text NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `configuration` (`template`,`cfgname`,`layout`,`position`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_layouts_conf` (
   `template` varchar(50) NOT NULL default '',
   `cfgname` varchar(50) NOT NULL default '',
   `layout` varchar(20) NOT NULL default '',
-  `attribs` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `attribs` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   PRIMARY KEY  (`template`,`cfgname`,`layout`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_advsearch_index` (
   `sid` int(11) NOT NULL auto_increment,
@@ -333,15 +347,15 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_advsearch_index` (
   KEY `field_id` (`field_id`),
   KEY `item_id` (`item_id`),
   FULLTEXT `search_index` (`search_index`),
-  KEY `value_id` (`value_id`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+  KEY `value_id` (`value_id`(191))
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_authors_ext` (
   `user_id` int(11) unsigned NOT NULL,
-  `author_basicparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `author_catparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `author_basicparams` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `author_catparams` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   PRIMARY KEY  (`user_id`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_download_history` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -352,7 +366,23 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_download_history` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `file_id` (`file_id`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
+
+CREATE TABLE IF NOT EXISTS `#__flexicontent_download_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL DEFAULT 0,
+  `visitor_id` varchar(32) NOT NULL DEFAULT '',
+  `ip_hash` varchar(32) NOT NULL DEFAULT '',
+  `file_id` int(11) NOT NULL,
+  `field_id` int(11) NOT NULL DEFAULT 0,
+  `downloaded_on` datetime NOT NULL,
+  `expire_on` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_time` (`user_id`, `downloaded_on`),
+  KEY `visitor_time` (`visitor_id`, `downloaded_on`),
+  KEY `ip_time` (`ip_hash`, `downloaded_on`),
+  KEY `expire_on` (`expire_on`)
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_download_coupons` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -365,9 +395,9 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_download_coupons` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `file_id` (`file_id`),
-  KEY `token` (`token`),
+  KEY `token` (`token`(191)),
   KEY `expire_on` (`expire_on`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_file_usage` (
 	`id` int(11) NOT NULL,
@@ -376,6 +406,13 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_file_usage` (
 	`prop` varchar(255) NOT NULL,
 	KEY  `id` (`id`),
 	KEY  `file_id` (`file_id`),
-	KEY  `context` (`context`),
-	KEY  `prop` (`prop`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`
+	KEY  `context` (`context`(191)),
+	KEY  `prop` (`prop`(191))
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
+
+CREATE TABLE IF NOT EXISTS `#__flexicontent_search_log` (
+  `search_term` varchar(128) NOT NULL default '',
+  `hits` int(11) unsigned NOT NULL default '1',
+  PRIMARY KEY (`search_term`),
+  KEY `hits` (`hits`)
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;

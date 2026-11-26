@@ -19,11 +19,7 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('groupedlist');   // \Joomla\CMS\Form\Field\GroupedlistField
 
 /**
@@ -44,7 +40,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 
 	public function getGroups()
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];
@@ -55,6 +51,14 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 		$images[] = array(
 			array('value' => '', 'text' => \Joomla\CMS\Language\Text::_($prompt_text))
 		);
+
+		// Optional extra choice, meaning: extract the image from the main text (value '__text__')
+		if (!empty($attributes['add_extract']))
+		{
+			$images[] = array(
+				array('value' => '__text__', 'text' => \Joomla\CMS\Language\Text::_('FLEXI_SEARCH_IMG_EXTRACT_FROM_TEXT'))
+			);
+		}
 
 		$valcolumn = 'name';
 		if (@$attributes['valcolumn'])

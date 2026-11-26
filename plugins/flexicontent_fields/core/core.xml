@@ -1092,12 +1092,12 @@
 
 			<field name="" type="separator" default="FLEXI_FIELD_VOTE_STARS_APPEARANCE" level="level2" />
 			<field name="stars_size" type="number" default="24" min="12" max="96" step="1" label="FLEXI_FIELD_VOTE_STARS_SIZE" description="FLEXI_FIELD_VOTE_STARS_SIZE_DESC" />
-			<field name="stars_color" type="color" default="#FFB400" label="FLEXI_FIELD_VOTE_STARS_COLOR" description="FLEXI_FIELD_VOTE_STARS_COLOR_DESC" />
-			<field name="stars_color_empty" type="color" default="#CCCCCC" label="FLEXI_FIELD_VOTE_STARS_COLOR_EMPTY" description="FLEXI_FIELD_VOTE_STARS_COLOR_EMPTY_DESC" />
-			<field name="main_label_show" type="radio" default="1" label="FLEXI_FIELD_VOTE_SHOW_RATING_LABEL" description="FLEXI_FIELD_VOTE_SHOW_RATING_LABEL_DESC" class="btn-group btn-group-yesno">
+			<field name="stars_tooltips" type="radio" default="1" label="FLEXI_FIELD_VOTE_STARS_TOOLTIPS" description="FLEXI_FIELD_VOTE_STARS_TOOLTIPS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="stars_color" type="fccolor" default="#FFB400" label="FLEXI_FIELD_VOTE_STARS_COLOR" description="FLEXI_FIELD_VOTE_STARS_COLOR_DESC" />
+			<field name="stars_color_empty" type="fccolor" default="#CCCCCC" label="FLEXI_FIELD_VOTE_STARS_COLOR_EMPTY" description="FLEXI_FIELD_VOTE_STARS_COLOR_EMPTY_DESC" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level2" />
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
@@ -1206,43 +1206,68 @@
 
 		<fieldset name="group-voting-reviews" hidden="true" icon_class="icon-paragraph-justify" label="FLEXI_FIELD_VOTE_REVIEWS" description="FLEXI_FIELD_VOTE_REVIEWS_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-			<field name="" type="separator" default="This an unfinished ALPHA-state feature, it is meant to be enabled only by testers" level="level3" class="alert alert-warning" />
+			<field name="" type="separator" default="FLEXI_FIELD_VOTE_REVIEWS_ALPHA_WARNING" level="level3" class="alert alert-warning" />
 			<field name="" type="separator" default="" level="level_br" />
 
 			<field name="" type="separator" default="reviews_conf" level="tabset_start" tab_class="s-fake" box_type="1" />
-			<field name="tab-reviews-auth-workflow" type="separator" default="Authoring, Workflow" icon_class="icon-pencil" level="tab_open" box_type="1" />
+			<field name="tab-reviews-auth-workflow" type="separator" default="FLEXI_FIELD_VOTE_REVIEWS_TAB_WORKFLOW" icon_class="icon-pencil" level="tab_open" box_type="1" />
 
-			<field name="allow_reviews" type="radio" default="0" label="FLEXI_ENABLE" description="..." class="btn-group btn-group-yesno">
+			<field name="allow_reviews" type="radio" default="0" label="FLEXI_ENABLE" description="FLEXI_FIELD_VOTE_REVIEWS_ENABLE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="" type="separator" default="New reviews" level="level2" />
-			<field name="allow_submit_review_by" type="radio" default="0" label="Allow submissions" description="Allow reviews to be submitted by guests" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_FIELD_VOTE_REVIEWS_NEW" level="level2" />
+			<field name="allow_submit_review_by" type="radio" default="0" label="FLEXI_FIELD_VOTE_REVIEWS_ALLOW_SUBMIT" description="FLEXI_FIELD_VOTE_REVIEWS_ALLOW_SUBMIT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_DISABLED</option>
-				<option value="1">Anyone</option>
-				<option value="1">Logged Only</option>
-				<option value="2">Use Access Level</option>
+				<option value="1">FLEXI_FIELD_VOTE_REVIEWS_SUBMIT_ANYONE</option>
+				<option value="2">FLEXI_FIELD_VOTE_REVIEWS_SUBMIT_LOGGED</option>
+				<option value="3">FLEXI_FIELD_VOTE_REVIEWS_SUBMIT_ACCESSLEVEL</option>
 			</field>
-			<field name="review_submit_access" type="accesslevel" default="1" label="Submit Access Level" description="..." />
+			<field name="review_submit_access" type="accesslevel" default="1" label="FLEXI_FIELD_VOTE_REVIEWS_SUBMIT_ACCESS" description="FLEXI_FIELD_VOTE_REVIEWS_SUBMIT_ACCESS_DESC" />
 
-			<field name="" type="separator" default="Publishing" description="" level="level2" />
-			<field name="do_approval" type="radio" default="1" label="Publish after approval" description="Require an administrator to read and approve new reviews" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_FIELD_VOTE_REVIEWS_PUBLISHING" description="" level="level2" />
+			<field name="do_approval" type="radio" default="1" label="FLEXI_FIELD_VOTE_REVIEWS_APPROVAL" description="FLEXI_FIELD_VOTE_REVIEWS_APPROVAL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="" type="separator" default="Guests" description="" level="level3" />
-			<field name="verify_email_ownership" type="radio" default="1" label="Verify email ownerships" disabled="disabled" description="For every new review by a guest, an email will be sent to the guest user email to verify email ownership" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_FIELD_VOTE_REVIEWS_GUESTS" description="" level="level3" />
+			<field name="verify_email_ownership" type="radio" default="1" label="FLEXI_FIELD_VOTE_REVIEWS_VERIFY_EMAIL" disabled="disabled" description="FLEXI_FIELD_VOTE_REVIEWS_VERIFY_EMAIL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">Yes ... TODO</option>
+				<option value="1">FLEXI_FIELD_VOTE_REVIEWS_VERIFY_EMAIL_YES</option>
 			</field>
 
-			<field name="tab-reviews-display" type="separator" default="Layout" icon_class="icon-palette" level="tab_open" box_type="1" />
-			<field name="reviews_placement" type="radio" default="0" label="Reviews List Placement" description="" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_INLINE</option>
-				<option value="1">FLEXI_MODAL_WINDOW</option>
+			<field name="tab-reviews-display" type="separator" default="FLEXI_FIELD_VOTE_REVIEWS_TAB_LAYOUT" icon_class="icon-palette" level="tab_open" box_type="1" />
+			<field name="reviews_placement" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_VOTE_REVIEWS_PLACEMENT" description="FLEXI_FIELD_VOTE_REVIEWS_PLACEMENT_DESC" class="btn-group group-fcinfo">
+				<option value="0" show_list="reviews-inline-mode" hide_list="">FLEXI_INLINE</option>
+				<option value="1" show_list="" hide_list="reviews-inline-mode">FLEXI_MODAL_WINDOW</option>
 			</field>
+			<field name="" type="separator" default="" level="level_br" depend_class="reviews-inline-mode" />
+			<field name="" type="separator" default="FLEXI_FIELD_VOTE_REVIEWS_INLINE_INFO" level="level3" class="alert alert-info" style="clear: both; margin: 24px 0 8px 0; font-size: 1em; font-weight: normal;" depend_class="reviews-inline-mode" />
+			<field name="reviews_page_size" type="text" size="4" default="5" label="FLEXI_FIELD_VOTE_REVIEWS_PAGE_SIZE" description="FLEXI_FIELD_VOTE_REVIEWS_PAGE_SIZE_DESC" />
+			<field name="reviews_useful" type="radio" default="1" label="FLEXI_FIELD_VOTE_REVIEWS_USEFUL" description="FLEXI_FIELD_VOTE_REVIEWS_USEFUL_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_DISABLED</option>
+				<option value="1">FLEXI_FIELD_VOTE_REVIEWS_USEFUL_LOGGED</option>
+				<option value="2">FLEXI_FIELD_VOTE_REVIEWS_USEFUL_ANYONE</option>
+			</field>
+			<field name="reviews_counter_in_lists" type="radio" default="1" label="FLEXI_FIELD_VOTE_REVIEWS_COUNTER_LISTS" description="FLEXI_FIELD_VOTE_REVIEWS_COUNTER_LISTS_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="reviews_loader" type="radio" default="1" label="FLEXI_FIELD_VOTE_REVIEWS_LOADER" description="FLEXI_FIELD_VOTE_REVIEWS_LOADER_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="reviews_live_update" type="radio" default="1" label="FLEXI_FIELD_VOTE_REVIEWS_LIVE_UPDATE" description="FLEXI_FIELD_VOTE_REVIEWS_LIVE_UPDATE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="reviews_store_rating" type="radio" default="0" label="FLEXI_FIELD_VOTE_REVIEWS_STORE_RATING" description="FLEXI_FIELD_VOTE_REVIEWS_STORE_RATING_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="reviews_max_length" type="text" size="5" default="500" label="FLEXI_FIELD_VOTE_REVIEWS_MAX_LENGTH" description="FLEXI_FIELD_VOTE_REVIEWS_MAX_LENGTH_DESC" />
 
 			<field name="" type="separator" default="reviews_conf" level="tabset_close" box_type="1" />
 
@@ -1279,6 +1304,10 @@
 			<field name="rating_stars" type="text" default="" hint="5" size="10" label="FLEXI_FIELD_VOTE_RATING_STARS" description="FLEXI_FIELD_VOTE_RATING_STARS_DESC" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_VOTE_AVERAGE_RATING" description="FLEXI_FIELD_VOTE_AVERAGE_RATING_DESC" level="level1" />
+			<field name="main_label_show" type="radio" default="1" label="FLEXI_FIELD_VOTE_SHOW_RATING_LABEL" description="FLEXI_FIELD_VOTE_SHOW_RATING_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="main_label" type="text" default="FLEXI_VOTE_AVERAGE_RATING" size="30" label="FLEXI_FIELD_VOTE_AVERAGE_RATING_LABEL" description="FLEXI_FIELD_VOTE_AVERAGE_RATING_LABEL_DESC" />
 
 			<field name="rating_texts" type="textarea" filter="string"
@@ -1312,6 +1341,10 @@
 				<option value="1" fcconfigs="{'extra_votes':'1##Quality##\nIf it is hard to break down%%\n\n2##Speed##\nHow fast it travels%%\n\n3##Accuracy##\nIf descripton was correct and complete%%\n\n4##Appearance##\nHow good it looks%%'}">FLEXI_LOAD_EXAMPLE</option>
 			</field>
 			<field name="extra_votes" type="textarea" filter="RAW" default="" rows="11" cols="30" label="FLEXI_FIELD_VOTE_CHARACTERISTICS" description="FLEXI_FIELD_VOTE_CHARACTERISTICS_DESC" class="" depend_class="composite-voting-mode"/>
+			<field name="extra_show_in_display" type="radio" default="1" label="FLEXI_FIELD_VOTE_EXTRA_IN_DISPLAY" description="FLEXI_FIELD_VOTE_EXTRA_IN_DISPLAY_DESC" class="btn-group btn-group-yesno" depend_class="composite-voting-mode">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_VOTE_CHARACTERISTIC" description="FLEXI_FIELD_VOTE_CHARACTERISTIC_DESC" level="level1" depend_class="composite-voting-mode" />
 			<field name="extra_counter" type="radio" default="1" label="FLEXI_FIELD_VOTE_SHOW_COUNTER" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_DESC" class="btn-group btn-group-yesno" depend_class="composite-voting-mode">

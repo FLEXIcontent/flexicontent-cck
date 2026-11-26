@@ -45,16 +45,17 @@ table#itemcompare s{
 
 	<table id="itemcompare" class="table table-striped table-condensed" style="width: 100%;">
 		<tr>
-			<th style="align: right; width: 6%;">
+			<th scope="col" style="text-align: right; width: 6%;">
 				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FIELD' ); ?>
 			</th>
-			<th style="align: left;">
+			<th scope="col" style="text-align: left;">
 				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_VERSION_NR' ) . $this->version; ?>
 			</th>
-			<th style="align: left;">
+			<th scope="col" style="text-align: left;">
 				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CURRENT_VERSION' ); ?>
 			</th>
-			<th style="align: left;">
+			<th scope="col" style="text-align: left;">
+				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CHANGES' ); ?>
 			</th>
 		</tr>
 		<?php

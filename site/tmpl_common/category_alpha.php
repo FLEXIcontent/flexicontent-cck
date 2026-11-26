@@ -4,7 +4,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\String\StringHelper;
 
 $app = \Joomla\CMS\Factory::getApplication();
-$caching = $app->getCfg('caching');
+$caching = $app->get('caching');
 
 $show_alpha = $this->params->get('show_alpha',1);
 if ($show_alpha == 1) {

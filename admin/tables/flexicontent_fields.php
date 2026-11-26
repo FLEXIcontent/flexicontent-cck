@@ -11,7 +11,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.access.rules');
 use Joomla\String\StringHelper;
 require_once('flexicontent_basetable.php');
 
@@ -22,7 +21,7 @@ class _flexicontent_fields_common extends flexicontent_basetable
         require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/security.php';
         $db = $this->getDbo();
         $old = $this->id ? $db->setQuery('SELECT attribs FROM #__flexicontent_fields WHERE id = ' . (int) $this->id)->loadResult() : '';
-        flexicontent_security::assertTrustedConfigurationChange($old, $this->attribs, \Joomla\CMS\Factory::getUser());
+        flexicontent_security::assertTrustedConfigurationChange($old, $this->attribs, \Joomla\CMS\Factory::getApplication()->getIdentity());
         return parent::store($updateNulls);
     }
 
@@ -38,7 +37,7 @@ class _flexicontent_fields_common extends flexicontent_basetable
 	 */
 	protected function __getAssetParentId(?\Joomla\CMS\Table\Table $table = null, $id = null)
 	{
-		$asset = \Joomla\CMS\Table\Table::getInstance('Asset');
+		$asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$asset->loadByName('com_flexicontent');
 		return $asset->id;
 	}

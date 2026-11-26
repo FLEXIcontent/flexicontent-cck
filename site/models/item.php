@@ -19,8 +19,13 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.model.legacy');
-JLoader::register('ParentClassItem', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'parentclassitem.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'ParentClassItem' => JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'parentclassitem.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * FLEXIcontent Component Item Model
@@ -59,8 +64,8 @@ class FlexicontentModelItem extends ParentClassItem
 
 		global $globalcats;
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user	= \Joomla\CMS\Factory::getUser();
-		$session = \Joomla\CMS\Factory::getSession();
+		$user	= \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$uri  = \Joomla\CMS\Uri\Uri::getInstance();
 		$aid	= (int) $user->get('aid');
 		$gid	= (int) $user->get('gid');
@@ -473,7 +478,8 @@ class FlexicontentModelItem extends ParentClassItem
 			return false;
 		}
 
-		$item = \Joomla\CMS\Table\Table::getInstance('flexicontent_items', '');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_items.php';
+		$item = new flexicontent_items(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$item->hit($this->_id);
 
 		return true;
@@ -502,7 +508,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	function getFavoured()
 	{
-		return flexicontent_db::getFavoured($type=0, $this->_id, \Joomla\CMS\Factory::getUser()->id);
+		return flexicontent_db::getFavoured($type=0, $this->_id, \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
 	}
 
 
@@ -515,7 +521,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	function removefav()
 	{
-		return flexicontent_db::removefav($type=0, $this->_id, \Joomla\CMS\Factory::getUser()->id);
+		return flexicontent_db::removefav($type=0, $this->_id, \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
 	}
 
 
@@ -528,7 +534,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	function addfav()
 	{
-		return flexicontent_db::addfav($type=0, $this->_id, \Joomla\CMS\Factory::getUser()->id);
+		return flexicontent_db::addfav($type=0, $this->_id, \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
 	}
 
 }

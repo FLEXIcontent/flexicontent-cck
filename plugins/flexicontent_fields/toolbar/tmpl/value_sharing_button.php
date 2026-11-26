@@ -32,7 +32,7 @@ if ($display_comments)
 // text resizer
 if ($display_resizer && $view == 'item')  // *** Item view only
 {
-	$document->addScriptDeclaration('var textsize = '.$default_size.';
+	$document->getWebAssetManager()->addInlineScript('var textsize = '.$default_size.';
 			var lineheight = '.$default_line.';
 			function fsize(size,line,unit,id){
 				var vfontsize = document.getElementById(id);

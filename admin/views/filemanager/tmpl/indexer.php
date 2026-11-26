@@ -23,6 +23,14 @@ $ctrl_task = 'task=filemanager.';
 
 $app = \Joomla\CMS\Factory::getApplication();
 $indexer_name = $app->input->get('indexer', 'filemanager_stats', 'cmd');
+
+// Tool: delete orphaned files, has its own template (warning, confirmation, progress)
+if ($indexer_name === 'orphans')
+{
+	include __DIR__ . '/orphans.php';
+
+	return;
+}
 $rebuildmode  = $app->input->get('rebuildmode', '', 'cmd');
 $index_urls   = $app->input->get('index_urls', 0, 'int');
 
@@ -37,107 +45,61 @@ $selected_ids = implode(',', $_selected_ids_arr);
 	<?php echo \Joomla\CMS\Language\Text::_('FLEXI_TASK_RUNNING'); ?> ... <br/>
 	
 <script>
-jQuery(document).ready(function() {
-	var total_time = 0;
-	var records_per_call = 1000;
-	var width = 0;
-	var looper = 0;
-	var onesector = 1000;
-	var fields_length = 0;
-	var items_length = 0;
-	var number = 0;
-	function updateprogress() {
-		if(looper>=number && looper) {
-			jQuery('div#insideprogress').css('width', '300px');
-			jQuery('div#updatepercent').text(' 100 %');
-			jQuery('div#statuscomment').html( jQuery('div#statuscomment').html() + '<br/><br/><strong>INDEXING FINISHED</strong>. You may close this window');
-			//jQuery('img#page_loading_img').hide();
-			return;
-		}
+document.addEventListener('DOMContentLoaded', async () => {
+	const progress = document.getElementById('insideprogress');
+	const percent = document.getElementById('updatepercent');
+	const status = document.getElementById('statuscomment');
+	const params = {
+		option: 'com_flexicontent', format: 'raw',
+		index_urls: <?php echo json_encode($index_urls); ?>,
+		indexer: <?php echo json_encode($indexer_name); ?>,
+		[<?php echo json_encode(\Joomla\CMS\Session\Session::getFormToken()); ?>]: '1'
+	};
+	const started = performance.now();
 
-		var start_time = new Date().getTime();
-
-		jQuery.ajax({
-			url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>index&records_per_call="+records_per_call+"&records_cnt="+looper+"&indexer=<?php echo $indexer_name;?>"+"&rebuildmode=<?php echo $rebuildmode; ?>"+"&index_urls=<?php echo $index_urls; ?>",
-			success: function(response, status2, xhr2) {
-				var request_time = new Date().getTime() - start_time;
-				total_time += request_time;
-				
-				var arr = response.split('|');
-				var result = arr[0].trim();
-				if ( result=='fail' || result!='success' )
-				{
-					jQuery('div#statuscomment').html( '<span style="font-weight:bold;">INDEXER HALTED, due to server response</span>: <br/> ' + (result=='fail'  ?  arr[1]  :  response) );
-					//jQuery('img#page_loading_img').hide();
-					looper = number;
-					return;
-				}
-				//looper=looper+records_per_call;
-				looper=parseInt(arr[1]);
-				
-				width = onesector*looper;
-				if (width>300) width = 300;
-				percent = width/3;
-				jQuery('div#insideprogress').css('width', width+'px');
-				jQuery('div#updatepercent').html(' '+percent.toFixed(2)+' %');
-				jQuery('div#statuscomment').html(
-					(looper<number?looper:number)+' / '+number+' <?php echo $records_name; ?> <br/>'
-					+ '<br/>' + arr[2]
-					+ '<br/>' + 'Total task time: '+parseFloat(total_time/1000).toFixed(2) + ' secs'
-					+ '<br/>' + arr[3]
-				);
-				setTimeout(updateprogress, 20);  // milliseconds to delay updating the HTML display
-			},
-			error: function (xhr, ajaxOptions, thrownError) {
-				alert(xhr.status);
-				alert(thrownError);
-			}
-		});
+	async function request(task, query = {}) {
+		const url = new URL('index.php', document.baseURI);
+		url.search = new URLSearchParams({...params, ...query, task: 'filemanager.' + task});
+		const response = await fetch(url, {credentials: 'same-origin', cache: 'no-store'});
+		if (!response.ok) throw Error('HTTP ' + response.status);
+		const [result, ...fields] = (await response.text()).split('|');
+		if (result.trim() !== 'success') throw Error(fields[0] || result);
+		return fields;
 	}
 
-	var start_time = new Date().getTime();
+	function update(current, total, summary, details) {
+		const ratio = total ? Math.min(current / total, 1) : 1;
+		progress.style.width = 300 * ratio + 'px';
+		percent.textContent = (100 * ratio).toFixed(2) + ' %';
+		status.replaceChildren(
+			Math.min(current, total) + ' / ' + total + ' <?php echo $records_name; ?>',
+			document.createElement('br'), summary || '', document.createElement('br'),
+			'Total task time ' + ((performance.now() - started) / 1000).toFixed(2) + ' seconds',
+			document.createElement('br'), details || ''
+		);
+	}
 
-	jQuery.ajax({
-		url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>countrows&index_urls=<?php echo $index_urls;?>&indexer=<?php echo $indexer_name;?>&selected_ids=<?php echo $selected_ids; ?>&<?php echo \Joomla\CMS\Session\Session::getFormToken().'=1'; ?>",
-		success: function(response, status, xhr) {
-			var request_time = new Date().getTime() - start_time;
-			total_time += request_time;
-			
-			var arr = response.split('|');
-			var result = arr[0].trim();
-			if( result=='fail' || result!='success' )
-			{
-				jQuery('div#statuscomment').html( '<span style="font-weight:bold;">INDEXER HALTED, due to server response</span>: <br/> ' + (result=='fail'  ?  arr[1]  :  response) );
-				return;
-			}
-			//items = jQuery.parseJSON(arr[1]);
-			//fields = jQuery.parseJSON(arr[2]);
-			//number = fields.length*items.length;
-			
-			items_length = arr[1];
-			fields_length = arr[2];
-			number = items_length;
-			onesector = (number==0)?300:(300/number);
-			
-			looper=parseInt(arr[3]);
-			width = 0;
-			percent = 0;
-			jQuery('div#insideprogress').css('width', width+'px');
-			jQuery('div#updatepercent').html(' '+percent.toFixed(2)+' %');
-			jQuery('div#statuscomment').html(
-				(looper<number?looper:number)+' / '+number+' <?php echo $records_name; ?> <br/>'
-					+ '<br/>' + arr[4]
-					+ '<br/>' + 'Total task time: '+parseFloat(total_time/1000).toFixed(2) + ' secs'
-					+ '<br/>' + arr[5]
-			);
-			updateprogress();
-		},
-		error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
+	try {
+		const [num, , offset, summary, details] = await request('countrows', {selected_ids: <?php echo json_encode($selected_ids); ?>});
+		const total = Number(num);
+		let current = Number(offset);
+		if (!Number.isFinite(total) || !Number.isFinite(current)) throw Error('Invalid indexer count');
+		update(current, total, summary, details);
+		while (current < total) {
+			const [next, details, log] = await request('index', {
+				records_per_call: 1000,
+				records_cnt: current,
+				rebuildmode: <?php echo json_encode($rebuildmode); ?>
+			});
+			if (!(Number(next) > current)) throw Error('The indexer returned no progress');
+			current = Number(next);
+			update(current, total, details, log);
 		}
-	});
-});
+		status.append(document.createElement('br'), 'Indexing finished. You may close this window.');
+	} catch (error) {
+		status.textContent = 'Indexer halted. ' + error.message;
+	}
+}, {once: true});
 </script>
 
 <style>

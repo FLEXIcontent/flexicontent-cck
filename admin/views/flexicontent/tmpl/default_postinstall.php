@@ -20,317 +20,54 @@ defined('_JEXEC') or die('Restricted access');
 ?>
 
 <script>
-
-jQuery(document).ready(function() {
-	var ajaxloader = '<span class="ajax-loader"><\/span>';
-
-
-<?php if(!$this->existfields) : /*@TODO must write a class for all following cases */ ?>
-	jQuery('#existfields').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.createdefaultfields&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#existfields-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#existfields-log').html(data);
+FlexiForm.ready(() => {
+	const tasks = {
+		existfields: 'createdefaultfields',
+		existcpfields: 'createdefaultcpfields',
+		existmenuitems: 'createmenuitems',
+		existtype: 'createdefaultype',
+		publishplugins: 'publishplugins',
+		existcats: 'addmcatitemrelations',
+		langsynced: 'updatelanguagedata',
+		existdbindexes: 'createdbindexes',
+		dbcharsetok: 'convertdbcharset',
+		existversions: 'createversionstable',
+		existversionsdata: 'populateversionstable',
+		existauthors: 'createauthorstable',
+		cachethumb: 'setcachethumbperms',
+		itemcountingdok: 'updateitemcountingdata',
+		deprecatedfiles: 'deletedeprecatedfiles',
+		oldfieldsdata: 'cleanupoldtables',
+		missingversion: 'addcurrentversiondata',
+		initialpermission: 'updateinitialpermission',
+	};
+	for (const [id, task] of Object.entries(tasks)) {
+		const button = document.getElementById(id);
+		const result = document.getElementById(id + '-log');
+		if (!button || !result) continue;
+		button.addEventListener('click', async event => {
+			event.preventDefault();
+			const endpoint = new URL('index.php', document.baseURI);
+			endpoint.search = new URLSearchParams({option: 'com_flexicontent', task: 'flexicontent.' + task,
+				format: 'raw', tmpl: 'component', '<?php echo \Joomla\CMS\Session\Session::getFormToken(); ?>': '1'});
+			const loader = document.createElement('span');
+			loader.className = 'ajax-loader';
+			result.replaceChildren(loader);
+			try {
+				let more, log = '';
+				do {
+					const response = await fetch(endpoint, {credentials: 'same-origin'});
+					if (!response.ok) throw Error(response.statusText);
+					const html = await response.text();
+					more = id === 'dbcharsetok' && html.includes('fc-dbcharset-more');
+					log = more ? log + html : html;
+					await FlexiForm.insertHTML(result, log);
+				} while (more);
+			} catch (error) {
+				result.replaceChildren(button);
+			}
 		});
-
-	});
-<?php endif; ?>
-
-
-<?php if(!$this->existcpfields) : /*@TODO must write a class for all following cases */ ?>
-	jQuery('#existcpfields').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.createdefaultcpfields&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#existcpfields-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#existcpfields-log').html(data);
-		});
-
-	});
-<?php endif; ?>
-
-
-<?php if(!$this->existmenuitems) : ?>
-	jQuery('#existmenuitems').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.createmenuitems&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#existmenuitems-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#existmenuitems-log').html(data);
-		});
-
-	});
-<?php endif; ?>
-
-
-<?php if(!$this->existtype) : ?>
-	jQuery('#existtype').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.createdefaultype&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#existtype-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#existtype-log').html(data);
-		});
-
-	});
-<?php endif; ?>
-
-
-<?php if(!$this->allplgpublish) : ?>
-	jQuery('#publishplugins').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.publishplugins&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#publishplugins-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#publishplugins-log').html(data);
-		});
-
-	});
-<?php endif; ?>
-
-
-<?php if(!$this->existcats) : ?>
-	jQuery('#existcats').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.addmcatitemrelations&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#existcats-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#existcats-log').html(data);
-		});
-
-	});
-<?php endif; ?>
-
-
-<?php if(!$this->langsynced) : ?>
-	jQuery('#langsynced').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.updatelanguagedata&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#langsynced-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#langsynced-log').html(data);
-		});
-
-	});
-<?php endif; ?>
-
-
-
-<?php if(!$this->existdbindexes) : ?>
-	jQuery('#existdbindexes').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.createdbindexes&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#existdbindexes-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#existdbindexes-log').html(data);
-		});
-
-	});
-<?php endif; ?>
-
-
-<?php if(!$this->existversions) : ?>
-	jQuery('#existversions').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.createversionstable&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#existversions-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#existversions-log').html(data);
-		});
-
-	});
-<?php endif; ?>
-
-
-<?php if(!$this->existversionsdata) : ?>
-	jQuery('#existversionsdata').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.populateversionstable&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#existversionsdata-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#existversionsdata-log').html(data);
-		});
-
-	});
-<?php endif; ?>
-
-
-<?php if (!$this->existauthors) : ?>
-	jQuery('#existauthors').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.createauthorstable&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#existauthors-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#existauthors-log').html(data);
-		});
-
-	});
-<?php endif; ?>
-
-
-<?php if (!$this->cachethumb) : ?>
-	jQuery('#cachethumb').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.setcachethumbperms&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#cachethumb-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#cachethumb-log').html(data);
-		});
-
-	});
-<?php endif; ?>
-
-
-<?php if (!$this->itemcountingdok) : ?>
-	jQuery('#itemcountingdok').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.updateitemcountingdata&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#itemcountingdok-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#itemcountingdok-log').html(data);
-		});
-
-	});
-<?php endif; ?>
-
-
-<?php if (!$this->deprecatedfiles) : ?>
-	jQuery('#deprecatedfiles').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.deletedeprecatedfiles&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#deprecatedfiles-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#deprecatedfiles-log').html(data);
-		});
-
-	});
-<?php endif; ?>
-
-
-<?php if (!$this->nooldfieldsdata) : ?>
-	jQuery('#oldfieldsdata').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.cleanupoldtables&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#oldfieldsdata-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#oldfieldsdata-log').html(data);
-		});
-
-	});
-<?php endif; ?>
-
-
-<?php if (!$this->missingversion) : ?>
-	jQuery('#missingversion').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.addcurrentversiondata&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#missingversion-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#missingversion-log').html(data);
-		});
-
-	});
-<?php endif; ?>
-
-
-<?php if(!$this->initialpermission) : ?>
-	jQuery('#initialpermission').on('click', function(e, data)
-	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.updateinitialpermission&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
-
-		jQuery('#initialpermission-log').html(ajaxloader);
-		jQuery.ajax({
-			type: 'GET',
-			url: url,
-			data: {}
-		}).done( function(data) {
-			jQuery('#initialpermission-log').html(data);
-		});
-
-	});
-<?php endif; ?>
-
+	}
 });
 </script>
 
@@ -434,6 +171,26 @@ jQuery(document).ready(function() {
 			<td>
 				<div id="existdbindexes-log" class="install-task">
 					<?php echo $this->existdbindexes ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existdbindexes" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CONVERT_DB_TABLES_UTF8MB4' ); ?>
+				<?php
+					if (!$this->dbcharsetok && !empty($this->dbcharsetpending)) {
+						echo "<br/><span class='fc-mssg-inline fc-mssg fc-info'>" . \Joomla\CMS\Language\Text::_( 'FLEXI_CONVERT_DB_TABLES_UTF8MB4_DESC' ) . "</span>";
+						echo "<br># tables: ". count($this->dbcharsetpending) ." : ";
+						foreach($this->dbcharsetpending as $tblname => $tbl)
+						{
+							echo "<br/><b>" . htmlspecialchars($tblname, ENT_QUOTES, 'UTF-8') . "</b> (<small>" . (int) $tbl->rows . " rows, " . round($tbl->bytes / 1048576, 1) . " MB</small>)";
+						}
+					}
+				?>
+			</td>
+			<td>
+				<div id="dbcharsetok-log" class="install-task">
+					<?php echo $this->dbcharsetok ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="dbcharsetok" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</div>
 			</td>
 		</tr>

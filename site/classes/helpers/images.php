@@ -600,8 +600,6 @@ HTML_PATTERN;
 	 */
 	static function BuildIcons($rows, $default_text = null)
 	{
-		jimport('joomla.filesystem.path' );
-		jimport('joomla.filesystem.file');
 		$NA = '-';
 
 		for ($i=0, $n=count($rows); $i < $n; $i++)

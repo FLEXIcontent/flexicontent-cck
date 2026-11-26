@@ -14,13 +14,28 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecords' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * View class for the FLEXIcontent search indexes screen
  */
 class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 {
+	/**
+	 * Columns of this manager are shown / hidden / moved in the browser (see fc-table-tools.js),
+	 * so the old position based hiding (cookie of the old column chooser) must not apply
+	 */
+	public function hideCol($colposition)
+	{
+		return '';
+	}
+
 	var $proxy_option   = null;
 	var $title_propname = null;
 	var $state_propname = null;
@@ -35,18 +50,18 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		global $globalcats;
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getSession();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
 		$task     = $jinput->getCmd('task', '');
 		$layout   = $jinput->getString('layout', 'default');
 
-		if ($layout === 'indexer')
+		if ($layout === 'indexer' || $layout === 'logs')
 		{
 			return parent::display($tpl);
 		}
@@ -60,8 +75,8 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
 		{
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get model
@@ -112,14 +127,14 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 
 		$filter_indextype	= $model->getState( 'filter_indextype' );
 
-		$f_active['filter_itemlang']	= (boolean)$filter_itemlang;
-		$f_active['filter_fieldtype']	= (boolean)$filter_fieldtype;
-		$f_active['filter_type']	= (boolean)$filter_type;
-		$f_active['filter_state']	= (boolean)$filter_state;
+		$f_active['filter_itemlang']	= (bool)$filter_itemlang;
+		$f_active['filter_fieldtype']	= (bool)$filter_fieldtype;
+		$f_active['filter_type']	= (bool)$filter_type;
+		$f_active['filter_state']	= (bool)$filter_state;
 
 		$f_active['search']			= strlen($search);
 		$f_active['search_itemtitle']	= strlen($search_itemtitle);
-		$f_active['search_itemid']		= (boolean)$search_itemid;
+		$f_active['search_itemid']		= (bool)$search_itemid;
 
 
 		/**
@@ -131,16 +146,16 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			// Add css to document
 			if ($isAdmin)
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 			}
 			else
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
@@ -341,18 +356,18 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 
 		if ($filter_fieldtype)
 		{
-			$js .= "jQuery('.col_fieldtype').addClass('filtered_column');";
+			$js .= "document.querySelectorAll('.col_fieldtype').forEach(el => el.classList.add('filtered_column'));";
 		}
 
 		if ($search)
 		{
-			$js .= "jQuery('.col_search').addClass('filtered_column');";
+			$js .= "document.querySelectorAll('.col_search').forEach(el => el.classList.add('filtered_column'));";
 		}
 
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');
@@ -365,9 +380,9 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			$document->addScriptDeclaration('
 				function fc_edit_fcitem_modal_load( container )
 				{
-					if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=items") != -1 )
+					if ( FlexiForm.element(container).querySelector("iframe").contentWindow.location.href.indexOf("view=items") != -1 )
 					{
-						container.dialog("close");
+						fc_closeDialog(FlexiForm.element(container).id);
 					}
 				}
 				function fc_edit_fcitem_modal_close()
@@ -379,10 +394,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			');
 		}
 
-		$query = "SHOW VARIABLES LIKE '%ft_min_word_len%'";
-		$db->setQuery($query);
-		$_dbvariable = $db->loadObject();
-		$ft_min_word_len = (int) @ $_dbvariable->Value;
+		$ft_min_word_len = flexicontent_db::getMinWordLen();
 		$notice_ft_min_word_len	= $app->getUserStateFromRequest( $option.'.fields.notice_ft_min_word_len',	'notice_ft_min_word_len',	0, 'int' );
 		//if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
 		//{
@@ -403,7 +415,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			if ($ft_min_word_len > 1 && $notice_ft_min_word_len < 10)
 			{
 				$app->setUserState( $option.'.fields.notice_ft_min_word_len', $notice_ft_min_word_len+1 );
-				$app->enqueueMessage("NOTE : Database limits minimum search word length (ft_min_word_len) to ".$ft_min_word_len, 'message');
+				$app->enqueueMessage("NOTE : Database limits minimum search word length (" . (flexicontent_db::getTableEngine() === 'innodb' ? 'innodb_ft_min_token_size' : 'ft_min_word_len') . ") to ".$ft_min_word_len, 'message');
 				$app->enqueueMessage('Please enable: "Searching small/common words":
 					<a class="btn" href="index.php?option=com_config&view=component&component=com_flexicontent&path=&"><span class="icon-options"></span>Configuration</a>
 					and then click to re-INDEX both search indexes', 'notice');
@@ -429,7 +441,6 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		{
 			$this->sidebar = null;
 
-			if(FLEXI_J30GE && !FLEXI_J40GE) $this->sidebar = JHtmlSidebar::render();
 			if(FLEXI_J40GE) $this->sidebar = \Joomla\CMS\HTML\Helpers\Sidebar::render();
 		}
 
@@ -454,11 +465,11 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 	 */
 	function setToolbar()
 	{
-		$user     = \Joomla\CMS\Factory::getUser();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		$js = '';
 
@@ -474,7 +485,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=search&amp;layout=indexer&amp;tmpl=component&amp;indexer=basic';
 			$btn_text = str_replace('<br/>', '', \Joomla\CMS\Language\Text::_('FLEXI_REINDEX_BASIC_CONTENT_LISTS'));
 			$btn_name = 'search_adv_index_dirty_only';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+			$full_js="if (!(await FlexiForm.confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "'))) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(strip_tags(\Joomla\CMS\Language\Text::_('FLEXI_REINDEX_BASIC_CONTENT_LISTS')), 'd')."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				$btn_text, $btn_name, $full_js,
@@ -487,7 +498,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=search&amp;layout=indexer&amp;tmpl=component&amp;indexer=advanced';
 			$btn_text = str_replace('<br/>', '', \Joomla\CMS\Language\Text::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW'));
 			$btn_name = 'search_adv_index_dirty_only';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+			$full_js="if (!(await FlexiForm.confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "'))) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(strip_tags(\Joomla\CMS\Language\Text::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW')), 'd')."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				$btn_text, $btn_name, $full_js,
@@ -500,7 +511,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=search&amp;layout=indexer&amp;tmpl=component&amp;indexer=advanced&amp;rebuildmode=quick';
 			$btn_text = str_replace('<br/>', '', \Joomla\CMS\Language\Text::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY'));
 			$btn_name = 'search_adv_index_dirty_only';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+			$full_js="if (!(await FlexiForm.confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "'))) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(strip_tags(\Joomla\CMS\Language\Text::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY')), 'd')."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				$btn_text, $btn_name, $full_js,
@@ -556,7 +567,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');

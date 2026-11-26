@@ -459,12 +459,12 @@ dl.tabs dt.open {
 	color: #000000;
 	z-index: 100;
 }
-div.current {
+div.current:not(.gslide) {
 	border: 1px solid #CCCCCC;
 	clear: both;
 	padding: 10px;
 }
-div.current dd {
+div.current:not(.gslide) dd {
 	margin: 0;
 	padding: 0;
 }
@@ -565,6 +565,10 @@ dl#content-pane.tabs {
 	content: "\f02c";
 }
 .icon-items:before {
+	content: "\f0c5";
+}
+.icon-params:before,
+.icon-copy_wvalues:before {
 	content: "\f0c5";
 }
 /*fix icon state*/
@@ -966,7 +970,7 @@ body .form-grid {
 			display: flex;
 			align-items: flex-start;
 
-			> :nth-child(1) {
+			> :nth-child(1):not([role="tooltip"]):not(.rl-admin-popover-container) {
 				flex-grow: 0;
 				flex-shrink: 1;
 				flex-basis: auto;
@@ -991,7 +995,7 @@ body .form-grid {
 				max-width: 600px;
 			}
 
-			> div {
+			> div:not([role="tooltip"]):not(.rl-admin-popover-container) {
 				flex-grow: 1;
 				flex-shrink: 1;
 				display: flex;
@@ -1115,7 +1119,7 @@ div table.fc-table-list tr:nth-child(odd) td {
 	background: initial;
 }
 /*** file view ***/
-.view-filemanager span.fc_hidden_1270.fc_noeffect.btn.btn-sm.hasTooltip {
+.view-filemanager button.fc_hidden_1270.fc_noeffect.btn.btn-sm.hasTooltip {
     padding: 8px;
 }
 .view-filemanager .group-fcset {
@@ -1124,7 +1128,7 @@ div table.fc-table-list tr:nth-child(odd) td {
 .view-filemanager span.btn.btn-sm.hasTooltip {
     padding: 8px;
 }
-.view-filemanager div#fc_mainChooseColBox_btn {
+.view-filemanager button#fc_mainChooseColBox_btn {
     padding: 7px;
 }
 
@@ -1259,7 +1263,7 @@ div table.fc-table-list tr:nth-child(odd) td {
 			background: var(--body-bg);
 			box-shadow: none;
 		}
-		div.statetoggler > div.statetoggler_inner > .options > div, div.statetoggler > div.statetoggler_inner > .options > span {
+		div.statetoggler > div.statetoggler_inner > .options > div, div.statetoggler > div.statetoggler_inner > .options > :is(span, button) {
 			color: var(--body-color);
 		}
 		.ui-widget-content {
@@ -1273,6 +1277,27 @@ div table.fc-table-list tr:nth-child(odd) td {
 		}
 		.select2-container-multi .select2-choices .select2-search-field input.select2-input, .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
 			background: #282c33 !important;
+		}
+		/* About FLEXIcontent credits */
+		div#fc-dash-sliders {
+			background: var(--body-bg);
+		}
+		div#fc-dash-credits #fc-dash-logo {
+			background: #fff;
+			border-radius: 6px;
+		}
+		div#fc-dash-credits #fc-dash-license {
+			color: var(--body-color) !important;
+			background: var(--body-bg) !important;
+			border-color: var(--border-color) !important;
+			border-left-color: var(--template-bg-dark-40) !important;
+		}
+		#flexicontent fieldset.fc-board-set div.fc-board-set-inner {
+			border-top-color: var(--border-color);
+		}
+		div#fc-dash-credits #fc-dash-devs .label:not(.bg-info) {
+			color: var(--body-color);
+			background: var(--template-bg-dark-60);
 		}
 }
 .buttons.btn-group.fc-iblock.dropdown{

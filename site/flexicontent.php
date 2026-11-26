@@ -11,8 +11,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('cms.component.helper');
-jimport('cms.plugin.helper');
 
 
 
@@ -25,7 +23,7 @@ $is_fc_component = 1;
 
 $cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 $app     = \Joomla\CMS\Factory::getApplication();
-$document= \Joomla\CMS\Factory::getDocument();
+$document= \Joomla\CMS\Factory::getApplication()->getDocument();
 $jinput  = $app->input;
 $format  = $jinput->get('format', 'html', 'cmd');
 
@@ -50,7 +48,6 @@ if ($print_logging_info && $format === 'html')
 {
 	$start_microtime = microtime(true);
 	global $fc_jprof;
-	jimport('joomla.profiler.profiler');
 	$fc_jprof = new \Joomla\CMS\Profiler\Profiler();
 	$fc_jprof->mark('START: FLEXIcontent component');
 }
@@ -72,7 +69,6 @@ require_once (JPATH_SITE.'/components/com_flexicontent/helpers/permission.php');
 require_once (JPATH_SITE.'/components/com_flexicontent/helpers/route.php');
 
 // Add component's table directory to the include path
-\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_flexicontent/tables');
 
 // Import the flexicontent_fields plugins and flexicontent plugins
 if (!FLEXI_ONDEMAND)
@@ -88,24 +84,26 @@ if (!FLEXI_ONDEMAND)
  */
 
 
-if ( \Joomla\CMS\Factory::getLanguage()->getDefault() != 'en-GB' )
+if ( \Joomla\CMS\Factory::getApplication()->getLanguage()->getDefault() != 'en-GB' )
 {
 	// If site default language is not english then load english language file for 'com_flexicontent' component, and the override (forcing a reload) with current language file
 	// We make sure that 'english' file has been loaded, because we need it as fallback for language strings that do not exist in current language
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reload = true, $load_default = true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reload = true, $load_default = true);
 }
 
 else
 	// No force loading needed, save some time, and do not force language file reload
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_SITE);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE);
+
+FLEXIUtilities::loadMediaLanguage(JPATH_SITE);
 
 // Load language overrides, just before executing the component (DONE manually for J1.5)
 /*if (!FLEXI_J16GE)
 {
 	$overrideDir = JPATH_SITE . '/languages/overrides/';
-	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
-	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
 }*/
 
 
@@ -325,7 +323,7 @@ if ($format === 'html')
 
 	// Load icomoon CSS
 	if ( $cparams->get('loadfw_icomoon_css', 2)==1 )
-		\Joomla\CMS\Factory::getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/media/jui/css/icomoon.css');
+		\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/media/jui/css/icomoon.css');
 }
 
 
@@ -354,9 +352,9 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	$filters_creation_times = FlexicontentFields::getFilterCreationTimes($filters_creation_total);
 
 	$fc_jprof->mark('END: FLEXIcontent component: '.$_msg);
-	$msg = '<div style="font-family:tahoma!important; font-size:11px!important;">'. implode('<br/>', $fc_jprof->getbuffer()) .'</div>';
+	$msg = '<div class="fc-perf-summary">'. implode('<br/>', $fc_jprof->getbuffer()) .'</div>';
 
-	$msg .= '<div style="font-family:tahoma!important; font-size:11px!important;">';
+	$msg .= '<div class="fc-perf-details">';
 
 	if (isset($fc_run_times['initialize_component']))
 		$msg .= sprintf('<br/>-- [Initialize component: %.2f s] ', $fc_run_times['initialize_component']/1000000);
@@ -468,17 +466,14 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	if (count($fields_render_times))
 	{
 		$msg .= sprintf('<br/><br/>-- [FC Fields Rendering: %.2f s] ', $fields_render_total/1000000);
-		$msg .= '<br/>';
+		$msg .= '<div class="fc-perf-grid">';
 
 		foreach($fields_render_times as $i => $_time)
 		{
-			$msg .=
-				'<div style="white-space:nowrap; float:left;'.($i%3==0 ? 'clear:both !important;' : '').'">'.
-					$fields_render_times[$i].
-				'</div>';
+			$msg .= '<div class="fc-perf-item">' . $fields_render_times[$i] . '</div>';
 		}
 
-		$msg .= '<br/><div class="fcclear"></div>';
+		$msg .= '</div>';
 	}
 
 	// **********************
@@ -486,16 +481,14 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	// **********************
 
 	if (count($filters_creation_times)) {
-		$msg .= sprintf('<br/>-- [FC Filters Creation: %.2f s] ', $filters_creation_total/1000000);
+		$msg .= sprintf('<br/><br/>-- [FC Filters Creation: %.2f s] ', $filters_creation_total/1000000);
 		if (isset($fc_run_times['create_filter_init'])) $msg .= sprintf('<br/> &nbsp; Filters Init: %.2f s ', $fc_run_times['create_filter_init']/1000000);
 
-		$msg .= '<br/>';
+		$msg .= '<div class="fc-perf-grid">';
 		foreach($filters_creation_times as $i => $_time) {
-			$msg .=
-				'<div style="white-space:nowrap; float:left;'.($i%3==0 ? 'clear:both !important;' : '').'" >'.
-					$filters_creation_times[$i].
-				'</div>';
+			$msg .= '<div class="fc-perf-item">' . $filters_creation_times[$i] . '</div>';
 		}
+		$msg .= '</div>';
 	}
 
 	$msg .= '</div>';

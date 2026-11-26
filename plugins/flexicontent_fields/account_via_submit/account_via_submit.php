@@ -5,13 +5,19 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright � 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 class plgFlexicontent_fieldsAccount_via_submit extends FCField
 {
@@ -42,7 +48,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
 
 		// initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';
@@ -123,8 +129,8 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			float: left !important;
 		}
 		';
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
+		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
 
 		/**
@@ -133,13 +139,13 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 		$field->html = array();
 
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		if ($item->id)
 		{
 			if ($field->parameters->get('display_item_owner', 0))
 			{
-				$owner = \Joomla\CMS\Factory::getUser($item->created_by);
+				$owner = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $item->created_by);
 			  $field->html[] = '
 			  <div class="'.$input_grp_class.' fc-xpended">
 				  <span class="' . $add_on_class . ' fc_acc_via_mail_item_owner">'.\Joomla\CMS\Language\Text::_( 'FLEXI_ACCOUNT_V_SUBMIT_ITEM_OWNER' ).'</span>
@@ -258,7 +264,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		if (!$isnew) return;
 
 		// Check if user is logged, if so then nothing to do
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		if ($user->id)
 		{
 			$post = array();
@@ -315,7 +321,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$this->initialize($field);
 
 		// Check email already used
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$db->setQuery('SELECT id FROM #__users WHERE email = ' . $db->Quote($email));
 		$existingUserID = $db->loadResult();
 
@@ -401,7 +407,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$attribs->initialized = 1;
 		$attribs = json_encode($attribs);
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = "UPDATE #__flexicontent_fields SET attribs=".$db->Quote($attribs) ." WHERE id = ".$field->id;
 		$result = $db->setQuery($query)->execute();
 	}
@@ -410,14 +416,11 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 	public static function registerUser($name, $username, $email, $password, $gender, &$field)
 	{
 		// Initialize new usertype setting
-		jimport('joomla.user.user');
-		jimport('joomla.user.helper');
-		jimport('cms.component.helper');
-		\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, 'en-GB', false);
-		\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_SITE, 'en-GB', false);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_SITE, null, true);
 
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$usersConf = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_users' );
 
 		$useractivation = $field->parameters->get('useractivation', '');
@@ -467,15 +470,15 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		// Make sure user was created
 		$db->setQuery('SELECT id FROM #__users WHERE email = ' . $db->Quote($email));
 		$newUserID = $db->loadResult();
-		$user = \Joomla\CMS\Factory::getUser($newUserID);
+		$user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $newUserID);
 
 		// User creation failed ?? !!
 		if ( !$user->id )  return false;
 
 		$data = $user->getProperties();
-		$data['fromname'] = $app->getCfg('fromname');
-		$data['mailfrom'] = $app->getCfg('mailfrom');
-		$data['sitename'] = $app->getCfg('sitename');
+		$data['fromname'] = $app->get('fromname');
+		$data['mailfrom'] = $app->get('mailfrom');
+		$data['sitename'] = $app->get('sitename');
 		$data['siteurl']  = \Joomla\CMS\Uri\Uri::root();
 		$data['password_clear'] = $password_clear;
 		$data['activation'] = $activation;
@@ -533,7 +536,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 		// Send the email
 		try {
-			$send_result = \Joomla\CMS\Factory::getMailer()->sendMail(
+			$send_result = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Mail\MailerFactoryInterface::class)->createMailer()->sendMail(
 				$data['mailfrom'], $data['fromname'], $recipient, $emailSubject, $emailBody,
 				$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname
 			);
@@ -583,7 +586,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 			// Send the email
 			try {
-				$send_result = \Joomla\CMS\Factory::getMailer()->sendMail(
+				$send_result = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Mail\MailerFactoryInterface::class)->createMailer()->sendMail(
 					$data['mailfrom'], $data['fromname'], $recipient, $emailSubject, $emailBody,
 					$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname
 				);
@@ -604,12 +607,12 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 	function sendEditCoupon(&$item, &$field, $email, $token)
 	{
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app = \Joomla\CMS\Factory::getApplication();
 
-		$SiteName	= $app->getCfg('sitename');
-		$mailfrom = $app->getCfg('mailfrom');
-		$fromname = $app->getCfg('fromname');
+		$SiteName	= $app->get('sitename');
+		$mailfrom = $app->get('mailfrom');
+		$fromname = $app->get('fromname');
 
 		// Check for a valid from address
 		if (! $mailfrom || ! \Joomla\CMS\Mail\MailHelper::isEmailAddress($mailfrom))
@@ -642,7 +645,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 		// Send the email
 		try {
-			$send_result = \Joomla\CMS\Factory::getMailer()->sendMail(
+			$send_result = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Mail\MailerFactoryInterface::class)->createMailer()->sendMail(
 				$mailfrom, $fromname, $recipient, $emailSubject, $emailBody,
 				$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname
 			);

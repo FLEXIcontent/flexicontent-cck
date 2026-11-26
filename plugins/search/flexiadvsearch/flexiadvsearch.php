@@ -22,7 +22,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('cms.plugin.plugin');
 
 require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
@@ -124,8 +123,12 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
 
-		$db       = \Joomla\CMS\Factory::getDbo();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$user     = $app->getIdentity();
+		$field_view_levels = array_map('intval', $user->getAuthorisedViewLevels());
+		$can_view_field = static function ($field) use ($field_view_levels) {
+			return !(int) $field->access || in_array((int) $field->access, $field_view_levels, true);
+		};
 
 		$app->setUserState('fc_view_total_'.$view, 0);
 		$app->setUserState('fc_view_limit_max_'.$view, 0);
@@ -395,6 +398,11 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		}
 
 
+		// Search results and filter predicates must respect the current field
+		// access, independently of which user originally built the shared index.
+		$fields_text = array_filter($fields_text, $can_view_field);
+		$filters = array_filter($filters, $can_view_field);
+
 		/**
 		 * Load Plugin parameters
 		 */
@@ -438,6 +446,21 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 
 		$select_relevance = array();
 		$text_search = $this->_buildTextSearch($text, $phrase, $txtmode, $select_relevance);
+
+		// Priority of the content types (type parameter 'search_priority'), it is the first sort criterion
+		$type_priority_cases = array();
+		foreach ($typeData as $_tdata)
+		{
+			$_type_priority = (int) $_tdata->params->get('search_priority', 0);
+			if ($_type_priority > 0)
+			{
+				$type_priority_cases[] = 'WHEN ' . (int) $_tdata->id . ' THEN ' . $_type_priority;
+			}
+		}
+		if ($type_priority_cases)
+		{
+			$select_relevance = array('type_priority' => 'CASE ty.id ' . implode(' ', $type_priority_cases) . ' ELSE 0 END') + (array) $select_relevance;
+		}
 
 
 		// ***
@@ -715,8 +738,12 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		{
 			$onBasic_textsearch    = '';
 			$onAdvanced_textsearch = $text_search;
-			$join_textsearch = ' JOIN #__flexicontent_advsearch_index as ts ON ts.item_id = i.id '.(count($fields_text) ? 'AND ts.field_id IN ('. implode(',',array_keys($fields_text)) .')' : '');
-			$join_textfields = ' JOIN #__flexicontent_fields as txtf ON txtf.id=ts.field_id';
+			$join_textsearch = ' JOIN #__flexicontent_advsearch_index as ts ON ts.item_id = i.id AND ts.field_id IN ('
+				. (count($fields_text) ? implode(',', array_keys($fields_text)) : '0') . ')';
+			// Apply this to both the matching query and the result-text query.
+			$join_textfields = ' JOIN #__flexicontent_fields as txtf ON txtf.id=ts.field_id'
+				. ' AND txtf.published = 1 AND txtf.isadvsearch IN (1,2)'
+				. ' AND txtf.access IN (0' . (count($field_view_levels) ? ',' . implode(',', $field_view_levels) : '') . ')';
 		}
 
 		// JOIN clauses ... (shared with filters)
@@ -810,9 +837,12 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		// *** Get the items
 		// ***
 
-		$query = 'SELECT SQL_CALC_FOUND_ROWS i.id'
+		// The total of matching items is a column of the list: COUNT(*) OVER(), counted after GROUP BY. One statement
+		// instead of SQL_CALC_FOUND_ROWS + FOUND_ROWS(), which MySQL 8.0.17+ deprecates
+		$query = 'SELECT i.id'
 			. $orderby_col
 			. $select_relevance
+			. ', COUNT(*) OVER() AS fc_list_total'
 			. ' FROM #__flexicontent_items_tmp AS i'
 			. $join_clauses_with_text
 			. $orderby_join
@@ -821,28 +851,29 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 			. $and_where_filters
 			. ' GROUP BY i.id '
 			. $orderby
+			// A unique last sort key. Without SQL_CALC_FOUND_ROWS the database may stop sorting at the LIMIT,
+			// and rows with equal sort values could then repeat or go missing across pages
+			. (trim((string) $orderby) !== '' && strpos($orderby, 'i.id') === false ? ', i.id' : '')
 			;
 		//echo "Adv search plugin main SQL query: ".nl2br($query)."<br/><br/>";
 
 		// NOTE: The plugin will return a PRECONFIGURED limited number of results, the SEARCH VIEW to do the pagination, splicing (appropriately) the data returned by all search plugins
 		try {
-			// Get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
-			// *** Usage of FOUND_ROWS() will fail when (e.g.) Joom!Fish or Falang are installed, in this case we will be forced to re-execute the query ...
-			// PLUS, we don't need Joom!Fish or Falang layer at --this-- STEP which may slow down the query considerably in large sites
+			// Get items, we use direct query because we don't need Joom!Fish or Falang layer at --this-- STEP
+			// which may slow down the query considerably in large sites
 			$query_limited = $query . ' LIMIT '.$search_limit.' OFFSET 0';
 			$rows = flexicontent_db::directQuery($query_limited);
 			$item_ids = array();
 			foreach ($rows as $row) $item_ids[] = $row->id;
 
-			// Get current items total for pagination
-			$db->setQuery("SELECT FOUND_ROWS()");
-			$fc_searchview['view_total'] = $db->loadResult();
+			// Get current items total for pagination: every row of the list carries it
+			$fc_searchview['view_total'] = $rows ? $rows[0]->fc_list_total : 0;
 			$app->setUserState('fc_view_total_'.$view, $fc_searchview['view_total']);
 		}
 
 		catch (Exception $e) {
 			// Get items via normal joomla SQL layer
-			$db->setQuery(str_replace('SQL_CALC_FOUND_ROWS', '', $query), 0, $search_limit);
+			$db->setQuery($query, 0, $search_limit);
 			$item_ids = $db->loadColumn(0);
 		}
 
@@ -900,7 +931,10 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 				// If joomla article view is allowed allowed and then search view may optional create Joomla article links
 				if( $typeData[$item->type_id]->params->get('allow_jview', 0) == 1 && $typeData[$item->type_id]->params->get('search_jlinks', 1) )
 				{
-					$item->href = \Joomla\CMS\Router\Route::_(ContentHelperRoute::getArticleRoute($item->slug, $item->categoryslug, $item->language));
+					// ContentHelperRoute is a Joomla 3 class name, Joomla 6 has it only with the Backward Compatibility 6 plugin
+					$item->href = \Joomla\CMS\Router\Route::_(FLEXI_J40GE
+						? \Joomla\Component\Content\Site\Helper\RouteHelper::getArticleRoute($item->slug, $item->categoryslug, $item->language)
+						: ContentHelperRoute::getArticleRoute($item->slug, $item->categoryslug, $item->language));
 				}
 				else
 				{
@@ -924,7 +958,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$option = $app->input->getCmd('option', '');
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		static $text_search = null;
 
@@ -961,6 +995,34 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		// Text search relevance [title] or [title, search index]
 		$filter_word_relevance_order = (int) $this->_params->get('filter_word_relevance_order', 0);
 
+		// Priority of the kind of field (title, category, tags) in which the words are found, only for the advanced index (1 row per field value)
+		$filter_word_field_priority = array();
+		if ($txtmode)
+		{
+			// Sortable option, e.g. "title,categories,tags", the previous list option stored a number (1..6)
+			$_prio_cfg = trim((string) $this->_params->get('filter_word_field_priority', ''));
+			$_prio_legacy = array(
+				1 => array('title', 'categories', 'tags'),
+				2 => array('title', 'tags', 'categories'),
+				3 => array('categories', 'title', 'tags'),
+				4 => array('categories', 'tags', 'title'),
+				5 => array('tags', 'title', 'categories'),
+				6 => array('tags', 'categories', 'title')
+			);
+
+			if (ctype_digit($_prio_cfg))
+			{
+				$filter_word_field_priority = $_prio_legacy[(int) $_prio_cfg] ?? array();
+			}
+			else foreach (preg_split('/\s*,\s*/', $_prio_cfg) as $_ft)
+			{
+				if (in_array($_ft, array('title', 'categories', 'tags'), true) && !in_array($_ft, $filter_word_field_priority, true))
+				{
+					$filter_word_field_priority[] = $_ft;
+				}
+			}
+		}
+
 		if ($phrase === null)
 		{
 			$default_searchphrase = $this->_params->get('default_searchphrase', 'all');
@@ -972,7 +1034,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 			: 'flexicontent_advsearch_index';
 
 		// Try to add space between words for current language using a dictionary
-		$lang_handler = FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getLanguage()->getTag());
+		$lang_handler = FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag());
 
 		if ($lang_handler)
 		{
@@ -989,8 +1051,8 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		$text = preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', $text_np);
 
 		// Split to words
-		$words_np = preg_split('/\s\s*/u', $text_np);
-		$words = preg_split('/\s\s*/u', $text);
+		$words_np = flexicontent_db::getBooleanSearchWords(preg_split('/\s\s*/u', $text_np), 'flexicontent_items_tmp', 'title');
+		$words = flexicontent_db::getBooleanSearchWords(preg_split('/\s\s*/u', $text), $si_tbl);
 
 		if (strlen($text))
 		{
@@ -1008,16 +1070,24 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 
 			/*
 			 * LIKE %word% search (needed by languages without spaces),
-			 * (1) Skip / Ignore this for languages with spaces,
+			 * (1) Skip / Ignore this for languages with spaces, unless the searched text itself is Chinese or Japanese
 			 * (2) Skip / Ignore this if current language supports splitting via dictionary
 			 */
-			if ($filter_word_like_any
-				&& in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th'))
-				&& ! FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getLanguage()->getTag(), $_hasHandlerOnly = true)
-			)
+			if (flexicontent_db::useLikeSearch($filter_word_like_any, $text_np))
 			{
-				$_index_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
-				$_title_relev = ' LOWER (i.title) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
+				// The text without the search prefix, because it is also matched inside the words of the index
+				$_index_match = flexicontent_db::getLikeSearchCondition($ts . '.search_index', $text_np, $phrase, $search_prefix);
+				$_title_relev = flexicontent_db::getLikeSearchCondition('i.title', $text_np, $phrase);
+
+				// Needed by "Most relevant first: Yes". Without it the relevance column was empty: an SQL syntax error
+				$_index_relev = $_index_match;
+			}
+
+			elseif (($terms = flexicontent_db::getQuotedSearchTerms($text_np, $phrase)) !== null)
+			{
+				$_index_match = flexicontent_db::getQuotedFulltextCondition($ts . '.search_index', $terms, $phrase, $search_prefix);
+				$_title_relev = flexicontent_db::getQuotedFulltextCondition('i.title', $terms, $phrase);
+				$_index_relev = $_index_match;
 			}
 
 			/*
@@ -1060,12 +1130,12 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 				case 'exact':
 					// Speed optimization ... 2-level searching: first require ALL words via FULLTEXT index, then require exact text via LIKE %phrase%
 					$newtext = '+' . implode(' +', $words);
-					$escaped_text = $db->escape($newtext, true);
+					$escaped_text = $db->escape($newtext);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
 					// Relevance by title, try to match (EXACT) words, via OR ignoring stop words and short words ...
 					$newtext_np = implode(' ', $words_np);
-					$escaped_text_np = $db->escape($newtext_np, true);
+					$escaped_text_np = $db->escape($newtext_np);
 					$quoted_text_np  = $db->Quote($escaped_text_np, false);
 
 					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND '.$ts.'.search_index LIKE '.$exact_text;
@@ -1076,19 +1146,19 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 				case 'all':
 					$nospace_languages = array('th-TH');
 
-					$is_nospace_language = in_array(\Joomla\CMS\Factory::getLanguage()->getTag(), $nospace_languages);
+					$is_nospace_language = in_array(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag(), $nospace_languages);
 
 					// TODO check if not using the * for THAI is appropriate & needed
 					$newtext = $is_nospace_language
 						? '+' . implode( ' +', $words ) . ''  // This is worked for Thai language.
 						: '+' . implode( '* +', $words ) . '*';  // This is not worked for Thai language.
 
-					$escaped_text = $db->escape($newtext, true);
+					$escaped_text = $db->escape($newtext);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
 					// Relevance by title, try to match (PREFIXED) words, via OR ignoring stop words and short words ...
 					$newtext_np = implode( '* ', $words_np ) . '*';
-					$escaped_text_np = $db->escape($newtext_np, true);
+					$escaped_text_np = $db->escape($newtext_np);
 					$quoted_text_np  = $db->Quote($escaped_text_np, false);
 
 					if ($is_nospace_language)
@@ -1096,11 +1166,12 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 						// Text nLH (no-Language-Handler, aka NO SPACES added to guess and seperate words)
 						$text_nLH = trim($original_text);  
 						$escaped_text_nLH = $db->escape($text_nLH, true);
-						$quoted_text_nLH  = $db->Quote($escaped_text_nLH, false);
+						// LIKE value with its % wildcards, quoted as one value
+						$quoted_text_nLH  = $db->Quote('%' . $escaped_text_nLH . '%', false);
 
-						$_index_match = " (MATCH (".$ts.".search_index) AGAINST (".$quoted_text." IN BOOLEAN MODE) OR i.title LIKE '%".$quoted_text_nLH."%') ";
-						$_title_relev = " (MATCH (i.title) AGAINST (".$quoted_text_np." IN BOOLEAN MODE) OR i.title LIKE '%".$quoted_text_nLH."%') ";
-						$_index_relev = " (MATCH (".$ts.".search_index) AGAINST (".$quoted_text." IN BOOLEAN MODE) OR i.title LIKE '%".$quoted_text_nLH."%') ";
+						$_index_match = " (MATCH (".$ts.".search_index) AGAINST (".$quoted_text." IN BOOLEAN MODE) OR i.title LIKE ".$quoted_text_nLH.") ";
+						$_title_relev = " (MATCH (i.title) AGAINST (".$quoted_text_np." IN BOOLEAN MODE) OR i.title LIKE ".$quoted_text_nLH.") ";
+						$_index_relev = " (MATCH (".$ts.".search_index) AGAINST (".$quoted_text." IN BOOLEAN MODE) OR i.title LIKE ".$quoted_text_nLH.") ";
 					}
 					else
 					{
@@ -1113,12 +1184,12 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 				case 'any':
 				default:
 					$newtext = implode( '* ', $words ) . '*';
-					$escaped_text = $db->escape($newtext, true);
+					$escaped_text = $db->escape($newtext);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
 					// Relevance by title, try to match (PREFIXED) words, via OR ignoring stop words and short words ...
 					$newtext_np = implode( '* ', $words_np ) . '*';
-					$escaped_text_np = $db->escape($newtext_np, true);
+					$escaped_text_np = $db->escape($newtext_np);
 					$quoted_text_np  = $db->Quote($escaped_text_np, false);
 
 					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
@@ -1128,7 +1199,17 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 				}
 			}
 
-			// Title relevance clause, Search index relevance clause ... (currently search index relevance not DONE)
+			// Field kind priority: the text search clause is part of the JOIN of the index rows, so the rows of an item are only the matching ones,
+			// and an item has a priority when it has a matching row of that kind of field (MAX over its rows)
+			if ($filter_word_field_priority)
+			{
+				foreach ($filter_word_field_priority as $_field_type)
+				{
+					$select_relevance['fld_' . $_field_type] = 'MAX(txtf.field_type = ' . $db->Quote($_field_type) . ')';
+				}
+			}
+
+			// Title relevance clause, Search index relevance clause (best matching row of the item, not an arbitrary one)
 			if ($filter_word_relevance_order > 0)
 			{
 				$select_relevance['rel_title'] = $_title_relev;
@@ -1136,7 +1217,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 
 			if ($filter_word_relevance_order > 1)
 			{
-				$select_relevance['rel_index'] = $_index_relev;
+				$select_relevance['rel_index'] = 'MAX(' . $_index_relev . ')';
 			}
 
 			// Indicate ignored words

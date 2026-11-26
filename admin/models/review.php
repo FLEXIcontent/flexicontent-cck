@@ -124,8 +124,8 @@ class FlexicontentModelReview extends FCModelAdmin
 		$this->canCreate = FlexicontentHelperPerm::getPerm()->CanCreateReviews;
 
 		// Load field's language files
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
 	}
 
 
@@ -161,6 +161,7 @@ class FlexicontentModelReview extends FCModelAdmin
 		$record->id							= 0;
 		$record->content_id			= $this->getState('content_id');
 		$record->type						= $this->getState('review_type');
+		$record->name					= '';
 		$record->email					= $this->getState('email');
 		$record->title					= '';
 		$record->text						= '';
@@ -211,16 +212,36 @@ class FlexicontentModelReview extends FCModelAdmin
 		 */
 
 		$isNew    = empty($this->_record->id);
-		$isLogged = (boolean) \Joomla\CMS\Factory::getUser()->id;
+		$isLogged = (bool) \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
+
+		// Ratings of the characteristics are used only if composite voting is enabled
+		if (!flexicontent_html::getVotingCharacteristics(flexicontent_html::getVotingFieldConfig()))
+		{
+			$form->removeField('custom_ratings');
+		}
 		
 		$readonlyFields = array();
 		$hiddenFields   = array();
 		
+		// The reviewed item and the reviewer (user or guest) can be selected only when creating a new review
+		if (!$isNew)
+		{
+			foreach (array('content_id', 'user_id') as $fieldname)
+			{
+				$form->setFieldAttribute($fieldname, 'type', 'text');
+				$form->setFieldAttribute($fieldname, 'class', 'readonly');
+				$form->setFieldAttribute($fieldname, 'readonly', 'true');
+				$form->setFieldAttribute($fieldname, 'filter', 'unset');
+			}
+		}
+
 		// Only allow email to guests to admins
 		if ((!$isNew || $isLogged) && !$this->canManage)
 		{
 			$readonlyFields[]= 'email';
 			$hiddenFields[]  = 'email';
+			$readonlyFields[]= 'name';
+			$hiddenFields[]  = 'name';
 		}
 
 		if (!$this->canManage)
@@ -299,7 +320,7 @@ class FlexicontentModelReview extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		$isOwner = $record && $record->user_id == $user->id;
@@ -374,7 +395,7 @@ class FlexicontentModelReview extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		return $this->canManage;
 	}
@@ -390,7 +411,7 @@ class FlexicontentModelReview extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		return $this->canManage;
 	}
@@ -460,8 +481,8 @@ class FlexicontentModelReview extends FCModelAdmin
 	 */
 	public function reviewerValidation($data)
 	{
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$review_id   = $data['id'];
 		$content_id  = $data['content_id'];
@@ -471,6 +492,9 @@ class FlexicontentModelReview extends FCModelAdmin
 
 		// Validate title, decode entities, and strip HTML
 		$data['title'] = flexicontent_html::dataFilter($data['title'], $maxlength=255, 'STRING', 0);
+
+		// Validate name: required for guests, logged users are identified by their account
+		$data['name'] = $user->id ? '' : trim(flexicontent_html::dataFilter(isset($data['name']) ? $data['name'] : '', $maxlength=100, 'STRING', 0));
 
 		// Validate email
 		$data['email'] = $user->id ? $user->email : flexicontent_html::dataFilter($data['email'], $maxlength=255, 'EMAIL', 0);
@@ -486,6 +510,12 @@ class FlexicontentModelReview extends FCModelAdmin
 		if (!$content_id)
 		{
 			$this->setError('Content being reviewed not given (content_id is zero)');
+			return false;
+		}
+
+		if (!$user->id && $data['name'] === '')
+		{
+			$this->setError(\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NAME'));
 			return false;
 		}
 
@@ -542,7 +572,7 @@ class FlexicontentModelReview extends FCModelAdmin
 
 		if (count($cid))
 		{
-			$user     = \Joomla\CMS\Factory::getUser();
+			$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 			$cid_list = implode(',', $cid);
 
 			$query = $this->_db->getQuery(true)
@@ -577,7 +607,7 @@ class FlexicontentModelReview extends FCModelAdmin
 	{
 		if (empty($this->fields[$item ? $item->type_id : 0]))
 		{
-			$db    = \Joomla\CMS\Factory::getDbo();
+			$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $db->Quote('voting');
 			$field = $db->setQuery($query)->loadObject();
 

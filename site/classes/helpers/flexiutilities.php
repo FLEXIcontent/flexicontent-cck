@@ -3,6 +3,23 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 class FLEXIUtilities
 {
+	/** Fill the new media labels on sites whose installed component pack predates the uploader. */
+	public static function loadMediaLanguage($clientPath)
+	{
+		$language = \Joomla\CMS\Factory::getApplication()->getLanguage();
+		$tag = $language->getTag();
+		if (!$tag || $tag === 'en-GB') return;
+
+		$bundle = JPATH_SITE . '/components/com_flexicontent';
+		$loaded = $language->load('com_flexicontent_media', $bundle, $tag, true, false);
+		$installed = $language->load('com_flexicontent_media', $clientPath, $tag, true, false);
+		if ($loaded || $installed)
+		{
+			// Prefer the site's French (or other current-language) component pack when it supplies a key.
+			$language->load('com_flexicontent', $clientPath, $tag, true, false);
+		}
+	}
+
 	static function funcIsDisabled($function)
 	{
 		static $disabledFuncs = null;
@@ -74,7 +91,7 @@ class FLEXIUtilities
 		//$extension = $extension ? $extension : 'com_flexicontent';
 
 		// Get current UI language, because language file paths use LL-CC (language-country)
-		$language_tag = $language_tag ? $language_tag : \Joomla\CMS\Factory::getLanguage()->getTag();
+		$language_tag = $language_tag ? $language_tag : \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 
 		// We will use template folder as BASE of language files instead of joomla's language folder
 		// Since FLEXIcontent templates are meant to be user-editable it makes sense to place language files inside them
@@ -82,8 +99,8 @@ class FLEXIUtilities
 		$base_dir = $tmpldir.DS.$tmplname;
 
 		// Final use joomla's API to load our template's language files -- (load english template language file then override with current language file)
-		\Joomla\CMS\Factory::getLanguage()->load($extension, $base_dir, 'en-GB', $reload=true);        // Fallback to english language template file
-		\Joomla\CMS\Factory::getLanguage()->load($extension, $base_dir, $language_tag, $reload=true);  // User's current language template file
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension, $base_dir, 'en-GB', $reload=true);        // Fallback to english language template file
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension, $base_dir, $language_tag, $reload=true);  // User's current language template file
 
 		if ($print_logging_info) $fc_run_times['templates_parsing_ini'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
@@ -98,7 +115,7 @@ class FLEXIUtilities
 	static function getlanguageslist($published_only=false, $add_all = true)
 	{
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		static $langs_cache = array();
 		//static $pub_languages = array();
 		//static $all_languages = array();
@@ -114,7 +131,7 @@ class FLEXIUtilities
 		 */
 
 		$query = $db->getQuery(true)
-			->select('DISTINCT lc.lang_id as id, lc.image as image_prefix, lc.lang_code as code, lc.title_native, lc.sef')
+			->select('lc.lang_id as id, lc.image as image_prefix, lc.lang_code as code, lc.title_native, lc.sef')
 			//->select('CASE WHEN CHAR_LENGTH(lc.title_native) THEN CONCAT(lc.title, " (", lc.title_native, ")") ELSE lc.title END as name')
 			->select('lc.title as name')
 			->from('#__languages as lc')
@@ -223,7 +240,7 @@ class FLEXIUtilities
 		) {
 			if (!$id) $all_retrieved = true;
 			$g_lastversions =  array();
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$query = "SELECT item_id as id, max(version_id) as version"
 									." FROM #__flexicontent_versions"
 									." WHERE 1"
@@ -257,7 +274,7 @@ class FLEXIUtilities
 
 		if( $g_currentversions==NULL || $force )
 		{
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			if (!FLEXI_J16GE) {
 				$query = "SELECT i.id, i.version FROM #__content AS i"
 					." WHERE i.sectionid=".FLEXI_SECTION
@@ -295,7 +312,7 @@ class FLEXIUtilities
 
 	static function &getLastItemVersion($id)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT max(version) as version'
 				.' FROM #__flexicontent_items_versions'
 				.' WHERE item_id = ' . (int)$id
@@ -313,7 +330,7 @@ class FLEXIUtilities
 
 		if ($status === null)
 		{
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c "
 				." LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version"
 				." JOIN #__categories as cat ON c.catid=cat.id"
@@ -336,13 +353,14 @@ class FLEXIUtilities
 	 * @return int
 	 * @since 1.5
 	 */
-	static function &getFirstVersion($id, $max, $current_version)
+	static function &getFirstVersion($id, $max, $current_version, $exclude_kept = false)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT version_id'
 				.' FROM #__flexicontent_versions'
 				.' WHERE item_id = ' . (int)$id
 				.' AND version_id!=' . (int)$current_version
+				.($exclude_kept ? ' AND keep = 0' : '')
 				.' ORDER BY version_id DESC'
 				;
 		$db->setQuery($query, ($max-1), 1);
@@ -357,12 +375,13 @@ class FLEXIUtilities
 	 * @return int
 	 * @since 1.5
 	 */
-	static function &getVersionsCount($id)
+	static function &getVersionsCount($id, $exclude_kept = false)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT COUNT(*)'
 				.' FROM #__flexicontent_versions'
 				.' WHERE item_id = ' . (int)$id
+				.($exclude_kept ? ' AND keep = 0' : '')
 				;
 		$db->setQuery($query);
 		$versionscount = $db->loadResult();
@@ -371,20 +390,95 @@ class FLEXIUtilities
 	}
 
 
+	/**
+	 * Load the minimal item data needed by the version history table and access checks.
+	 * Avoids the full item model, which is not available in the frontend RAW context.
+	 *
+	 * @return object|null
+	 */
+	static function getVersionRecord($id)
+	{
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$db->setQuery(
+			'SELECT c.id, c.created, c.created_by, c.version AS current_version, ua.name AS creator, ie.type_id'
+			.' FROM #__content AS c'
+			.' LEFT JOIN #__users AS ua ON ua.id = c.created_by'
+			.' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = c.id'
+			.' WHERE c.id = ' . (int) $id
+		);
+
+		return $db->loadObject();
+	}
+
+
+	/**
+	 * Toggle the permanent-backup flag of one version.
+	 * Only one version per item can be kept; the kept version is excluded from rotation.
+	 *
+	 * @param   int  $id       Item id
+	 * @param   int  $version  Version number
+	 *
+	 * @return  array  array('success' => bool, 'keep' => int, 'error' => string)
+	 */
+	static function setVersionKeep($id, $version)
+	{
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		$db->setQuery(
+			'SELECT id, keep FROM #__flexicontent_versions'
+			.' WHERE item_id = ' . (int) $id
+			.' AND version_id = ' . (int) $version
+		);
+		$row = $db->loadObject();
+
+		if (!$row)
+		{
+			return array('success' => false, 'keep' => 0, 'error' => \Joomla\CMS\Language\Text::_('FLEXI_VERSION_NOT_FOUND'));
+		}
+
+		$new_keep = (int) $row->keep ? 0 : 1;
+
+		// Clear any other permanent backup of this item, then toggle the requested version
+		$db->setQuery('UPDATE #__flexicontent_versions SET keep = 0 WHERE item_id = ' . (int) $id)->execute();
+		$db->setQuery('UPDATE #__flexicontent_versions SET keep = ' . $new_keep . ' WHERE id = ' . (int) $row->id)->execute();
+
+		return array('success' => true, 'keep' => $new_keep, 'error' => '');
+	}
+
+
+	/**
+	 * Get the version marked as permanent backup for an item (0 if none)
+	 *
+	 * @return int
+	 */
+	static function getKeptVersion($id)
+	{
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$query = 'SELECT version_id'
+				.' FROM #__flexicontent_versions'
+				.' WHERE item_id = ' . (int)$id
+				.' AND keep = 1'
+				.' ORDER BY id DESC'
+				;
+		$db->setQuery($query, 0, 1);
+
+		return (int) $db->loadResult();
+	}
+
+
 	static function getCache($group='', $client=0)
 	{
-		$conf = \Joomla\CMS\Factory::getConfig();
+		$conf = \Joomla\CMS\Factory::getApplication()->getConfig();
 
 		//$client = 0;//0 is site, 1 is admin
 		$options = array(
 			'defaultgroup' => $group,
 			'storage' => $conf->get('cache_handler', ''),
 			'caching' => true,
-			'cachebase' => ($client == 1 ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache'))
+			'cachebase' => ($client == 1 ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_CACHE))
 		);
 
-		jimport('joomla.cache.cache');
-		$cache = \Joomla\CMS\Cache\Cache::getInstance('', $options);
+		$cache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('', $options);
 
 		return $cache;
 	}
@@ -580,7 +674,7 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 	 */
 	static function isSqlValidDate($date)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$q = "SELECT day(".$db->Quote($date).")";
 		$db->setQuery($q);
 		$num = $db->loadResult();
@@ -630,13 +724,14 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 				if($char==$enclosure_char) {
 					$isEnclosured = true;
 				} else {
-					if( $char==$fld_sep_start && $i+$fld_sep_size < $size && substr($string, $i,$fld_sep_size) == $field_separator ) {
+					// A separator may also be the last character(s) of the file, e.g. an export whose last item ends with an empty field
+					if( $char==$fld_sep_start && $i+$fld_sep_size <= $size && substr($string, $i,$fld_sep_size) == $field_separator ) {
 						$i = $i + ($fld_sep_size-1);
 						$array[$rowIndex][$columnIndex] = $fieldValue;
 						$fieldValue="";
 
 						$columnIndex++;
-					} else if( $char==$rec_sep_start && $i+$rec_sep_size < $size && substr($string, $i,$rec_sep_size) == $record_separator ) {
+					} else if( $char==$rec_sep_start && $i+$rec_sep_size <= $size && substr($string, $i,$rec_sep_size) == $record_separator ) {
 						$i = $i + ($rec_sep_size-1);
 						echo "\n";
 						$array[$rowIndex][$columnIndex] = $fieldValue;
@@ -653,7 +748,7 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 			}
 		}
 
-		if($fieldValue) { // save last field
+		if($fieldValue !== '' || $columnIndex > 0) { // save last field (also an empty one, or '0', after a field separator)
 			$array[$rowIndex][$columnIndex] = $fieldValue;
 		}
 		return $array;
@@ -717,14 +812,15 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 		$perms   = FlexicontentHelperPerm::getPerm();
 		$app     = \Joomla\CMS\Factory::getApplication();
 		$jinput  = $app->input;
-		$db      = \Joomla\CMS\Factory::getDbo();
-		$session = \Joomla\CMS\Factory::getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		// Redirect to Joomla backend
 		if (!$perms->CanManage)
 		{
-			$app->redirect('index.php', \Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS'), 'warning');
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS'), 'warning');
+			$app->redirect('index.php');
 		}
 
 		// Check access to current management tab
@@ -776,21 +872,21 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 			elseif ($comments === 1 && $perms->CanComments)
 			{
 				call_user_func($addEntry,
-					'<a href="index.php?option=com_jcomments&amp;task=view&amp;fog=com_flexicontent" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
+					'<a href="index.php?option=com_jcomments&amp;task=view&amp;fog=com_flexicontent" onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
 						'<span class="fcsb-icon-comments icon-comments"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_COMMENTS') .
 					'</a>', '', false);
 			}
 			elseif ($comments === 3 && $perms->CanComments)
 			{
 				call_user_func($addEntry,
-					'<a href="index.php?option=com_komento" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
+					'<a href="index.php?option=com_komento" onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
 						'<span class="fcsb-icon-comments icon-comments"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_COMMENTS') .
 					'</a>', '', false);
 			}
 			elseif ($comments === 0 && $cparams->get('comments_admin_link'))
 			{
 				call_user_func($addEntry,
-					'<a href="' . $cparams->get('comments_admin_link') . '" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
+					'<a href="' . $cparams->get('comments_admin_link') . '" onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
 						'<span class="fcsb-icon-comments icon-comments"></span>'.\Joomla\CMS\Language\Text::_('FLEXI_COMMENTS').
 					'</a>', '', false);
 			}
@@ -849,27 +945,11 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 			$perms->CanIndex
 				? call_user_func($addEntry, '<span class="fcsb-icon-search icon-search"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search') : null;
 
-			$CanSeeSearchLogs = !FLEXI_J40GE && \Joomla\CMS\Factory::getUser()->authorise('core.admin', 'com_search');
-
-			if ($CanSeeSearchLogs)
-			{
-				$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_search');
-				$enable_log_searches = $params->get('enabled');
-				if ($enable_log_searches)
-				{
-					call_user_func($addEntry,
-					'<a href="index.php?option=com_search&tmpl=component" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
+			$perms->CanIndex
+				? call_user_func($addEntry,
+					'<a href="index.php?option=com_flexicontent&view=search&layout=logs&tmpl=component" onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
 						'<span class="fcsb-icon-book icon-book"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ).
-					'</a>', '', false);
-				}
-				else
-				{
-					call_user_func($addEntry,
-					'<a href="index.php?option=com_config&view=component&component=com_search&path=" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, function(){window.location.reload(false)}); return false;" >'.
-						'<span class="fcsb-icon-book icon-book"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ).
-					'</a>', '', false);
-				}
-			}
+					'</a>', '', false) : null;
 
 			$perms->CanStats
 				? call_user_func($addEntry, '<span class="fcsb-icon-stats icon-chart"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats') : null;
@@ -902,7 +982,7 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 			if ($perms->CanPlugins)
 			{
 				call_user_func($addEntry,
-				'<a href="index.php?option=com_plugins" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
+				'<a href="index.php?option=com_plugins" onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
 					'<span class="fcsb-icon-plugins icon-power-cord"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_PLUGINS' ).
 				'</a>', '', false);
 			}
@@ -910,7 +990,7 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 			if ($perms->CanConfig && empty($_SERVER['HTTPS']))
 			{
 				call_user_func($addEntry,
-				'<a href="https://flexicontent.org/downloads/translations.html?tmpl=component" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 650, 0); return false;" >'.
+				'<a href="https://flexicontent.org/downloads/translations.html?tmpl=component" onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 650, 0); return false;" >'.
 					'<span class="fcsb-icon-translations icon-flag"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_TRANSLATION_PACKAGES' ).
 				'</a>', '', false);
 			}

@@ -72,23 +72,23 @@ class fc_Waveform_LazyLoad
 	fcview_mediafile.initValue = function(tagid, config_name)
 	{
 		var fnn  = tagid.replace(/-/g, '_');
-		var file = jQuery('#fcview_' + tagid + '_file-data-txt');
+		var file = document.getElementById('fcview_' + tagid + '_file-data-txt');
+		var waveform = document.getElementById('fc_mediafile_audio_spectrum_' + fnn);
+		var box = document.getElementById('fc_mediafile_audio_spectrum_box_' + fnn);
+		var controls = document.getElementById('fc_mediafile_controls_' + fnn);
+		if (!file || !waveform || !box || !controls || FlexiForm.data(waveform, 'audio_spectrum')) return;
 		var loading_timer = null, progress_timer = null;
+		var loadingLabel = window.Joomla?.Text?._('FLEXI_FIELD_MEDIAFILE_LOADING_PERCENT') || '%s%';
 
-		var box    = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn);
-		var slider = document.querySelector('#fc_mediafile_slider_' + fnn);
-
-		var _progressBar = box.find('.fc_mediafile_audio_spectrum_progressbar');
-		if (_progressBar.length)
-		{
-			var bar          = _progressBar.find('.bar').get(0);
-			var barText      = _progressBar.find('.barText').get(0);
-			var progressBar  = box.find('.fc_mediafile_audio_spectrum_progressbar').get(0);
-		}
-		else
-		{
-			progressBar = false;
-		}
+		var slider = document.getElementById('fc_mediafile_slider_' + fnn);
+		var progressBar = box.querySelector('.fc_mediafile_audio_spectrum_progressbar');
+		var bar = progressBar?.querySelector('.bar');
+		var barText = progressBar?.querySelector('.barText');
+		var preview = file.dataset.wfpreview;
+		var peaks = file.dataset.wfpeaks;
+		var loadError;
+		var base = (fcview_mediafile_base_url[config_name] || '').replace(/\/$/, '');
+		var mediaURL = path => new URL(path, new URL(base + '/', document.baseURI));
 
 		var keyPressedDown = function(key_event)
 		{
@@ -206,7 +206,7 @@ class fc_Waveform_LazyLoad
 
 			var factor = 100;
 
-			barText.innerHTML = 'Loading : ' + percent + ' %';
+			barText.textContent = loadingLabel.replace('%s', percent);
 			progressBar.style.opacity = '1';
 			progressBar.style.visibility = 'visible';
 
@@ -216,7 +216,7 @@ class fc_Waveform_LazyLoad
 				var frame = 0;
 				loading_timer = setInterval(function ()
 				{
-					barText.innerHTML = 'Loading : ' + percent + ' %';
+					barText.textContent = loadingLabel.replace('%s', percent);
 					frame += 1;
 					if (frame >= steps)
 					{
@@ -242,7 +242,7 @@ class fc_Waveform_LazyLoad
 
 			if (!!percent)
 			{
-				barText.innerHTML = 'Loading : ' + percent + ' %';
+				barText.textContent = loadingLabel.replace('%s', percent);
 				progressBar.style.opacity = '0.75';
 
 				setTimeout(function () {
@@ -283,15 +283,29 @@ class fc_Waveform_LazyLoad
 
 		var loadFile = function ()
 		{
-			var isURL = /^(f|ht)tps?:\/\//i.test(file.data('wfpreview'));
-			var url   = isURL ? file.data('wfpreview') : fcview_mediafile_base_url[config_name] + '/' + file.data('wfpreview');
-			// v7: load() renders waveform and loads audio; pass peaks only when available
-			if (audio_spectrum._saved_peaks_) {
-				audio_spectrum.load(url, [audio_spectrum._saved_peaks_]);
-			} else {
-				audio_spectrum.load(url);
-			}
+			if (loadError) loadError.hidden = true;
+			var url = mediaURL(preview).href;
+			var channelData = audio_spectrum._saved_peaks_ ? [audio_spectrum._saved_peaks_] : undefined;
 			audio_spectrum._loading_started_ = true;
+			audio_spectrum.load(url, channelData).catch(function ()
+			{
+				audio_spectrum._loading_started_ = false;
+				audio_spectrum.start_on_ready = false;
+				stopProgressBar(0);
+				buttons.play.disabled = false;
+				buttons.pause.disabled = buttons.stop.disabled = true;
+				buttons.pause.classList.remove('is_active');
+				buttons.play.style.display = 'inline-block';
+				buttons.pause.style.display = buttons.stop.style.display = 'none';
+				if (!loadError) {
+					loadError = document.createElement('p');
+					loadError.className = 'alert alert-warning fc-mediafile-load-error';
+					loadError.setAttribute('role', 'status');
+					loadError.textContent = Joomla.Text._('FLEXI_FIELD_MEDIAFILE_PLAYBACK_LOAD_FAILED');
+					box.before(loadError);
+				}
+				loadError.hidden = false;
+			});
 		}
 
 
@@ -330,15 +344,14 @@ class fc_Waveform_LazyLoad
 		audio_spectrum._stopProgressBar   = stopProgressBar;
 		audio_spectrum._updateProgressBar = updateProgressBar;
 
-		jQuery('#fc_mediafile_audio_spectrum_' + fnn).data('audio_spectrum', audio_spectrum);
+		FlexiForm.data(waveform, 'audio_spectrum', audio_spectrum);
 
 		// Get control buttons
-		var controls = jQuery('#fc_mediafile_controls_' + fnn);
 		var buttons = {
-			load:  controls.find('.loadBtn').get(0),
-			play:  controls.find('.playBtn').get(0),
-			pause: controls.find('.pauseBtn').get(0),
-			stop:  controls.find('.stopBtn').get(0)
+			load:  controls.querySelector('.loadBtn'),
+			play:  controls.querySelector('.playBtn'),
+			pause: controls.querySelector('.pauseBtn'),
+			stop:  controls.querySelector('.stopBtn')
 		}
 
 		audio_spectrum._buttons_ = buttons;
@@ -422,26 +435,15 @@ class fc_Waveform_LazyLoad
 			console.warn(e);
 		});
 
-		box.get(0).addEventListener("keydown", function (event) {
-			return keyPressedDown(event);
-		}, false);
-		box.get(0).addEventListener("keydown", function (event) {
-			return keyPressedDown(event);
-		}, false);
-
-		buttons.play.addEventListener("keydown", function (event) {
-			return keyPressedDown(event);
-		}, false);
-		buttons.pause.addEventListener("keydown", function (event) {
-			return keyPressedDown(event);
-		}, false);
+		box.addEventListener('keydown', keyPressedDown);
+		if (!box.contains(controls)) controls.addEventListener('keydown', keyPressedDown);
 
 		// Add events of playback buttons
 		buttons.play.addEventListener('click', function()
 		{
-			if (!!!file.data('wfpreview'))
+			if (!preview)
 			{
-				alert(Joomla.JText._('Preview can not load file. Reference to preview file is empty.'));
+				FlexiForm.alert(Joomla.Text._('FLEXI_FIELD_MEDIAFILE_PREVIEW_MISSING'));
 				return;
 			}
 
@@ -534,7 +536,7 @@ class fc_Waveform_LazyLoad
 
 		buttons.load.addEventListener('click', function()
 		{
-			if (!!file.data('wfpreview'))
+			if (preview)
 			{
 				buttons.pause.disabled = true;
 				buttons.stop.disabled  = true;
@@ -548,40 +550,29 @@ class fc_Waveform_LazyLoad
 
 
 		// Render waveform from pre-computed peaks (if peaks JSON is available)
-		if (!!file.data('wfpreview') && !!file.data('wfpeaks'))
+		if (preview && peaks)
 		{
-			var isURL   = /^(f|ht)tps?:\/\//i.test(file.data('wfpreview'));
-			var mp3Url  = isURL ? file.data('wfpreview') : fcview_mediafile_base_url[config_name] + '/' + file.data('wfpreview');
-			var jsonUrl = isURL ? file.data('wfpeaks')   : fcview_mediafile_base_url[config_name] + '/' + file.data('wfpeaks');
-
+			const jsonUrl = mediaURL(peaks);
+			jsonUrl.searchParams.set('format', 'json');
 			updateProgressBar(0);
 
-			jQuery.ajax({
-				url:      jsonUrl,
-				dataType: 'json',
-				data:     { format: 'json' },
-
-				progress: function(t)
-				{
-					var e = t.lengthComputable ? t.loaded / t.total : t.loaded / (t.loaded + 1e6);
-					updateProgressBar(Math.round(100 * e), null);
-				},
-
-				success: function(response)
-				{
-					var data = response.data;
-					data.unshift(data[1]);
-
-					// v7: store peaks for reuse; wrap in array for per-channel format
-					audio_spectrum._saved_peaks_ = data;
-
-					// v7: load() with peaks renders waveform immediately while audio loads in background
-					audio_spectrum.load(mp3Url, [data]);
-					audio_spectrum._loading_started_ = true;
-
-					stopProgressBar(100);
-				}
+			const request = new XMLHttpRequest();
+			request.open('GET', jsonUrl);
+			request.responseType = 'json';
+			if (jsonUrl.origin === location.origin) request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+			request.addEventListener('progress', event => {
+				const fraction = event.lengthComputable ? event.loaded / event.total : event.loaded / (event.loaded + 1e6);
+				updateProgressBar(Math.round(100 * fraction));
 			});
+			request.addEventListener('load', () => {
+				const data = request.response?.data;
+				if (request.status >= 200 && request.status < 300 && Array.isArray(data) && data.length > 1 && !audio_spectrum._loading_started_) {
+					audio_spectrum._saved_peaks_ = [data[1], ...data];
+					loadFile();
+				}
+				stopProgressBar(100);
+			});
+			request.addEventListener('error', () => stopProgressBar(0));
+			request.send();
 		}
-
 	}

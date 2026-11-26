@@ -5,12 +5,18 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright � 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
 class plgFlexicontent_fieldsToolbar extends FCField
@@ -64,7 +70,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -83,7 +89,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		if ($app->input->get('print', '', 'cmd')) return;
 
 		//$scheme = \Joomla\CMS\Uri\Uri::getInstance()->getScheme();  // we replaced http(s):// with //
-		$document	= \Joomla\CMS\Factory::getDocument();
+		$document	= \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		$lang = $document->getLanguage();
 		$lang = $item->parameters->get('language', $lang);
@@ -122,7 +128,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		if ($load_css && !$css_loaded)
 		{
 			$css_loaded = true;
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
+			$document->getWebAssetManager()->registerAndUseStyle('plg_flexicontent_fields_toolbar.style', 'plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
 		}
 
 
@@ -147,7 +153,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			// OPEN GRAPH: site name
 			if ($field->parameters->get('add_og_site_name') && $view == 'item')
 			{
-				$document->addCustomTag("<meta property=\"og:site_name\" content=\"".\Joomla\CMS\Factory::getApplication()->getCfg('sitename')."\" />");
+				$document->addCustomTag("<meta property=\"og:site_name\" content=\"".\Joomla\CMS\Factory::getApplication()->get('sitename')."\" />");
 			}
 
 			// OPEN GRAPH: title
@@ -201,7 +207,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 				// Add image if fould, making sure it is converted to ABSOLUTE URL
 				if ($imageurl)
 				{
-					$is_absolute = (boolean) parse_url($imageurl, PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $imageurl);
+					$is_absolute = (bool) parse_url($imageurl, PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $imageurl);
 					$imageurl = $is_absolute ? $imageurl : \Joomla\CMS\Uri\Uri::root().$imageurl;
 					$document->addCustomTag("<meta property=\"og:image\" content=\"{$imageurl}\" />");
 				}
@@ -219,7 +225,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 
 		// Get layout name
 		$viewlayout = $field->parameters->get('viewlayout', '');
-		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_sharing_button';
+		$viewlayout = $viewlayout && $viewlayout !== 'default' ? 'value_'.$viewlayout : 'value_sharing_button';
 
 		// Create field's viewing HTML, using layout file
 		$field->{$prop} = array();
@@ -260,14 +266,14 @@ class plgFlexicontent_fieldsToolbar extends FCField
 
 	private function _getCommentsCount($id)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		static $jcomment_installed = null;
 
 		if ($jcomment_installed===null) {
 			$app = \Joomla\CMS\Factory::getApplication();
-			$dbprefix = $app->getCfg('dbprefix');
+			$dbprefix = $app->get('dbprefix');
 			$db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'jcomments"');
-			$jcomment_installed = (boolean) count($db->loadObjectList());
+			$jcomment_installed = (bool) count($db->loadObjectList());
 		}
 		if (!$jcomment_installed) return 0;
 

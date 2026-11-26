@@ -2,172 +2,356 @@
 
 namespace Sabberworm\CSS\RuleSet;
 
-use Sabberworm\CSS\Rule\Rule;
-use Sabberworm\CSS\Renderable;
+use Sabberworm\CSS\Comment\Comment;
 use Sabberworm\CSS\Comment\Commentable;
+use Sabberworm\CSS\CSSElement;
+use Sabberworm\CSS\OutputFormat;
+use Sabberworm\CSS\Parsing\ParserState;
+use Sabberworm\CSS\Parsing\UnexpectedEOFException;
+use Sabberworm\CSS\Parsing\UnexpectedTokenException;
+use Sabberworm\CSS\Position\Position;
+use Sabberworm\CSS\Position\Positionable;
+use Sabberworm\CSS\Renderable;
+use Sabberworm\CSS\Rule\Rule;
 
 /**
- * RuleSet is a generic superclass denoting rules. The typical example for rule sets are declaration block.
- * However, unknown At-Rules (like @font-face) are also rule sets.
+ * This class is a container for individual 'Rule's.
+ *
+ * The most common form of a rule set is one constrained by a selector, i.e., a `DeclarationBlock`.
+ * However, unknown `AtRule`s (like `@font-face`) are rule sets as well.
+ *
+ * If you want to manipulate a `RuleSet`, use the methods `addRule(Rule $rule)`, `getRules()` and `removeRule($rule)`
+ * (which accepts either a `Rule` or a rule name; optionally suffixed by a dash to remove all related rules).
  */
-abstract class RuleSet implements Renderable, Commentable {
+abstract class RuleSet implements CSSElement, Commentable, Positionable
+{
+    use Position;
 
-	private $aRules;
-	protected $iLineNo;
-	protected $aComments;
+    /**
+     * the rules in this rule set, using the property name as the key,
+     * with potentially multiple rules per property name.
+     *
+     * @var array<string, array<int<0, max>, Rule>>
+     */
+    private $aRules;
 
-	public function __construct($iLineNo = 0) {
-		$this->aRules = array();
-		$this->iLineNo = $iLineNo;
-		$this->aComments = array();
-	}
+    /**
+     * @var array<array-key, Comment>
+     *
+     * @internal since 8.8.0
+     */
+    protected $aComments;
 
-	/**
-	 * @return int
-	 */
-	public function getLineNo() {
-		return $this->iLineNo;
-	}
+    /**
+     * @param int $iLineNo
+     */
+    public function __construct($iLineNo = 0)
+    {
+        $this->aRules = [];
+        $this->setPosition($iLineNo);
+        $this->aComments = [];
+    }
 
-	public function addRule(Rule $oRule, Rule $oSibling = null) {
-		$sRule = $oRule->getRule();
-		if(!isset($this->aRules[$sRule])) {
-			$this->aRules[$sRule] = array();
-		}
+    /**
+     * @return void
+     *
+     * @throws UnexpectedTokenException
+     * @throws UnexpectedEOFException
+     *
+     * @internal since V8.8.0
+     */
+    public static function parseRuleSet(ParserState $oParserState, RuleSet $oRuleSet)
+    {
+        while ($oParserState->comes(';')) {
+            $oParserState->consume(';');
+        }
+        while (true) {
+            $commentsBeforeRule = $oParserState->consumeWhiteSpace();
+            if ($oParserState->comes('}')) {
+                break;
+            }
+            $oRule = null;
+            if ($oParserState->getSettings()->bLenientParsing) {
+                try {
+                    $oRule = Rule::parse($oParserState, $commentsBeforeRule);
+                } catch (UnexpectedTokenException $e) {
+                    try {
+                        $sConsume = $oParserState->consumeUntil(["\n", ";", '}'], true);
+                        // We need to “unfind” the matches to the end of the ruleSet as this will be matched later
+                        if ($oParserState->streql(substr($sConsume, -1), '}')) {
+                            $oParserState->backtrack(1);
+                        } else {
+                            while ($oParserState->comes(';')) {
+                                $oParserState->consume(';');
+                            }
+                        }
+                    } catch (UnexpectedTokenException $e) {
+                        // We’ve reached the end of the document. Just close the RuleSet.
+                        return;
+                    }
+                }
+            } else {
+                $oRule = Rule::parse($oParserState, $commentsBeforeRule);
+            }
+            if ($oRule) {
+                $oRuleSet->addRule($oRule);
+            }
+        }
+        $oParserState->consume('}');
+    }
 
-		$iPosition = count($this->aRules[$sRule]);
+    /**
+     * @param Rule|null $oSibling
+     *
+     * @return void
+     */
+    public function addRule(Rule $oRule, $oSibling = null)
+    {
+        $sRule = $oRule->getRule();
+        if (!isset($this->aRules[$sRule])) {
+            $this->aRules[$sRule] = [];
+        }
 
-		if ($oSibling !== null) {
-			$iSiblingPos = array_search($oSibling, $this->aRules[$sRule], true);
-			if ($iSiblingPos !== false) {
-				$iPosition = $iSiblingPos;
-			}
-		}
+        $iPosition = count($this->aRules[$sRule]);
 
-		array_splice($this->aRules[$sRule], $iPosition, 0, array($oRule));
-	}
+        if ($oSibling !== null) {
+            $iSiblingPos = array_search($oSibling, $this->aRules[$sRule], true);
+            if ($iSiblingPos !== false) {
+                $iPosition = $iSiblingPos;
+                $oRule->setPosition($oSibling->getLineNo(), $oSibling->getColNo() - 1);
+            }
+        }
+        if ($oRule->getLineNumber() === null) {
+            //this node is added manually, give it the next best line
+            $columnNumber = $oRule->getColNo();
+            $rules = $this->getRules();
+            $pos = count($rules);
+            if ($pos > 0) {
+                $last = $rules[$pos - 1];
+                $oRule->setPosition($last->getLineNo() + 1, $columnNumber);
+            } else {
+                $oRule->setPosition(1, $columnNumber);
+            }
+        } elseif ($oRule->getColumnNumber() === null) {
+            $oRule->setPosition($oRule->getLineNumber(), 0);
+        }
 
-	/**
-	 * Returns all rules matching the given rule name
-	 * @param (null|string|Rule) $mRule pattern to search for. If null, returns all rules. if the pattern ends with a dash, all rules starting with the pattern are returned as well as one matching the pattern with the dash excluded. passing a Rule behaves like calling getRules($mRule->getRule()).
-	 * @example $oRuleSet->getRules('font-') //returns an array of all rules either beginning with font- or matching font.
-	 * @example $oRuleSet->getRules('font') //returns array(0 => $oRule, …) or array().
-	 */
-	public function getRules($mRule = null) {
-		if ($mRule instanceof Rule) {
-			$mRule = $mRule->getRule();
-		}
-		$aResult = array();
-		foreach($this->aRules as $sName => $aRules) {
-			// Either no search rule is given or the search rule matches the found rule exactly or the search rule ends in “-” and the found rule starts with the search rule.
-			if(!$mRule || $sName === $mRule || (strrpos($mRule, '-') === strlen($mRule) - strlen('-') && (strpos($sName, $mRule) === 0 || $sName === substr($mRule, 0, -1)))) {
-				$aResult = array_merge($aResult, $aRules);
-			}
-		}
-		return $aResult;
-	}
+        array_splice($this->aRules[$sRule], $iPosition, 0, [$oRule]);
+    }
 
-	/**
-	 * Override all the rules of this set.
-	 * @param array $aRules The rules to override with.
-	 */
-	public function setRules(array $aRules) {
-		$this->aRules = array();
-		foreach ($aRules as $rule) {
-			$this->addRule($rule);
-		}
-	}
+    /**
+     * Returns all rules matching the given rule name
+     *
+     * @example $oRuleSet->getRules('font') // returns array(0 => $oRule, …) or array().
+     *
+     * @example $oRuleSet->getRules('font-')
+     *          //returns an array of all rules either beginning with font- or matching font.
+     *
+     * @param Rule|string|null $mRule
+     *        Pattern to search for. If null, returns all rules.
+     *        If the pattern ends with a dash, all rules starting with the pattern are returned
+     *        as well as one matching the pattern with the dash excluded.
+     *        Passing a `Rule` for this parameter is deprecated in version 8.9.0, and will not work from v9.0.
+     *        Call `getRules($rule->getRule())` instead.
+     *
+     * @return array<int, Rule>
+     */
+    public function getRules($mRule = null)
+    {
+        if ($mRule instanceof Rule) {
+            $mRule = $mRule->getRule();
+        }
+        /** @var array<int, Rule> $aResult */
+        $aResult = [];
+        foreach ($this->aRules as $sName => $aRules) {
+            // Either no search rule is given or the search rule matches the found rule exactly
+            // or the search rule ends in “-” and the found rule starts with the search rule.
+            if (
+                !$mRule || $sName === $mRule
+                || (
+                    strrpos($mRule, '-') === strlen($mRule) - strlen('-')
+                    && (strpos($sName, $mRule) === 0 || $sName === substr($mRule, 0, -1))
+                )
+            ) {
+                $aResult = array_merge($aResult, $aRules);
+            }
+        }
+        usort($aResult, function (Rule $first, Rule $second) {
+            if ($first->getLineNo() === $second->getLineNo()) {
+                return $first->getColNo() - $second->getColNo();
+            }
+            return $first->getLineNo() - $second->getLineNo();
+        });
+        return $aResult;
+    }
 
-	/**
-	 * Returns all rules matching the given pattern and returns them in an associative array with the rule’s name as keys. This method exists mainly for backwards-compatibility and is really only partially useful.
-	 * @param (string) $mRule pattern to search for. If null, returns all rules. if the pattern ends with a dash, all rules starting with the pattern are returned as well as one matching the pattern with the dash excluded. passing a Rule behaves like calling getRules($mRule->getRule()).
-	 * Note: This method loses some information: Calling this (with an argument of 'background-') on a declaration block like { background-color: green; background-color; rgba(0, 127, 0, 0.7); } will only yield an associative array containing the rgba-valued rule while @link{getRules()} would yield an indexed array containing both.
-	 */
-	public function getRulesAssoc($mRule = null) {
-		$aResult = array();
-		foreach($this->getRules($mRule) as $oRule) {
-			$aResult[$oRule->getRule()] = $oRule;
-		}
-		return $aResult;
-	}
+    /**
+     * Overrides all the rules of this set.
+     *
+     * @param array<array-key, Rule> $aRules The rules to override with.
+     *
+     * @return void
+     */
+    public function setRules(array $aRules)
+    {
+        $this->aRules = [];
+        foreach ($aRules as $rule) {
+            $this->addRule($rule);
+        }
+    }
 
-	/**
-	* Remove a rule from this RuleSet. This accepts all the possible values that @link{getRules()} accepts. If given a Rule, it will only remove this particular rule (by identity). If given a name, it will remove all rules by that name. Note: this is different from pre-v.2.0 behaviour of PHP-CSS-Parser, where passing a Rule instance would remove all rules with the same name. To get the old behvaiour, use removeRule($oRule->getRule()).
- * @param (null|string|Rule) $mRule pattern to remove. If $mRule is null, all rules are removed. If the pattern ends in a dash, all rules starting with the pattern are removed as well as one matching the pattern with the dash excluded. Passing a Rule behaves matches by identity.
-	*/
-	public function removeRule($mRule) {
-		if($mRule instanceof Rule) {
-			$sRule = $mRule->getRule();
-			if(!isset($this->aRules[$sRule])) {
-				return;
-			}
-			foreach($this->aRules[$sRule] as $iKey => $oRule) {
-				if($oRule === $mRule) {
-					unset($this->aRules[$sRule][$iKey]);
-				}
-			}
-		} else {
-			foreach($this->aRules as $sName => $aRules) {
-				// Either no search rule is given or the search rule matches the found rule exactly or the search rule ends in “-” and the found rule starts with the search rule or equals it (without the trailing dash).
-				if(!$mRule || $sName === $mRule || (strrpos($mRule, '-') === strlen($mRule) - strlen('-') && (strpos($sName, $mRule) === 0 || $sName === substr($mRule, 0, -1)))) {
-					unset($this->aRules[$sName]);
-				}
-			}
-		}
-	}
+    /**
+     * Returns all rules matching the given pattern and returns them in an associative array with the rule’s name
+     * as keys. This method exists mainly for backwards-compatibility and is really only partially useful.
+     *
+     * Note: This method loses some information: Calling this (with an argument of `background-`) on a declaration block
+     * like `{ background-color: green; background-color; rgba(0, 127, 0, 0.7); }` will only yield an associative array
+     * containing the rgba-valued rule while `getRules()` would yield an indexed array containing both.
+     *
+     * @param Rule|string|null $mRule $mRule
+     *        Pattern to search for. If null, returns all rules. If the pattern ends with a dash,
+     *        all rules starting with the pattern are returned as well as one matching the pattern with the dash
+     *        excluded.
+     *        Passing a `Rule` for this parameter is deprecated in version 8.9.0, and will not work from v9.0.
+     *        Call `getRulesAssoc($rule->getRule())` instead.
+     *
+     * @return array<string, Rule>
+     */
+    public function getRulesAssoc($mRule = null)
+    {
+        /** @var array<string, Rule> $aResult */
+        $aResult = [];
+        foreach ($this->getRules($mRule) as $oRule) {
+            $aResult[$oRule->getRule()] = $oRule;
+        }
+        return $aResult;
+    }
 
-	public function __toString() {
-		return $this->render(new \Sabberworm\CSS\OutputFormat());
-	}
+    /**
+     * Removes a `Rule` from this `RuleSet` by identity.
+     *
+     * @param Rule|string|null $mRule
+     *        `Rule` to remove.
+     *        Passing a `string` or `null` is deprecated in version 8.9.0, and will no longer work from v9.0.
+     *        Use `removeMatchingRules()` or `removeAllRules()` instead.
+     */
+    public function removeRule($mRule)
+    {
+        if ($mRule instanceof Rule) {
+            $sRule = $mRule->getRule();
+            if (!isset($this->aRules[$sRule])) {
+                return;
+            }
+            foreach ($this->aRules[$sRule] as $iKey => $oRule) {
+                if ($oRule === $mRule) {
+                    unset($this->aRules[$sRule][$iKey]);
+                }
+            }
+        } elseif ($mRule !== null) {
+            $this->removeMatchingRules($mRule);
+        } else {
+            $this->removeAllRules();
+        }
+    }
 
-	public function render(\Sabberworm\CSS\OutputFormat $oOutputFormat) {
-		$sResult = '';
-		$bIsFirst = true;
-		foreach ($this->aRules as $aRules) {
-			foreach($aRules as $oRule) {
-				$sRendered = $oOutputFormat->safely(function() use ($oRule, $oOutputFormat) {
-					return $oRule->render($oOutputFormat->nextLevel());
-				});
-				if($sRendered === null) {
-					continue;
-				}
-				if($bIsFirst) {
-					$bIsFirst = false;
-					$sResult .= $oOutputFormat->nextLevel()->spaceBeforeRules();
-				} else {
-					$sResult .= $oOutputFormat->nextLevel()->spaceBetweenRules();
-				}
-				$sResult .= $sRendered;
-			}
-		}
-		
-		if(!$bIsFirst) {
-			// Had some output
-			$sResult .= $oOutputFormat->spaceAfterRules();
-		}
+    /**
+     * Removes rules by property name or search pattern.
+     *
+     * @param string $searchPattern
+     *        pattern to remove.
+     *        If the pattern ends in a dash,
+     *        all rules starting with the pattern are removed as well as one matching the pattern with the dash
+     *        excluded.
+     */
+    public function removeMatchingRules($searchPattern)
+    {
+        foreach ($this->aRules as $propertyName => $rules) {
+            // Either the search rule matches the found rule exactly
+            // or the search rule ends in “-” and the found rule starts with the search rule or equals it
+            // (without the trailing dash).
+            if (
+                $propertyName === $searchPattern
+                || (\strrpos($searchPattern, '-') === \strlen($searchPattern) - \strlen('-')
+                    && (\strpos($propertyName, $searchPattern) === 0
+                        || $propertyName === \substr($searchPattern, 0, -1)))
+            ) {
+                unset($this->aRules[$propertyName]);
+            }
+        }
+    }
 
-		return $oOutputFormat->removeLastSemicolon($sResult);
-	}
+    public function removeAllRules()
+    {
+        $this->aRules = [];
+    }
 
-	/**
-	 * @param array $aComments Array of comments.
-	 */
-	public function addComments(array $aComments) {
-		$this->aComments = array_merge($this->aComments, $aComments);
-	}
+    /**
+     * @return string
+     *
+     * @deprecated in V8.8.0, will be removed in V9.0.0. Use `render` instead.
+     */
+    public function __toString()
+    {
+        return $this->render(new OutputFormat());
+    }
 
-	/**
-	 * @return array
-	 */
-	public function getComments() {
-		return $this->aComments;
-	}
+    /**
+     * @return string
+     */
+    protected function renderRules(OutputFormat $oOutputFormat)
+    {
+        $sResult = '';
+        $bIsFirst = true;
+        $oNextLevel = $oOutputFormat->nextLevel();
+        foreach ($this->getRules() as $oRule) {
+            $sRendered = $oNextLevel->safely(function () use ($oRule, $oNextLevel) {
+                return $oRule->render($oNextLevel);
+            });
+            if ($sRendered === null) {
+                continue;
+            }
+            if ($bIsFirst) {
+                $bIsFirst = false;
+                $sResult .= $oNextLevel->spaceBeforeRules();
+            } else {
+                $sResult .= $oNextLevel->spaceBetweenRules();
+            }
+            $sResult .= $sRendered;
+        }
 
-	/**
-	 * @param array $aComments Array containing Comment objects.
-	 */
-	public function setComments(array $aComments) {
-		$this->aComments = $aComments;
-	}
+        if (!$bIsFirst) {
+            // Had some output
+            $sResult .= $oOutputFormat->spaceAfterRules();
+        }
 
+        return $oOutputFormat->removeLastSemicolon($sResult);
+    }
+
+    /**
+     * @param array<string, Comment> $aComments
+     *
+     * @return void
+     */
+    public function addComments(array $aComments)
+    {
+        $this->aComments = array_merge($this->aComments, $aComments);
+    }
+
+    /**
+     * @return array<string, Comment>
+     */
+    public function getComments()
+    {
+        return $this->aComments;
+    }
+
+    /**
+     * @param array<string, Comment> $aComments
+     *
+     * @return void
+     */
+    public function setComments(array $aComments)
+    {
+        $this->aComments = $aComments;
+    }
 }

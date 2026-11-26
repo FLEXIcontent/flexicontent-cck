@@ -621,6 +621,16 @@ body .nowrap_hidden {
   margin: -1px 0 0 0;
   white-space: nowrap;
 }
+#flexicontent .fcfield-relation-value_box {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: flex-start !important;
+  gap: 0.5rem !important;
+}
+#flexicontent .fcfield-relation-value_box > .fc-xpended-row {
+  width: auto !important;
+  flex: 1 1 auto !important;
+}
 #flexicontent {
   /* EXTRA START */
   /* EXTRA END */
@@ -1264,6 +1274,10 @@ td.col_edit_layout {
   /* SELECT2 */
   /* Single-choice */
   /* Multi-choises */
+  /* CHOICES.JS (equivalent of the SELECT2 width rules above) */
+  /* Single-choice */
+  /* Multi-choices */
+  /* Double size filters */
 }
 .flexicontent #fc-filters-box .fc-filter.fc-filter-double {
   min-width: 628px;
@@ -1406,6 +1420,34 @@ td.col_edit_layout {
   background: #fff url(../images/select2.png) no-repeat scroll -32px -22px !important;
   width: 100% !important;
 }
+.flexicontent #fc-filters-box .fc-filter .choices {
+  width: 196px !important;
+}
+.flexicontent #fc-filters-box .fc-filter .choices[data-type*="select-multiple"] {
+  width: 206px !important;
+}
+.flexicontent #fc-filters-box .fc-filter.fc-filter-double .choices {
+  width: 482px !important;
+}
+.flexicontent #fc-filters-box .fc-filter.fc-filter-double .choices[data-type*="select-multiple"] {
+  width: 490px !important;
+}
+/* Reorder toolbar filter selects: these .fc-filter are rendered outside
+   #fc-filters-box (into #fcorder_notes_box / #fc_fieldtype_filter_box),
+   so they need their own Choices width rules.
+   display:inline-block keeps them on the same line as the floated label:
+   without it the plain block .choices loses its BFC when the dropdown opens
+   and drops to the next line. */
+.flexicontent #fcorder_notes_box .choices,
+.flexicontent #fc_fieldtype_filter_box .choices {
+  width: 196px !important;
+  display: inline-block !important;
+  vertical-align: top;
+}
+.flexicontent #fcorder_notes_box .choices[data-type*="select-multiple"],
+.flexicontent #fc_fieldtype_filter_box .choices[data-type*="select-multiple"] {
+  width: 206px !important;
+}
 #s2id_scope.select2-container.use_select2_lib {
   margin: 0;
   display: inherit;
@@ -1470,7 +1512,7 @@ td.col_edit_layout {
     display: none;
   }
 }
-div#fc-filters-slide-btn {
+button#fc-filters-slide-btn {
   border: 0;
   background: none;
   box-shadow: none;
@@ -1708,7 +1750,14 @@ div.statetoggler > div.statetoggler_inner {
   min-height: auto;
   min-width: auto;
 }
-div.statetoggler > div.statetoggler_inner > div.stateopener {
+div.statetoggler > div.statetoggler_inner > button.stateopener,
+div.statetoggler > div.statetoggler_inner > .options > button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+}
+div.statetoggler > div.statetoggler_inner > .stateopener {
   line-height: auto;
   height: auto;
   width: auto;
@@ -1722,8 +1771,8 @@ div.statetoggler > div.statetoggler_inner > div.stateopener {
   text-decoration: none;
   position: relative;
 }
-div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_expired,
-div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_scheduled {
+div.statetoggler > div.statetoggler_inner > .stateopener span.fc_expired,
+div.statetoggler > div.statetoggler_inner > .stateopener span.fc_scheduled {
   position: absolute;
   left: -2px;
   right: -2px;
@@ -1733,17 +1782,17 @@ div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_scheduled {
   border-bottom: 1px solid gray;
   opacity: 1;
 }
-div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_expired + span:before,
-div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_scheduled + span:before {
+div.statetoggler > div.statetoggler_inner > .stateopener span.fc_expired + span:before,
+div.statetoggler > div.statetoggler_inner > .stateopener span.fc_scheduled + span:before {
   opacity: 0.4;
   color: black;
 }
-div.statetoggler > div.statetoggler_inner > div.stateopener.ajax-loader {
+div.statetoggler > div.statetoggler_inner > .stateopener.ajax-loader {
   background-position: center;
   padding: 8px;
   margin: -1px -1px -1px -1px;
 }
-div.statetoggler > div.statetoggler_inner > div.stateopener img {
+div.statetoggler > div.statetoggler_inner > .stateopener img {
   padding: 0;
   margin: 0;
   border: none;
@@ -1769,7 +1818,7 @@ div.statetoggler > div.statetoggler_inner > .options {
   box-sizing: border-box;
 }
 div.statetoggler > div.statetoggler_inner > .options > div,
-div.statetoggler > div.statetoggler_inner > .options > span {
+div.statetoggler > div.statetoggler_inner > .options > :is(span, button) {
   position: relative;
   float: left;
   clear: both;
@@ -1785,7 +1834,6 @@ div.statetoggler > div.statetoggler_inner > .options > span {
   min-width: auto;
   background: none repeat scroll 0 0 transparent;
   color: black;
-  outline: none;
   text-decoration: none;
   white-space: nowrap;
   text-align: left;
@@ -1796,19 +1844,19 @@ div.statetoggler > div.statetoggler_inner > .options > div {
   text-align: center;
   font-weight: bold;
 }
-div.statetoggler > div.statetoggler_inner > .options > span:hover {
+div.statetoggler > div.statetoggler_inner > .options > :is(span, button):hover {
   background-color: #e7e7e7;
   background-image: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
 }
-div.statetoggler > div.statetoggler_inner > .options > span > span,
-div.statetoggler > div.statetoggler_inner > .options > span > img {
+div.statetoggler > div.statetoggler_inner > .options > :is(span, button) > span,
+div.statetoggler > div.statetoggler_inner > .options > :is(span, button) > img {
   max-width: unset;
   padding: 0;
   margin: 0 0.5em 0 0;
   border: none;
   box-sizing: unset;
 }
-div.statetoggler > div.statetoggler_inner > .options > span > img {
+div.statetoggler > div.statetoggler_inner > .options > :is(span, button) > img {
   display: unset;
 }
 /************
@@ -1992,7 +2040,7 @@ body .fc-nowrap-box .nowrap_box .label,
   box-sizing: border-box;
   clear: both;
   float: left;
-  margin: 0 0 1% 0 !important;
+  margin: 0 !important;
   width: 100%;
 }
 #flexicontent .fc-xpended .input-group-text:first-child,
@@ -2633,13 +2681,45 @@ body .icon-flexicontent:before {
   text-align: left;
   float: left;
   width: 98%;
-  display: inline-block;
+  display: block;
   clear: both;
   box-sizing: border-box;
+  padding: 12px 16px !important;
+  background-image: none;
+  font-size: 13px;
+  line-height: 1.5;
 }
 .flexicontent #fc_perf_box {
   margin: 12px 0% 48px;
   width: 100%;
+}
+#fc_perf_box .fc-perf-summary,
+#fc_perf_box .fc-perf-plugin-time {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+#fc_perf_box .fc-perf-details {
+  font-size: 12px;
+  line-height: 1.5;
+}
+#fc_perf_box .fc-perf-details > br:first-child {
+  display: none;
+}
+#fc_perf_box .fc-perf-details small {
+  display: block;
+  padding-inline-start: 20px;
+  opacity: 0.85;
+}
+#fc_perf_box .fc-perf-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px 16px;
+  margin: 6px 0;
+}
+#fc_perf_box .fc-perf-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 /****************************
  * Versioning TAB (item form)
@@ -2858,6 +2938,7 @@ ul.fcrecords {
 .records_container > ul > li.fcrecord .addfield_handle,
 .records_container > ul > li.fcrecord .delfield_handle {
   display: inline-block;
+  box-sizing: content-box; /* buttons: keep the span sizing */
   width: 18px;
   height: 16px;
   line-height: 16px;
@@ -3273,9 +3354,16 @@ a.fc_assoc_translation:before {
 }
 body div .fc-del-filter-icon {
   color: #bd362f;
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: inherit;
   /*color: #942a25; color: darkred;*/
   font-size: 12px !important;
   cursor: pointer;
+}
+button.badge {
+  border: 0;
 }
 /*******
  * Forms
@@ -5532,6 +5620,7 @@ div#fc-dash-credits #fc-dash-license {
 }
 div#fc-dash-credits #fc-dash-devs {
   display: inline-flex;
+  flex-wrap: wrap;
 }
 div#fc-dash-credits #fc-dash-devs > .fc-mssg-inline {
   vertical-align: top;
@@ -5943,4 +6032,23 @@ body div .fc_assoc_isuptodate {
 }
 body div .fc_assoc_isuptodate span {
   color: white;
+}
+
+/* Field pickers (sortable lists of fields, e.g. Items Manager custom columns): the dropdown opens above the controls below it */
+.container_fcfield-inner .choices.is-open {
+	z-index: 1000;
+}
+
+.container_fcfield-inner .choices__list--dropdown,
+.container_fcfield-inner .choices__list[aria-expanded] {
+	z-index: 1001;
+	width: max-content;
+	min-width: 100%;
+	max-width: min(520px, 90vw);
+}
+
+.container_fcfield-inner .choices__list--dropdown .choices__item {
+	white-space: normal;
+	word-break: normal;
+	overflow-wrap: break-word;
 }

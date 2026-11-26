@@ -19,8 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.view.legacy');
-jimport('joomla.filesystem.file');
 
 use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;
@@ -50,13 +48,13 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		$dispatcher = JEventDispatcher::getInstance();
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = \Joomla\CMS\Factory::getApplication()->input;
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		$option   = $jinput->get('option', '', 'cmd');
 		$format   = $jinput->get('format', 'html', 'cmd');
 		$print    = $jinput->get('print', '', 'cmd');
 
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		// Check for Joomla issue with system plugins creating \Joomla\CMS\Document\Document in early events forcing it to be wrong type, when format as url suffix is enabled
 		if ($format && $document->getType() != strtolower($format))
@@ -67,7 +65,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		$menus    = $app->getMenu();
 		$menu     = $menus->getActive();
 		$uri      = \Joomla\CMS\Uri\Uri::getInstance();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$aid      = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 
 		// Get view's Model
@@ -187,7 +185,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		if (!$params->get('disablecss', ''))
 		{
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
@@ -304,7 +302,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			{
 				case ''        :  $default_heading = $category->title;  break;
 				case 'myitems' :  $default_heading =Text::_('FLEXI_MY_CONTENT');  break;
-				case 'author'  :  $default_heading =Text::sprintf('FLEXI_ITEMS_OF_USER', \Joomla\CMS\Factory::getUser((int) $authorid)->get('name'));  break;
+				case 'author'  :  $default_heading =Text::sprintf('FLEXI_ITEMS_OF_USER', \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $authorid)->get('name'));  break;
 				case 'tags'    :  $default_heading =Text::_('FLEXI_TAG') .': '. $tag->name;  break;
 				case 'favs'    :  $default_heading =Text::_('FLEXI_MY_FAVOURITES');  break;
 				default        :  $default_heading =Text::_('FLEXI_CONTENT_IN_CATEGORY');
@@ -540,6 +538,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		\Joomla\CMS\Plugin\PluginHelper::importPlugin('content');
 
 		$noroute_cats = array_flip($globalnoroute);
+		$links_use_current_cat = (int) ComponentHelper::getParams('com_flexicontent')->get('item_links_in_listings', 0) === 1;
 
 		$type_attribs = flexicontent_db::getTypeAttribs($force=true, $typeid=0);
 		$type_params = array();
@@ -577,7 +576,8 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 			// 1. CATEGORY SLUG: CURRENT category
 			// -- Current category IS a category of the item and ALSO routing (creating links) to this category is allowed
-			if ( $item_in_category && !isset($noroute_cats[$category->id]) )
+			// -- ONLY if configured (component option 'item_links_in_listings'), by default item links use the item's MAIN category, so that item has a single URL
+			if ( $links_use_current_cat && $item_in_category && !isset($noroute_cats[$category->id]) )
 			{
 				$item->categoryslug = $category->slug;
 			}
@@ -668,7 +668,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 		$joomla_image_path = FLEXI_J40GE
 			?	ComponentHelper::getParams('com_media')->get('image_path', 'images')
-			: $app->getCfg('image_path', '');
+			: $app->get('image_path', '');
 		$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 		$joomla_image_url  = '';//$joomla_image_url  ? $joomla_image_url.'/' : ''; // NEED REVIEW
 		// Signed phpThumb URL builder, $conf holds the sizing options (see flexicontent_images::phpThumbURL())
@@ -1045,7 +1045,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 			$resultsCounter = $pageNav->getResultsCounter();  // for overriding model's result counter
 
-			$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getConfig()->get('sef');
+			$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getApplication()->getConfig()->get('sef');
 			if ($_sh404sef)
 			{
 				$pageNav->setAdditionalUrlParam('limit', $model->getState('limit'));

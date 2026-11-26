@@ -19,9 +19,6 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
 //jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 //\Joomla\CMS\Form\FormHelper::loadFieldClass('usergroup');   // \Joomla\CMS\Form\Field\UserFieldgroup
@@ -97,7 +94,7 @@ class JFormFieldFLEXIUsergroup extends \Joomla\CMS\Form\FormField  // \Joomla\CM
 			$extra_options[] = $tmp;
 		}
 		
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$db->setQuery(
 			'SELECT a.id AS value, a.title AS text, COUNT(DISTINCT b.id) AS level' .
 			' FROM #__usergroups AS a' .

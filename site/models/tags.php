@@ -19,7 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Model
@@ -92,7 +91,7 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -302,7 +301,7 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	 */
 	function _buildQuery()
 	{
-		$user		= \Joomla\CMS\Factory::getUser();
+		$user		= \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Show special state items
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
@@ -449,8 +448,8 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
-		$user   = \Joomla\CMS\Factory::getUser();
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$show_owned = $this->_params->get('show_owned', 1);     // Show items owned by current user, regardless of their state
 		$show_trashed = $this->_params->get('show_trashed', 1);   // Show trashed items (to authorized users)
@@ -479,7 +478,7 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		{
 			$lta = 'i';
 			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
-			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
@@ -522,9 +521,10 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 
 		$si_tbl = 'flexicontent_items_ext';
 
+		$quoted_terms = flexicontent_db::getQuotedSearchTerms($text, $phrase);
 		$search_prefix = $this->_params->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$text = !$search_prefix  ?  trim( $text )  :  preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($text));
-		$words = preg_split('/\s\s*/u', $text);
+		$words = flexicontent_db::getBooleanSearchWords(preg_split('/\s\s*/u', $text));
 
 		if( strlen($text) )
 		{
@@ -532,7 +532,11 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 			$escaped_text = $db->escape($text, true);
 			$quoted_text = $db->Quote( $escaped_text, false );
 
-			switch ($phrase)
+			if ($quoted_terms !== null)
+			{
+				$_text_match = flexicontent_db::getQuotedFulltextCondition($ts . '.search_index', $quoted_terms, $phrase, $search_prefix);
+			}
+			else switch ($phrase)
 			{
 				case 'natural':
 					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.') ';
@@ -563,7 +567,7 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 					else
 					{
 						$newtext = '+' . implode( ' +', $words );
-						$quoted_text = $db->escape($newtext, true);
+						$quoted_text = $db->escape($newtext);
 						$quoted_text = $db->Quote( $quoted_text, false );
 						$exact_text  = $db->Quote( '%'. $escaped_text .'%', false );
 						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND '.$ts.'.search_index LIKE '.$exact_text;
@@ -582,9 +586,9 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 					$jinput->set('shortwords', implode(' ', $shortwords));
 
 					$newtext = '+' . implode( '* +', $words ) . '*';
-					$quoted_text = $db->escape($newtext, true);
+					$quoted_text = $db->escape($newtext);
 					$quoted_text = $db->Quote( $quoted_text, false );
-					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					$_text_match = empty($words) ? ' 0=1 ' : ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 
 				case 'any':
@@ -600,9 +604,9 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 					$jinput->set('shortwords', implode(' ', $shortwords));
 
 					$newtext = implode( '* ', $words ) . '*';
-					$quoted_text = $db->escape($newtext, true);
+					$quoted_text = $db->escape($newtext);
 					$quoted_text = $db->Quote( $quoted_text, false );
-					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					$_text_match = empty($words) ? ' 0=1 ' : ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 			}
 
@@ -647,7 +651,7 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		{
 			// Load by module id
 			$module_id = $jinput->getInt('module', 0);
-			$module   = \Joomla\CMS\Table\Table::getInstance('Module', 'JTable');
+			$module = new \Joomla\CMS\Table\Module(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 
 			if ($module->load($module_id))
 			{

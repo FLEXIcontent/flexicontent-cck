@@ -109,13 +109,45 @@ body .icon-flexicontent:before {
 	text-align: left;
 	float: left;
 	width: 98%;
-	display: inline-block;
+	display: block;
 	clear: both;
 	box-sizing: border-box;
+	padding: 12px 16px !important;
+	background-image: none;
+	font-size: 13px;
+	line-height: 1.5;
 }
 .flexicontent #fc_perf_box {
 	margin: 12px 0% 48px;
 	width: 100%;
+}
+#fc_perf_box .fc-perf-summary,
+#fc_perf_box .fc-perf-plugin-time {
+	font-weight: bold;
+	margin-bottom: 8px;
+}
+#fc_perf_box .fc-perf-details {
+	font-size: 12px;
+	line-height: 1.5;
+}
+#fc_perf_box .fc-perf-details > br:first-child {
+	display: none;
+}
+#fc_perf_box .fc-perf-details small {
+	display: block;
+	padding-inline-start: 20px;
+	opacity: 0.85;
+}
+#fc_perf_box .fc-perf-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 4px 16px;
+	margin: 6px 0;
+}
+#fc_perf_box .fc-perf-item {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 
@@ -370,6 +402,7 @@ ul.fcrecords {
 	.addfield_handle,
 	.delfield_handle {
 		display: inline-block;
+		box-sizing: content-box; /* buttons: keep the span sizing */
 		width: 18px;
 		height: 16px;
 		line-height: 16px;
@@ -816,9 +849,16 @@ a.fc_assoc_translation:before {
 
 body div .fc-del-filter-icon {
 	color: #bd362f;
+	padding: 0;
+	border: 0;
+	background: none;
+	line-height: inherit;
 	/*color: #942a25; color: darkred;*/
 	font-size: 12px !important;
 	cursor: pointer;
+}
+button.badge {
+	border: 0;
 }
 
 

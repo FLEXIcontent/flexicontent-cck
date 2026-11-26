@@ -2,17 +2,23 @@
 
 namespace Sabberworm\CSS\Parsing;
 
-class SourceException extends \Exception {
-	private $iLineNo;
-	public function __construct($sMessage, $iLineNo = 0) {
-		$this->iLineNo = $iLineNo;
-		if (!empty($iLineNo)) {
-			$sMessage .= " [line no: $iLineNo]";
-		}
-		parent::__construct($sMessage);
-	}
+use Sabberworm\CSS\Position\Position;
+use Sabberworm\CSS\Position\Positionable;
 
-	public function getLineNo() {
-		return $this->iLineNo;
-	}
+class SourceException extends \Exception implements Positionable
+{
+    use Position;
+
+    /**
+     * @param string $sMessage
+     * @param int $iLineNo
+     */
+    public function __construct($sMessage, $iLineNo = 0)
+    {
+        $this->setPosition($iLineNo);
+        if (!empty($iLineNo)) {
+            $sMessage .= " [line no: $iLineNo]";
+        }
+        parent::__construct($sMessage);
+    }
 }

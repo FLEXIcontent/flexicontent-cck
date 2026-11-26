@@ -5,12 +5,18 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 class plgFlexicontent_fieldsFcloadmodule extends FCField
 {
@@ -45,7 +51,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 			$field->value[0] = '';
 		}
 
-		$document	= \Joomla\CMS\Factory::getDocument();
+		$document	= \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
@@ -113,7 +119,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -162,7 +168,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 		$position		= $field->parameters->get('position', '');
 		$style 			= $field->parameters->get('style', -2);
 
-		$document		= \Joomla\CMS\Factory::getDocument();
+		$document		= \Joomla\CMS\Factory::getApplication()->getDocument();
 		$display 		= array();
 		$renderer		= $document->loadRenderer('module');
 		$mparams		= array('style'=>$style);
@@ -296,7 +302,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 
 	function _getModuleObject($id)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query 	= 'SELECT * FROM #__modules'
 				. ' WHERE id = ' . (int)$id

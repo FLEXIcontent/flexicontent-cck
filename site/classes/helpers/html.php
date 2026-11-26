@@ -12,6 +12,23 @@ use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
 
 class flexicontent_html
 {
+	/** Visible, translated caption and decorative icon used by the media field footers. */
+	public static function mediaActionLabel($action)
+	{
+		static $actions = [
+			'upload' => ['upload', 'FLEXI_MEDIA_ACTION_UPLOAD'],
+			'files'  => ['folder-open', 'FLEXI_MY_FILES'],
+			'url'    => ['link', 'FLEXI_MEDIA_ACTION_URL'],
+			'edit'   => ['edit', 'FLEXI_EDIT'],
+			'clear'  => ['times', 'FLEXI_CLEAR'],
+			'fetch'  => ['sync', 'FLEXI_FETCH'],
+		];
+		[$icon, $key] = $actions[$action];
+
+		return '<span class="fc-image-tool-icon fas fa-' . $icon . '" aria-hidden="true"></span>'
+			. '<span class="fc-tool-label">' . htmlspecialchars(\Joomla\CMS\Language\Text::_($key), ENT_QUOTES, 'UTF-8') . '</span>';
+	}
+
 	static $use_bootstrap = true;
 	static $icon_classes = null;
 	static $option = 'com_flexicontent';
@@ -318,9 +335,6 @@ class flexicontent_html
 		static $initialized;
 		if ($initialized===null)
 		{
-			jimport('joomla.filesystem.path' );
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.file');
 			$initialized = 1;
 		}
 
@@ -375,7 +389,7 @@ class flexicontent_html
 				$less->setFormatter('compressed');
 			}
 
-			// wikimedia/less.php nécessite les répertoires d'import explicites
+			// wikimedia/less.php requires explicit import directories
 			$importDirs = array_merge(
 				array(dirname($path . $in) . DS),
 				$inc_paths,
@@ -587,13 +601,16 @@ class flexicontent_html
 		$app  =Factory::getApplication();
 		$jinput = $app->input;
 
+		// Note of the column chooser, about the columns hidden on smaller screens
+		\Joomla\CMS\Language\Text::script('FLEXI_COLUMNS_SCREEN_HIDDEN');
+
 		// Clear legacy cookie
 		$legacy_cookie = $jinput->cookie->get('columnchoose_'.$data_tbl_id, null);
 		if ($legacy_cookie) $jinput->cookie->set('columnchoose_'.$data_tbl_id, null, 1, '', '');
 
 		$js = "
-		var show_col_{$data_tbl_id} = Array();
-		jQuery(document).ready(function() {
+		var show_col_{$data_tbl_id} = [];
+		FlexiForm.ready(function() {
 		";
 
 		// Get visibility of table columns from Posted Form or from Browser Cookie
@@ -623,6 +640,54 @@ class flexicontent_html
 	static function getToolTip($title = '', $content = '', $translate = 1, $escape = 1)
 	{
 		return \Joomla\CMS\HTML\HTMLHelper::tooltipText($title ?? '', $content ?? '', $translate, $escape);
+	}
+
+
+	/**
+	 * Create the inline note of a form field: an icon that shows the note in a popover
+	 * on mouse hover, keyboard focus or click / tap
+	 *
+	 * @param   string  $text     The note, a language string or text (may contain HTML)
+	 * @param   string  $img      Note image in the assets/images folder, FLEXIcontent's own note images are shown as icons
+	 * @param   string  $class    Extra CSS classes of the note
+	 * @param   string  $preview  Optional image (assets/images folder) shown after the icon
+	 * @param   string  $style    Inline CSS of the note
+	 *
+	 * @return  string  The HTML of the note
+	 * @since   5.1
+	 */
+	static function getInlineTip($text, $img = '', $class = '', $preview = '', $style = '')
+	{
+		static $icons = array(
+			'comments.png'    => 'icon-info-circle',
+			'information.png' => 'icon-info-circle',
+			'note.gif'        => 'icon-info-circle',
+			'warning.png'     => 'icon-warning',
+		);
+
+		// Same options as the field editor, its labels use the same selector
+		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.popover', '.hasPopover', array('trigger' => 'click hover focus'));
+
+		$img     = (string) $img ?: 'comments.png';
+		$preview = (string) $preview;
+		$label   = \Joomla\CMS\Language\Text::_('FLEXI_NOTES');
+		$path    = 'administrator/components/com_flexicontent/assets/images/';
+		$attribs = array('style' => 'vertical-align: middle; max-height: 24px;');
+
+		// An array of attributes: Joomla 4+ splits an attribute string at every space
+		$html = isset($icons[$img])
+			? '<span class="' . $icons[$img] . '" aria-hidden="true"></span><span class="visually-hidden">' . $label . '</span>'
+			: \Joomla\CMS\HTML\HTMLHelper::image($path . $img, $label, $attribs);
+
+		if ($preview !== '')
+		{
+			$html .= ' ' . \Joomla\CMS\HTML\HTMLHelper::image($path . $preview, '', $attribs);
+		}
+
+		return '<span class="hasPopover fc-inline-tip ' . htmlspecialchars(trim((string) $class), ENT_COMPAT, 'UTF-8') . '" tabindex="0"'
+			. ' style="margin-inline-start: 12px;' . ($style ? ' ' . $style : '') . '"'
+			. ' data-bs-content="' . htmlspecialchars(\Joomla\CMS\Language\Text::_((string) $text), ENT_COMPAT, 'UTF-8') . '">'
+			. $html . '</span>';
 	}
 
 
@@ -727,7 +792,6 @@ class flexicontent_html
 	 */
 	function renderItem($item_id, $view=FLEXI_ITEMVIEW, $ilayout = '')
 	{
-		\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
 		//require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
@@ -750,7 +814,9 @@ class flexicontent_html
 		// Get type's ilayout
 		if (!$ilayout)
 		{
-			$type = \Joomla\CMS\Table\Table::getInstance('flexicontent_types', '');
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_types.php';
+			$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$type = new flexicontent_types($__fcTableDb);
 			$type->id = $item->type_id;
 			$type->load();
 			$type->params = new \Joomla\Registry\Registry($type->attribs);
@@ -1159,9 +1225,48 @@ class flexicontent_html
 					'.implode('', $options).'
 				</fieldset>
 			';
-			Factory::getApplication()->getDocument()->addScriptDeclaration('jQuery(document).ready(function(){ jQuery(\'input[name="'.$layout_type.'"]\').click( function() { adminFormPrepare(this.form, 2); }); });');
 		}
 		return $outside_label.$html;
+	}
+
+
+	/**
+	 * Get the labels of ALL selected options of a filter's HTML
+	 * (multi-select filters can have several selected values)
+	 *
+	 * @access public
+	 * @return array
+	 * @since 4.2
+	 */
+	static function getSelectedOptionsLabels($filterHtml)
+	{
+		$labels = array();
+
+		if (!preg_match_all('/<option\b[^>]*>.*?<\/option>/is', (string) $filterHtml, $opts))
+		{
+			return $labels;
+		}
+
+		foreach ($opts[0] as $optHtml)
+		{
+			// Keep only selected options
+			if (!preg_match('/selected\s*=\s*(?:"selected"|\'selected\'|selected)/i', $optHtml))
+			{
+				continue;
+			}
+			// Skip options with an empty value (e.g. the filter's internal prompt label)
+			if (preg_match('/value\s*=\s*(["\'])(.*?)\1/i', $optHtml, $valMatch) && $valMatch[2] === '')
+			{
+				continue;
+			}
+			$label = trim(strip_tags($optHtml));
+			if ($label !== '')
+			{
+				$labels[] = $label;
+			}
+		}
+
+		return $labels;
 	}
 
 
@@ -1253,6 +1358,7 @@ class flexicontent_html
 			$JQUERY_UI_THEME = 'ui-lightness';
 		}
 		\Joomla\CMS\Language\Text::script("FLEXI_FORM_IS_BEING_SUBMITTED", true);
+		\Joomla\CMS\Language\Text::script("FLEXI_AJAX_SAVE_UNCONFIRMED", true);
 		\Joomla\CMS\Language\Text::script("FLEXI_LOADING", true);
 
 		/*
@@ -1352,14 +1458,46 @@ class flexicontent_html
 	}
 
 
-	/**
-	 * Utility function to load each JS Frameworks once
-	 *
-	 * @param 	string 		$text
-	 * @param 	int 		$nb
-	 * @return 	string
-	 * @since 1.5
-	 */
+	/** Load the shared tag picker for an item or import form. */
+	static function loadTagPicker($fieldName, $assignTask, $itemLanguage = false)
+	{
+		$app = \Joomla\CMS\Factory::getApplication();
+		$document = $app->getDocument();
+		$root = \Joomla\CMS\Uri\Uri::root(true);
+		$base = \Joomla\CMS\Uri\Uri::base(true);
+		$token = \Joomla\CMS\Session\Session::getFormToken() . '=1';
+		$config = array(
+			'name' => $fieldName,
+			'suggestions' => $base . '/components/com_flexicontent/tasks/core.php?task=viewtags&format=json&lang='
+				. rawurlencode($app->getLanguage()->getTag()) . '&' . $token,
+			'assign' => $base . '/index.php?option=com_flexicontent&task=' . $assignTask . '&format=raw&' . $token,
+			'itemLanguage' => $itemLanguage,
+			'keepOpen' => $itemLanguage,
+			'removeLabel' => \Joomla\CMS\Language\Text::_('FLEXI_DELETE_TAG'),
+			'requestError' => \Joomla\CMS\Language\Text::_('JERROR_AN_ERROR_HAS_OCCURRED'),
+			'assignError' => \Joomla\CMS\Language\Text::_('FLEXI_ERROR_SAVING_TAG'),
+		);
+		self::loadFramework('form-utils');
+		$document->addScript($root . '/components/com_flexicontent/assets/js/tag-picker.js', array('version' => 'auto'));
+		$document->addStyleSheet($root . '/components/com_flexicontent/assets/css/tag-picker.css', array('version' => 'auto'));
+		$document->addScriptDeclaration('FlexiForm.ready(() => fc_initTagPicker('
+			. json_encode($config, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)
+			. '));');
+	}
+
+	/** Administrator views that can start without the shared jQuery loader. */
+	static function usesNativeAdminAssets()
+	{
+		$app = Factory::getApplication();
+		$input = $app->getInput();
+		$view = $input->getCmd('view', 'flexicontent');
+		return FLEXI_J40GE && $app->isClient('administrator')
+			&& (($input->getCmd('option') === 'com_config' && $input->getCmd('component') === 'com_flexicontent') || in_array($input->getCmd('option'), ['com_modules', 'com_menus'], true) || ($view === 'flexicontent' && in_array($input->getCmd('layout', ''), ['', 'default'], true)) || in_array($view, array(
+				'item', 'items', 'itemcompare', 'itemelement', 'tagelement', 'field', 'fields', 'type', 'types', 'tag', 'tags', 'template', 'templates', 'category', 'categories', 'users', 'groups', 'stats', 'search', 'import', 'file', 'filemanager', 'fileselement', 'review', 'reviews', 'mediadata', 'mediadatas', 'appsman', 'fccategoryelement', 'user', 'group',
+			), true));
+	}
+
+	/** Load a JavaScript framework once per request. */
 	static function loadFramework( $framework, $mode='', $params=null )
 	{
 		// Detect already loaded framework
@@ -1373,12 +1511,26 @@ class flexicontent_html
 
 		static $load_frameworks = null;
 		static $load_jquery = null;
+		static $jquery_for_plugins = null;
+		static $jquery_free_front = null;
 
 		if (!isset($load_frameworks[$framework]))
 		{
 			if ($load_jquery === null)
 			{
-				$load_jquery = (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site');
+				// Generic/native pages do not preload jQuery in Choices mode.
+				// Selected legacy widgets below request their own dependencies explicitly.
+				$useChoicesJs = (int) $cparams->get('select_lib_type', 0) === 1;
+				$load_jquery = !self::usesNativeAdminAssets()
+					&& !(FLEXI_J40GE && $app->isClient('site'))
+					&& ( (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site') )
+					&& ! ( $app->isClient('site') && $useChoicesJs );
+
+				// Retained for the legacy bootstrap-toggle compatibility path.
+				$jquery_for_plugins = (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site');
+
+				// Choices.js mode without jQuery for plugins: the site front has no jQuery at all
+				$jquery_free_front = $app->isClient('site') && $useChoicesJs && !$jquery_for_plugins;
 			}
 
 			$loadfw_param   = 'loadfw_' . strtolower(str_replace('-', '_', $framework));
@@ -1416,7 +1568,9 @@ class flexicontent_html
 				break;
 
 			case 'bootstrap-toggle':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				// A jQuery plugin: on a jQuery-free front the checkboxes stay plain checkboxes
+				if ($jquery_free_front) break;
+				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/bootstrap-toggle';
 				$document->addScript($framework_path.'/js/bootstrap2-toggle.min.js');
@@ -1433,7 +1587,7 @@ class flexicontent_html
 			case 'touch-punch':
 				$mobileDetector = flexicontent_html::getMobileDetector();
 				$isMobile = $mobileDetector->isMobile() || $mobileDetector->isTablet();
-				if ($isMobile)
+				if ($isMobile && $load_jquery)
 				{
 					if ($load_jquery) flexicontent_html::loadJQuery();
 					$document->addScript(\Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.touch-punch.min.js');
@@ -1448,7 +1602,6 @@ class flexicontent_html
 				$url_grapjs_css = 'https://unpkg.com/grapesjs@' . $grapjs_vers . '/dist/css/grapes.min.css';
 				$url_grapjs_js = 'https://unpkg.com/grapesjs@' . $grapjs_vers . '/dist/grapes.min.js';
 
-				$document->addStyleSheet($framework_path.'/stylesheets/toastr.min.css');
 				$document->addStyleSheet($url_grapjs_css);
 				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-preset-webpage.min.css?0.1.10');
 				$document->addStyleSheet($framework_path.'/stylesheets/tooltip.css');
@@ -1456,7 +1609,7 @@ class flexicontent_html
 				$document->addStyleSheet($framework_path.'/stylesheets/demos.css');
 
 				$document->addScript('https://static.filestackapi.com/v3/filestack.js');
-				$document->addScript($framework_path.'/js/toastr.min.js');
+				flexicontent_html::loadFramework('flexi-lib');
 				$document->addScript($url_grapjs_js);
 
 
@@ -1479,15 +1632,12 @@ class flexicontent_html
 				break;
 
 			case 'grapesjs_view':
-				$js .= "
-					jQuery(document).ready(function(){
-						jQuery('.tab-container').click(function(e)
-						{
-							e.preventDefault();
-							return true;
-						});
+				self::loadFramework('form-utils');
+				$js .= "FlexiForm.ready(function () {
+					document.querySelectorAll('.tab-container').forEach(function (tab) {
+						tab.addEventListener('click', function (event) { event.preventDefault(); });
 					});
-				";
+				});";
 				break;
 
 			case 'sabberworm':
@@ -1497,14 +1647,21 @@ class flexicontent_html
 				break;
 
 			case 'mousewheel':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				// Called only by widgets that actually use the mousewheel plugin.
+				flexicontent_html::loadJQuery(1, 0, 0);  // a jQuery plugin: load jQuery itself (core only, without jQuery UI)
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/mousewheel';
 				$document->addScript($framework_path.'/jquery.mousewheel.min.js');
 				break;
 
 			case 'mCSB':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				// mCustomScrollbar is a jQuery plugin; in choices mode (jQuery-free front) the
+				// native CSS scrollbar rules in flexi_choices.css (.fc_add_scroller) are used instead.
+				$mcsb_cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+				$mcsb_site_choices = $app->isClient('site') && (int) $mcsb_cparams->get('select_lib_type', 0) === 1;
+				if ($mcsb_site_choices) break;
+
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/mCSB';
 
@@ -1533,7 +1690,7 @@ class flexicontent_html
 				break;
 
 			case 'image-picker':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/image-picker';
 				$document->addScript($framework_path.'/image-picker.min.js');
@@ -1550,7 +1707,7 @@ class flexicontent_html
 					? $params->get('api_lang_code_edit', flexicontent_html::getUserCurrentLang())
 					: $params->get('api_lang_code', flexicontent_html::getUserCurrentLang());
 				$force_language_param = '&language=' . $force_language_code;
-				$apikey = trim($params->get('google_maps_js_api_key', $params->get('apikey')));
+				$apikey = trim((string) $params->get('google_maps_js_api_key', $params->get('apikey')));
 
 				// Key is not empty
 				if ($apikey)
@@ -1591,229 +1748,41 @@ class flexicontent_html
 				break;
 
 			case 'select2':
-				if ($load_jquery) flexicontent_html::loadJQuery();
-
-				// Load flexi-lib, as it contains the select2 attach function: fc_attachSelect2()
+				// Keep the framework name and load setting used by existing layouts.
 				flexicontent_html::loadFramework('flexi-lib');
-
-				// Load jQuery mouse wheel as this JS can make use of it
-				flexicontent_html::loadFramework('mousewheel');
-
-				// Disable select2 JS in mobile devices and instead use chosen JS ...
 				$mobileDetector = flexicontent_html::getMobileDetector();
 				$isMobile = $mobileDetector->isMobile() || $mobileDetector->isTablet();
+				$framework_path = \Joomla\CMS\Uri\Uri::root(true) . $lib_path . '/choicesjs';
+				$css_path = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/css';
+				$version = array('version' => '11.1.0');
+				$document->addScript($framework_path . '/choices.min.js', $version);
+				$document->addScript($framework_path . '/sortable.min.js', $version);
+				$document->addStyleSheet($framework_path . '/choices.min.css', $version);
+				$document->addStyleSheet($css_path . '/flexi_choices.css', array('version' => '2.4'));
+				\Joomla\CMS\Language\Text::script('FLEXI_NO_RESULTS', false);
+				\Joomla\CMS\Language\Text::script('FLEXI_NO_CHOICES', false);
 
-				// Load chosen function (if not loaded already) and target specific selector
-				if ($isMobile) {
-    				try {
-        				JHtml::_('formbehavior.chosen', '.use_chosen_lib');
-    					} catch (\Throwable $e) {
-       			 // 'chosen' WebAsset preset removed in Joomla 6 core — safe to ignore,
-        		// Tom Select already handles mobile/touch correctly.
-   					 }
-				}
-
-				// Regardless if we loaded chosen JS or some other code loaded it, prevent it from ... attaching to elements meant for select2
-				$js .= "
-				if (typeof jQuery.fn.chosen == 'function') {
-					jQuery.fn.chosen_fc = jQuery.fn.chosen;
-					jQuery.fn.chosen = function(){
-						var args = arguments;
-						var result;
-						jQuery(this).each(function() {
-							if (jQuery(this).hasClass('use_select2_lib') || jQuery(this).hasClass('fc_no_js_attach')) return;
-							result = jQuery(this).chosen_fc(args);
-						});
-						return result;
-					};
-				}
-				";
-
-				$ver = '3.5.4';
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/select2';
-				$framework_folder = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'select2';
-				$document->addScript($framework_path.'/select2.min.js', array('version' => $ver));
-				$document->addScript($framework_path.'/select2.sortable.js', array('version' => $ver));
-				$document->addStyleSheet($framework_path.'/select2.css', array('version' => $ver));
-
-				$lang_code = flexicontent_html::getUserCurrentLang();
-				if ( $lang_code && $lang_code!='en' )
-				{
-					// Try language shortcode
-					if ( file_exists($framework_folder.DS.'select2_locale_'.$lang_code.'.js') ) {
-						$document->addScript($framework_path.'/select2_locale_'.$lang_code.'.js', array('version' => $ver));
-					}
-					// select2 JS 4.0.0+
-					/*if ( file_exists($framework_folder.DS.'select2'.DS.'i18n'.DS.$lang_code.'.js') ) {
-						$document->addScript($framework_path.'/select2/i18n/'.$lang_code.'.js', array('version' => $ver));
-					}*/
-					// Try country language code
-					else {
-						$country_code = flexicontent_html::getUserCurrentLang($short_tag=false);
-						if ( $country_code && file_exists($framework_folder.DS.'select2_locale_'.$country_code.'.js') ) {
-							$document->addScript($framework_path.'/select2_locale_'.$country_code.'.js', array('version' => $ver));
-						}
-						// select2 JS 4.0.0+
-						/*if ( $country_code && file_exists($framework_folder.DS.'select2'.DS.'i18n'.DS.$country_code.'.js') ) {
-							$document->addScript($framework_path.'/select2/i18n/'.$country_code.'.js', array('version' => $ver));
-						}*/
-					}
-				}
-
-				// Attach select2 JS but skip it in mobiles and use chosen instead
-				$js .= "
-					jQuery(document).ready(function()
-					{
-						window.skip_select2_js = ".($isMobile ? 1 : 0).";
-						fc_attachSelect2('body');
-					});
-				";
+				// Keep FLEXIcontent's Choices instance if Joomla's fancy-select loads its copy later.
+				$js .= "window.fc_Choices = window.Choices;\n"
+					. "window.fc_use_choicesjs = true;\n"
+					. "window.skip_select2_js = " . ($isMobile ? 1 : 0) . ";\n"
+					. "FlexiForm.ready(function() { fc_attachSelect2(document.body); });\n";
 				break;
 
 			case 'inputmask':
-				if ($load_jquery) flexicontent_html::loadJQuery();
-
+				flexicontent_html::loadFramework('form-utils');
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/inputmask';
-				$document->addScript($framework_path.'/jquery.inputmask.bundle.min.js');
-
-				// Extra inputmask declarations definitions, e.g. ...
-				$js .= "";
-
-				// Attach inputmask to all input fields that have appropriate tag parameters
-				$js .= "
-					jQuery(document).ready(function(){
-						Inputmask.extendAliases({
-							decimal: {
-								alias: 'numeric',
-								autoGroup: true,
-								radixPoint: '.',
-								groupSeparator: ',',
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							decimal_comma: {
-								alias: 'numeric',
-								autoGroup: true,
-								radixPoint: ',',
-								groupSeparator: '.',
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							currency: {
-								alias: 'numeric',
-								prefix: '$ ',
-								groupSeparator: ',',
-								autoGroup: true,
-								digits: 2,
-								digitsOptional: false,
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							currency_euro: {
-								alias: 'currency',
-								prefix: '\u20ac ',
-								groupSeparator: ',',
-								autoGroup: true,
-								digits: 2,
-								digitsOptional: false,
-								clearMaskOnLostFocus: false,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							percentage_zero_nolimit: {
-								alias: 'percentage',
-								digits: 2,
-								radixPoint: '.',
-								autoGroup: true,
-								min: 0,
-								max: '',
-								suffix: ' %',
-								allowPlus: false,
-								allowMinus: false,
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							percentage_nolimit_nolimit: {
-								alias: 'percentage',
-								digits: 2,
-								radixPoint: '.',
-								autoGroup: true,
-								min: '',
-								max: '',
-								suffix: ' %',
-								allowPlus: false,
-								allowMinus: true,
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							integer: {
-								alias: 'numeric',
-								digits: 0,
-								radixPoint: '',
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							unsigned: {
-								alias: 'numeric',
-								digits: 0,
-								radixPoint: '',
-								allowPlus: false,
-								allowMinus: false,
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							'mobile': {
-								'mask': '9999 999 999',
-								'autounmask': true,
-								'insertMode': true,
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							}
-						});
-
-						jQuery('input.has_inputmask').each(function() {
-							jQuery(this).inputmask();
-						});
-						jQuery('input.inputmask-regex').each(function() {
-							jQuery(this).inputmask('Regex');
-						});
-					});
-				";
+				$document->addScript($framework_path.'/inputmask.min.js', array('version' => '5.0.10'));
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/input-masks.js', array('version' => FLEXI_VHASH));
 				break;
 
 			case 'prettyCheckable':
-				if ($load_jquery) flexicontent_html::loadJQuery();
-
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/prettyCheckable';
-				$document->addScript($framework_path.'/dev/prettyCheckable.js');
-				$document->addStyleSheet($framework_path.'/dist/prettyCheckable.css');
-				$js .= "
-					jQuery(document).ready(function(){
-						jQuery('input.use_prettycheckable').each(function() {
-							var elem = jQuery(this);
-							var lbl = elem.next('label');
-							var lbl_html = elem.next('label').html();
-							lbl.remove();
-							elem.prettyCheckable({
-								color: 'blue',
-								label: lbl_html
-							});
-						});
-					});
-				";
-				break;
+				// Native inputs preserve the label, keyboard focus and form state.
+				return $_loaded[$framework] = false;
 
 			case 'multibox':
 			case 'jmultibox':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jmultibox';
 
@@ -1833,7 +1802,9 @@ class flexicontent_html
 				break;
 
 			case 'fancybox':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				// An explicitly selected gallery needs jQuery core, independently of the select widget.
+				flexicontent_html::loadJQuery(1, 0, 0);  // a jQuery plugin: load jQuery itself (core only, without jQuery UI)
+
 				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js');
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/fancybox';
@@ -1860,7 +1831,7 @@ class flexicontent_html
 				break;
 
 			case 'galleriffic':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/galleriffic';
 				$document->addStyleSheet($framework_path.'/css/basic.css');
@@ -1869,7 +1840,7 @@ class flexicontent_html
 				break;
 
 			case 'elastislide':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/elastislide';
 				$document->addStyleSheet($framework_path.'/css/gallery.css');
@@ -1882,7 +1853,8 @@ class flexicontent_html
 				break;
 
 			case 'photoswipe':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				// This bundled version exposes a native API; its jQuery adapter uses removed .live().
+				flexicontent_html::loadFramework('form-utils');
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/photoswipe';
 
@@ -1895,14 +1867,41 @@ class flexicontent_html
 				$document->addScript($framework_path.'/code.photoswipe.min.js');
 
 				$js .= "
-					jQuery(document).ready(function() {
-						var myPhotoSwipe = jQuery('.photoswipe_fccontainer a').photoSwipe();
+					FlexiForm.ready(function() {
+						Code.photoSwipe('.photoswipe_fccontainer a');
 					});
 				";
 				break;
 
+			case 'glightbox':
+				// GLightbox is a pure vanilla JS lightbox (MIT), no jQuery dependency.
+				// It is loaded in both standard and Choices.js (jQuery-free front) modes.
+				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/glightbox';
+				$document->addStyleSheet($framework_path.'/dist/css/glightbox.min.css');
+				$document->addScript($framework_path.'/dist/js/glightbox.min.js', array(
+					'version' => (string) filemtime(dirname(__DIR__, 2).'/librairies/glightbox/dist/js/glightbox.min.js'),
+				));
+
+				// Attaching the lightbox is left to the caller so that it creates
+				// a GLightbox instance with field specific options
+				$js .= "";
+				break;
+
+			case 'swiper':
+				// Swiper is a pure vanilla JS carousel/slider (MIT), no jQuery dependency.
+				// It is loaded in both standard and Choices.js (jQuery-free front) modes.
+				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/swiper';
+				$document->addStyleSheet($framework_path.'/dist/css/swiper-bundle.min.css');
+				$document->addScript($framework_path.'/dist/js/swiper-bundle.min.js');
+
+				// Attaching the carousel is left to the caller so that it creates
+				// Swiper instances with field specific options
+				$js .= "";
+				break;
+
 			case 'fcxSlide':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js');
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/fcxSlide';
 				$document->addScript($framework_path.'/class.fcxSlide.js', array('version' => FLEXI_VHASH));
@@ -1916,7 +1915,7 @@ class flexicontent_html
 				break;
 
 			case 'zTree':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/zTree';
 				$document->addStyleSheet($framework_path.'/css/flexi_ztree.css');
@@ -1925,43 +1924,6 @@ class flexicontent_html
 				//$document->addScript($framework_path.'/js/jquery.ztree.core-3.5.js');
 				//$document->addScript($framework_path.'/js/jquery.ztree.excheck-3.5.js');
 				//$document->addScript($framework_path.'/js/jquery.ztree.exedit-3.5.js');
-				break;
-
-			case 'plupload':
-				if ($load_jquery) flexicontent_html::loadJQuery();
-
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/plupload';
-				$framework_folder = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'plupload';
-				$document->addScript($framework_path.'/js/plupload.full.min.js');
-
-				if ($mode=='ui') {
-					$document->addStyleSheet($framework_path.'/js/jquery.ui.plupload/css/jquery.ui.plupload.css');
-					$document->addScript($framework_path.'/js/jquery.ui.plupload/jquery.ui.plupload.min.js');
-					//$document->addScript($framework_path.'/js/themeswitcher.js');
-				} else {
-					$document->addStyleSheet($framework_path.'/js/jquery.plupload.queue/css/jquery.plupload.queue.css');
-					$document->addScript($framework_path.'/js/jquery.plupload.queue/jquery.plupload.queue.js');
-				}
-
-				$lang_code = flexicontent_html::getUserCurrentLang();
-				if ( $lang_code && $lang_code!='en' )
-				{
-					// Try language shortcode
-					if ( file_exists($framework_folder.DS.'js'.DS.'i18n'.DS.$lang_code.'.js') ) {
-						$document->addScript($framework_path.'/js/i18n/'.$lang_code.'.js');
-					}
-					// Try country language code
-					else {
-						$country_code = flexicontent_html::getUserCurrentLang($short_tag=false);
-						$country_code = str_replace('-', '_', $country_code);    // Files for this library use underscore ...
-						if ( $country_code && file_exists($framework_folder.DS.'js'.DS.'i18n'.DS.$country_code.'.js') ) {
-							$document->addScript($framework_path.'/js/i18n/'.$country_code.'.js');
-						}
-					}
-				}
-				// For debugging
-				//$document->addScript($framework_path.'/js/moxie.min.js');
-				//$document->addScript($framework_path.'/js/plupload.dev.js');
 				break;
 
 			case 'nouislider':
@@ -2015,7 +1977,7 @@ class flexicontent_html
 				}
 
 				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js', array('version' => FLEXI_VHASH));
-				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
+				if ($load_jquery) $document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
 				\Joomla\CMS\Language\Text::script("FLEXI_APPLYING_FILTERING", true);
 				\Joomla\CMS\Language\Text::script("FLEXI_TYPE_TO_LIST", true);
 				\Joomla\CMS\Language\Text::script("FLEXI_TYPE_TO_FILTER", true);
@@ -2024,6 +1986,11 @@ class flexicontent_html
 				break;
 
 			case 'flexi-lib':
+				flexicontent_html::loadFramework('form-utils');
+				if (version_compare(JVERSION, '5.0', '>='))
+				{
+					$document->getWebAssetManager()->useScript('joomla.dialog-autocreate')->useScript('messages');
+				}
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
 				flexicontent_html::loadFramework('flexi_js_common');
@@ -2082,9 +2049,10 @@ class flexicontent_html
 				);
 
 				if ( $cparams->get('page_reloading_enable', 1) ) :
+					// Preserve configured progress styling on native forms.
 					$js .= '
-						jQuery( document ).ready(function() {
-							jQuery("body").prepend(\'\\
+						FlexiForm.ready(function() {
+							if (!document.getElementById("fc_filter_form_blocker")) document.body.insertAdjacentHTML("afterbegin", \'\\
 								<div id="fc_filter_form_blocker" style="display: none;">\\
 									<div class="fc_blocker_overlay" style="' . $styles->overlay_box . '"></div>\\
 									<div class="fc_blocker_content" style="' . $styles->content_box . '">\\
@@ -2100,7 +2068,46 @@ class flexicontent_html
 				break;
 
 			// Used only by content / configuration forms, that have form elements needing this
+			case 'form-utils':
+				\Joomla\CMS\Language\Text::script('FLEXI_FORM_IS_BEING_SUBMITTED', true);
+				\Joomla\CMS\Language\Text::script('FLEXI_AJAX_SAVE_UNCONFIRMED', true);
+				\Joomla\CMS\Language\Text::script('FLEXI_LOADING', true);
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/form-utils.js', array('version' => FLEXI_VHASH));
+				break;
+
+			case 'sortable':
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/choicesjs/sortable.min.js', array('version' => FLEXI_VHASH));
+				break;
+
+			case 'field-repeater':
+				flexicontent_html::loadFramework('flexi-lib');
+				flexicontent_html::loadFramework('sortable');
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/field-repeater.js', array('version' => FLEXI_VHASH));
+				break;
+
+			case 'indexed-field':
+				flexicontent_html::loadFramework('field-repeater');
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/indexed-field.js', array('version' => FLEXI_VHASH));
+				break;
+
+			case 'native-field-controls':
+				flexicontent_html::loadFramework('form-utils');
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/native-field-controls.js', array('version' => FLEXI_VHASH));
+				break;
+
+			case 'media-field-controls':
+				flexicontent_html::loadFramework('form-utils');
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/media-field-controls.js', array('version' => FLEXI_VHASH));
+				break;
+
+			case 'media-metadata':
+				flexicontent_html::loadFramework('form-utils');
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/media-metadata.js', array('version' => FLEXI_VHASH));
+				break;
+
 			case 'flexi-lib-form':
+				flexicontent_html::loadFramework('form-utils');
+				flexicontent_html::loadFramework('sortable');
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
 				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/flexi-lib-form.js', array('version' => FLEXI_VHASH));
@@ -2119,6 +2126,8 @@ class flexicontent_html
 				\Joomla\CMS\Language\Text::script("FLEXI_INDEXED_FIELD_STATE_COL_DISABLED", true);
 				\Joomla\CMS\Language\Text::script('FLEXI_REQUIRED',true);
 				\Joomla\CMS\Language\Text::script('FLEXI_INVALID',true);
+				\Joomla\CMS\Language\Text::script('FLEXI_INPUTMASK_INCOMPLETE', true);
+				\Joomla\CMS\Language\Text::script('FLEXI_VALIDATION_EMAIL_FORMAT', true);
 				\Joomla\CMS\Language\Text::script('JLIB_FORM_FIELD_INVALID',true);
 				\Joomla\CMS\Language\Text::script('FLEXI_AUTO',true);
 				\Joomla\CMS\Language\Text::script('FLEXI_FIELD_SELECT_AT_LEAST_PROMPT',true);
@@ -2195,7 +2204,7 @@ class flexicontent_html
 		if ($validation=='-1') return flexicontent_html::striptagsandcut( $v, $maxlength );
 
 		// validation: via function call
-		$v = $maxlength ? substr($v, 0, $maxlength) : $v;
+		$v = $maxlength ? substr((string) $v, 0, $maxlength) : $v;
 		if ($check_callable)
 		{
 			if (strpos($validation, '::') !== false && is_callable(explode('::', $validation)))
@@ -2277,7 +2286,6 @@ class flexicontent_html
 
 			case 'EMAIL':
 				// Use the Joomla mail helper to validate emails
-				jimport('joomla.mail.helper');
 				if ( !\Joomla\CMS\Mail\MailHelper::isEmailAddress($v) ) $v = '';
 				break;
 
@@ -2380,18 +2388,18 @@ class flexicontent_html
 						'. $text . '
 					</div>' : '') . '
 					<span class="readmore">
-						<span style="cursor: pointer;" class="btn btn-mini" onclick="' . $box_js . ' fc_file_props_handle = fc_showAsDialog(box, 800, 600, null, { title: \'' . \Joomla\CMS\Language\Text::_($options['modal_title']) . '\'}); return false;">
+						<button type="button" style="cursor: pointer;" class="btn btn-mini" onclick="' . $box_js . ' fc_file_props_handle = fc_showAsDialog(box, 800, 600, null, { title: \'' . \Joomla\CMS\Language\Text::_($options['modal_title']) . '\'}); return false;">
 							<span class="'.$options['more_icon'].'"></span>
 							'.\Joomla\CMS\Language\Text::_($options['more_txt']).'
-						</span>
+						</button>
 					</span>';
 				break;
 			case 1:
 				$text2 = '
-					<span style="cursor: pointer;" class="btn btn-mini" onclick="var box = this.nextElementSibling; box.style.display = box.style.display == \'none\' ? \'block\' : \'none\'; return false;">
+					<button type="button" style="cursor: pointer;" class="btn btn-mini" onclick="var box = this.nextElementSibling; box.style.display = box.style.display == \'none\' ? \'block\' : \'none\'; return false;">
 						<span class="'.$options['more_icon'].'"></span>
 						'.\Joomla\CMS\Language\Text::_($options['more_txt']).'
-					</span>
+					</button>
 					<span class="fc_cutted_text" style="display: none;">
 						' . htmlspecialchars(StringHelper::substr($cleantext, $chars), ENT_COMPAT, 'UTF-8') . '
 					</span>';
@@ -2422,7 +2430,6 @@ class flexicontent_html
 	 */
 	static function extractimagesrc( $row )
 	{
-		jimport('joomla.filesystem.file');
 
 		$regex = '#<\s*img [^\>]*src\s*=\s*(["\'])(.*?)\1#im';
 
@@ -2729,13 +2736,14 @@ class flexicontent_html
 		$item_url = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
 		$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?') . 'task=remove' . '&' . \Joomla\CMS\Session\Session::getFormToken() . '=1';
 
-		$view =Factory::getApplication()->input->getCm('view', '');
+		$view =Factory::getApplication()->input->getCmd('view', '');
 		$link .= '&isitemview=' . ($view == 'item' ? '1' : '0');
 
 		$targetLink = "_self";
+		self::loadFramework('flexi-lib');
 		$confirm_text = \Joomla\CMS\Language\Text::_('FLEXI_ARE_YOU_SURE_PERMANENT_DELETE', true);
 
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return confirm(\''.$confirm_text.'\')" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return FlexiForm.confirmLink(this, \''.$confirm_text.'\', event)" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output = \Joomla\CMS\Language\Text::_('FLEXI_ICON_SEP') . $output . \Joomla\CMS\Language\Text::_('FLEXI_ICON_SEP');
 
 		return $output;
@@ -3112,19 +3120,32 @@ class flexicontent_html
 		if (!class_exists($recordClass))
 		{
 			// Prefer frontend record model if it exists
-			!$isAdmin && file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php')
-				? JLoader::register($recordClass, JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php')
-				: JLoader::register($recordClass, JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php');
+			// Lazy class loading (was JLoader::register): load the record model only if/when used
+			$recordPath = !$isAdmin && file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php')
+				? JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php'
+				: JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php';
+			spl_autoload_register(static function ($class) use ($recordClass, $recordPath) {
+				if ($class === $recordClass && is_file($recordPath)) require_once $recordPath;
+			}, true, true);
 		}
 
-		try
+		// One model per record type: it is only needed for its list of supported states, which does not depend on
+		// the record. (Creating one per row ran a query per row of every list that shows state buttons.)
+		static $models = array();
+
+		if (!isset($models[$recordClass]))
 		{
-			$model = new $recordClass();
+			try
+			{
+				$models[$recordClass] = new $recordClass();
+			}
+			catch (Exception $e)
+			{
+				die('flexicontent_html::' . __FUNCTION__ . '() , unknown type: ' . $config->record_name);
+			}
 		}
-		catch (Exception $e)
-		{
-			die('flexicontent_html::' . __FUNCTION__ . '() , unknown type: ' . $record_name);
-		}
+
+		$model = $models[$recordClass];
 
 		$archive_unsupported = !isset($model->supported_conditions[2]);
 		$trash_unsupported   = !isset($model->supported_conditions[-2]);
@@ -3322,7 +3343,7 @@ class flexicontent_html
 			: null;
 		$stateicon = flexicontent_html::stateicon($state, $icon_params, 'html', $state_text, $record, $show_status = 2);
 
-		$tz_string =Factory::getApplication()->getCfg('offset');
+		$tz_string =Factory::getApplication()->get('offset');
 		$tz = new DateTimeZone( $tz_string );
 		$tz_offset = $tz->getOffset(new \Joomla\CMS\Date\Date()) / 3600;
 
@@ -3411,12 +3432,16 @@ class flexicontent_html
 			);
 
 			$output = '
-			<div class="statetoggler ' . $button_classes . ' ' . $tooltip_class . '" ' . ($tooltip_placement ? ' data-placement="' . $tooltip_placement . '"' : '') . ' title="' . $tooltip_title . '" onclick="fc_statehandler_singleton.toggleSelector(this)">
+			<div class="statetoggler ' . $button_classes . ' ' . $tooltip_class . '" ' . ($tooltip_placement ? ' data-placement="' . $tooltip_placement . '"' : '') . ' title="' . $tooltip_title . '">
 				<div class="statetoggler_inner">
-					<div id="row' . $record->id . '" class="stateopener ntxt">
+					<button type="button" id="row' . $record->id . '" class="stateopener ntxt"
+						aria-label="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_CHANGE_STATE'), ENT_QUOTES, 'UTF-8') . '"
+						aria-description="' . htmlspecialchars(strip_tags($state_text ?: $state_names[$state]), ENT_QUOTES, 'UTF-8') . '"
+						aria-expanded="false" aria-controls="fc-state-options-' . $record->id . '"
+						onclick="fc_statehandler_singleton.toggleSelector(this)">
 						' . $stateicon . '
-					</div>
-					<div class="options" data-id="' . $record->id . '" ' . $state_js_ids_list . ' ' . $state_js_titles_list . '></div>
+					</button>
+					<div class="options" id="fc-state-options-' . $record->id . '" data-id="' . $record->id . '" ' . $state_js_ids_list . ' ' . $state_js_titles_list . '></div>
 				</div>
 			</div>';
 		}
@@ -3521,9 +3546,10 @@ class flexicontent_html
 		$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?') . 'task=approval' . '&' . \Joomla\CMS\Session\Session::getFormToken() . '=1';
 
 		$targetLink = "_self";
-		$confirm_text = \Joomla\CMS\Language\Text::_('FLEXI_CONFIRM_SEND_APPROVAL', true) . "\n" . ' (' . $overlib . ')';
+		self::loadFramework('flexi-lib');
+		$confirm_text = \Joomla\CMS\Language\Text::_('FLEXI_CONFIRM_SEND_APPROVAL', true) . '\n' . ' (' . addslashes($overlib) . ')';  // '\n': a line break written for the JS string of the onclick attribute (a real line break is a JS syntax error)
 
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return confirm(\''.$confirm_text.'\')" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return FlexiForm.confirmLink(this, \''.$confirm_text.'\', event)" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output = \Joomla\CMS\Language\Text::_('FLEXI_ICON_SEP') . $output . \Joomla\CMS\Language\Text::_('FLEXI_ICON_SEP');
 
 		return $output;
@@ -3807,7 +3833,7 @@ class flexicontent_html
 
 		$output = ' <a href="' . $link . '" class="' . $button_classes . '" data-placement="' . $tooltip_placement . '" title="' . $tooltip_title . '"
 		' . (!$menu_typeid
-			? 'onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 1200, 0, false, {\'title\': \''.flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TYPE'), 2).'\'}); return false;" '
+			? 'onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 1200, 0, false, {\'title\': \''.flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TYPE'), 2).'\'}); return false;" '
 			: '') . '
 		>' . $image.$caption . '</a>';
 
@@ -4055,6 +4081,386 @@ class flexicontent_html
 	}
 
 	/**
+	 * Get the WHERE conditions (array) selecting the reviews that the current user can see, for the given items:
+	 * the public sees published + approved reviews with text, the author also sees his own (pending) review,
+	 * and moderators (users that can change the state of the reviewed content) also see the pending reviews
+	 *
+	 * @param   object   $db         The database object
+	 * @param   array    $item_ids   The ids of the reviewed items
+	 *
+	 * @return  array    The WHERE conditions
+	 */
+	static function reviewsVisibleWhere($db, $item_ids)
+	{
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$uid      = (int) $user->id;
+		$item_ids = array_values(array_unique(array_map('intval', (array) $item_ids)));
+
+		$visible = array('r.approved = 1');
+
+		if ($uid)
+		{
+			$visible[] = 'r.user_id = ' . $uid;
+
+			$moderated = array();
+
+			foreach ($item_ids as $_id)
+			{
+				if ($user->authorise('core.edit.state', 'com_content.article.' . $_id))
+				{
+					$moderated[] = $_id;
+				}
+			}
+
+			if ($moderated)
+			{
+				$visible[] = 'r.content_id IN (' . implode(',', $moderated) . ')';
+			}
+		}
+
+		return array(
+			'r.type = ' . $db->Quote('item'),
+			'r.state = 1',
+			'CHAR_LENGTH(TRIM(r.text)) > 0',
+			'r.content_id IN (' . ($item_ids ? implode(',', $item_ids) : '0') . ')',
+			'(' . implode(' OR ', $visible) . ')',
+		);
+	}
+
+
+	/**
+	 * Get the number of (visible) reviews of the given items, with a single query (used for the reviews counter)
+	 *
+	 * @param   array    $item_ids   The ids of the reviewed items
+	 *
+	 * @return  array    Array of item id => number of reviews
+	 */
+	static function getItemReviewCounts($item_ids)
+	{
+		static $counts = array();
+
+		$item_ids = array_values(array_unique(array_map('intval', (array) $item_ids)));
+		$missing  = array_values(array_diff($item_ids, array_keys($counts)));
+
+		if ($missing)
+		{
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+			$query = $db->getQuery(true)
+				->select('r.content_id, COUNT(*) AS total')
+				->from('#__flexicontent_reviews AS r')
+				->where(static::reviewsVisibleWhere($db, $missing))
+				->group('r.content_id');
+
+			$found = $db->setQuery($query)->loadAssocList('content_id', 'total');
+
+			foreach ($missing as $_id)
+			{
+				$counts[$_id] = (int) ($found[$_id] ?? 0);
+			}
+		}
+
+		return array_intersect_key($counts, array_flip($item_ids));
+	}
+
+
+	/**
+	 * Get the number of stars (1 to $stars) of the rating of a review, rating = percentage (0 - 100)
+	 * Same rounding as the SQL condition of reviewStarWhere()
+	 *
+	 * @param   int|float  $percent  The rating of the review as a percentage
+	 * @param   int        $stars    The number of stars of the rating
+	 *
+	 * @return  int  The number of stars, 0 if the review has no rating
+	 */
+	static function reviewStarBucket($percent, $stars = 5)
+	{
+		return (int) $percent > 0 ? max(1, (int) round($percent * max(1, (int) $stars) / 100)) : 0;
+	}
+
+
+	/**
+	 * SQL condition: the review has the given rating (number of stars), used by the filter of the reviews list
+	 *
+	 * @param   int   $star    The number of stars to match
+	 * @param   int   $stars   The number of stars of the rating
+	 *
+	 * @return  string  The SQL condition
+	 */
+	static function reviewStarWhere($star, $stars = 5)
+	{
+		return '(r.average_rating > 0 AND GREATEST(1, ROUND(r.average_rating * ' . max(1, (int) $stars) . ' / 100)) = ' . (int) $star . ')';
+	}
+
+
+	/**
+	 * Get the distribution of the ratings of the (visible) reviews of an item: number of reviews for each number of stars
+	 *
+	 * @param   int   $item_id   The id of the reviewed item
+	 * @param   int   $stars     The number of stars of the rating
+	 *
+	 * @return  array  Array of stars => number of reviews, for 1 to $stars (reviews without rating are not counted)
+	 */
+	static function getItemReviewDistribution($item_id, $stars = 5)
+	{
+		$stars = max(1, (int) $stars);
+		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		$query = $db->getQuery(true)
+			->select('CAST(GREATEST(1, ROUND(r.average_rating * ' . $stars . ' / 100)) AS UNSIGNED) AS stars, COUNT(*) AS total')
+			->from('#__flexicontent_reviews AS r')
+			->where(static::reviewsVisibleWhere($db, array($item_id)))
+			->where('r.average_rating > 0')
+			->group('stars');
+
+		$found = $db->setQuery($query)->loadAssocList('stars', 'total') ?: array();
+		$dist  = array();
+
+		for ($s = 1; $s <= $stars; $s++)
+		{
+			$dist[$s] = (int) ($found[$s] ?? 0);
+		}
+
+		return $dist;
+	}
+
+
+	/**
+	 * Get the review of the current (logged) user for the given item
+	 *
+	 * @param   int   $item_id   The id of the reviewed item
+	 *
+	 * @return  object|null   The review (with the author name) or null
+	 */
+	static function getItemOwnReview($item_id)
+	{
+		$uid = (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
+
+		if (!$uid)
+		{
+			return null;
+		}
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		$query = $db->getQuery(true)
+			->select('r.*')
+			->select('CASE WHEN u.id IS NOT NULL THEN u.name ELSE r.name END AS author_name')
+			->from('#__flexicontent_reviews AS r')
+			->join('LEFT', '#__users AS u ON u.id = r.user_id')
+			->where(static::reviewsVisibleWhere($db, array($item_id)))
+			->where('r.user_id = ' . $uid)
+			->order('r.id DESC');
+
+		return $db->setQuery($query, 0, 1)->loadObject() ?: null;
+	}
+
+
+	/**
+	 * Get a page of the reviews of an item, newest first, without the review of the current user (it is displayed separately)
+	 *
+	 * @param   int   $item_id   The id of the reviewed item
+	 * @param   int   $offset    Number of reviews to skip
+	 * @param   int   $limit     Number of reviews to return
+	 * @param   int   $star      Return only the reviews with this rating (number of stars), 0: all reviews
+	 * @param   int   $stars     The number of stars of the rating
+	 *
+	 * @return  array   The reviews (with the author name)
+	 */
+	static function getItemReviewsPage($item_id, $offset, $limit, $star = 0, $stars = 5)
+	{
+		$uid = (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
+		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		$query = $db->getQuery(true)
+			->select('r.*')
+			->select('CASE WHEN u.id IS NOT NULL THEN u.name ELSE r.name END AS author_name')
+			->from('#__flexicontent_reviews AS r')
+			->join('LEFT', '#__users AS u ON u.id = r.user_id')
+			->where(static::reviewsVisibleWhere($db, array($item_id)))
+			->order('r.submit_date DESC, r.id DESC');
+
+		if ($uid)
+		{
+			$query->where('r.user_id <> ' . $uid);
+		}
+
+		// Only the reviews with the given rating (number of stars)
+		if ((int) $star > 0)
+		{
+			$query->where(static::reviewStarWhere($star, $stars));
+		}
+
+		return $db->setQuery($query, max(0, (int) $offset), max(1, (int) $limit))->loadObjectList() ?: array();
+	}
+
+
+	/**
+	 * Identify the voter of the 'useful' votes of reviews: logged users by user id, guests by IP address
+	 *
+	 * @return  array   array(user id, ip), the ip is empty for logged users
+	 */
+	static function getReviewVoterKey()
+	{
+		$uid = (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
+
+		return array($uid, $uid ? '' : substr((string) ($_SERVER['REMOTE_ADDR'] ?? ''), 0, 50));
+	}
+
+
+	/**
+	 * Get the 'useful' votes of the current user (or guest IP) for the given reviews
+	 *
+	 * @param   array   $review_ids   The ids of the reviews
+	 *
+	 * @return  array   Array of review id => 1 (useful) or 0 (not useful), reviews without a vote are not included
+	 */
+	static function getReviewUsefulVotes($review_ids)
+	{
+		$review_ids = array_values(array_unique(array_filter(array_map('intval', (array) $review_ids))));
+
+		if (!$review_ids)
+		{
+			return array();
+		}
+
+		list($uid, $ip) = static::getReviewVoterKey();
+
+		if (!$uid && $ip === '')
+		{
+			return array();
+		}
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		$query = $db->getQuery(true)
+			->select('review_id, vote')
+			->from('#__flexicontent_reviews_useful')
+			->where('review_id IN (' . implode(',', $review_ids) . ')')
+			->where('user_id = ' . $uid)
+			->where('ip = ' . $db->Quote($ip));
+
+		return array_map('intval', $db->setQuery($query)->loadAssocList('review_id', 'vote'));
+	}
+
+
+	/**
+	 * Get the number of stars used for the ratings of reviews (same as the voting field)
+	 *
+	 * @return  int  The number of stars (1 to 10)
+	 *
+	 * @since   3.3.0
+	 */
+	static function getVotingFieldConfig()
+	{
+		static $field = false;
+
+		if ($field === false)
+		{
+			$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$field = $db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $db->Quote('voting'))->loadObject();
+
+			if ($field)
+			{
+				// The item is passed by reference, so it must be a variable
+				$item = (object) array('type_id' => 0);
+				FlexicontentFields::loadFieldConfig($field, $item);
+			}
+		}
+
+		return $field ?: null;
+	}
+
+	static function reviewStarsCount()
+	{
+		static $stars = null;
+
+		if ($stars === null)
+		{
+			$stars = 5;
+			$field = static::getVotingFieldConfig();
+
+			if ($field)
+			{
+				$resolution = max(5, min(100, (int) $field->parameters->get('rating_resolution', 5)));
+				$stars      = (int) $field->parameters->get('rating_stars', 5);
+				$stars      = max(1, min(10, $stars > 0 ? min($stars, $resolution) : $resolution));
+			}
+		}
+
+		return $stars;
+	}
+
+	/**
+	 * Get the voting characteristics of the composite voting (extra votes) of the voting field
+	 *
+	 * @param   object  $field  The voting field
+	 *
+	 * @return  array   xid => object(title, desc), empty if composite voting is disabled
+	 */
+	static function getVotingCharacteristics($field)
+	{
+		$chars = array();
+
+		if (!$field || !(int) $field->parameters->get('enable_extra_votes', 0))
+		{
+			return $chars;
+		}
+
+		$extra_votes = preg_split("/[\s]*%%[\s]*/", (string) $field->parameters->get('extra_votes', ''));
+
+		foreach ($extra_votes as $extra_vote)
+		{
+			if (trim($extra_vote) === '')
+			{
+				continue;
+			}
+
+			$parts = explode('##', $extra_vote);
+			$xid   = (int) trim($parts[0]);
+
+			if ($xid < 1)
+			{
+				continue;
+			}
+
+			$chars[$xid] = (object) array(
+				'title' => isset($parts[1]) ? trim($parts[1]) : '',
+				'desc'  => isset($parts[2]) ? trim($parts[2]) : '',
+			);
+		}
+
+		return $chars;
+	}
+
+	/**
+	 * Creates a read-only display of rating stars (e.g. for the rating of a review)
+	 *
+	 * @param   int     $percent  The rating as a percentage (0 - 100)
+	 * @param   int     $stars    The number of stars to display
+	 * @param   string  $size     CSS size of each star
+	 *
+	 * @return  string  The HTML of the stars, self-contained (inline styles)
+	 *
+	 * @since   3.3.0
+	 */
+	static function reviewStars($percent, $stars = 5, $size = '1.1em')
+	{
+		$percent = max(0, min(100, (int) $percent));
+		$stars   = max(1, min(10, (int) $stars));
+		$size    = htmlspecialchars($size, ENT_QUOTES, 'UTF-8');
+		$label   = round($percent * $stars / 100, 1) . ' / ' . $stars;
+
+		$star = '<svg viewBox="0 0 576 512" aria-hidden="true" focusable="false" style="flex:none;width:' . $size . ';height:' . $size . ';"><path fill="currentColor" d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 327 113.2 469.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 327 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/></svg>';
+		$row  = str_repeat($star, $stars);
+
+		return '<span class="fc-review-stars" role="img" aria-label="' . $label . '" title="' . $label . '" style="position:relative;display:inline-block;white-space:nowrap;line-height:1;vertical-align:middle;">'
+			. '<span style="display:inline-flex;color:#ccc;">' . $row . '</span>'
+			. '<span style="position:absolute;left:0;top:0;display:inline-flex;overflow:hidden;width:' . $percent . '%;color:#f5a623;">' . $row . '</span>'
+			. '</span>';
+	}
+
+	/**
 	 * Creates the ajax voting stars system
 	 *
 	 * @param array $field
@@ -4082,13 +4488,19 @@ class flexicontent_html
 		$html = '';
 		$int_xid = (int) $xid;
 		$item_id = $field->item_id;
+		$review_type = 'item';
+		// Reviews are enabled and new submissions are allowed (the review button / list is displayed by the reviews list of the field)
+		$add_review_form = (int) ($field->parameters->get('allow_reviews', 0) && $field->parameters->get('allow_submit_review_by', 0));
 
 
 		// Get extra voting option (composite voting)
 		$xids = array();
 		$enable_extra_votes = (int) $field->parameters->get('enable_extra_votes', 0);
 
-		if ($enable_extra_votes && ($xid === 'all' || $xid === 'extra' || $int_xid))
+		// Characteristics are not displayed with the rating (they are rated in the review form only), the overall rating is then read-only
+		$extra_hidden = $enable_extra_votes && !(int) $field->parameters->get('extra_show_in_display', 1);
+
+		if ($enable_extra_votes && !$extra_hidden && ($xid === 'all' || $xid === 'extra' || $int_xid))
 		{
 			// Retrieve and split-up extra vote types, (removing last one if empty)
 			$extra_votes = $field->parameters->get('extra_votes', '');
@@ -4124,7 +4536,6 @@ class flexicontent_html
 				? \Joomla\CMS\Language\Text::_($field->parameters->get('main_label', 'FLEXI_VOTE_AVERAGE_RATING'))
 				: '';
 			$counter_show_label = $field->parameters->get('main_counter_show_label', 1);
-			$add_review_form = (int) $field->parameters->get('allow_reviews', 0);
 			$html .= flexicontent_html::ItemVoteDisplay(
 				$field,
 				$item_id,
@@ -4133,12 +4544,12 @@ class flexicontent_html
 				'main',
 				$vote_label,
 				$stars_override = 0,
-				($allow_vote = isset($vote->allow_vote) ? $vote->allow_vote : true),
+				($allow_vote = !$extra_hidden && (isset($vote->allow_vote) ? $vote->allow_vote : true)),
 				$vote_counter = 'default',
 				$counter_show_label,
 				$add_review_form,
 				$xids,
-				$review_type='item'
+				$review_type
 			);
 		}
 
@@ -4350,15 +4761,29 @@ class flexicontent_html
 			// Load tooltips JS
 			if ($cparams->get('add_tooltips', 1)) \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
 
-			flexicontent_html::loadFramework('jQuery');
-			flexicontent_html::loadFramework('flexi_tmpl_common');
-
 			$document =Factory::getApplication()->getDocument();
 			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/fcvote.css', array('version' => FLEXI_VHASH));
+			self::loadFramework('flexi-lib');
 			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/fcvote.js', array('version' => FLEXI_VHASH));
 
 			// Make the CSRF token available to the JS, via: Joomla.getOptions('csrf.token')
 			\Joomla\CMS\HTML\HTMLHelper::_('form.csrf');
+
+			// URL globals + SEF language for fcvote.js (standalone: loaded without flexi_js_common / flexi_tmpl_common)
+			$sef_lang_code = '';
+			// getLanguages() returns an array of language objects, indexed here by language code
+			$site_languages = \Joomla\CMS\Language\LanguageHelper::getLanguages('lang_code');
+			$lang_code = \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
+			if (isset($site_languages[$lang_code]))
+			{
+				$sef_lang_code = $site_languages[$lang_code]->sef;
+			}
+			$document->addScriptDeclaration('
+				if (typeof window.jbase_url_fc === "undefined") window.jbase_url_fc = '.json_encode(\Joomla\CMS\Uri\Uri::base()).';
+				if (typeof window.jroot_url_fc === "undefined") window.jroot_url_fc = '.json_encode(\Joomla\CMS\Uri\Uri::root()).';
+				if (typeof window.fc_sef_lang === "undefined") window.fc_sef_lang = '.json_encode((string) $sef_lang_code).';
+				if (typeof window.FC_VOTE_REVIEW_TITLE === "undefined") window.FC_VOTE_REVIEW_TITLE = '.json_encode(\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_THIS_ITEM')).';
+			');
 
 			// Star size and colors, via voting field parameters (Viewing -> Basic)
 			$star_size = (int) $field->parameters->get('stars_size', 24) ?: 24;
@@ -4490,7 +4915,7 @@ class flexicontent_html
 				{
 					$href = 'javascript:;';
 					$popup_msg = addcslashes($no_acc_msg, "'");
-					$onclick = 'alert(\''.$popup_msg.'\');';
+					$onclick = 'FlexiForm.alert(\''.$popup_msg.'\');';
 				}
 
 				// WITH Redirection
@@ -4499,18 +4924,25 @@ class flexicontent_html
 					$href = $no_acc_url;
 					$popup_msg = addcslashes($no_acc_msg . "\\n\\n" . $no_acc_msg_redirect, "'");
 
-					if ($no_acc_askredirect==2)       $onclick = 'return confirm(\''.$popup_msg.'\');';
-					else if ($no_acc_askredirect==1)  $onclick = 'alert(\''.$popup_msg.'\'); return true;';
+					if ($no_acc_askredirect==2)       $onclick = 'return FlexiForm.confirmLink(this, \''.$popup_msg.'\', event);';
+					else if ($no_acc_askredirect==1)  $onclick = 'return FlexiForm.alertLink(this, \''.$popup_msg.'\', event);';
 					else                              $onclick = 'return true;';
 				}
 			}
 
-			$dovote_class = ' hasTooltip ' . ($has_acclvl ? 'fc_dovote' : '');
+			$dovote_class = $has_acclvl ? 'fc_dovote' : '';
+
+			// Tooltip of the stars (e.g. 'Good 4/5'), it is displayed by fcvote.js (not by the tooltip library of the site: it was not hidden after clicking), can be disabled in the field configuration
+			$show_star_tips = (int) $field->parameters->get('stars_tooltips', 1);
 
 			for ($i = 1; $i <= $rating_resolution; $i++)
 			{
+				$tip_attrs = $show_star_tips
+					? ' data-fcvote-tip="' . htmlspecialchars($star_tooltips[$i], ENT_QUOTES, 'UTF-8') . '" aria-label="' . htmlspecialchars($star_tooltips[$i], ENT_QUOTES, 'UTF-8') . '"'
+					: '';
+
 				$html_vote_links .= '
-					<li class="voting-links"><a onclick="'.$onclick.'" href="'.$href.'" title="'.$star_tooltips[$i].'" class="'.$dovote_class.' '.$star_classes[$i].'" data-rel="'.$id.'_'.$xid.'">'.$i.'</a></li>';
+					<li class="voting-links"><a onclick="'.$onclick.'" href="'.$href.'"'.$tip_attrs.' class="'.$dovote_class.' '.$star_classes[$i].'" data-rel="'.$id.'_'.$xid.'">'.$i.'</a></li>';
 			}
 		}
 
@@ -4555,14 +4987,6 @@ class flexicontent_html
 				</ul>
 
 				<div class="fcvote_message" ></div>
-
-				'.($add_review_form ? '
-				<input type="button" class="btn btn-primary fcvote_toggle_review_form"
-					onclick="fcvote_open_review_form(jQuery(\'#fcvote_review_form_box_'.$id.'\').attr(\'id\'), '.$id.', \''.$review_type.'\', this)"
-					value="'.\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_THIS_ITEM').'"/>
-				<div id="fcvote_review_form_box_'.$id.'_loading" class="fcvote_review_form_box_loading"></div>
-				<span class="fcclear"></span>
-				<div id="fcvote_review_form_box_'.$id.'" class="fcvote_review_form_box" style="display:none;"></div>' : '').'
 
 				'.( $desc ? '<div class="fcvote-desc">'.$desc.'</div>' :'' ).'
 			</div>
@@ -4736,7 +5160,7 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildtagsselect($name, $attribs, $selected, $displaytype=1, $tagid=null)
+	static function buildtagsselect($name, $attribs, $selected, $displaytype=1, $tagid=null, $extra_options=array())
 	{
 		$db =Factory::getContainer()->get(DatabaseInterface::class);
 		$query = 'SELECT id, name'
@@ -4751,6 +5175,10 @@ class flexicontent_html
 			$options[] = \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', '', $displaytype);
 		else if ($displaytype)
 			$options[] = \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', '', \Joomla\CMS\Language\Text::_( 'FLEXI_SELECT_TAG' ));
+
+		// Optional special entries listed before the tags, array(value => text)
+		foreach ($extra_options as $extra_value => $extra_text)
+			$options[] = \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', $extra_value, $extra_text);
 
 		foreach ($data as $val)
 			$options[] = \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', $val->id, $val->name);
@@ -4828,7 +5256,7 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildfilesextlist($name, $attribs, $selected, $displaytype=1, $tagid=null)
+	static function buildfilesextlist($name, $attribs, $selected, $displaytype=1, $tagid=null, $extensions=null)
 	{
 		$db =Factory::getContainer()->get(DatabaseInterface::class);
 		$query = 'SELECT DISTINCT ext'
@@ -4843,7 +5271,7 @@ class flexicontent_html
 		else if ($displaytype)
 			$options[] = \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', '', \Joomla\CMS\Language\Text::_( 'FLEXI_ALL_EXT' ));
 
-		foreach ($data as $val)
+		foreach ($extensions === null ? $data : array_intersect($data, $extensions) as $val)
 			$options[] = \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', $val, $val);
 
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
@@ -4859,10 +5287,12 @@ class flexicontent_html
 	static function builduploaderlist($name, $attribs, $selected, $displaytype=1, $tagid=null)
 	{
 		$db =Factory::getContainer()->get(DatabaseInterface::class);
-		$query = 'SELECT DISTINCT f.uploaded_by AS uid, u.name AS name'
+		// One row per uploader, by name. The order was that of the file extension of an unspecified file of each uploader
+		$query = 'SELECT f.uploaded_by AS uid, u.name AS name'
 		. ' FROM #__flexicontent_files AS f'
 		. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
-		. ' ORDER BY f.ext ASC'
+		. ' GROUP BY f.uploaded_by, u.name'
+		. ' ORDER BY u.name ASC, f.uploaded_by ASC'
 		;
 		$db->setQuery($query);
 		$data = $db->loadObjectList();
@@ -5732,6 +6162,7 @@ class flexicontent_html
 		$tbname = 'toolbar'
 	)
 	{
+		self::loadFramework('flexi-lib');
 		if (FLEXI_J40GE) {
 		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance($tbname);
 		} else {
@@ -5751,7 +6182,7 @@ class flexicontent_html
 			$full_js = $extra_js ."; Joomla.submitbutton('$task');";
 			if ($confirm)
 			{
-				$full_js = "if (confirm('".$confirm_msg."')) { ".$full_js." }";
+				$full_js = "if (await FlexiForm.confirm('".$confirm_msg."')) { ".$full_js." }";
 			}
 			if (!$menu)
 			{
@@ -5761,20 +6192,31 @@ class flexicontent_html
 
 		if ($list)
 		{
-			$full_js = "if (document.adminForm.boxchecked.value==0) { alert('".$err_msg."') ;} else { ".$full_js." }";
+			$full_js = "if (document.adminForm.boxchecked.value==0) { FlexiForm.alert('".$err_msg."') ;} else { ".$full_js." }";
 		}
 
+		if (strpos($full_js, 'await FlexiForm.confirm(') !== false)
+		{
+			$full_js = "return FlexiForm.runAction(this, async () => { " . $full_js . " });";
+		}
 		$full_js = "javascript: $full_js";
 
 		$button_html	= '
-		<'.$tag_type.' '.($tag_type=='a' ? 'href="javascript:;"' : '').'
+		<'.$tag_type.' '.($tag_type=='a' ? 'href="javascript:;"' : ($tag_type=='button' ? 'type="button"' : '')).'
 			onclick="'.htmlspecialchars($full_js, ENT_QUOTES, 'UTF-8').'"
 			class="toolbar ' . $btn_sm_class . ' ' . $btn_class . '"
 			' . $attrs . '
 		>
-			<span class="'.$class.'" title="'.htmlspecialchars($text, ENT_QUOTES, 'UTF-8').'"></span>
+			<span class="'.$class.'" aria-hidden="true"></span>
 			'.$text.'
 		</'.$tag_type.'>';
+
+		// Keep the existing click handler; expose native buttons to Joomla's keyboard shortcuts.
+		if (FLEXI_J40GE && $tag_type === 'button' && in_array($btn_name, array('save', 'apply', 'apply_ajax'), true))
+		{
+			$shortcut_class = $btn_name === 'save' ? 'button-save' : 'button-apply';
+			$button_html = '<joomla-toolbar-button>' . str_replace('class="toolbar ', 'class="toolbar ' . $shortcut_class . ' ', $button_html) . '</joomla-toolbar-button>';
+		}
 
 		if (!$auto_add)
 		{
@@ -5832,13 +6274,15 @@ class flexicontent_html
 			$drop_btn = str_replace('<button ', '<button id="btngroup_id_' . $btngroup_id . '" ', $drop_btn);
 		}
 
+		$primary_button = str_replace('_DDI_class_', '', array_shift($btn_arr));
 		$buttons_html = '
 			<div class="buttons btn-group' . (FLEXI_J40GE ? ' dropdown' : '') . '">
-				'.array_shift($btn_arr).'
+				'.$primary_button.'
 			  '.($drop_btn ?: '
-			  <button class="' . $drop_btn_class . '"
+			  <button type="button" class="' . $drop_btn_class . '"
 					' . (FLEXI_J40GE ? ' data-bs-toggle="dropdown" ' : ' data-toggle="dropdown" ') .'
 					id="btngroup_id_' . $btngroup_id . '" aria-expanded="false"
+					aria-label="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('JOPTIONS'), ENT_QUOTES, 'UTF-8') . '"
 				>
 			    <span class="caret"></span>
 			  </button>').'
@@ -6325,156 +6769,16 @@ class flexicontent_html
 	// Get SEF url regardless of being in backend / frontend
 	public static function getSefUrl($url, $xhtml = true, $ssl = null)
 	{
-		static $site_router, $site_instance, $isAdmin, $isSH404SEF, $useSiteApp;
-		
-		/**
-		 * J4 case
-		 */
-
-		if (FLEXI_J40GE)
-		{
-			// This also works in J4 
-			// return $url = \Joomla\CMS\Router\Route::link('site', $url);
-
-			$router =Factory::getContainer()->get(\Joomla\CMS\Router\SiteRouter::class);
-			$url = $router->build($url);
-			$url = $url->toString();
-
-			return $url;
-		}
-
-		
-		/**
-		 * J3 case
-		 */
-
-		// Get frontend route instance if we are in the backend and SH404SEF is not installed
-		if ($site_router === null)
-		{
-			$isAdmin    =Factory::getApplication()->isClient('administrator');
-			$isSH404SEF = defined('SH404SEF_IS_RUNNING') &&Factory::getApplication()->getConfig()->get('sef');
-			$useSiteApp = $isAdmin; // && $isSH404SEF;
-
-			$site_instance = $useSiteApp
-				? JApplication::getInstance('site')   // In J4 use CMSApplication::getInstance('site')
-				:Factory::getApplication();
-			$site_router = $site_instance->getRouter('site');
-		}
-
-		if (!is_array($url) && (strpos($url, '&') !== 0) && (strpos($url, 'index.php') !== 0))
-		{
-			return $url;
-		}
-
-		// Build route
-		$uri = $site_router->build($url);
-
-		$scheme = array('path', 'query', 'fragment');
-
-		/*
-		 * Get the secure/unsecure URLs.
-		 *
-		 * If the first 5 characters of the BASE are 'https', then we are on an ssl connection over
-		 * https and need to set our secure URL to the current request URL, if not, and the scheme is
-		 * 'http', then we need to do a quick string manipulation to switch schemes.
-		 */
-		if ((int) $ssl || $uri->isSsl())
-		{
-			static $host_port;
-
-			if (!is_array($host_port))
-			{
-				$uri2 = \Joomla\CMS\Uri\Uri::getInstance();
-				$host_port = array($uri2->getHost(), $uri2->getPort());
-			}
-
-			// Determine which scheme we want.
-			$uri->setScheme(((int) $ssl === 1 || $uri->isSsl()) ? 'https' : 'http');
-			$uri->setHost($host_port[0]);
-			$uri->setPort($host_port[1]);
-			$scheme = array_merge($scheme, array('host', 'port', 'scheme'));
-		}
-
-		$url = $uri->toString($scheme);
-
-		// Replace spaces.
-		$url = preg_replace('/\s/u', '%20', $url);
-
-		if ($xhtml)
-		{
-			$url = htmlspecialchars($url, ENT_COMPAT, 'UTF-8');
-		}
-
-		/**
-		 * Needed in older Joomla versions like J3.7 (and maybe for J3.8, J3.9). Check if we are in the backend again
-		 * and remove '/administrator' from URL as it is added even though we've set the application to the site app
-		 */
-		if ($useSiteApp)
-		{
-			$url = str_replace(\Joomla\CMS\Uri\Uri::base(true), \Joomla\CMS\Uri\Uri::root(true), $url);
-		}
+		$router = Factory::getContainer()->get(\Joomla\CMS\Router\SiteRouter::class);
+		$url    = $router->build($url)->toString();
 
 		return $url;
 	}
 
 
-	// Check and if needed install Joomla template overrides into current Joomla template
+	/** @deprecated Joomla's media field no longer needs per-template layouts. */
 	public static function install_template_overrides($display_mssg = false)
 	{
-		jimport('joomla.filesystem.path' );
-		jimport('joomla.filesystem.folder');
-		jimport('joomla.filesystem.file');
-		$app =Factory::getApplication();
-
-		$pathDestFolder_arr = array(
-			Path::clean(JPATH_BASE.'/templates/'.$app->getTemplate().'/html/com_media/images/'),
-			Path::clean(JPATH_BASE.'/templates/'.$app->getTemplate().'/html/com_media/imageslist/')
-		);
-		$pathSourceFolder_arr = array(
-			Path::clean(JPATH_ROOT.'/components/com_flexicontent/layouts/html/com_media/images'),
-			Path::clean(JPATH_ROOT.'/components/com_flexicontent/layouts/html/com_media/imageslist')
-		);
-
-		$install_count = $update_count = 0;
-
-		foreach($pathDestFolder_arr as $i => $pathDestFolder)
-		{
-			$pathSourceFolder = $pathSourceFolder_arr[$i];
-
-			// 1. Check DESTINATION folder
-			if ( !is_dir($pathDestFolder) && !mkdir($pathDestFolder, 0755, true) )
-			{
-				echo '<span class="alert alert-warning"> Error, unable to create folder: '. $pathDestFolder.'</span>';
-			}
-
-			// 2. Copy override files
-			$files = glob($pathSourceFolder . '/*.*');
-
-			foreach($files as $sourcepath)
-			{
-				$dest_path = $pathDestFolder . basename($sourcepath);
-
-				$not_exists = !file_exists($dest_path);
-				if ($not_exists || filemtime($sourcepath) > filemtime($dest_path))
-				{
-					$not_exists ? $install_count++ : $update_count++;
-					copy($sourcepath, $dest_path);
-				}
-			}
-		}
-
-		if ($display_mssg)
-		{
-			if ($install_count)
-			{
-				Factory::getApplication()->enqueueMessage('<span class="badge">' . \Joomla\CMS\Language\Text::_('FLEXI_INSTALLED') . '</span> ' . $install_count . ' template overrides', 'message');
-			}
-
-			if ($display_mssg && $update_count)
-			{
-				Factory::getApplication()->enqueueMessage('<span class="badge">' . \Joomla\CMS\Language\Text::_('FLEXI_UPDATED') . '</span> ' . $update_count . ' template overrides', 'message');
-			}
-		}
 	}
 
 
@@ -6556,5 +6860,186 @@ class flexicontent_html
 		}
 
 		return $field->input;
+	}
+
+
+	/**
+	 * Render the version history table of an item.
+	 * Shared by the item form and the Ajax pagination endpoint, so both renderings
+	 * always stay identical (including the comparison link's opening mode).
+	 *
+	 * @param   array   $versions  Rows from ParentClassItem::getVersionList()
+	 * @param   object  $item      Item (needs id, created, creator, current version)
+	 * @param   array   $options   Rendering options, see renderVersionRow()
+	 *
+	 * @return  string
+	 */
+	public static function renderVersionsTable($versions, $item, $options)
+	{
+		$html = '<table class="table table-sm fc-version-table">'
+			. '<thead><tr>'
+			. '<th scope="col">' . \Joomla\CMS\Language\Text::_('FLEXI_VERSION') . '</th>'
+			. '<th scope="col">' . \Joomla\CMS\Language\Text::_('JDATE') . '</th>'
+			. '<th scope="col">' . \Joomla\CMS\Language\Text::_('JAUTHOR') . '</th>'
+			. '<th scope="col">' . \Joomla\CMS\Language\Text::_('FLEXI_VERSION_BACKUP') . '</th>'
+			. '<th scope="col">' . \Joomla\CMS\Language\Text::_('FLEXI_ACTIONS') . '</th>'
+			. '</tr></thead><tbody>';
+
+		if (empty($item->id))
+		{
+			$html .= '<tr><td colspan="5" class="versions-first">'
+				. \Joomla\CMS\Language\Text::_('FLEXI_NEW_ARTICLE')
+				. '</td></tr>';
+		}
+		else
+		{
+			foreach ($versions as $version)
+			{
+				if ((int) $version->nr > 0)
+				{
+					$html .= self::renderVersionRow($version, $item, $options);
+				}
+			}
+		}
+
+		return $html . '</tbody></table>';
+	}
+
+
+	/**
+	 * Render one row of the version history table.
+	 *
+	 * Expected options:
+	 *   item_id, current_version, is_site, allow_comparing, can_keep, task_items, token, date_format
+	 *
+	 * @return  string
+	 */
+	public static function renderVersionRow($version, $item, $options)
+	{
+		$nr       = (int) $version->nr;
+		$isSite   = !empty($options['is_site']);
+		$current  = (int) $options['current_version'];
+		$isCurrent = $nr === $current;
+		$isKept   = !empty($version->keep);
+		$dateFormat = !empty($options['date_format'])
+			? $options['date_format']
+			: 'd/M H:i';
+		$taskItems = isset($options['task_items']) ? $options['task_items'] : 'task=items.';
+		$token    = isset($options['token']) ? $options['token'] : \Joomla\CMS\Session\Session::getFormToken();
+		$itemId   = (int) $options['item_id'];
+		$compareMode = isset($options['compare_mode']) ? $options['compare_mode'] : 'inline';
+
+		$classes = array('fc-version-row');
+		if ($isCurrent) $classes[] = 'active-version';
+		if ($isKept)    $classes[] = 'is-kept';
+
+		$author = $nr === 1
+			? (isset($item->creator) ? $item->creator : '')
+			: $version->modifier;
+		$author = self::striptagsandcut($author, 25);
+
+		// Permanent backup marker (one per item, excluded from rotation)
+		$keepCell = '<td class="versions fc-version-keep-cell">';
+		if (!empty($options['can_keep']) && !$isSite)
+		{
+			$keepUrl = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&task=items.setversionkeep&format=raw'
+				. '&id=' . $itemId . '&version=' . $nr . '&' . $token . '=1';
+			$keepLabel = $isKept
+				? \Joomla\CMS\Language\Text::sprintf('FLEXI_VERSION_UNKEEP', $nr)
+				: \Joomla\CMS\Language\Text::sprintf('FLEXI_VERSION_KEEP', $nr);
+			$keepIcon = $isKept ? 'icon-lock' : 'icon-unlock';
+			$keepCell .= '<a href="javascript:;" data-keep-url="' . htmlspecialchars($keepUrl, ENT_COMPAT, 'UTF-8') . '"'
+				. ' class="fc-version-keep hasTooltip'
+				. ($isKept ? ' is-kept' : ' is-unlocked') . '" title="' . htmlspecialchars($keepLabel, ENT_COMPAT, 'UTF-8') . '"'
+				. ' data-version="' . $nr . '">'
+				. '<span class="' . $keepIcon . '" aria-hidden="true"></span>'
+				. '<span class="visually-hidden">' . htmlspecialchars($keepLabel, ENT_COMPAT, 'UTF-8') . '</span>'
+				. '</a>';
+		}
+		elseif ($isKept)
+		{
+			$keepCell .= '<span class="icon-lock text-warning" aria-hidden="true"></span>';
+		}
+		$keepCell .= '</td>';
+
+		// Comment tooltip
+		$comment = !empty($version->comment)
+			? $version->comment
+			: \Joomla\CMS\Language\Text::_('FLEXI_NO_VERSION_COMMENT');
+		$tooltip = \Joomla\CMS\HTML\HTMLHelper::tooltipText(
+			\Joomla\CMS\Language\Text::_('FLEXI_COMMENT'),
+			$comment,
+			0,
+			1
+		);
+		// tooltipText() already escapes its output when $escape = 1 (as passed above)
+		$actions = '<a href="javascript:;" class="hasTooltip fc-version-comment" title="' . $tooltip . '">'
+			. '<span class="icon-comment" aria-hidden="true"></span>'
+			. '<span class="visually-hidden">' . \Joomla\CMS\Language\Text::_('FLEXI_COMMENT') . '</span>'
+			. '</a>';
+
+		// Compare with current version: new browser tab (inline) or Joomla dialog (popup)
+		if (!$isSite && !$isCurrent && !empty($options['allow_comparing']))
+		{
+			$compareUrl = 'index.php?option=com_flexicontent&view=itemcompare&cid[]=' . $itemId
+				. '&version=' . $nr . '&tmpl=component';
+			$compareLabel = \Joomla\CMS\Language\Text::_('FLEXI_COMPARE_WITH_CURRENT_VERSION');
+
+			if ($compareMode === 'popup')
+			{
+				$dialogOptions = array(
+					'popupType'  => 'iframe',
+					'src'        => \Joomla\CMS\Uri\Uri::base(true) . '/' . $compareUrl,
+					'textHeader' => $compareLabel . ' #' . $nr,
+					'width'      => '90%',
+					'height'     => '85%',
+				);
+				$actions .= ' <a class="fc-version-compare hasTooltip" href="' . htmlspecialchars($compareUrl, ENT_COMPAT, 'UTF-8') . '"'
+					. ' data-joomla-dialog="' . htmlspecialchars(json_encode($dialogOptions, JSON_UNESCAPED_SLASHES), ENT_COMPAT, 'UTF-8') . '"'
+					. ' title="' . htmlspecialchars($compareLabel, ENT_COMPAT, 'UTF-8') . '">'
+					. '<span class="icon-eye-open" aria-hidden="true"></span>'
+					. '<span class="visually-hidden">' . $compareLabel . '</span>'
+					. '</a>';
+			}
+			else
+			{
+				$actions .= ' <a class="fc-version-compare hasTooltip" href="' . htmlspecialchars($compareUrl, ENT_COMPAT, 'UTF-8') . '"'
+					. ' target="_blank" rel="noopener noreferrer"'
+					. ' title="' . htmlspecialchars($compareLabel, ENT_COMPAT, 'UTF-8') . '">'
+					. '<span class="icon-eye-open" aria-hidden="true"></span>'
+					. '<span class="visually-hidden">' . $compareLabel . '</span>'
+					. '</a>';
+			}
+		}
+
+		// Restore (loads the version into the edit form)
+		if (!$isSite)
+		{
+			if ($isCurrent)
+			{
+				$actions .= ' <span class="fc-version-current badge bg-success">'
+					. \Joomla\CMS\Language\Text::_('FLEXI_CURRENT') . '</span>';
+			}
+			else
+			{
+				$restoreUrl = 'index.php?option=com_flexicontent&' . $taskItems . 'edit'
+					. '&cid[]=' . $itemId . '&version=' . $nr . '&' . $token . '=1';
+				$restoreLabel = \Joomla\CMS\Language\Text::sprintf('FLEXI_REVERT_TO_THIS_VERSION', $nr);
+				$actions .= ' <a href="javascript:;" class="fc-version-restore hasTooltip"'
+					. ' data-restore-url="' . htmlspecialchars(\Joomla\CMS\Uri\Uri::base(true) . '/' . $restoreUrl, ENT_COMPAT, 'UTF-8') . '"'
+					. ' title="' . htmlspecialchars($restoreLabel, ENT_COMPAT, 'UTF-8') . '">'
+					. '<span class="icon-undo" aria-hidden="true"></span>'
+					. '<span class="visually-hidden">' . $restoreLabel . '</span>'
+					. '</a>';
+			}
+		}
+
+		return '<tr class="' . implode(' ', $classes) . '" data-version="' . $nr . '">'
+			. '<td class="versions fc-version-nr">#' . $nr . '</td>'
+			. '<td class="versions fc-version-date">' . \Joomla\CMS\HTML\HTMLHelper::_('date', ($nr === 1 ? $item->created : $version->date) ?: '', $dateFormat) . '</td>'
+			. '<td class="versions fc-version-author">' . htmlspecialchars($author, ENT_COMPAT, 'UTF-8') . '</td>'
+			. $keepCell
+			. '<td class="versions fc-version-actions">' . $actions . '</td>'
+			. '</tr>';
 	}
 }

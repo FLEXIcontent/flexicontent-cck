@@ -14,7 +14,13 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecords' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * HTML View class for the Fileselement View
@@ -41,11 +47,11 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		global $globalcats;
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getSession();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
@@ -61,8 +67,8 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
 		{
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get model
@@ -269,16 +275,16 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			// Add css to document
 			if ($isAdmin)
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 			}
 			else
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
@@ -288,7 +294,6 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 			// Add JS frameworks
 			flexicontent_html::loadFramework('select2');
-			flexicontent_html::loadFramework('prettyCheckable');
 			flexicontent_html::loadFramework('flexi-lib');
 			flexicontent_html::loadFramework('flexi-lib-form');
 
@@ -381,150 +386,74 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 		// *** BOF FOLDER MODE specific ***
 
-		// Add JS to document to initialize the file list
-		// eg Find and mark file usage by fileid / filename search (respectively: DB mode / Folder mode)
-		if ($folder_mode)
-		{
-			$js = "
-			document.addEventListener('DOMContentLoaded', function()
-			{
-				var delfilename = '".$delfilename."';
-				var remove_existing_files_from_list = 0;
-				var remove_new_files_from_list = 0;
-
-				// Find and mark file usage by filename search
-				var original_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .originalname');  // newly selected field values, not yet saved in DB
-				var existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .".$existing_class."');  // existing (or optionally newly selected too) field values, already saved in DB
-
-				var imgobjs = Array();
-				for (i=0,n=original_objs.length; i<n; i++)
-				{
-					if (original_objs[i].value) imgobjs.push(original_objs[i].value);
-					if (delfilename!='' && original_objs[i].value == delfilename)
-					{
-						//window.parent.fcfield_assignImage".$fieldid."('".$targetid."', '', '', 0);
-						remove_existing_files_from_list = 1;
-					}
-				}
-				for (i=0,n=existing_objs.length; i<n; i++)
-				{
-					if (existing_objs[i].value) imgobjs.push(existing_objs[i].value);
-					if (delfilename!='' && existing_objs[i].value == delfilename)
-					{
-						//window.parent.fcfield_assignImage".$fieldid."('".$targetid."', '', '', 0);
-						remove_new_files_from_list = 1;
-					}
-				}
-
-				if ( remove_existing_files_from_list || remove_new_files_from_list )
-				{
-					mssg = '".\Joomla\CMS\Language\Text::_('FLEXI_DELETE_FILE_IN_LIST_WINDOW_MUST_CLOSE')."';
-					mssg = mssg + '\\n' + (remove_existing_files_from_list ? '".\Joomla\CMS\Language\Text::_('FLEXI_EXISTING_FILE_REMOVED_SAVE_RECOMMENEDED',true)."' : '');
-					alert( mssg );
-					//window.parent.fcfield_assignImage".$fieldid."('".$targetid."', '', '', 0);
-				}
-
-				for (i=0,n=imgobjs.length; i<n; i++)
-				{
-					var rows = jQuery.find('a[data-filename=\"'+ imgobjs[i] +'\"]');
-					jQuery(rows).addClass('striketext');
-				}
-
-				".($autoassign && count($pending_file_names) ? "
-				jQuery('td.is-pending-file input').next().trigger('click');
-				" : "")."
-
-				".($autoassign==1 && count($pending_file_names) ? "
-				jQuery('#insert_selected_btn').trigger('click');
-				" : "")."
-			});
-			";
-		}
-
-		else
-		{
-			$js = "
-			document.addEventListener('DOMContentLoaded', function()
-			{
-				// Find and mark file usage by filename search
-				var existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .".$existing_class."');  // existing (or optionally newly selected too) field values, already saved in DB
-				for (i=0,n=existing_objs.length; i<n; i++)
-				{
-					var rows = jQuery.find('a[data-filename=\"'+ existing_objs[i].innerHTML +'\"]');
-					jQuery(rows).addClass('striketext');
-				}
-
-				// Find and mark file usage by fileid search
-				var id_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." input.contains_fileid');
-				var imgids = Array();
-				for (i=0,n=id_objs.length; i<n; i++)
-				{
-					if ( id_objs[i].value) imgids.push(id_objs[i].value);
-				}
-				for (i=0,n=imgids.length; i<n; i++)
-				{
-					var rows = jQuery.find('a[data-fileid=\"'+ imgids[i] +'\"]');
-					jQuery(rows).addClass('striketext');
-				}
-
-				".($autoassign && count($pending_file_names) ? "
-				jQuery('td.is-pending-file input').next().trigger('click');
-				" : "")."
-
-				".($autoassign==1 && count($pending_file_names) ? "
-				jQuery('#insert_selected_btn').trigger('click');
-				" : "")."
-			});
-			";
-		}
-
-
-		$js .= "
+		$selector = '.fcfieldval_container_' . (int) $fieldid . ' ';
+		$js = "
 			var fcfiles_keep_modal = 0;
-			var fcfiles_targetid = '".$targetid."';
+			var fcfiles_targetid = " . json_encode($targetid, JSON_HEX_TAG | JSON_HEX_AMP) . ";
 
-			function fc_fileselement_assign_files(el)
+			FlexiForm.ready(function()
 			{
-				var rows = jQuery('input[name=\"cid[]\"]:checked');
-				if (!rows.length)
+				const parentDocument = window.parent.document;
+				const fields = parentDocument.querySelectorAll(" . json_encode($selector . '.' . $existing_class) . ");
+				const originals = " . ($folder_mode ? "parentDocument.querySelectorAll(" . json_encode($selector . '.originalname') . ")" : "[]") . ";
+				const filenames = new Set([...fields, ...originals].map(field => field.value || field.textContent.trim()).filter(Boolean));
+				const ids = new Set([...parentDocument.querySelectorAll(" . json_encode($selector . 'input.contains_fileid') . ")].map(field => field.value).filter(Boolean));
+				const deleted = " . json_encode($delfilename, JSON_HEX_TAG | JSON_HEX_AMP) . ";
+				if (" . ($folder_mode ? 'true' : 'false') . " && deleted && filenames.has(deleted))
 				{
-					alert('Please select some files');
+					const removedOriginal = [...originals].some(field => field.value === deleted);
+					FlexiForm.alert(" . json_encode(\Joomla\CMS\Language\Text::_('FLEXI_DELETE_FILE_IN_LIST_WINDOW_MUST_CLOSE'), JSON_HEX_TAG | JSON_HEX_AMP) . "
+						+ (removedOriginal ? '\\n' + " . json_encode(\Joomla\CMS\Language\Text::_('FLEXI_EXISTING_FILE_REMOVED_SAVE_RECOMMENEDED'), JSON_HEX_TAG | JSON_HEX_AMP) . " : ''));
+				}
+				document.querySelectorAll('a[data-filename], a[data-fileid]').forEach(link => {
+					if (filenames.has(link.dataset.filename) || ids.has(link.dataset.fileid)) link.classList.add('striketext');
+				});
+				" . ($autoassign && count($pending_file_names) ? "
+				document.querySelectorAll('td.is-pending-file input').forEach(input => input.nextElementSibling?.click());
+				" : "") . "
+				" . ($autoassign == 1 && count($pending_file_names) ? "
+				document.getElementById('insert_selected_btn')?.click();
+				" : "") . "
+			});
+
+			function fc_fileselement_assign_files()
+			{
+				const inputs = [...document.querySelectorAll('input[name=\"cid[]\"]:checked')]
+					.filter(input => input.closest('tr')?.querySelector('.fc_set_file_assignment:not(.striketext)'));
+				if (!inputs.length)
+				{
+					FlexiForm.alert(" . json_encode(\Joomla\CMS\Language\Text::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', \Joomla\CMS\Language\Text::_('FLEXI_SELECT')), JSON_HEX_TAG | JSON_HEX_AMP) . ");
 					return;
 				}
 
-				jQuery('#fileman_tabset').hide();
-				jQuery('#fileman_tabset').prev().show();
-
+				const tabs = document.getElementById('fileman_tabset');
+				FlexiForm.show(tabs, false);
+				FlexiForm.show(tabs?.previousElementSibling);
 				setTimeout(function()
 				{
 					fcfiles_keep_modal = 1;
-					var row_count = 0;
-					rows.each(function(index, value)
+					for (const [index, input] of inputs.entries())
 					{
-						var row = jQuery(this).closest('tr');
-						var assign_file_btn = row.find('.fc_set_file_assignment');
-						if (row_count > 0 || fcfiles_targetid == '')
+						if (index || !fcfiles_targetid)
 						{
-							// Add after given element or at end if element was not provided
-							fcfiles_targetid = fcfiles_targetid ?
-								window.parent.addField".$fieldid."(null, null, jQuery('#'+fcfiles_targetid, parent.document).closest('li.fcfieldval_container'), {insert_before: 0, scroll_visible: 0, animate_visible: 0}) :
-								window.parent.addField".$fieldid."(null);
+							const row = window.parent.document.getElementById(fcfiles_targetid)?.closest('.fcfieldval_container');
+							fcfiles_targetid = row
+								? window.parent.addField" . $fieldid . "(null, null, row, {insert_before: 0, scroll_visible: 0, animate_visible: 0})
+								: window.parent.addField" . $fieldid . "(null);
 						}
-						if (fcfiles_targetid == 'cancel')  return false;  // Stop .each() loop
-						row_count++;
-						assign_file_btn.trigger('click');
-					});
-					window.parent.fc_field_dialog_handle_".$fieldid.".dialog('close');
+						if (!fcfiles_targetid || fcfiles_targetid === 'cancel') break;
+						input.closest('tr').querySelector('.fc_set_file_assignment').click();
+					}
+					window.parent.fc_field_dialog_handle_" . $fieldid . "?.dialog('close');
 				}, 50);
 			}
 
-			function fc_fileselement_assign_file(target_valuebox_tagid, file_data, f_preview)
+			function fc_fileselement_assign_file(targetId, data, preview)
 			{
-				file_data.preview = f_preview;
-				var result = window.parent.fcfield_assignFile".$fieldid."(target_valuebox_tagid, file_data, fcfiles_keep_modal);
-				if (result != 'cancel')
+				const result = window.parent.fcfield_assignFile" . $fieldid . "(targetId, {...data, preview}, fcfiles_keep_modal);
+				if (result !== 'cancel' && result !== false)
 				{
-					jQuery('file'+file_data.id).className = 'striketext';
+					document.getElementById('file' + data.id)?.classList.add('striketext');
 				}
 			}
 
@@ -532,11 +461,11 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			{
 				if (document.adminForm.boxchecked.value==0)
 				{
-					alert('". flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', \Joomla\CMS\Language\Text::_('FLEXI_DELETE')), 'd')."');
+					FlexiForm.alert('". flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', \Joomla\CMS\Language\Text::_('FLEXI_DELETE')), 'd')."');
 				}
 				else
 				{
-					if (confirm('".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_ARE_YOU_SURE'), 's')."')) Joomla.submitbutton('filemanager.remove');
+					return FlexiForm.confirmAction(document.adminForm, '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_ARE_YOU_SURE'), 's')."', () => Joomla.submitbutton('filemanager.remove'));
 				}
 			}
 		";
@@ -597,6 +526,11 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		 */
 
 		$lists = array();
+		if (!$jinput->getCmd('isxtdbtn'))
+		{
+			// The file library uses native selects in its compact search toolbar.
+			$this->select_class = 'form-select';
+		}
 
 
 		// Build publication state filter
@@ -767,18 +701,24 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 
 		// Build extension filter
+		$lists['picker_ext'] = flexicontent_html::buildfilesextlist(
+			'filter_ext',
+			array(
+				'class' => $this->select_class,
+				'size' => '1',
+				'aria-label' => \Joomla\CMS\Language\Text::_('FLEXI_PICKER_ALL_TYPES'),
+				'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+			),
+			$filter_ext,
+			\Joomla\CMS\Language\Text::_('FLEXI_PICKER_ALL_TYPES'),
+			null,
+			!empty($field) && in_array($field->field_type, ['file', 'image', 'mediafile'], true)
+				? flexicontent_upload::getAllowedExtensions(flexicontent_upload::getUploadParams($field))
+				: null
+		);
 		$lists['filter_ext'] = $this->getFilterDisplay(array(
 			'label' => \Joomla\CMS\Language\Text::_('FLEXI_ALL_EXT'),
-			'html' => flexicontent_html::buildfilesextlist(
-				'filter_ext',
-				array(
-					'class' => $this->select_class,
-					'size' => '1',
-					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
-				),
-				$filter_ext,
-				'-'
-			)
+			'html' => $lists['picker_ext']
 		));
 
 
@@ -820,7 +760,6 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		$lists['order']     = $filter_order;
 
 		// Uploadstuff
-		jimport('joomla.client.helper');
 
 		$require_ftp = !\Joomla\CMS\Client\ClientHelper::hasCredentials('ftp');
 
@@ -876,7 +815,6 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		{
 			$this->sidebar = null;
 
-			if(FLEXI_J30GE && !FLEXI_J40GE) $this->sidebar = JHtmlSidebar::render();
 			if(FLEXI_J40GE) $this->sidebar = \Joomla\CMS\HTML\Helpers\Sidebar::render();
 		}
 
@@ -886,6 +824,12 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
 
+		if ($jinput->getString('fc_confirm_unlink'))
+		{
+			// Use the same confirmation in the manager, modal and template overrides.
+			require JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/filemanager/tmpl/unlink_confirmation.php';
+			return;
+		}
 		parent::display($tpl);
 
 		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;

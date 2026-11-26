@@ -15,7 +15,6 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
 
-jimport('legacy.model.list');
 
 /**
  * FLEXIcontent Component Import Model
@@ -73,6 +72,8 @@ class FlexicontentModelImport extends \Joomla\CMS\MVC\Model\ListModel
 		$seccats     = $fcform ? $jinput->get('seccats', 0, 'int')      :  $app->getUserStateFromRequest( $p.'seccats', 'seccats', false, 'array');
 		$seccats_col = $fcform ? $jinput->get('seccats_col', 0, 'int')  :  $app->getUserStateFromRequest( $p.'seccats_col', 'seccats_col', 0, 'int');
 		$tags_col    = $fcform ? $jinput->get('tags_col', 0, 'int')     :  $app->getUserStateFromRequest( $p.'tags_col', 'tags_col', 0, 'int');
+		$tags_ids    = $fcform ? $jinput->get('tags_ids', array(), 'array') :  $app->getUserStateFromRequest( $p.'tags_ids', 'tags_ids', array(), 'array');
+		$tags_ids    = array_values(array_filter(ArrayHelper::toInteger((array) $tags_ids)));
 
 		if (!is_array($seccats))    $seccats    = strlen($seccats)    ? array($seccats)    : array();
 
@@ -81,12 +82,14 @@ class FlexicontentModelImport extends \Joomla\CMS\MVC\Model\ListModel
 		$this->setState('seccats', $seccats);
 		$this->setState('seccats_col', $seccats_col);
 		$this->setState('tags_col', $tags_col);
+		$this->setState('tags_ids', $tags_ids);
 
 		$app->setUserState($p.'maincat', $maincat);
 		$app->setUserState($p.'maincat_col', $maincat_col);
 		$app->setUserState($p.'seccats', $seccats);
 		$app->setUserState($p.'seccats_col', $seccats_col);
 		$app->setUserState($p.'tags_col', $tags_col);
+		$app->setUserState($p.'tags_ids', $tags_ids);
 
 
 		// Publication: Author/modifier
@@ -170,6 +173,11 @@ class FlexicontentModelImport extends \Joomla\CMS\MVC\Model\ListModel
 		// Folders for media / file fields
 		$media_folder = $app->getUserStateFromRequest( $p.'media_folder', 'media_folder', $this->cparams->get('import_media_folder', 'tmp/fcimport_media'), 'string');
 		$docs_folder  = $app->getUserStateFromRequest( $p.'docs_folder', 'docs_folder', $this->cparams->get('import_docs_folder', 'tmp/fcimport_docs'), 'string');
+
+		// Fields whose files should not be checked (checkboxes), remembered so that they are kept when returning to the form
+		$skip_file_field = $fcform ? $jinput->get('skip_file_field', array(), 'array') : $app->getUserStateFromRequest( $p.'skip_file_field', 'skip_file_field', array(), 'array');
+		$this->setState('skip_file_field', (array) $skip_file_field);
+		$app->setUserState($p.'skip_file_field', (array) $skip_file_field);
 
 		$this->setState('media_folder', $media_folder);
 		$this->setState('docs_folder', $docs_folder);

@@ -1,365 +1,205 @@
-	var fcfield_image = {};
-	
-	fcfield_image.debugToConsole = [];
-	fcfield_image.use_native_apis = [];
-	fcfield_image.currElement = [];
-	fcfield_image.dialog_handle = [];
+var fcfield_image = {
+  debugToConsole: [],
+  use_native_apis: [],
+  currElement: [],
+  dialog_handle: [],
 
-	fcfield_image.toggleMediaURL = function(element_id_n, config_name)
-	{
-		var url = jQuery("#"+element_id_n+"_mediaurl").val();
-		var msg_box = jQuery("#fcfield_message_box_"+element_id_n);
+  // Joomla detaches an empty media control's clear button but keeps its reference.
+  prepareMediaClone(source, clone) {
+    const originals = source.querySelectorAll('joomla-field-media');
+    clone.querySelectorAll('joomla-field-media').forEach((media, index) => {
+      const selector = media.getAttribute('button-clear');
+      const button = originals[index]?.buttonClearEl;
+      if (selector && button && !media.querySelector(selector)) {
+        (media.querySelector('.input-group') || media).append(button.cloneNode(true));
+      }
+    });
+  },
 
-		if (url != "" && jQuery("#"+element_id_n+"_mediaurl").closest('.fcfield-image-mediaurl-box').is(":visible"))
-		{
-			msg_box.html("<span class=\"alert alert-warning fc-iblock fcpadded\">" + Joomla.JText._('FLEXI_FIELD_IMAGE_CLEAR_MEDIA_URL_FIRST') + "</span>");
-			return;
-		}
+  toggleMediaURL(id) {
+    const input = document.getElementById(id + '_mediaurl');
+    const box = input?.closest('.fcfield-image-mediaurl-box');
+    const row = box?.closest('.fcfieldval_container');
+    if (!row) return;
+    const props = row.querySelector('.fcimg_url_props');
+    const button = row.querySelector('.fcfield-mediaurl-btn[data-for="' + id + '"]');
+    const shown = getComputedStyle(props || box).display !== 'none';
+    // Closing the panel preserves an existing URL and its fetched thumbnail.
+    if (!shown && !row.querySelector('.fc_auto_uploader')) {
+      row.querySelectorAll('.fc_file_uploader').forEach(node => FlexiForm.show(node, false));
+      FlexiForm.show(row.querySelector('.fcfield_preview_box'));
+      row.querySelectorAll('.fc_files_uploader_toggle_btn').forEach(node => {
+        node.classList.remove('active'); node.setAttribute('aria-expanded', 'false');
+      });
+    }
+    FlexiForm.show(props, !shown);
+    FlexiForm.show(box, !shown);
+    button?.classList.toggle('active', !shown);
+    button?.setAttribute('aria-expanded', String(!shown));
+    FlexiMediaMetadata.notice(document.getElementById('fcfield_message_box_' + id));
+  },
 
-		jQuery("#"+element_id_n+"_mediaurl").closest('.fcfield-image-mediaurl-box').slideToggle();
-	}
+  toggleFields(id) {
+    const props = document.querySelector('.fcimg_value_props[data-name="' + id + '"]');
+    if (!props) return;
+    const shown = getComputedStyle(props).display === 'none';
+    FlexiForm.show(props, shown);
+    const button = document.querySelector('.fc-image-edit-btn[data-for="' + id + '"]');
+    button?.classList.toggle('active', shown);
+    button?.setAttribute('aria-expanded', String(shown));
+  },
 
+  showUploader(fieldName) {
+    FlexiMediaField.showUploader('custom_' + fieldName);
+  },
 
-	fcfield_image.showUploader = function(field_name_n, config_name)
-	{
-		var fnn  = field_name_n.replace(/-/g, '_');
-		var box = jQuery('#custom_' + field_name_n + '_fc_preview_msg').closest('.fcfieldval_container');
-		box.find('.fc_files_uploader_toggle_btn').click();
-	}
+  clearData(id, key) {
+    const input = document.getElementById(id + '_mediaurl');
+    if (!input) return;
+    FlexiMediaMetadata.cancel(input);
+    input.value = '';
+    const thumb = document.getElementById(id + '_mediathumburl');
+    if (thumb) thumb.value = '';
+    FlexiMediaMetadata.notice(document.getElementById('fcfield_message_box_' + id));
+    fcfield_image.clearField(input, {}, key);
+  },
 
+  async fetchData(id, key) {
+    const input = document.getElementById(id + '_mediaurl');
+    const box = document.getElementById('fcfield_message_box_' + id);
+    if (!input) return;
+    const url = FlexiMediaMetadata.webURL(input.value);
+    if (!url) {
+      FlexiMediaMetadata.notice(box, FlexiForm.text('FLEXI_FIELD_IMAGE_ENTER_MEDIA_URL'));
+      return;
+    }
+    FlexiMediaMetadata.notice(box);
+    try {
+      const data = await FlexiMediaMetadata.load(input, FlexiMediaMetadata.noembed(url), true);
+      if (!data) return;
+      const thumb = FlexiMediaMetadata.webURL(data.thumbnail_url);
+      if (!thumb) {
+        FlexiMediaMetadata.notice(box, String(data.error || FlexiForm.text('FIELDS_IMAGE_RESPONSE_PARSING_FAILED')), 'info');
+        return;
+      }
+      fcfield_image.clearField(input, {}, key);
+      const thumbInput = document.getElementById(id + '_mediathumburl');
+      if (thumbInput) thumbInput.value = thumb.href;
+      fcfield_image.assignImage(id, thumb.href, thumb.href, 2, FlexiForm.text('FLEXI_FIELD_MEDIA_URL'), key);
+    } catch (error) {
+      FlexiMediaMetadata.notice(box, FlexiForm.text('FIELDS_IMAGE_SERVER_RESPONDED_WITH_ERROR') + ' ' + error.message, 'danger');
+    }
+  },
 
-	fcfield_image.clearData = function(element_id_n, config_name)
-	{
-		var mediaurl = jQuery("#"+element_id_n+"_mediaurl").val('');
-		var msg_box = jQuery("#fcfield_message_box_"+element_id_n);
-		
-		mediaurl.val('');
-		msg_box.html('');
+  update_path_tip(element) {
+    element.closest('.fc-field-props-box')?.querySelectorAll('.hasTipImgpath, .hasTipPreview').forEach(node => {
+      const title = node.title || node.value;
+      if (title && node.store) {
+        const [heading, tooltip] = title.split('::', 2);
+        node.store('tip:title', heading);
+        node.store('tip:text', tooltip);
+      }
+    });
+  },
 
-		// Clear existing value
-		fcfield_image.clearField(jQuery("#"+element_id_n+"_mediaurl").get(0), {}, config_name);
-	}
+  incrementValCnt(key) {
+    const input = FlexiMediaField.row(document.getElementById(fcfield_image.currElement[key]))?.querySelector('.hasvalue');
+    if (!input) return;
+    const hadValue = !!input.value;
+    input.value = '1';
+    FlexiMediaField.changeCount(key, hadValue ? 0 : 1);
+  },
 
-	fcfield_image.fetchData = function(element_id_n, config_name)
-	{
-		var msg_box = jQuery("#fcfield_message_box_"+element_id_n);
+  toggleProperties(button) {
+    const props = FlexiMediaField.row(button)?.querySelector('.fcimg_value_props');
+    if (!props) return;
+    const shown = FlexiForm.visible(props);
+    FlexiForm.show(props, !shown);
+    button.setAttribute('aria-expanded', String(!shown));
+  },
 
-		// if URL field is empty then nothing to do, else continue with creating the fetch URL
-		var url = jQuery("#"+element_id_n+"_mediaurl").val();
+  clearFieldUploader(box) {
+    FlexiMediaField.clearUploader(box);
+  },
 
-		if (url == "")
-		{
-			msg_box.html("<span class=\"alert alert-warning fc-iblock fcpadded\">" + Joomla.JText._('FLEXI_FIELD_IMAGE_ENTER_MEDIA_URL') + "</span>");
-			return;
-		}
-		else
-		{
-			// Clear any existing message
-			msg_box.html("");
-		}
+  clearField(element, options, key) {
+    const box = FlexiMediaField.row(element);
+    if (!box) return;
+    const preview = box.querySelector('.fcfield_preview_box');
+    if (options?.hide_image) {
+      FlexiForm.show(preview, false);
+    } else {
+      const hadValue = !!box.querySelector('.hasvalue')?.value;
+      FlexiMediaField.clearUploader(box);
+      FlexiMediaField.setValue(box, '.originalname, .existingname, .hasvalue', '');
+      box.querySelector('.fc_preview_thumb')?.setAttribute('src', FlexiMediaField.placeholder);
+      const caption = box.querySelector('.fc_preview_msg');
+      if (caption) {
+        caption.textContent = '';
+        caption.removeAttribute('title');
+      }
+      FlexiForm.show(preview, false);
+      FlexiMediaField.changeCount(key, hadValue ? -1 : 0);
+    }
+    if (options?.keep_props) FlexiMediaField.setValue(box, 'input, textarea', '');
+  },
 
-		fcfield_image.debugToConsole[config_name] ? window.console.log("Fetching "+url) : "";
+  assignImage(tagId, file, previewUrl, keepModal, caption, key) {
+    const id = tagId.replace(/_existingname$/, '');
+    const input = document.getElementById(id);
+    const box = FlexiMediaField.row(input);
+    if (!box) return;
+    const hadValue = !!input.value;
+    input.value = file ? '1' : '';
+    FlexiMediaField.setValue(box, '.existingname', file);
+    FlexiMediaField.setValue(box, '.originalname', '');
 
-		var ajax_url;
-		var ajax_type;
+    const preview = document.getElementById(id + '_preview_image');
+    if (preview) {
+      preview.src = previewUrl || FlexiMediaField.placeholder;
+      if (keepModal != 2) {
+        FlexiForm.show(preview.closest('.fcfield_preview_box'));
+        FlexiMediaField.clearUploader(box);
+      }
+    }
+    const message = document.getElementById(id + '_fc_preview_msg');
+    if (message) {
+      message.textContent = caption || file || '';
+      message.title = caption ? file : '';
+    }
+    FlexiMediaField.resetRemoval(document.getElementById(id + '_remove'));
+    FlexiMediaField.changeCount(key, Number(!!file) - Number(hadValue));
+    if (!keepModal) fcfield_image.dialog_handle[key]?.dialog('close');
+  },
 
-		// try noembed.com
-		ajax_url = "https://noembed.com/embed?url="+encodeURIComponent(url); // TODO check if needed to add more URL vars
-		ajax_type = "jsonp";
+  fileFiltered() {},
 
-		var mediaID = "";
-		var apiType = "";
+  fileUploaded(uploader, file, result, key) {
+    const upload = FlexiMediaField.uploaded(uploader, result, '.existingname');
+    if (upload) fcfield_image.assignImage(upload.target.id, upload.file.filename, upload.preview,
+      window.FlexiUploader ? 0 : 2, upload.file.filename_original, key);
+  }
+};
 
-		//mediathumburl
+function initQuantumImagePicker() {
+  const open = window.QuantumuploadimageModalOpen;
+  if (typeof open !== 'function') return;
+  window.QuantumuploadimageModalOpen = function (...args) {
+    const input = typeof quantumuploadimageSelector === 'undefined' ? null : quantumuploadimageSelector?.querySelector('input');
+    const subpath = (input?.dataset.defaultSubpath || '').replace(/^\/+|\/+$/g, '');
+    const scope = (input?.dataset.defaultScope || 'images').replace(/^\/+|\/+$/g, '');
+    if (!input || !scope || !subpath) return open.apply(this, args);
+    const value = input.value;
+    input.value = '';
+    localStorage.setItem('quantummanagerLastDir', 'root/' + subpath);
+    localStorage.setItem('quantummanagerScope', scope);
+    try {
+      return open.apply(this, args);
+    } finally {
+      if (value) setTimeout(() => { if (!input.value) input.value = value; }, 200);
+    }
+  };
+}
 
-		// Make AJAX call
-		jQuery.ajax({
-			/*beforeSend: function(xhrObj) {
-				xhrObj.setRequestHeader("Access-Control-Allow-Headers", "Origin, X-CSRF-Token, X-Requested-With, Content-Type, Accept, Authorization");
-			},*/
-			url: ajax_url,
-			dataType: ajax_type,
-			success: function(data) {
-				fcfield_image.debugToConsole[config_name] ? window.console.log("Received Server response") : "";
-				var response;
-				try {
-					response = typeof data !== "object" ? jQuery.parseJSON( data ) : data;
-					fcfield_image.debugToConsole[config_name] ? window.console.log("Calling callback "+(apiType ? apiType : "embedly")+" function on data:") : "";
-					fcfield_image.debugToConsole[config_name] ? window.console.log(response) : "";
-
-					if (mediaID && apiType)
-					{
-						switch(apiType)
-						{
-							case "youtube"     : fcfield_image.youtubeCallback(element_id_n, response, mediaID, config_name);  break;
-							case "vimeo"       : fcfield_image.vimeoCallback(element_id_n, response, mediaID, config_name);  break;
-							case "dailymotion" : fcfield_image.dailymotionCallback(element_id_n, response, mediaID, config_name);  break;
-						}
-					}
-					else
-					{
-						if (typeof response.error !== "undefined")
-						{
-							msg_box.html("<span class=\"alert alert-info fc-iblock fcpadded\">Reply: " + response.error + " <br>This link is a not video / media URL ?</span>");
-						}
-						else
-						{
-							//fcfield_image.noembedCallback(element_id_n, response, config_name);
-							jQuery("#"+element_id_n+"_mediathumburl").val(response.thumbnail_url);
-
-							// Clear existing value
-							fcfield_image.clearField(jQuery("#"+element_id_n+"_mediaurl").get(0), {}, config_name);
-
-							// Assign fetched preview URL
-							var filename = response.thumbnail_url;
-							var preview_url = response.thumbnail_url;
-							var preview_caption = Joomla.JText._('FLEXI_FIELD_MEDIA_URL');
-							fcfield_image.assignImage(element_id_n, filename, preview_url, 2, preview_caption, config_name);
-						}
-					}
-				} catch(err) {
-					msg_box.html("<span class=\"alert alert-error alert-danger fc-iblock fcpadded\">" + Joomla.JText._(/*'PLG_FLEXICONTENT_' + */'FIELDS_IMAGE_RESPONSE_PARSING_FAILED') + ": " + err.message + "</span>");
-				}
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				fcfield_image.debugToConsole[config_name] ? window.console.log("Error, responseText is:") : "";
-				fcfield_image.debugToConsole[config_name] ? window.console.log(jqXHR.responseText) : "";
-				var response;
-				try {
-					response = jQuery.parseJSON( jqXHR.responseText );
-				} catch(err) {
-					response = jqXHR.responseText;
-				}
-				var errorText = typeof response !== "object" ? response : (mediaID && (apiType=="dailymotion" || apiType=="youtube")  ? response.error.message : response.error_message);
-				if (apiType=="youtube" && typeof response == "object") errorText += " Reason: "  +response.error.errors[0].reason;
-				msg_box.html("<span class=\"alert alert-error alert-danger fc-iblock fcpadded\"><i>" + Joomla.JText._(/*'PLG_FLEXICONTENT_' + */'FIELDS_IMAGE_SERVER_RESPONDED_WITH_ERROR') + "</i><br/><br/>" + errorText + "</span>");
-			}
-		});
-	}
-
-	fcfield_image.update_path_tip = function(el)
-	{
-		var tipped_elements = jQuery(el).closest('.fc-field-props-box').find('.hasTipImgpath, .hasTipPreview');
-
-		tipped_elements.each(function()
-		{
-			var title = this.get('title') || this.get('value');
-			if (title)
-			{
-				var parts = title.split('::', 2);
-				this.store('tip:title', parts[0]);
-				this.store('tip:text', parts[1]);
-			}
-		});
-	}
-
-	fcfield_image.incrementValCnt = function(config_name)
-	{
-		var box = jQuery('#'+fcfield_image.currElement[config_name]).closest('.fcfieldval_container');
-		var hasValue = box.find('.hasvalue').val();
-		box.find('.hasvalue').val('1');
-		var valcounter = document.getElementById('custom_' + config_name);
-		if (hasValue=='')
-		{
-			valcounter.value = valcounter.value==''  ?  '1'  :  parseInt(valcounter.value) + 1;
-		}
-		//if (window.console) window.console.log('valcounter: ' + valcounter.value);
-	}
-
-
-	fcfield_image.clearFieldUploader = function(box, config_name)
-	{
-		var upload_container = box.find('.fc_file_uploader');
-		var upload_instance = upload_container.data('plupload_instance');
-
-		var upBTN = box.find('.fc_files_uploader_toggle_btn');
-		if (upload_instance)
-		{
-			jQuery(upload_instance).data('fc_plupload_instance').clearUploader(upBTN.data('rowno'));
-		}
-		upBTN.removeClass('active');
-		upload_container.hide();
-	}
-
-
-	fcfield_image.clearField = function(el, options, config_name)
-	{
-		var box = jQuery(el).closest('.fcfieldval_container');
-		var hasValue = box.find('.hasvalue').val();
-		var valcounter = document.getElementById('custom_' + config_name);
-		//if (window.console) window.console.log('valcounter: ' + valcounter.value);
-
-		options = options || {};
-		options.hide_image = options.hide_image || false;
-		options.keep_props = options.keep_props || false;
-
-		if (options.hide_image)
-		{
-			box.find('.fcfield_preview_box').hide();
-		}
-		else
-		{
-			fcfield_image.clearFieldUploader(box, config_name);
-
-			box.find('.originalname').val('');
-			box.find('.existingname').val('');
-			box.find('.hasvalue').val('');
-			box.find('.fc_preview_thumb').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
-			box.find('.fc_preview_msg').html(' ');
-			box.find('.fcfield_preview_box').show();
-
-			if (hasValue) valcounter.value = ( valcounter.value=='' || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
-			//if (window.console) window.console.log('valcounter: ' + valcounter.value);
-		}
-		if (options.keep_props)
-		{
-			box.find('input, textarea').val('');
-		}
-	}
-
-
-	fcfield_image.assignImage = function(tagid, file, preview_url, keep_modal, preview_caption, config_name)
-	{
-		// Get TAG ID of the main form element of this field
-		var ff_suffix = '_existingname';
-		var elementid_n = tagid.replace(ff_suffix, '');
-
-		// Get current has-value Flag and also set new value to the flag
-		var valcounter = document.getElementById('custom_' + config_name);
-		var hasvalue_obj = jQuery('#' + elementid_n);
-		var hasValue = hasvalue_obj.val();
-		hasvalue_obj.val(file ? '1' : '');
-
-		// Increment/Make non-empty the form field used as value counter, so that is-required validation works
-		if (file && !hasValue)
-		{
-			valcounter.value = valcounter.value==''  ?  1  :  parseInt(valcounter.value) + 1;
-		}
-
-		// Decrement/Make empty the form field used as value counter, so that is-required validation works
-		else if (!file && hasValue)
-		{
-			valcounter.value = ( valcounter.value=='' || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
-		}
-		//if (window.console) window.console.log('valcounter: ' + valcounter.value);
-
-		// Set existing value & Clear original value for both DB-mode & Folder-mode(s)
-		jQuery('#' + elementid_n + '_existingname').val(file);
-		jQuery('#' + elementid_n + '_originalname').val('');
-
-		// Replace old preview image
-		var preview_img_OLD = jQuery('#' + elementid_n + '_preview_image');
-		if (preview_img_OLD)
-		{
-			var box = preview_img_OLD.closest('.fcfieldval_container');
-			var preview_img_NEW = preview_url != ''
-				? '<img class=\"fc_preview_thumb\" id=\"' + elementid_n + '_preview_image\" src=\"'+preview_url+'\" alt=\"Preview image\" />'
-				: '<img class=\"fc_preview_thumb\" id=\"' + elementid_n + '_preview_image\" src=\"data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=\" alt=\"Preview image\" />';
-
-			preview_img_NEW = jQuery(preview_img_NEW);
-			preview_img_NEW.insertAfter( preview_img_OLD );
-			preview_img_OLD.remove();
-
-			if (keep_modal != 2)
-			{
-				preview_img_NEW.closest('.fcfield_preview_box').show();
-				fcfield_image.clearFieldUploader(box, config_name);
-			}
-
-			// Set new preview text too (a 'title')
-			if (file)
-			{
-				jQuery('#' + elementid_n + '_fc_preview_msg' ).html(!!preview_caption ? preview_caption : file);
-				jQuery('#' + elementid_n + '_fc_preview_msg' ).attr('title', !!preview_caption ? file : '')
-			}
-
-			jQuery('#' + elementid_n + '_remove').removeAttr('checked').trigger('change');
-		}
-
-		// Close file select modal dialog
-		if (!keep_modal && !!fcfield_image.dialog_handle[config_name])
-		{
-			fcfield_image.dialog_handle[config_name].dialog('close');
-		}
-
-		// Re-validate
-		jQuery(valcounter).trigger('blur');
-		//if (window.console) window.console.log('valcounter: ' + valcounter.value);
-	}
-
-
-	fcfield_image.fileFiltered = function(uploader, file, config_name)
-	{
-	}
-
-
-	fcfield_image.fileUploaded = function(uploader, file, result, config_name)
-	{
-		// Get 'fc_plupload' class instance from uploader
-		var _this = jQuery(uploader).data('fc_plupload_instance');
-		try {
-			var response = eval(result.response);
-		} catch(err) {
-			var response = eval('(' + result.response + ')');
-		}
-
-		if (!!response.error)
-		{
-			alert(response.error.message);
-			return;
-		}
-
-		//window.console.log(response.data);
-		var file = response.data;
-		file.targetid    = jQuery(uploader.settings.container).closest('.fcfieldval_container').find('.existingname').attr('id');
-		file.preview_url = jQuery(uploader.settings.container).find('.plupload_img_preview > img').attr('src');
-		fcfield_image.assignImage(file.targetid, file.filename, file.preview_url, 2, file.filename_original, config_name);
-	}
-
-
-	jQuery(document).ready(function() {
-		window.__QuantumuploadimageModalOpen = window.QuantumuploadimageModalOpen;
-		/*window.QuantumuploadimageModalOpen = function () {
-			let input = quantumuploadimageSelector.querySelector('input');
-			let clearValue = false;
-			console.log(jQuery(input));
-			if (input.value == '' && jQuery(input).data('default-subpath')) {
-				clearValue = true;
-				let defaultSubPath = jQuery(input).data('default-subpath');
-				jQuery(input).val('images/'+defaultSubPath+'/dummy.png');
-				console.log(jQuery(input).val());
-			}
-			window.__QuantumuploadimageModalOpen();
-			//if (clearValue) jQuery(input).val('');
-		}*/
-
-		window.QuantumuploadimageModalOpen = function () {
-			let input = quantumuploadimageSelector.querySelector('input');
-
-			let defaultSubPath = (typeof input !== 'undefined' ? jQuery(input).data('default-subpath') : '') || '';
-			let defaultScope   = (typeof input !== 'undefined' ? jQuery(input).data('default-scope') : '') || 'images';
-
-			// Trim leading and trailing slashes
-			defaultScope   = defaultScope.replace(/^\/+|\/+$/g, '');
-			defaultSubPath = defaultSubPath.replace(/^\/+|\/+$/g, '');
-			let backupValue = '';
-
-			//console.log(input); console.log(defaultSubPath); console.log(defaultScope);
-			if (defaultScope && defaultSubPath)
-			{
-				if (input.value != '') {
-					backupValue = input.value;
-					jQuery(input).val('');
-					console.log(jQuery(input).val());
-				}
-				localStorage.setItem('quantummanagerLastDir', 'root/' + defaultSubPath);
-				console.log(localStorage.getItem('quantummanagerLastDir'));
-				localStorage.setItem('quantummanagerScope',defaultScope);
-				console.log(localStorage.getItem('quantummanagerScope'));
-			}
-			window.__QuantumuploadimageModalOpen();
-			setTimeout(function() {
-				if (backupValue) jQuery(input).val(backupValue);
-			}, 200);
-		}
-	});
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initQuantumImagePicker, {once:true});
+else initQuantumImagePicker();

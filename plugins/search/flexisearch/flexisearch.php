@@ -19,7 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('cms.plugin.plugin');
 
 require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
@@ -91,7 +90,7 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 		}
 		$whereTypes =  $wheres ? '(' . implode(') OR (', $wheres) . ')' : '';
 		
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$db		= \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query	= $db->getQuery(true);
 		$query->clear();
 		$query->select('t.id, t.name ');
@@ -146,12 +145,12 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 	 */
 	function onContentSearch( $text, $phrase='', $ordering='', $areas=null )
 	{
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$db		= \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app	= \Joomla\CMS\Factory::getApplication();
-		$user	= \Joomla\CMS\Factory::getUser();
+		$user	= $app->getIdentity();
 		
 		// Get language
-		$cntLang = substr(\Joomla\CMS\Factory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
+		$cntLang = substr($app->getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
 		$urlLang  = \Joomla\CMS\Factory::getApplication()->input->getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
 		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
 		
@@ -362,7 +361,10 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 					// If joomla article view is allowed allowed and then search view may optional create Joomla article links
 					if( $typeData[$item->type_id]->params->get('allow_jview', 0) == 1 && $typeData[$item->type_id]->params->get('search_jlinks', 1) )
 					{
-						$item->href = \Joomla\CMS\Router\Route::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->language));
+						// ContentHelperRoute is a Joomla 3 class name, Joomla 6 has it only with the Backward Compatibility 6 plugin
+						$item->href = \Joomla\CMS\Router\Route::_(FLEXI_J40GE
+							? \Joomla\Component\Content\Site\Helper\RouteHelper::getArticleRoute($item->slug, $item->catslug, $item->language)
+							: ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->language));
 					}
 					else
 					{

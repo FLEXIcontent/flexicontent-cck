@@ -12,11 +12,13 @@ use Joomla\String\StringHelper;
 
 // first define the template name
 $tmpl = $this->tmpl;
-$user = \Joomla\CMS\Factory::getUser();
+$app  = \Joomla\CMS\Factory::getApplication();
+$user = $app->getIdentity();
+$wa   = $app->getDocument()->getWebAssetManager();
 
-\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-\Joomla\CMS\Factory::getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
+$wa->registerAndUseScript('flexicontent.template.items-tabbed.script', 'components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+$wa->registerAndUseStyle('flexicontent.template.items-tabbed.style', 'components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+$wa->addInlineScript(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 // MICRODATA 'itemtype' for ALL items in the listing (this is the fallback if the 'itemtype' in content type / item configuration are not set)
 $microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'Article' );

@@ -17,9 +17,9 @@ $page_classes .= $isSite && $this->pageclass_sfx ? ' page'.$this->pageclass_sfx 
 
 	<?php if ($buttons_placement === 2) : /* PLACE buttons at LEFT of form */ ?>
 		<div class="span2 col-md-2 fctoolbar_side_placement fcpos_left">
-			<div id="fctoolbar_btn" class="btn btn-primary" onclick="fc_toggle_box_via_btn(<?php echo FLEXI_J40GE ? "jQuery('#fctoolbar').parent()" : "'fctoolbar'"; ?>, this, 'btn-primary');" >
+			<button type="button" id="fctoolbar_btn" class="btn btn-primary" onclick="fc_toggle_box_via_btn(<?php echo FLEXI_J40GE ? "document.getElementById('fctoolbar')?.parentElement" : "'fctoolbar'"; ?>, this, 'btn-primary');" >
 				<?php echo \Joomla\CMS\Language\Text::_('JTOOLBAR'); ?> <span class="icon-wrench"></span></a>
-			</div>
+			</button>
 			<?php // An EXAMPLE of adding more buttons: $this->toolbar->appendButton('Standard', 'cancel', 'JCANCEL', 'items.cancel', false);
 			echo $this->toolbar->render(); ?>
 		</div>
@@ -40,9 +40,9 @@ $page_classes .= $isSite && $this->pageclass_sfx ? ' page'.$this->pageclass_sfx 
 
 			<?php if ($buttons_placement === 0) : /* PLACE buttons at TOP of form */ ?>
 			<div class="fctoolbar_top_placement">
-				<div id="fctoolbar_btn" class="btn btn-primary" onclick="fc_toggle_box_via_btn(<?php echo FLEXI_J40GE ? "jQuery('#fctoolbar').parent()" : "'fctoolbar'"; ?>, this, 'btn-primary');" >
+				<button type="button" id="fctoolbar_btn" class="btn btn-primary" onclick="fc_toggle_box_via_btn(<?php echo FLEXI_J40GE ? "document.getElementById('fctoolbar')?.parentElement" : "'fctoolbar'"; ?>, this, 'btn-primary');" >
 					<?php echo \Joomla\CMS\Language\Text::_('JTOOLBAR'); ?> <span class="icon-wrench"></span></a>
-				</div>
+				</button>
 				<?php // An EXAMPLE of adding more buttons: $this->toolbar->appendButton('Standard', 'cancel', 'JCANCEL', 'items.cancel', false);
 				echo $this->toolbar->render(); ?>
 			</div>

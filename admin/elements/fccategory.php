@@ -14,9 +14,6 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
 //jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 //\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
@@ -25,7 +22,6 @@ jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 
 /**
@@ -65,7 +61,8 @@ class JFormFieldFccategory extends \Joomla\CMS\Form\FormField
 			$element_id = $this->id;
 		}
 
-		$item = \Joomla\CMS\Table\Table::getInstance('flexicontent_categories', '');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_categories.php';
+		$item = new flexicontent_categories(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		if ($this->value)
 		{
 			$item->load($this->value);
@@ -87,11 +84,11 @@ class JFormFieldFccategory extends \Joomla\CMS\Form\FormField
 			$js = "
 			function fcClearSelectedCategory(element_id)
 			{
-				jQuery('#'+element_id+'_name').val('');
-				jQuery('#'+element_id+'_name').attr('placeholder', '".\Joomla\CMS\Language\Text::_( 'FLEXI_FORM_SELECT',true )."');
-				jQuery('#'+element_id).val('');
-				jQuery('#'+element_id + '_clear').addClass('hidden');
-				jQuery('#'+element_id + '_edit').addClass('hidden');
+				document.getElementById(element_id+'_name').value = '';
+				document.getElementById(element_id+'_name').setAttribute('placeholder', '".\Joomla\CMS\Language\Text::_( 'FLEXI_FORM_SELECT',true )."');
+				document.getElementById(element_id).value = '';
+				document.getElementById(element_id+'_clear')?.classList.add('hidden');
+				document.getElementById(element_id+'_edit')?.classList.add('hidden');
 				return false;
 			};
 
@@ -99,17 +96,21 @@ class JFormFieldFccategory extends \Joomla\CMS\Form\FormField
 			function fcSelectCategory(id, title)
 			{
 				document.getElementById(fc_select_cat_element_id).value = id;
-				document.getElementById(fc_select_cat_element_id+'_name').value = title;"
+				document.getElementById(fc_select_cat_element_id+'_name').value = title;
+
+				// Point the edit button to the selected category
+				var edit_btn = document.getElementById(fc_select_cat_element_id+'_edit');
+				if (edit_btn) edit_btn.href = 'index.php?option=com_flexicontent&task=category.edit&id=' + id;"
 			.($allowEdit  ? "
-				jQuery('#'+fc_select_cat_element_id+'_edit').removeClass('hidden');" : '')
+				document.getElementById(fc_select_cat_element_id+'_edit')?.classList.remove('hidden');" : '')
 			.($allowClear ? "
-				jQuery('#'+fc_select_cat_element_id+'_clear').removeClass('hidden');" :'')
+				document.getElementById(fc_select_cat_element_id+'_clear')?.classList.remove('hidden');" :'')
 			."
 				//$('sbox-btn-close').fireEvent('click');
 				fc_field_dialog_handle_record.dialog('close');
 			}
 			";
-			\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+			\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 			flexicontent_html::loadFramework('flexi-lib');
 		}
 
@@ -146,11 +147,11 @@ class JFormFieldFccategory extends \Joomla\CMS\Form\FormField
 		<span class="input-append">
 			<input type="text" id="'.$element_id.'_name" placeholder="'.\Joomla\CMS\Language\Text::_( 'FLEXI_FORM_SELECT',true ).'" value="'.$title.'" '.$required_param.' readonly="readonly" />
 			'. //<a class="modal btn hasTooltip" onclick="fc_select_cat_element_id=\''.$element_id.'\'" href="'.$link.'" rel="'.$rel.'" title="'.$_select.'">
-			'<a class="btn hasTooltip" onclick="fc_select_cat_element_id=\''.$element_id.'\'; var url = jQuery(this).attr(\'href\'); window.fc_field_dialog_handle_record = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''.$_select.'\'}); return false;" href="'.$link.'" title="'.$_select.'" >
+			'<a class="btn hasTooltip" onclick="fc_select_cat_element_id=\''.$element_id.'\'; var url = this.getAttribute(\'href\'); window.fc_field_dialog_handle_record = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''.$_select.'\'}); return false;" href="'.$link.'" title="'.$_select.'" >
 				'.\Joomla\CMS\Language\Text::_( 'FLEXI_FORM_SELECT' ).'
 			</a>
 			'.($allowEdit ? '
-			<a id="' .$element_id. '_edit" class="btn ' . ($this->value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&amp;task=category.edit&amp;cid=' . $this->value . '" target="_blank" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_CATEGORY' ).'">
+			<a id="' .$element_id. '_edit" class="btn ' . ($this->value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&amp;task=category.edit&amp;id=' . $this->value . '" target="_blank" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_CATEGORY' ).'">
 				<span class="icon-edit"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_FORM_EDIT') . '
 			</a>
 			' : '').'

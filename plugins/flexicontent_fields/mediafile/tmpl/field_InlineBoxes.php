@@ -22,10 +22,23 @@ foreach ($field->value as $file_id)
 
 	$file_data         = $files_data[$file_id];
 	$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
+	$file_summary = $use_myfiles != 4 && in_array($form_info_header, [1, 2, 3])
+		? \Joomla\CMS\Layout\LayoutHelper::render('flexicontent_fields.file_summary', [
+			'file' => $file_data, 'header' => (int) $form_info_header, 'showTitle' => !$iform_title,
+		], JPATH_SITE . '/components/com_flexicontent/layouts')
+		: '';
 
 	$ext = strtolower(flexicontent_upload::getExt($file_data->filename));
-	$file_data->waveform_preview = !$file_data->filename ? '' : 'audio_preview/' . str_ireplace('.'.$ext, '', basename($file_data->filename)) . '.mp3';
-	$file_data->waveform_peaks   = !$file_data->filename ? '' : 'audio_preview/' . str_ireplace('.'.$ext, '', basename($file_data->filename)) . '.json';
+	$audio_extensions = ['aac', 'flac', 'm4a', 'mp3', 'oga', 'ogg', 'opus', 'wav', 'webm'];
+	$audio_file = $file_data->filename && in_array($ext, $audio_extensions, true);
+	$upload_directory = dirname($file_data->filename);
+	$preview_base = ($upload_directory === '.' ? '' : $upload_directory . '/') . 'audio_preview/' . pathinfo($file_data->filename, PATHINFO_FILENAME);
+	$file_data->waveform_preview = $audio_file ? $preview_base . '.mp3' : '';
+	$file_data->waveform_peaks = $audio_file ? $preview_base . '.json' : '';
+	$public_audio_root = rtrim(\Joomla\CMS\Uri\Uri::root(true) . '/' . $mediapath, '/');
+	$original_audio = $audio_file && isset($file_data->secure) && !$file_data->secure && empty($file_data->url)
+		? $public_audio_root . '/' . implode('/', array_map('rawurlencode', explode('/', $file_data->filename)))
+		: '';
 
 	$preview_css = 'width:100px; height:100px;';
 
@@ -77,11 +90,9 @@ foreach ($field->value as $file_id)
 	$default_stamp_val = isset($form_data[$file_id])  ?  (int)$form_data[$file_id]['stamp']  :  1;
 
 	$addExistingURL_onclick = "fc_openFileSelection_".$field->id."(this);";
-	$toggleUploader_onclick = 'var box = jQuery(this).closest(\'.fcfieldval_container\'); ' .
-		'var isVisible = box.find(\'.fc_file_uploader\').is(\':visible\'); ' .
-		'isVisible ? jQuery(this).removeClass(\'active\') : jQuery(this).addClass(\'active\'); ' .
-		'isVisible ? box.find(\'.fcfield_preview_box\').show() : box.find(\'.fcfield_preview_box\').hide(); ' .
-		'isVisible ? box.find(\'.inlinefile-prv-box\').addClass(\'empty\') : box.find(\'.inlinefile-prv-box\').removeClass(\'empty\');';
+	$toggleUploader_onclick = 'if (!FlexiMediaField.beforeToggle(this, \'mediafile\')) return; ';
+
+	$flat_btn_class = ' fc-flat-btn';
 
 	if ($use_inline_uploaders)
 	{
@@ -93,8 +104,8 @@ foreach ($field->value as $file_id)
 				'refresh_on_complete' => false,
 				'thumb_size_default' => $thumb_size_default,
 				'toggle_btn' => array(
-					'class' => ($file_btns_position ? 'dropdown-item' : '') . ' ' . $btn_item_class,
-					'text' => '<span class="fcfield-uploadvalue fcfont-icon-inline '.$font_icon_class.'"></span>' . (!$file_btns_position ? '&nbsp; ' . Text::_('FLEXI_UPLOAD') : ''),
+					'class' => $btn_item_class . $flat_btn_class,
+					'text' => flexicontent_html::mediaActionLabel('upload'),
 					'onclick' => $toggleUploader_onclick,
 					'action' => null
 				),
@@ -106,24 +117,18 @@ foreach ($field->value as $file_id)
 		);
 
 		$multi_icon = $form_font_icons ? ' <span class="icon-stack"></span>' : '<span class="pages_stack"></span>';
-		$btn_classes = ($file_btns_position ? 'dropdown-item' : '') . ' ' . $btn_item_class;
-		$uploader_html->multiUploadBtn = '';  /*'
-			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-up fcfield-uploadvalue multi" id="'.$elementid_n.'_mul_uploadvalue">
-				&nbsp; ' . $multi_icon . ' ' . (!$file_btns_position || $file_btns_position==2 ? Text::_('FLEXI_UPLOAD') : '') . '
-			</span>';*/
+		$btn_classes = $btn_item_class . $flat_btn_class;
+		$uploader_html->multiUploadBtn = '';
+		// !!! CLASS: fc-files-modal-link fc-sel NEEDED BY JS !!! DO NOT REMOVE, DO NOT MOVE
 		$uploader_html->myFilesBtn = '
-			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.'" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue">
-				<span class="fc-files-modal-link  fc-sel fcfield-selectvalue multi fcfont-icon-inline ' . $font_icon_class . '"></span>
-				' .  ($file_btns_position ? $multi_icon : '') . ' ' . (!$file_btns_position || $file_btns_position==2 ? ' ' . Text::_('FLEXI_MY_FILES') : '') . ' ' .'
-			</span>';
+			<button type="button" data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="fc-files-modal-link fc-sel fcfield-selectvalue multi '.$btn_classes.'" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue" title="'.Text::_('FLEXI_MY_FILES').'">
+				' . flexicontent_html::mediaActionLabel('files') . '
+			</button>';
 		$uploader_html->mediaUrlBtn = !$usemediaurl ? '' : '
-			<span class="' . ($file_btns_position ? 'dropdown-item' : '') . ' ' . $btn_item_class .'" onclick="fcfield_mediafile.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
-				<span class="fcfield-medialurlvalue fcfont-icon-inline ' . $font_icon_class . '"></span>
-				' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . Text::_('FLEXI_FIELD_MEDIA_URL') : '') . '
-			</span>';
-		$uploader_html->clearBtn = '
-			 <span class="' . $btn_item_class . ' fcfield-clearvalue ' . $font_icon_class . '" title="'.Text::_('FLEXI_CLEAR').'" onclick="fcfield_mediafile.clearField(this, {}, \''.$field_name_js.'\');">
-			</span>';
+			<button type="button" aria-expanded="false" class="'.$btn_classes.' fcfield-mediaurl-btn" data-for="'.$elementid_n.'" title="'.Text::_('FLEXI_FIELD_MEDIA_URL').'" onclick="fcfield_mediafile.toggleMediaURL(\''.$elementid_n.'\'); return false;">
+				' . flexicontent_html::mediaActionLabel('url') . '
+			</button>';
+		$uploader_html->clearBtn = '<button type="button" class="'.$btn_classes.' fcfield-clearvalue" title="'.Text::_('FLEXI_CLEAR').'" aria-label="'.Text::_('FLEXI_CLEAR').'" onclick="fcfield_mediafile.clearField(this, {}, \''.$field_name_js.'\');">' . flexicontent_html::mediaActionLabel('clear') . '</button>';
 	}
 
 	$fnn = $FN_n;   // Alias ...
@@ -143,7 +148,7 @@ foreach ($field->value as $file_id)
 		{
 			$modal_url   = "index.php?option=com_ajax&view=default&tmpl=component&asset=com_content&author=&plugin=quantummanagermedia&format=html";
 			$modal_url  .= $jmedia_subpath ? "&folder=".$jmedia_subpath : '';			$modal_title = 'Select file'; $width = 0; $height = 0;
-			$onclick_js  = "var url = jQuery(this).attr('data-href'); var fieldid = jQuery(this).closest('.fc_media_file_box').find('input').attr('id'); url = url+ '&fieldid=' + fieldid;"
+			$onclick_js  = "var url = this.dataset.href; var fieldid = this.closest('.fc_media_file_box').querySelector('input').id; url = url+ '&fieldid=' + fieldid;"
 				. " var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, {$width}, {$height}, null, "
 				. " {title:'{$modal_title}', loadFunc: null}); return false;";
 			$select_file_btn =
@@ -151,9 +156,10 @@ foreach ($field->value as $file_id)
 												   onclick="'.$onclick_js.'" href="javascript:" data-href="'.$modal_url.'"
 	><i class="icon-search"></i></a>';  // &nbsp; Select
 			$juri_root = \Joomla\CMS\Uri\Uri::root(true);
-			$file_placeholder_text = 'No file selected';
+			$file_placeholder_text = htmlspecialchars(Text::_('FLEXI_MEDIA_NO_FILE_SELECTED'), ENT_QUOTES, 'UTF-8');
+			$file_clear_label = htmlspecialchars(Text::_('FLEXI_CLEAR'), ENT_QUOTES, 'UTF-8');
 			$file_placeholder_src  = '';//$juri_root . '/' .'......./person_placeholder.jpg';
-			$file_clear_value_js   = "jQuery(this).parent().find('input[type=text]').val(''); fcfield_file.clearMediaFile(this, '".$file_placeholder_src."');";
+			$file_clear_value_js   = "fcfield_mediafile.clearMediaFile(this, '".$file_placeholder_src."');";
 
 			$file_is_img  = !$file_data->filename ? false : in_array(strtolower(pathinfo($file_data->filename, PATHINFO_EXTENSION)), $imagesExt);
 			$filename_ext = pathinfo($file_data->filename, PATHINFO_EXTENSION);
@@ -174,9 +180,9 @@ foreach ($field->value as $file_id)
 													<object data="{$object_src}" type="" width="480" height="180" class="inline-preview-obj" style="{$object_style}; background:#eee; border-radius: 6px 6px 0 0;"></object>
 												</div>
 												<div class="input-group">
-													<input class="form-control input-group-prepend fc_mediafile" type="text" readonly="" style="flex-grow:20; min-width:unset" value="{$file_data->filename}" id="{$elementid_n}_mediafile" name="{$fieldname_n}[mediafile]" placeholder="{$file_placeholder_text}" data-config_name={$field_name_js}" />
+													<input class="form-control input-group-prepend fc_mediafile" type="text" readonly="" style="flex-grow:20; min-width:unset" value="{$file_data->filename}" id="{$elementid_n}_mediafile" name="{$fieldname_n}[mediafile]" placeholder="{$file_placeholder_text}" data-config_name="{$field_name_js}" />
 													{$select_file_btn}
-													<button type="button" href="#" title="Clear" class="form-control btn input-group-append fit-contents clear-btn" onclick="{$file_clear_value_js}"><i class="icon-cancel"></i></button>
+													<button type="button" href="#" title="{$file_clear_label}" class="form-control btn input-group-append fit-contents clear-btn" onclick="{$file_clear_value_js}"><i class="icon-cancel"></i></button>
 												</div>
 											</div>
 										</div>
@@ -257,10 +263,12 @@ HTML;
 		<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
 		<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$file_data->filename.'<br/>'.$file_data->altname.'</div>
 		<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" style="'.(($use_myfiles == 4 && !$use_quantum) || !in_array($form_info_header, [1,3]) ? 'display:none' : '').'"
-			readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.'
+			data-fc-media-key="'.$field_name_js.'" data-fc-media-type="mediafile" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.'
 			value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'"
 			data-label_text="'.$field->label.'"
 			data-filename="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'"
+			data-wf-public-root="'.htmlspecialchars($public_audio_root, ENT_QUOTES, 'UTF-8').'"
+			data-wforiginal="'.htmlspecialchars($original_audio, ENT_QUOTES, 'UTF-8').'"
 			data-wfpreview="'.htmlspecialchars($file_data->waveform_preview, ENT_COMPAT, 'UTF-8').'"
 			data-wfpeaks="'.htmlspecialchars($file_data->waveform_peaks, ENT_COMPAT, 'UTF-8').'"
 		/>
@@ -282,12 +290,8 @@ HTML;
 			<div class="fcclear"></div>
 		' : '')).'
 
-		'.(in_array($form_info_header, [2,3]) && $use_myfiles != 4 ? '
-		<div class="fcclear"></div>
-		<div class="'.$input_grp_class.' fc-xpended-row">
-			<label class="' . $add_on_class . ' badge fc-lbl fc_filedata_title-lbl" style="margin:0">'.Text::_( 'FLEXI_ORIGINAL_FILENAME' ).'</label>
-			<input type="text" disabled class="' . $add_on_class . ' fc_filedata_title" value="'. htmlentities($filename_original, ENT_COMPAT, 'UTF-8') .'" />
-		</div>' : '').'
+		'.$file_summary.'
+		<input type="hidden" class="fc_filedata_title" value="'.htmlspecialchars((string) $filename_original, ENT_QUOTES, 'UTF-8').'" />
 
 		<div class="fcclear"></div>
 
@@ -296,11 +300,12 @@ HTML;
 			<div class="inlinefile-prv-box" style="'. ($use_myfiles == 4 && $inputmode == 1 && !$use_quantum ? 'width: 100%' : 'flex-basis: auto;') . '">
 				'.($form_file_preview && $use_myfiles != 4 ? '<div class="fcfield_preview_box' . ($form_file_preview === 2 ? ' auto' : '') . '" style="'.$preview_css.'">
 					<div class="fc_preview_text">' . $preview_text . '</div>
-					<img id="'.$elementid_n.'_image_preview" src="'.$preview_src.'" class="fc_preview_thumb" alt="Preview image placeholder"/></div>' : '').'
+					<img id="'.$elementid_n.'_image_preview" src="'.$preview_src.'" class="fc_preview_thumb" alt="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_MEDIA_PREVIEW_IMAGE'), ENT_QUOTES, 'UTF-8') . '"/></div>' : '').'
 				'.(!$media_field_html && !empty($uploader_html) ? $uploader_html->container : $media_field_html).'
 			</div>
 
 
+			<div class="mf_value_props" data-name="'.$elementid_n.'" style="display: none;">
 			<div class="inlinefile-data-box" style="flex-basis: auto; flex-shrink: 50;">
 				'.
 
@@ -359,6 +364,7 @@ HTML;
 			'
 
 			</div>
+			</div><!-- EOF .mf_value_props -->
 		</div>
 
 		<div class="fcclear"></div>
@@ -369,12 +375,12 @@ HTML;
 
 				<!--div id="fc_mediafile_current_time_' . $fnn . '" class="media_time">00:00:00</div-->
 				<div id="fc_mediafile_controls_' . $fnn . '" class="fc_mediafile_controls">
-					<a href="javascript:;" class="btn playBtn">
-						<span class="icon-play-circle controls"></span><span class="btnControlsText">' . Text::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
-					</a>
-					<a href="javascript:;" class="btn pauseBtn" style="display: none;">
-						<span class="icon-pause-circle controls"></span><span class="btnControlsText">' . Text::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</span>
-					</a>
+					<button type="button" class="btn playBtn fc-waveform-toggle" aria-label="' . htmlspecialchars(Text::_('FLEXI_FIELD_MEDIAFILE_PLAY'), ENT_QUOTES, 'UTF-8') . '">
+						<i class="fas fa-play" aria-hidden="true"></i>
+					</button>
+					<button type="button" class="btn pauseBtn fc-waveform-toggle" aria-label="' . htmlspecialchars(Text::_('FLEXI_FIELD_MEDIAFILE_PAUSE'), ENT_QUOTES, 'UTF-8') . '" style="display: none;">
+						<i class="fas fa-pause" aria-hidden="true"></i>
+					</button>
 					<a href="javascript:;" class="btn stopBtn" style="display: none;">
 						<span class="icon-stop-circle controls"></span><span class="btnControlsText">' . Text::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</span>
 					</a>
@@ -384,7 +390,8 @@ HTML;
 					' . ($allowdownloads ? $_download_btn_html : '') . '
 					' . (!$wf_zoom_slider ? '' : '
 					<div class="fc_mediafile_wf_zoom_box">
-						- <input id="fc_mediafile_slider_' . $fnn. '" type="range" min="0.5" max="200" value="0.5" class="fc_mediafile_wf_zoom" /> +
+						<label for="fc_mediafile_slider_' . $fnn . '">' . Text::_('FLEXI_FIELD_MEDIAFILE_WAVEFORM_ZOOM') . '</label>
+						<input id="fc_mediafile_slider_' . $fnn . '" type="range" min="1" max="8" step="0.25" value="1" class="fc_mediafile_wf_zoom" data-zoom-factor disabled />
 					</div>
 					') . '
 				</div>
@@ -419,7 +426,7 @@ HTML;
 		";
 	}*/
 
-	if (!$filename_original)
+	if ($use_inline_uploaders)
 	{
 		$per_value_js .= "
 			fcfield_mediafile.showUploader('" . $field->name . '_' . $n . "', '".$field_name_js."');
@@ -437,11 +444,11 @@ $js = ""
 	fcfield_mediafile_base_url['".$field_name_js."'] = '".$base_url."';
 "
 . (!$per_value_js ? "" : "
-	jQuery(document).ready(function()
+	FlexiForm.ready(function()
 	{
 		" . $per_value_js . "
 	});
 ");
 
-if ($js) $document->addScriptDeclaration($js);
+if ($js) $document->getWebAssetManager()->addInlineScript($js);
 

@@ -10,7 +10,14 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/security.php';
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 #[AllowDynamicProperties] //php8.2 compatibility
 class plgFlexicontent_fieldsAddressint extends FCField
 {
@@ -50,7 +57,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';
@@ -58,6 +65,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
 		$btn_item_class  = $cparams->get('bootstrap_ver', 2)==2  ?  'btn' : 'btn btn-outline-secondary';
 		$btn_group_class = $cparams->get('bootstrap_ver', 2)==2  ?  'btn-group' : 'btn-group';
+		$flat_btn_class  = ' fc-flat-btn';
 		$form_font_icons = $cparams->get('form_font_icons', 1);
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 		$font_icon_class .= FLEXI_J40GE ? ' icon icon- ' : '';
@@ -117,6 +125,10 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		// MAP Engine to use in item form: 'googlemap' or 'nominatim'
 		$mapapi_edit = $field->parameters->get('mapapi_edit', 'googlemap');
 
+		// Width of the address card in the item edit form
+		$form_card_width = (int) $field->parameters->get('form_card_width', 600);
+		$form_card_width = $form_card_width > 0 ? $form_card_width : 600;
+
 		// Some parameter shortcuts
 		$addr_edit_mode = $field->parameters->get('addr_edit_mode', 'plaintext');
 		$edit_latlon    = (int) $field->parameters->get('edit_latlon',  1);
@@ -129,6 +141,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$use_country    = (int) $field->parameters->get('use_country',  1);
 
 		$use_custom_marker   = (int) $field->parameters->get('use_custom_marker', 1);
+		$show_marker_anchor  = (int) $field->parameters->get('show_marker_anchor', 0);
 		$default_marker_file = $field->parameters->get('default_marker_file', '');
 		$custom_marker_path  = $field->parameters->get('custom_marker_path', 'modules/mod_flexigooglemap/assets/marker');
 
@@ -263,8 +276,8 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$ac_type_options .= '<option value="'.htmlspecialchars($ac_type, ENT_COMPAT, 'UTF-8').'"  '.($ac_type == $ac_types_default ? 'selected="selected"' : '').'>'.\Joomla\CMS\Language\Text::_($lbl)."</option>\n";
 		}
 
-		// CSS classes of value container
-		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		// CSS classes of value container ('floated' => several values side by side)
+		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id . ($fields_box_placing ? ' floated' : '');
 
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
@@ -272,6 +285,9 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 		// JS safe Field name
 		$field_name_js = str_replace('-', '_', $field->name);
+
+		flexicontent_html::loadFramework('form-utils');
+		$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/repeater.js', array('version' => 'auto'));
 
 		// JS & CSS of current field
 		$js = '
@@ -282,25 +298,12 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			fcfield_addrint.map_type["'.$field_name_js.'"] = "' . strtoupper($map_type) . '";
 		';
 
-		// Google Maps: pass component restrictions via configure()
-		if ($mapapi_edit === 'googlemap')
-		{
-			$conf_ops = array();
-			if (count($ac_country_allowed_list))
-			{
-				$conf_ops[] = 'country:[\'' . implode("', '", $ac_country_allowed_list) . '\']';
-			}
-			$js .= '
-			fcfield_addrint.configure["' . $field_name_js . '"] = function(placesAutocomplete)
-			{
-				if (' . ($conf_ops ? 1 : 0)  . ') placesAutocomplete.setComponentRestrictions({' . implode(', ', $conf_ops) . '});
-			}
-			';
-		}
-
 		// Nominatim: pass optional tile server URL
 		if ($mapapi_edit === 'nominatim')
 		{
+			\Joomla\CMS\Language\Text::script('JSEARCH_FILTER_SUBMIT');
+			$js .= 'fcfield_addrint.nominatim_url[' . json_encode($field_name_js) . '] = '
+				. json_encode(trim($field->parameters->get('nominatim_api_url', ''))) . ';';
 			$nominatim_tile_url = trim($field->parameters->get('nominatim_tile_url', ''));
 			if ($nominatim_tile_url)
 			{
@@ -315,320 +318,34 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		// Handle multiple records
 		if ($multiple)
 		{
-			// Add the drag and drop sorting feature
-			if ($add_ctrl_btns) $js .= "
-			jQuery(document).ready(function(){
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					cancel: false,
-					/*containment: 'parent',*/
-					tolerance: 'pointer'
-					".($field->parameters->get('fields_box_placing', 1) ? "
-					,start: function(e) {
-						//jQuery(e.target).children().css('float', 'left');
-						//fc_setEqualHeights(jQuery(e.target), 0);
-					}
-					,stop: function(e) {
-						//jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
-					}
-					" : '')."
-				});
-			});
-			";
+			$config = array(
+				'fieldKey' => $field_name_js,
+				'mapEngine' => $mapapi_edit,
+				'defaults' => array('custom_marker' => $default_marker_file, 'marker_anchor' => 'BotC', 'zoom' => (string) $map_zoom),
+			);
+			$js .= $this->buildValueRepeater($field, $elementid, $fieldname, $max_values, $add_ctrl_btns, $config, 'fcfield_address');
 
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
-			$js .= "
-			function addField".$field->id."(el, groupval_box, fieldval_box, params)
-			{
-				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
-				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
-				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
-				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-
-				if(!remove_previous && (rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
-					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
-					return 'cancel';
-				}
-
-				// Find last container of fields and clone it to create a new container of fields
-				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
-				var newField  = lastField.clone();
-				newField.find('.fc-has-value').removeClass('fc-has-value');
-
-				// Destroy any select2 elements
-				var sel2_elements = newField.find('div.select2-container');
-				if (sel2_elements.length)
-				{
-					sel2_elements.remove();
-					newField.find('select.use_select2_lib, select.has_select2_lib').select2('destroy').show();
-				}
-
-				// New element's field name and id
-				var uniqueRowN = uniqueRowNum" . $field->id . ";
-				var element_id = '" . $elementid . "_' + uniqueRowN;
-				var fname_pfx  = '" . $fieldname . "[' + uniqueRowN + ']';
-				";
-
-			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			$js .=
-
-			/**
-			 * Update non-optional properties
-			 * Latitude, Longtitude, Directions URL
-			 */
-				"
-				theInput = newField.find('input.addrint_lat').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[lat]');
-				theInput.attr('id', element_id + '_lat');
-				newField.find('.addrint_lat-lbl').first().attr('for', element_id + '_lat');
-
-				theInput = newField.find('input.addrint_lon').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[lon]');
-				theInput.attr('id', element_id + '_lon');
-				newField.find('.addrint_lon-lbl').first().attr('for', element_id + '_lon');
-
-				theInput = newField.find('input.addrint_url').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[url]');
-				theInput.attr('id', element_id + '_url');
-				newField.find('.addrint_url-lbl').first().attr('for', element_id + '_url');
-				" .
-
-			/**
-			 * Address format: 'plaintext'
-			 */
-				"
-				theArea = newField.find('.addrint_addr_display').first();
-				theArea.val('');
-				theArea.attr('name', fname_pfx + '[addr_display]');
-				theArea.attr('id', element_id + '_addr_display');
-				newField.find('.addrint_addr_display-lbl').first().attr('for', element_id + '_addr_display');
-				" .
-
-			/**
-			 * Address format: 'formatted'
-			 */
-				"
-				theInput = newField.find('.addrint_addr_formatted').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[addr_formatted]');
-				theInput.attr('id', element_id + '_addr_formatted');
-				newField.find('.addrint_addr_formatted-lbl').first().attr('for', element_id + '_addr_formatted');
-
-				theInput = newField.find('.addrint_addr1').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[addr1]');
-				theInput.attr('id', element_id + '_addr1');
-				newField.find('.addrint_addr1-lbl').first().attr('for', element_id + '_addr1');
-				" .
-
-			/**
-			 * Update optional properties of 'formatted' format
-			 */
-				"
-				theInput = newField.find('.addrint_name').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[name]');
-				theInput.attr('id', element_id + '_name');
-				newField.find('.addrint_name-lbl').first().attr('for', element_id + '_name');
-
-				theInput = newField.find('.addrint_addr2').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[addr2]');
-				theInput.attr('id', element_id + '_addr2');
-
-				theInput = newField.find('.addrint_addr3').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[addr3]');
-				theInput.attr('id', element_id + '_addr3');
-
-				theInput = newField.find('.fc_gm_city').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[city]');
-				theInput.attr('id', element_id + '_city');
-				newField.find('.fc_gm_city-lbl').first().attr('for', element_id + '_city');
-
-				theSelect = newField.find('select.fc_gm_usstate').first();
-				theSelect.val('');
-				theSelect.attr('name', fname_pfx + '[state]');
-				theSelect.attr('id', element_id + '_state');
-				newField.find('.fc_gm_usstate-lbl').first().attr('for', element_id + '_state');
-
-				theInput = newField.find('.fc_gm_province').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[province]');
-				theInput.attr('id', element_id + '_province');
-				newField.find('.fc_gm_province-lbl').first().attr('for', element_id + '_province');
-
-				theSelect = newField.find('select.fc_gm_country').first();
-				theSelect.val('');
-				theSelect.attr('name', fname_pfx + '[country]');
-				theSelect.attr('id', element_id + '_country');
-				newField.find('.fc_gm_country-lbl').first().attr('for', element_id + '_country');
-
-				theInput = newField.find('.addrint_zip').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[zip]');
-				theInput.attr('id', element_id + '_zip');
-				newField.find('.addrint_zip-lbl').first().attr('for', element_id + '_zip');
-
-				theInput = newField.find('.addrint_zip_suffix').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[zip_suffix]');
-				theInput.attr('id', element_id + '_zip_suffix');
-				";
-
-			/**
-			 * Update custom marker
-			 */
-			if ($use_custom_marker) $js .= "
-				theSelect = newField.find('select.fc_gm_custom_marker').first();
-				theSelect.val('" . $default_marker_file ."');
-				theSelect.attr('name', fname_pfx + '[custom_marker]');
-				theSelect.attr('id', element_id + '_custom_marker');
-				newField.find('.fc_gm_custom_marker-lbl').first().attr('for', element_id + '_custom_marker');
-
-				theSelect = newField.find('select.fc_gm_marker_anchor').first();
-				theSelect.val('BotC');
-				theSelect.attr('name', fname_pfx + '[marker_anchor]');
-				theSelect.attr('id', element_id + '_marker_anchor');
-				newField.find('.fc_gm_marker_anchor-lbl').first().attr('for', element_id + '_marker_anchor');
-				";
-
-			/**
-			 * Update map header information
-			 */
-			$js .= "
-				theInput = newField.find('.addrint_marker_tolerance').first();
-				theInput.attr('name', fname_pfx + '[marker_tolerance]');
-				theInput.attr('id', element_id + '_marker_tolerance');
-				newField.find('.addrint_marker_tolerance-lbl').first().attr('for', element_id + '_marker_tolerance');
-
-				theInput = newField.find('.addrint_zoom').first();
-				theInput.attr('value', '" . $map_zoom . "');
-				theInput.attr('name', fname_pfx + '[zoom]');
-				theInput.attr('id', element_id + '_zoom');
-				newField.find('.addrint_zoom-lbl').first().attr('for', element_id + '_zoom');
-				";
-
-			// Update messages box
-			$js .= "
-				theDiv = newField.find('div.addrint_messages');
-				theDiv.html('');
-				theDiv.attr('id', element_id + '_messages');
-				";
-
-			// Clear canvas container and hide outer container of map
-			$js .= "
-				theDiv = newField.find('div.addrint_map_canvas');
-				theDiv.html('').removeClass('has_fc_google_maps_map');
-				theDiv.attr('id', 'map_canvas_' + element_id );
-
-				theDiv = newField.find('div.fcfield_addressint_map');
-				theDiv.attr('id', element_id + '_addressint_map');
-				theDiv.hide();
-				";
-
-			// Attach search auto-complete
-			$js .= "
-				theInput = newField.find('.addrint_autocomplete').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[autocomplete]');
-				theInput.attr('id', element_id + '_autocomplete');
-				newField.find('.addrint_autocomplete-lbl').first().attr('for', element_id + '_autocomplete');
-
-				theSelect = newField.find('select.addrint_ac_type').first();
-				theSelect.val('');
-				theSelect.attr('name', fname_pfx + '[ac_type]');
-				theSelect.attr('id', element_id + '_ac_type');
-
-				// Re-init any select2 element
-				var has_select2 = theSelect.prev().hasClass('.select2-container');
-				if (has_select2) {
-					theSelect.prev().remove();
-					theSelect.select2('destroy').show();
-				}
-				";
-
-			// Add new field to DOM
-			$js .= "
-				lastField ?
-					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
-					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
-				if (remove_previous) lastField.remove();
-
-				// Attach form validation on new element
-				fc_validationAttach(newField);
-
-				// Re-init any select2 elements
-				fc_attachSelect2(newField);
-				";
-
-			// Add new element to sortable objects (if field not in group)
-			if ($add_ctrl_btns) $js .= "
-				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
-				";
-
-			// Show new field, increment counters
-			$js .="
-				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
-				if (scroll_visible) fc_scrollIntoView(newField, 1);
-				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
-
-				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({html: true, container: newField});
-				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
-
-				// Initialize maps search autocomplete (Google Maps)
-				fcfield_addrint.initAutoComplete(element_id, '" . $field_name_js . "');
-
-				// Initialize marker selector
-				fcfield_addrint.initMarkerSelector(element_id, '" . $field_name_js . "');
-
-				rowCount".$field->id."++;       // incremented / decremented
-				uniqueRowNum".$field->id."++;   // incremented only
-			}
-
-
-			function deleteField".$field->id."(el, groupval_box, fieldval_box)
-			{
-				// Disable clicks on remove button, so that it is not reclicked, while we do the field value hide effect (before DOM removal of field value)
-				var btn = fieldval_box ? false : jQuery(el);
-				if (btn && rowCount".$field->id." > 1) btn.css('pointer-events', 'none').off('click');
-
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-
-				// Add empty container if last element, instantly removing the given field value container
-				if(rowCount".$field->id." == 1)
-					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
-
-				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
-				if (rowCount".$field->id." > 1)
-				{
-					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the field value hide effect (before DOM removal of field value)
-					row.find('.fcfield-delvalue').remove();
-					row.find('.fcfield-expand-view').remove();
-					row.find('.fcfield-insertvalue').remove();
-					row.find('.fcfield-drag-handle').remove();
-					row.find('.fcfield-enablevalue').remove();
-					row.find('.fcfield-disablevalue').remove();
-					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){ jQuery(this).remove(); });
-					rowCount".$field->id."--;
-				}
-			}
-			";
-
-			$css .= '';
-
-			$remove_button = '<span class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2         = '<span class="' . $btn_item_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$remove_button = '
+				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-delvalue ' . $font_icon_class . '"
+					title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ) . '"
+					onclick="deleteField'.$field->id.'(this); return false;"
+				></button>';
+			$move2 = '
+				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-drag-handle ' . $font_icon_class . '" onclick="event.preventDefault(); return false;"
+					title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ) . '"
+				></button>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '
+				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '"
+					title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ) . '"
+					onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 1}); return false;"
+				></button> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '
+				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"
+					title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ) . '"
+					onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 0}); return false;"
+				></button> ' : '';
+
 		}
 
 		// Field not multi-value
@@ -642,39 +359,13 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		}
 
 
-		// Add field's custom CSS / JS
-		$js .= "
-			function enableField".$field->id."(el, groupval_box, fieldval_box)
-			{
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('.fcfieldval_container');
+		// Skip feature is available for non-required fields
+		$enable_disable_btns = !$required;
 
-				row.find('.fcfield-enablevalue').parent().hide();
-				row.find('.fcfield-disablevalue').parent().show();
-
-				row.find('.fc-field-prop-disabled').removeAttr('disabled').prop('disabled', false).removeClass('fc-field-prop-disabled');
-				row.find('.fc-field-value-properties-box').removeClass('fc-field-value-disabled');
-			}
-			function disableField".$field->id."(el, groupval_box, fieldval_box)
-			{
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('.fcfieldval_container');
-
-				row.find('.fcfield-enablevalue').parent().show();
-				row.find('.fcfield-disablevalue').parent().hide();
-
-				row.find(':enabled').attr('disabled', 'disabled').prop('disabled', true).addClass('fc-field-prop-disabled');
-				row.find('.fc-field-value-properties-box').addClass('fc-field-value-disabled');
-			}
-		";
-
-		// Check if not required, and add buttons  Edit / Skip to allow skipping the value block
-		$enable_disable_btns = !$required /*&& count($required_props)*/ ? '
-			<div class="'.$input_grp_class.' fc-xpended-btns" style="%s">
-				<span class="fcfield-enablevalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ENABLE_N_EDIT_VALUE_DATA' ).'" onclick="enableField'.$field->id.'(this);"> '.\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT' ).'</span>
-			</div>
-			<div class="'.$input_grp_class.' fc-xpended-btns" style="%s">
-				<span class="fcfield-disablevalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_SKIP_VALUE_DATA_ON_SAVE' ).'" onclick="disableField'.$field->id.'(this);"> '.\Joomla\CMS\Language\Text::_( 'FLEXI_SKIP' ).'</span>
+		// Skip button only (borderless icon), toggles the disabled state of the value
+		$skip_btn = $enable_disable_btns ? '
+			<div class="fc-xpended-btns">
+				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-skipvalue" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_SKIP_VALUE_DATA_ON_SAVE' ).'" aria-pressed="__SKIPPED__" onclick="fcfield_address.toggleSkipped(this); return false;"><span class="fc-image-tool-icon fas __EYE_ICON__ fc-skip-icon" aria-hidden="true"></span></button>
 			</div>
 		' : '';
 
@@ -698,8 +389,11 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 			if ($mapapi_edit === 'googlemap')
 			{
+				\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AUTOCOMPLETE_LABEL');
+				\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLACE_SEARCH_FAILED');
+
 				// Load form.js (Google Maps autocomplete + map)
-				$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
+				$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_addressint.form', 'plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
 
 				// Load Google Maps JS API
 				flexicontent_html::loadFramework('google-maps', 'form', $field->parameters);
@@ -708,19 +402,14 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			{
 				// Load form_osm.js (Nominatim autocomplete + Leaflet map)
 				// Leaflet itself is loaded dynamically by form_osm.js if not already present
-				$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/form_osm.js', array('version' => FLEXI_VHASH));
+				$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_addressint.form_osm', 'plugins/flexicontent_fields/addressint/js/form_osm.js', array('version' => FLEXI_VHASH));
 			}
 		}
 
 
 		// Add field's CSS / JS
-		if ($multiple) $js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
+		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
 
 		/**
@@ -737,17 +426,30 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 		foreach($field->html as $n => & $_html_)
 		{
+			$value_is_disabled = !empty($field->fc_form_data[$n]->value_disabled);
+			$skip_btn_n = str_replace(array('__EYE_ICON__', '__SKIPPED__'), array($value_is_disabled ? 'fa-eye-slash' : 'fa-eye', $value_is_disabled ? 'true' : 'false'), $skip_btn);
+
 			$_html_ = '
-				'.(!$add_ctrl_btns ? '' : '
-				<div class="'.$btn_group_class.' fc-xpended-btns">
-					'.$move2.'
-					'.$remove_button.'
-					'.(!$add_position ? '' : $add_here).'
+				<div class="card fc-video-card fc-address-card'.($fields_box_placing ? ' fc-address-multi' : '').($value_is_disabled ? ' fc-address-skipped' : '').'" style="'.($fields_box_placing ? 'width: '.$form_card_width.'px; max-width: 100%;' : 'width: 100%; max-width: 100%;').'">
+				<div class="fc-video-card-body">
+
+				<div class="fc-address-top-row">
+					'.(!$add_ctrl_btns ? '' : '
+					<div class="'.$btn_group_class.' fc-xpended-btns fc-image-top-toolbar">
+						'.$move2.'
+						'.$remove_button.'
+						'.(!$add_position ? '' : $add_here).'
+					</div>
+					')
+					. $skip_btn_n . '
 				</div>
-				')
-				. ($enable_disable_btns ? sprintf($enable_disable_btns, !$field->fc_form_data[$n]->value_disabled ? 'display:none' : '',  $field->fc_form_data[$n]->value_disabled ? 'display:none' : '') : '') . '
 				<div class="fcclear"></div>
-				'.$_html_;
+
+				'.$_html_.'
+
+				</div><!-- EOF .fc-video-card-body -->
+				</div><!-- EOF .card -->
+				';
 		}
 		unset($_html_);
 
@@ -764,9 +466,9 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="'.$btn_group_class.' fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+					<button type="button" class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(this.closest(\'.fc-xpended-btns\'));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
 						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
-					</span>
+					</button>
 				</div>';
 		}
 
@@ -796,6 +498,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		// Make sure posted data is an array
 		$v = reset($post);
 		$post = !is_array($v) ? array($post) : $post;
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 
 		// Enforce configuration so that user does not manipulate form to add disabled data
 		$use_name          = (int) $field->parameters->get('use_name', 1);
@@ -818,15 +521,17 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$newpost = array();
 		foreach ($post as $n => $v)
 		{
-			if (empty($v)) continue;
-
 			// Skip value if both address and formated address are empty
 			if (
 				empty($v['addr_display']) && empty($v['addr_formatted']) &&
 				empty($v['addr1']) && empty($v['city']) && empty($v['state']) &&
 				empty($v['province']) && empty($v['zip']) &&
 				(empty($v['lat']) || empty($v['lon'])) && empty($v['url'])
-			) continue;
+			)
+			{
+				if ($use_ingroup) $newpost[$new++] = null;
+				continue;
+			}
 
 			// validate data or empty/set default values
 			$newpost[$new] = array();
@@ -847,7 +552,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$newpost[$new]['zip']   = !isset($v['zip']) ? '' : flexicontent_html::dataFilter($v['zip'],    10,   'STRING', '');
 			$newpost[$new]['lat']   = !isset($v['lat']) ? '' : flexicontent_html::dataFilter(str_replace(',', '.', $v['lat']),  100, 'DOUBLE', 0);
 			$newpost[$new]['lon']   = !isset($v['lon']) ? '' : flexicontent_html::dataFilter(str_replace(',', '.', $v['lon']),  100, 'DOUBLE', 0);
-			$newpost[$new]['url']   = !isset($v['url']) ? '' : flexicontent_html::dataFilter($v['url'],    4000,   'URL', '');
+			$newpost[$new]['url']   = !isset($v['url']) ? '' : flexicontent_security::safeUrl(flexicontent_html::dataFilter($v['url'], 4000, 'URL', ''));
 			$newpost[$new]['zoom']  = !isset($v['zoom']) ? '' : flexicontent_html::dataFilter($v['zoom'],  2, 'INTEGER', $map_zoom);
 
 			$newpost[$new]['lat']   = $newpost[$new]['lat'] ? $newpost[$new]['lat'] : '';  // clear if zero
@@ -874,6 +579,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$byIds = FlexicontentFields::indexFieldsByIds($item->fields, $item);
 		foreach($post as $i => $v)
 		{
+			if ($v === null) continue;
 			foreach($props_to_fields as $propname)
 			{
 				$to_fieldid = $field->parameters->get('field_'.$propname);
@@ -913,7 +619,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');

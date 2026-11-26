@@ -5,12 +5,11 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright � 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-jimport('cms.plugin.plugin');
 
 class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 {
@@ -72,8 +71,8 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 			 * we load the ENGLISH language file (without forcing it, to avoid overwriting site-default), and then current language file
 			 */
 			$extension_name = 'plg_flexicontent_fields_' . $ft;
-			\Joomla\CMS\Factory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);  // force_reload OFF
-			\Joomla\CMS\Factory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);  // force_reload ON
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);  // force_reload OFF
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);  // force_reload ON
 
 			// Import field type if not already imported
 			$class_name = 'plgFlexicontent_fields' . ucfirst($ft);
@@ -94,7 +93,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 			$init = true;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -136,7 +135,10 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 				$plg_db_data    = \Joomla\CMS\Plugin\PluginHelper::getPlugin($extfolder, $extname);
 
 				// Load class if called by CLI
-				JLoader::register($className, $plgPath);
+				// Lazy class loading (was JLoader::register): loaded only if/when used.
+				spl_autoload_register(static function ($class) use ($className, $plgPath) {
+					if ($class === $className && is_file($plgPath)) require_once $plgPath;
+				}, true, true);
 
 				self::$fcProPlg = new $className($dispatcher, array(
 					'type'   => $extfolder,
@@ -319,7 +321,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -525,6 +527,38 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 		return $this->getLayoutPath($plg, $layout ?: 'value', $plg_subtype, $default_layout='value_default');
 	}
 
+	// Expose the established callbacks for both standalone values and field groups.
+	protected function buildValueRepeater($field, $id, $name, $max, $sortable, array $config, $adapter = 'null')
+	{
+		flexicontent_html::loadFramework('field-repeater');
+		$fieldId = (int) $field->id;
+		$config = json_encode($config + array(
+			'fieldId' => $fieldId,
+			'initialCount' => count($field->value),
+			'id' => $id,
+			'name' => $name,
+			'max' => (int) $max,
+		), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+
+		if ($max)
+		{
+			\Joomla\CMS\Language\Text::script('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED', true);
+		}
+
+		$js = $sortable ? "FlexiForm.ready(() => FlexiFieldRepeater.attachOrdering($fieldId));" : '';
+		return $js . "
+			function addField$fieldId(el, groupval_box, fieldval_box, params)
+			{
+				return FlexiFieldRepeater.get($config, $adapter).add(el, fieldval_box, params);
+			}
+			function deleteField$fieldId(el, groupval_box, fieldval_box)
+			{
+				FlexiFieldRepeater.get($config, $adapter).remove(el, fieldval_box);
+			}
+			addField$fieldId.fcNative = deleteField$fieldId.fcNative = true;
+		";
+	}
+
 
 
 	/**
@@ -565,7 +599,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 		$values = $this->values;
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';
@@ -595,9 +629,9 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="'.$btn_group_class.' fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+					<button type="button" class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
 						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
-					</span>
+					</button>
 				</div>';
 		}
 
@@ -919,7 +953,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 	 */
 	public function getExistingFieldValues()
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = $db->getQuery(true)
 			->select('value')
 			->from('#__flexicontent_fields_item_relations')
@@ -936,7 +970,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 	function renameLegacyFieldParameters($map)
 	{
 		// Load parameters directly from DB
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = $db->getQuery(true)
 			->select('attribs')
 			->from('#__flexicontent_fields')

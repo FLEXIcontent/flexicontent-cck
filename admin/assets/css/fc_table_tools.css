@@ -1,0 +1,386 @@
+/**
+ * FLEXIcontent table tools: resizable, movable and hideable columns (see fc-table-tools.js)
+ */
+
+/* Scrollable box around the table (the scrollbar appears only when the table is wider than the page) */
+.fc-table-wrap {
+	width: 100%;
+	max-width: 100%;
+	min-width: 0;
+	/* The wide table must not stretch its parents (flex items take the intrinsic width of their content) */
+	contain: inline-size;
+}
+
+.fc-table-wrap.fc-scroll {
+	overflow-x: auto;
+	padding-bottom: 6px;
+}
+
+/* Excel-like header: gray cells, white separators; the rows have barely visible separators */
+.fc-table-wrap {
+	--fc-head-bg: #eceef1;
+	--fc-head-sep: #fff;
+	--fc-col-line: #7f7f7f0d;
+}
+
+[data-bs-theme="dark"] .fc-table-wrap {
+	--fc-head-bg: #2c3136;
+	--fc-head-sep: #1b1e21;
+	--fc-col-line: rgba(255, 255, 255, .08);
+}
+
+.fc-table-wrap table > thead > tr > th {
+	background-color: var(--fc-head-bg) !important;
+}
+
+.fc-table-wrap table > thead > tr > th:not(:last-child),
+.fc-table-wrap table > tbody > tr:not(.collapsed_row) > td:not(:last-child) {
+	position: relative;
+}
+
+.fc-table-wrap table > thead > tr > th:not(:last-child)::after,
+.fc-table-wrap table > tbody > tr:not(.collapsed_row) > td:not(:last-child)::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	inset-inline-end: 0;
+	width: 1px;
+	background: var(--fc-col-line);
+	pointer-events: none;
+}
+
+.fc-table-wrap table > thead > tr > th:not(:last-child)::after {
+	width: 1px;
+	background: var(--fc-head-sep);
+}
+
+/* 10px of space at the left and at the right of the titles and of the values */
+.fc-table-wrap table > thead > tr > th,
+.fc-table-wrap table > tbody > tr:not(.collapsed_row) > td {
+	padding-inline: 10px !important;
+}
+
+/* Header cells can be grabbed and dragged (links of the titles keep the pointer cursor) */
+.fc-table-wrap th.fc-col-th[draggable="true"] {
+	cursor: grab;
+}
+
+.fc-table-wrap th.fc-col-th[draggable="true"]:active {
+	cursor: grabbing;
+}
+
+/* Measuring the width of a column */
+.fc-measure,
+.fc-measure * {
+	white-space: nowrap !important;
+}
+
+/* Hidden column */
+.fc-col-off {
+	display: none !important;
+}
+
+/* Fixed widths (after the first resize) */
+table.fc-table-fixed {
+	table-layout: fixed;
+	max-width: none;
+}
+
+table.fc-table-fixed td {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	overflow-wrap: anywhere;
+}
+
+/* Cells with images (e.g. an icon in a custom column): no ellipsis dots when the column is narrower than the image */
+table.fc-table-fixed td:has(img, picture, svg, video) {
+	text-overflow: clip;
+}
+
+/* Header cells */
+th.fc-col-th {
+	position: relative;
+}
+
+/* Right edge of the header: drag to resize */
+.fc-colresizer {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	inset-inline-end: -3px;
+	z-index: 4;
+	width: 7px;
+	cursor: col-resize;
+	touch-action: none;
+}
+
+.fc-colresizer:hover,
+body.fc-col-resizing .fc-colresizer {
+	background: rgba(13, 110, 253, .35);
+}
+
+body.fc-col-resizing {
+	cursor: col-resize;
+	user-select: none;
+}
+
+/* Drop position while moving a column */
+/* The whole vertical line (header and rows) is highlighted */
+.fc-table-wrap .fc-col-drop-before {
+	box-shadow: inset 3px 0 0 var(--primary-bg, #0d6efd);
+}
+
+.fc-table-wrap .fc-col-drop-after {
+	box-shadow: inset -3px 0 0 var(--primary-bg, #0d6efd);
+}
+
+/* The column being moved */
+.fc-table-wrap .fc-col-dragging {
+	opacity: .45;
+}
+
+/* The edge of the column being resized */
+.fc-table-wrap .fc-col-edge {
+	box-shadow: inset -2px 0 0 var(--primary-bg, #0d6efd);
+}
+
+/* Columns box (opened by the columns button above the table) */
+.fc-colbox {
+	min-width: 260px;
+	max-width: 560px;
+	padding: .75rem;
+}
+
+.fc-colbox-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .4rem;
+	margin-bottom: .75rem;
+}
+
+.fc-colchip {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	padding: .25rem .65rem;
+	font-size: .85rem;
+	color: inherit;
+	background: var(--tertiary-bg, #f4f5f7);
+	border: 1px solid var(--card-border-color, #ccc);
+	border-radius: 2rem;
+	cursor: pointer;
+}
+
+.fc-colchip.on {
+	color: #fff;
+	background: var(--fc-chip-on, #4f74a3);
+	border-color: var(--fc-chip-on, #4f74a3);
+}
+
+.fc-colchip.on:hover {
+	background: var(--fc-chip-on-hover, #44668f);
+	border-color: var(--fc-chip-on-hover, #44668f);
+}
+
+[data-bs-theme="dark"] .fc-colchip.on {
+	--fc-chip-on: #3f6190;
+	--fc-chip-on-hover: #4a6ea1;
+}
+
+.fc-colchip.off {
+	opacity: .6;
+	text-decoration: line-through;
+}
+
+.fc-colchip-eye {
+	display: inline-flex;
+}
+
+.fc-colbox-actions {
+	display: flex;
+	gap: .5rem;
+	justify-content: flex-end;
+}
+
+
+/* Context menu of a column header */
+.fc-ctxmenu {
+	position: fixed;
+	z-index: 100000;
+	min-width: 200px;
+	padding: .3rem 0;
+	color: var(--body-color, #212529);
+	background: var(--body-bg, #fff);
+	border: 1px solid var(--card-border-color, #cfd4da);
+	border-radius: .35rem;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, .25);
+}
+
+.fc-ctxitem {
+	display: block;
+	width: 100%;
+	padding: .45rem 1rem;
+	font: inherit;
+	text-align: start;
+	color: inherit;
+	background: transparent;
+	border: 0;
+	cursor: pointer;
+}
+
+.fc-ctxitem:hover,
+.fc-ctxitem:focus {
+	color: #fff;
+	background: var(--primary-bg, #0d6efd);
+	outline: 0;
+}
+
+.fc-ctxsep {
+	height: 1px;
+	margin: .3rem 0;
+	background: var(--card-border-color, #dee2e6);
+}
+
+
+/* Status buttons group in the rows: rounded outer corners only */
+.fc-table-wrap .btn-group.fc-group > * {
+	border-radius: 0 !important;
+}
+
+.fc-table-wrap .btn-group.fc-group > :first-child {
+	border-start-start-radius: .4rem !important;
+	border-end-start-radius: .4rem !important;
+}
+
+.fc-table-wrap .btn-group.fc-group > :last-child {
+	border-start-end-radius: .4rem !important;
+	border-end-end-radius: .4rem !important;
+}
+
+
+/* Counters of the options of the filter lists: "-7- Text" is shown as a badge + text */
+.choices__item.fc-has-count {
+	display: flex !important;
+	align-items: center;
+}
+
+.choices__item .fc-opt-count,
+.fc-tag-chip .fc-opt-count {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	min-width: 1.8rem;
+	margin-inline-end: .65rem;
+	padding: 0 .45rem;
+	font-size: .70rem;
+	font-weight: 600;
+	line-height: 1.6;
+	color: #fff;
+	background: var(--primary-bg, #2f5fa8);
+	border-radius: 1rem;
+}
+
+.choices__item .fc-opt-count.is-zero,
+.fc-tag-chip .fc-opt-count.is-zero {
+	color: inherit;
+	background: rgba(127, 127, 127, .2);
+	opacity: .8;
+}
+
+
+/* Legend below a list (file manager: icons of the fields using the files) */
+.fc-table-legend {
+	padding: .75rem 10px;
+	text-align: center;
+}
+
+
+/* Header badges ("Content Lists", "Search view", ...): white text */
+.fc-table-wrap table > thead > tr > th .label,
+.fc-table-wrap table > thead > tr > th .badge {
+	color: #fff !important;
+}
+
+
+/* Columns box opens below the button and extends to the right (it used to be right-aligned to the button and left the page when the button is the first one) */
+#flexicontent #fc-managers-header #mainChooseColBox.fcman-abs {
+	left: 0;
+	right: auto;
+}
+
+
+/* Pill with the number of items, shown right of a category name (links to the list of the items of the category) */
+#flexicontent .fc-table-wrap td a.fc_cat_items_count,
+#flexicontent .fc-table-wrap td button.fc_tags_toggle {
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	width: auto !important;
+	min-width: 2rem;
+	margin-inline-start: .4rem;
+	padding: .1rem .5rem;
+	font-size: .8rem;
+	line-height: 1.5;
+	text-align: center;
+	text-decoration: none;
+	vertical-align: middle;
+	color: inherit;
+	background: var(--card-bg, #fff);
+	border: 1px solid var(--template-bg-dark-20, #b9c5d8);
+	border-radius: .35rem;
+}
+
+/* The tags button (number of tags + icon) has the same size as the pills; the pill of a tag is placed right of it */
+#flexicontent .fc-table-wrap td button.fc_tags_toggle {
+	gap: .25rem;
+	margin-inline-start: 0;
+	cursor: pointer;
+}
+
+
+
+/* Tags list of the items manager (opened by the tags button): a chip per tag = name (edit link) + blue pill with the number of items */
+.fc-tag-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .35rem;
+	margin-top: .4rem;
+}
+
+/* Same corners and border as the pills of the tags button and of the categories */
+#flexicontent .fc-table-wrap .fc-tag-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	max-width: 100%;
+	padding: .1rem .3rem .1rem .5rem;
+	font-size: .75rem;
+	line-height: 1.5;
+	background: var(--card-bg, #fff);
+	border: 1px solid var(--template-bg-dark-20, #b9c5d8);
+	border-radius: .35rem;
+}
+
+/* A name stays on one line (the table cells break words anywhere, which cut it into pieces); a name that does not fit in a narrow column ends with an ellipsis */
+#flexicontent .fc-table-wrap .fc-tag-chip .fc-tag-chip-name {
+	flex: 0 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow-wrap: normal;
+	word-break: normal;
+}
+
+#flexicontent .fc-table-wrap .fc-tag-chip a.fc-opt-count {
+	flex: none;
+	margin-inline-end: 0;
+	color: #fff !important;
+	text-decoration: none !important;
+}
+
+#flexicontent .fc-table-wrap .fc-tag-chip a.fc-opt-count.is-zero {
+	color: inherit !important;
+}

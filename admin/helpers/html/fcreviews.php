@@ -58,10 +58,15 @@ abstract class JHtmlFcreviews extends JHtmlFcbase
 
 		if ($states === null)
 		{
-			// Array of image, task, title, action
+			// Simple inline SVG icons: green check (approved), grey cross (unapproved)
+			$svg_open = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" style="display:block;"><path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="';
+			$svg_check = $svg_open . 'M4 12.5l5 5L20 6.5"/></svg>';
+			$svg_cross = $svg_open . 'M6 6l12 12M18 6L6 18"/></svg>';
+
+			// Array of icon, task, title, action, style
 			$states = array(
-				0 => array('cancel-circle', static::$ctrl . '.approved', \Joomla\CMS\HTML\HTMLHelper::tooltipText('FLEXI_REVIEW_UNAPPROVED'), \Joomla\CMS\HTML\HTMLHelper::tooltipText('FLEXI_TOGGLE'), 'color: #555;'),
-				1 => array('checkmark-2', static::$ctrl . '.unapproved', \Joomla\CMS\HTML\HTMLHelper::tooltipText('FLEXI_REVIEW_APPROVED'), \Joomla\CMS\HTML\HTMLHelper::tooltipText('FLEXI_TOGGLE'), 'color: darkgreen;'),
+				0 => array($svg_cross, static::$ctrl . '.approved', \Joomla\CMS\HTML\HTMLHelper::tooltipText('FLEXI_REVIEW_UNAPPROVED'), \Joomla\CMS\HTML\HTMLHelper::tooltipText('FLEXI_TOGGLE'), 'color: #9aa0a6;'),
+				1 => array($svg_check, static::$ctrl . '.unapproved', \Joomla\CMS\HTML\HTMLHelper::tooltipText('FLEXI_REVIEW_APPROVED'), \Joomla\CMS\HTML\HTMLHelper::tooltipText('FLEXI_TOGGLE'), 'color: #198754;'),
 			);
 		}
 		$value = (int) $row->approved;
@@ -69,14 +74,9 @@ abstract class JHtmlFcreviews extends JHtmlFcbase
 
 		return $row->canEditState && $row->canCheckin
 			? '
-			<a href="javascript:;" onclick="return Joomla.listItemTask(\'cb' . $i . '\',\'' . $state[1] . '\')" class="featured ntxt ' . static::$btn_sm_class . ' ' . static::$btn_mbar_class . ' ' . static::$tooltip_class
-				. ($value == 1 ? ' active' : '') . '" title="' . $state[3] . '">
-				<span class="icon-' . $state[0] . '" style="'. $state[4] .'"></span>
-			</a>
+			<a href="javascript:;" onclick="return Joomla.listItemTask(\'cb' . $i . '\',\'' . $state[1] . '\')" class="fclink-approved ' . static::$tooltip_class . '" title="' . $state[3] . '"
+				style="display:inline-block;text-decoration:none;cursor:pointer;' . $state[4] . '">' . $state[0] . '</a>
 			' : '
-			<a class="fclink-approved ntxt ' . static::$btn_sm_class . ' ' . static::$btn_mbar_class . ' ' . static::$tooltip_class . ' disabled' . ($value == 1 ? ' active' : '') . '" title="'
-				. $state[2] . '">
-				<span class="icon-' . $state[0] . '" style="'. $state[4] .'"></span>
-			</a>';
+			<span class="fclink-approved ' . static::$tooltip_class . '" title="' . $state[2] . '" style="display:inline-block;opacity:0.6;' . $state[4] . '">' . $state[0] . '</span>';
 	}
 }

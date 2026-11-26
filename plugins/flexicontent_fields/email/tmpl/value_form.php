@@ -52,9 +52,9 @@ foreach ($values as $value)
 	}
 
 	// Add styles for label position
-	$document = \Joomla\CMS\Factory::getDocument();
-	$styleurl = \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/email/css/style.css';
-	$document->addStyleSheet($styleurl);
+	$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+	$styleurl = 'plugins/flexicontent_fields/email/css/style.css';
+	$document->getWebAssetManager()->registerAndUseStyle('plg_flexicontent_fields_email.style', $styleurl);
 
 	// Use paremeters to decide if email should be cloaked and if we need a mailto: link
 
@@ -142,7 +142,7 @@ foreach ($values as $value)
 
 	//Captcha
 	$display_captcha = (int) $field->parameters->get($LPN . 'display_captcha', 0);
-	$captcha_plgname = $display_captcha ? $app->getCfg('captcha') : '0';
+	$captcha_plgname = $display_captcha ? $app->get('captcha') : '0';
 	$captcha_html    = '';
 
     if ($display_captcha)

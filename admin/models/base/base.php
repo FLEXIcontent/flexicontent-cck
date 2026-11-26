@@ -15,7 +15,6 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
 
-jimport('legacy.model.admin');
 require_once('traitbase.php');
 
 #[AllowDynamicProperties] //php8.2 compatibility
@@ -359,7 +358,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		 
 		if (!empty($data))
 		{
-			$data_matches = $data && (boolean) $this->_record;
+			$data_matches = $data && (bool) $this->_record;
 
 			foreach ($data as $k => $v)
 			{
@@ -389,7 +388,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			}
 		}
 
-		return (boolean) $this->_record;
+		return (bool) $this->_record;
 	}
 
 
@@ -470,7 +469,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		if ( !$pk ) return true;
 
 		// Get current user
-		$user	= \Joomla\CMS\Factory::getUser();
+		$user	= \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$uid	= $user->get('id');
 
 		// Lets get table record and checkout the it
@@ -608,6 +607,11 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			$this->setError($record->getError());
 			return false;
 		}
+
+		// The values that the database stores when strict mode is off (a text cut to the length of its column, '' as 0 in
+		// a number column, '' or 0 in a required column of a new row), so that it accepts the record with strict mode on
+		// too. This also covers Joomla's own tables and the file table, which do not extend flexicontent_basetable
+		flexicontent_db::fitRecordToColumns($record, $record->getFields(), $isNew);
 
 		// Store data in the db
 		if (!$record->store())
@@ -917,7 +921,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		}
 
 		$record = $record ?: $this->_record;
-		$user   = $user ?: \Joomla\CMS\Factory::getUser();
+		$user   = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		return false;
 	}
@@ -938,7 +942,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		}
 
 		$record = $record ?: $this->_record;
-		$user   = $user ?: \Joomla\CMS\Factory::getUser();
+		$user   = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		return false;
 	}
@@ -1010,7 +1014,10 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		if (isset($options['params_fset']) && isset($options['layout_type']))
 		{
 			// Merge Layout parameters into parameters of the record
-			JLoader::register('flexicontent_tmpl', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'tmpl.php');
+			// Lazy class loading (was JLoader::register): loaded only if/when used.
+			spl_autoload_register(static function ($class) {
+				if ($class === 'flexicontent_tmpl' && is_file($f = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'tmpl.php')) require_once $f;
+			}, true, true);
 			$layout_data = flexicontent_tmpl::mergeLayoutParams($item, $data, $options);
 
 			// Unset layout data since these we handled above
@@ -1157,7 +1164,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			$this->batchSet = true;
 
 			// Get current user
-			$this->user = \Joomla\CMS\Factory::getUser();
+			$this->user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 			// Get table
 			$this->table = $this->getTable($this->records_dbtbl, 'JTable');
@@ -1515,7 +1522,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 	public function setitemstate($id, $state = 1, $cleanCache = true)
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		static $event_failed_notice_added = false;
 
@@ -1634,7 +1641,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 				. ' WHERE item_id = ' . (int) $id
 				. ' AND valueorder = 1'
 				. ' AND field_id = 10'
-				. ' AND version = ' . (int) $v['version']
+				. ' AND version = ' . (int) ($v['version'] ?? 0)
 			;
 			$this->_db->setQuery($query)->execute();
 		}
@@ -1688,10 +1695,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 				{
 					$jm_state = $state;
 				}
-
-				// Workaround for extensions using the model but not setting correct include path
-				$component = $parts[1] === 'category' ? 'com_categories' : $parts[1];
-				\Joomla\CMS\MVC\Model\BaseDatabaseModel::addIncludePath(JPATH_BASE . '/components/' . $component . '/models');
 			}
 
 			//Trigger the event

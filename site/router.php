@@ -368,7 +368,7 @@ class _FlexicontentSiteRouter
 							$segments[] = 'tagged';
 						}
 
-						if ($mtagid !== $tagid)
+						if ($tagid !== null && $mtagid !== $tagid)
 						{
 							$segments[] = 0  // TODO use here $remove_ids
 								? $tagalias  // TODO: Use alias path from TAGs Tree
@@ -404,7 +404,7 @@ class _FlexicontentSiteRouter
 							$segments[] = 'authored';
 						}
 
-						if ($mauthorid !== $authorid)
+						if ($authorid !== null && $mauthorid !== $authorid)
 						{
 							$segments[] = $remove_ids
 								? $authoralias
@@ -420,6 +420,10 @@ class _FlexicontentSiteRouter
 
 						unset($query['authorid']);
 						unset($query['cid']);
+
+						// Category filters are configured only via the menu item, they must not appear in the SEF URL
+						unset($query['cids']);
+						unset($query['excl_cids']);
 						break;
 
 					case 'favs':
@@ -1057,8 +1061,8 @@ class _FlexicontentSiteRouter
 						if (!$record_id)
 						{
 							// Make sure our language file has been loaded
-							Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
-							Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+							\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+							\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
 							throw new Exception(Text::sprintf('FLEXI_REQUESTED_CONTENT_OR_VIEW_NOT_FOUND', $explicit_view), 404);
 						}
@@ -1105,9 +1109,9 @@ class _FlexicontentSiteRouter
 		$tbl = '#__categories', $alias_col = 'alias'
 	)
 	{
-		$language = !$language /*&& !$parent_id*/ ? Factory::getLanguage()->getTag() : $language;
+		$language = !$language /*&& !$parent_id*/ ? \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag() : $language;
 
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = $db->getQuery(true)
 			->select('i.id')
 			->from($db->QuoteName($tbl) . ' AS i')
@@ -1202,8 +1206,8 @@ class _FlexicontentSiteRouter
 		if (count($records) > 1)
 		{
 			// Make sure our language file has been loaded
-			Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
-			Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
 			throw new Exception(Text::sprintf('FLEXI_DUPLICATE_ALIAS_FAILED_TO_FIND_UNIQUE_PAGE', ($tbl === '#__categories' ? 'category' : 'item'), $alias), 404);
 		}
@@ -1247,7 +1251,7 @@ class _FlexicontentSiteRouter
 
 					if ($record_id_from_url)
 					{
-						$db = Factory::getDbo();
+						$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 						$query = $db->getQuery(true)
 							->select($db->quoteName($alias_col))
 							->from($db->quoteName($tbls[0]))
@@ -1257,8 +1261,8 @@ class _FlexicontentSiteRouter
 
 						if ($real_alias && $real_alias !== $record_alias_from_url)
 						{
-							Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
-							Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+							\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+							\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 							throw new Exception(Text::sprintf('FLEXI_REQUESTED_CONTENT_OR_VIEW_NOT_FOUND', 'Item'), 404);
 						}
 					}
@@ -1351,7 +1355,7 @@ class _FlexicontentSiteRouter
 		// If current category id not given then use item's main category
 		if (!isset($globalcats[$cid]))
 		{
-			$db = Factory::getDbo();
+			$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 			$query = $db->getQuery(true)
 				->select('i.catid')
@@ -1450,8 +1454,8 @@ class _FlexicontentSiteRouter
 			if (!$record_id)
 			{
 				// Make sure our language file has been loaded
-				Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
-				Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+				\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+				\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
 				throw new Exception(Text::sprintf('FLEXI_REQUESTED_CONTENT_OR_VIEW_NOT_FOUND', $expected_view), 404);
 			}
@@ -1495,7 +1499,7 @@ class _FlexicontentSiteRouter
 			$cid = $item->catid;
 		}
 		else {
-			$db = version_compare(JVERSION, '4', 'lt') ? Factory::getDbo() : Factory::getContainer()->get('DatabaseDriver');
+			$db = version_compare(JVERSION, '4', 'lt') ? Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class) : Factory::getContainer()->get('DatabaseDriver');
 			$sql_query = $db->getQuery(true)
 				->select('i.catid')
 				->from($db->QuoteName('#__content') . ' AS i')

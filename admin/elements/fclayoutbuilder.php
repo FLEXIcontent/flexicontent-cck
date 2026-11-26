@@ -16,11 +16,7 @@ defined('_JEXEC') or die('Restricted access');
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 //\Joomla\CMS\Form\FormHelper::loadFieldClass('radio');   // \Joomla\CMS\Form\Field\RadioField
 
 /**
@@ -53,7 +49,8 @@ class JFormFieldFclayoutbuilder extends \Joomla\CMS\Form\FormField
 			'editor_sfx' => ($this->element['editor_sfx'] ?: $this->element['name']),
 		);
 
-		\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/fc_service_registry.php';
+		flexicontent_register_html_helpers(JPATH_SITE . '/components/com_flexicontent/helpers/html');
 		return \Joomla\CMS\HTML\HTMLHelper::_('fclayoutbuilder.getBuilderHtml', $builder_options);
 	}
 }

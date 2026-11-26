@@ -36,7 +36,7 @@ class UsersHelper
 	 */
 	public static function addSubmenu($vName)
 	{
-		JSubMenuHelper::addEntry(
+		\Joomla\CMS\HTML\Helpers\Sidebar::addEntry(
 			\Joomla\CMS\Language\Text::_('COM_USERS_SUBMENU_USERS'),
 			'index.php?option=com_users&view=users',
 			$vName == 'users'
@@ -47,24 +47,24 @@ class UsersHelper
 
 		if ($canDo->get('core.admin'))
 		{
-			JSubMenuHelper::addEntry(
+			\Joomla\CMS\HTML\Helpers\Sidebar::addEntry(
 				\Joomla\CMS\Language\Text::_('COM_USERS_SUBMENU_GROUPS'),
 				'index.php?option=com_users&view=groups',
 				$vName == 'groups'
 			);
-			JSubMenuHelper::addEntry(
+			\Joomla\CMS\HTML\Helpers\Sidebar::addEntry(
 				\Joomla\CMS\Language\Text::_('COM_USERS_SUBMENU_LEVELS'),
 				'index.php?option=com_users&view=levels',
 				$vName == 'levels'
 			);
-			JSubMenuHelper::addEntry(
+			\Joomla\CMS\HTML\Helpers\Sidebar::addEntry(
 				\Joomla\CMS\Language\Text::_('COM_USERS_SUBMENU_NOTES'),
 				'index.php?option=com_users&view=notes',
 				$vName == 'notes'
 			);
 
 			$extension = \Joomla\CMS\Factory::getApplication()->input->getString('extension');
-			JSubMenuHelper::addEntry(
+			\Joomla\CMS\HTML\Helpers\Sidebar::addEntry(
 				\Joomla\CMS\Language\Text::_('COM_USERS_SUBMENU_NOTE_CATEGORIES'),
 				'index.php?option=com_categories&extension=com_users',
 				$vName == 'categories' || $extension == 'com_users'
@@ -84,7 +84,7 @@ class UsersHelper
 	{
 		if (empty(self::$actions))
 		{
-			$user = \Joomla\CMS\Factory::getUser();
+			$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 			self::$actions = new \Joomla\CMS\Object\CMSObject;
 
 			$actions = \Joomla\CMS\Access\Access::getActionsFromFile(
@@ -144,7 +144,7 @@ class UsersHelper
 	 */
 	static function getGroups()
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$db->setQuery(
 			'SELECT a.id AS value, a.title AS text, COUNT(DISTINCT b.id) AS level' .
 			' FROM #__usergroups AS a' .

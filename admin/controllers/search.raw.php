@@ -14,7 +14,13 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentControllerBaseAdmin' => JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 // Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
 require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'search.php';
@@ -73,8 +79,8 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 		$indexer     = $this->input->getCmd('indexer', 'advanced');
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 		$model = $this->getModel('search');
 
@@ -85,8 +91,8 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 		}
 
 		// Clear previous log file
-		$log_filename = 'items_search_indexer_' . \Joomla\CMS\Factory::getUser()->id . '.php';
-		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
+		$log_filename = 'items_search_indexer_' . \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.php';
+		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename);
 
 		if (file_exists($log_filename_full))
 		{
@@ -116,8 +122,8 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 
 		// Check is session table DATA column is not mediumtext (16MBs, it can be 64 KBs ('text') in some sites that were not properly upgraded)
 		$tblname  = 'session';
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbname   = $app->getCfg('db');
+		$dbprefix = $app->get('dbprefix');
+		$dbname   = $app->get('db');
 		$db->setQuery("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '" . $dbname . "' AND TABLE_NAME = '" . $dbprefix . $tblname . "'");
 		$jession_coltypes = $db->loadAssocList('COLUMN_NAME');
 		$_dataColType = strtolower($jession_coltypes['data']['DATA_TYPE']);
@@ -169,8 +175,14 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 			$model->purge($del_field_ids);
 		}
 
+		// A full basic rebuild also replaces the field-attributed autocomplete index.
+		if ($indexer === 'basic')
+		{
+			$db->setQuery('TRUNCATE TABLE #__flexicontent_basicsearch_index')->execute();
+		}
+
 		// For basic index, clear records if no fields marked as text searchable
-		elseif (!count($fields))
+		if ($indexer === 'basic' && !count($fields))
 		{
 			$db->setQuery("UPDATE #__flexicontent_items_ext SET search_index = '' ");
 			$db->execute();
@@ -240,8 +252,8 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 
 		$start_microtime = microtime(true);
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		$has_zlib      = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
@@ -254,7 +266,6 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 		$records_cnt      = $this->input->getInt('records_cnt', 0);        // Counter of items indexed so far, this is given via HTTP request
 
 		$log_filename = $session->get($indexer . '_log_filename', null, 'flexicontent');
-		jimport('joomla.log.log');
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file
@@ -418,6 +429,7 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 
 				// Add all query itemids to searchindex array so that it will be cleared even if zero fields are indexed
 				$searchindex = array();
+				$basic_index = array();
 
 				foreach ($query_itemids as $query_itemid)
 				{
@@ -481,6 +493,7 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 						if (!empty($field->search[$query_itemid]))
 						{
 							$searchindex[$query_itemid][] = $field->search[$query_itemid];
+							$basic_index[$query_itemid][$field->id] = $field->search[$query_itemid];
 						}
 					}
 
@@ -497,6 +510,8 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 
 			if ($indexer === 'basic')
 			{
+				flexicontent_db::replaceBasicSearchIndex($query_itemids, $basic_index);
+
 				// Check for zero search index records
 				if (count($searchindex))
 				{
@@ -755,6 +770,29 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 	 */
 	public function purge()
 	{
+		// Same authority as the 'search.purge' task of the html controller (search.php): this raw twin is reached
+		// with format=raw and must not purge by GET, without the form token, or for a user who cannot manage the index
+		$app  = \Joomla\CMS\Factory::getApplication();
+		$user = $app->getIdentity();
+
+		if (!$app->isClient('administrator') || !$user->id
+			|| !$user->authorise('flexicontent.managefields', 'com_flexicontent')
+			|| !($user->authorise('flexicontent.createfield', 'com_flexicontent')
+				|| $user->authorise('flexicontent.editfield', 'com_flexicontent')))
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'), 403);
+		}
+
+		if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST')
+		{
+			throw new \RuntimeException('POST request required', 405);
+		}
+
+		if (!\Joomla\CMS\Session\Session::checkToken('post'))
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'), 403);
+		}
+
 		$model = $this->getModel('search');
 		$model->purge();
 		$msg = \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_PURGED');

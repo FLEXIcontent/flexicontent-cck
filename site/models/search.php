@@ -19,7 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Model
@@ -134,10 +133,7 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		$option = $app->input->getCmd('option');
 
 		//if ( !$app->getUserState( $option.'.min_word_len', 0 ) ) {  // Do not cache to allow configuration changes
-			$db = \Joomla\CMS\Factory::getDbo();
-			$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
-			$_dbvariable = $db->loadObject();
-			$min_word_len = (int) @ $_dbvariable->Value;
+			$min_word_len = flexicontent_db::getMinWordLen();
 			$minchars = $params->get('minchars', 3);
 			$search_prefix = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 			$min_word_len = !$search_prefix && $min_word_len > $minchars  ?  $min_word_len : $minchars;

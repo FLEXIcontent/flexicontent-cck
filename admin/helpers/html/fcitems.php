@@ -72,10 +72,10 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 
 		if ($tz === null)
 		{
-			$nullDate = \Joomla\CMS\Factory::getDbo()->getNullDate();
+			$nullDate = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)->getNullDate();
 			$nowDate = \Joomla\CMS\Factory::getDate()->toUnix();
 
-			$tz = \Joomla\CMS\Factory::getUser()->getTimezone();
+			$tz = \Joomla\CMS\Factory::getApplication()->getIdentity()->getTimezone();
 		}
 
 		// Check publication START/FINISH dates on if item has state: publised / in-progress / archived
@@ -186,7 +186,22 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 	{
 		if ($appearance === 1)
 		{
-			return ($raw_value !== '' && strip_tags($raw_value) !== '') ? '<span class="icon-checkmark"></span>' : '';
+			if ($raw_value === '' || strip_tags($raw_value) === '')
+			{
+				return '';
+			}
+
+			// The content of the field is shown as a tooltip (plain text, limited in length) when hovering the check mark
+			$tip = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags(preg_replace('#<(br|/p|/div|/li|/tr)\b[^>]*>#i', ' ', $raw_value)), ENT_QUOTES, 'UTF-8')));
+			$max = 500;
+
+			if (mb_strlen($tip, 'UTF-8') > $max)
+			{
+				$tip = mb_substr($tip, 0, $max, 'UTF-8') . ' ...';
+			}
+
+			return '<span class="icon-checkmark ' . static::$tooltip_class . '"'
+				. ($tip !== '' ? ' title="' . htmlspecialchars($tip, ENT_QUOTES, 'UTF-8') . '"' : '') . '></span>';
 		}
 
 		$clean = trim(strip_tags($raw_value));

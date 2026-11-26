@@ -13,7 +13,7 @@
 	<package>net.manuellemos.diff</package>
 
 	<version>@(#) $Id: diff.php,v 1.6 2014/01/30 04:07:41 mlemos Exp $</version>
-	<copyright>Copyright © (C) Manuel Lemos 2013</copyright>
+	<copyright>Copyright Â© (C) Manuel Lemos 2013</copyright>
 	<title>OAuth client</title>
 	<author>Manuel Lemos</author>
 	<authoraddress>mlemos-at-acm.org</authoraddress>

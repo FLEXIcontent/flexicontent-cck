@@ -94,14 +94,10 @@
 			</field>
 			<field name="label_form" type="text" default="" label="FLEXI_LABEL" description="Enter a label to use for item form that is different than field label for viewing" depend_class=""/>
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
+			<field name="form_card_width" type="text" default="400" size="6" label="PLG_FLEXICONTENT_FIELDS_FILE_FORM_CARD_WIDTH" description="PLG_FLEXICONTENT_FIELDS_FILE_FORM_CARD_WIDTH_DESC" />
 
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
 			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/file/tmpl/" filter="^field_.*\.php$" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label text-white bg-warning label-warning" />
-
-			<field name="show_values_expand_btn" type="radio" default="1" label="FLEXI_FIELD_EDIT_EXPAND_VALUES" description="FLEXI_FIELD_EDIT_EXPAND_VALUES_DESC" class="btn-group btn-group-yesno" depend_class="fieldgroupoff">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 
 			<field name="form_info_header" type="radio" label="Header info" default="3">
 				<option value="1">Server storage sub-path</option>
@@ -179,6 +175,43 @@
 			<field name="iform_stamp_default" type="radio" default="1" label="FLEXI_DOWNLOAD_STAMPING" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+			</field>
+
+
+			<field name="" type="separator" default="FLEXI_FILE_CUSTOM1_SEP" description="FLEXI_FILE_CUSTOM_SEP_DESC" level="level3" />
+			<field name="custom1_enable" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE" description="FLEXI_FILE_CUSTOM_ENABLE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="custom1-on">FLEXI_NO</option>
+				<option value="1" show_list="custom1-on" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="custom1_label" type="text" default="" label="FLEXI_FILE_CUSTOM_LABEL" description="FLEXI_FILE_CUSTOM_LABEL_DESC" depend_class="custom1-on" />
+			<field name="custom1_label_show" type="radio" default="1" label="FLEXI_FILE_CUSTOM_LABEL_SHOW" description="FLEXI_FILE_CUSTOM_LABEL_SHOW_DESC" depend_class="custom1-on" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="custom1_default" type="textarea" filter="raw" rows="3" cols="40" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_FILE_CUSTOM_DEFAULT_DESC" depend_class="custom1-on" />
+			<field name="custom1_rows" type="number" default="2" min="1" max="30" step="1" label="FLEXI_FILE_CUSTOM_ROWS" description="FLEXI_FILE_CUSTOM_ROWS_DESC" depend_class="custom1-on" />
+			<field name="custom1_default_use" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC" depend_class="custom1-on">
+				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
+				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
+				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FILE_CUSTOM2_SEP" description="FLEXI_FILE_CUSTOM_SEP_DESC" level="level3" />
+			<field name="custom2_enable" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE" description="FLEXI_FILE_CUSTOM_ENABLE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="custom2-on">FLEXI_NO</option>
+				<option value="1" show_list="custom2-on" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="custom2_label" type="text" default="" label="FLEXI_FILE_CUSTOM_LABEL" description="FLEXI_FILE_CUSTOM_LABEL_DESC" depend_class="custom2-on" />
+			<field name="custom2_label_show" type="radio" default="1" label="FLEXI_FILE_CUSTOM_LABEL_SHOW" description="FLEXI_FILE_CUSTOM_LABEL_SHOW_DESC" depend_class="custom2-on" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="custom2_default" type="textarea" filter="raw" rows="3" cols="40" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_FILE_CUSTOM_DEFAULT_DESC" depend_class="custom2-on" />
+			<field name="custom2_rows" type="number" default="2" min="1" max="30" step="1" label="FLEXI_FILE_CUSTOM_ROWS" description="FLEXI_FILE_CUSTOM_ROWS_DESC" depend_class="custom2-on" />
+			<field name="custom2_default_use" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC" depend_class="custom2-on">
+				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
+				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
+				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_MY_FILES" description="" icon_class="icon-upload" level="tab_open" box_type="1" />
@@ -287,6 +320,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="csv_export_format" type="radio" default="html" label="FLEXI_FIELD_FILE_CSV_EXPORT_FORMAT" description="FLEXI_FIELD_FILE_CSV_EXPORT_FORMAT_DESC" class="btn-group group-fcinfo" depend_class="csv_rendered_display">
+				<option value="html">FLEXI_FIELD_FILE_CSV_EXPORT_FORMAT_HTML</option>
+				<option value="importable">FLEXI_FIELD_FILE_CSV_EXPORT_FORMAT_IMPORTABLE</option>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_DISPLAY_INACCESSIBLE_FILES_PARAMS_LABEL" level="level2" />
 			<field name="noaccess_display" type="radio" default="1" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_DISPLAY" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_DISPLAY_DESC" class="btn-group btn-group-yesno">
@@ -370,7 +407,7 @@
 			<field name="viewtext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT" depend_class="allow-viewing-custom" description="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT_DESC"/>
 			<field name="viewinside" type="radio" default="1" label="View inside" description="Select to view file in same / new window" depend_class="allow-viewing" class="btn-group group-fcinfo">
 				<option value="0">Fancybox modal</option>
-				<option value="1">jQuery modal (responsive + fullscreen)</option>
+				<option value="1">GLightbox modal (responsive + fullscreen)</option>
 				<option value="2">New window</option>
 				<option value="3">Same window</option>
 			</field>
@@ -485,6 +522,36 @@
 			</field>
 			<field name="coupon_hits_limit" type="text" size="5" default="3" label="FLEXI_FIELD_FILE_COUPON_HITS_LIMIT" depend_class="multivalue-mode11" description="FLEXI_FIELD_FILE_COUPON_HITS_LIMIT_DESC"/>
 			<field name="coupon_expiration_days" type="text" size="5" default="15" label="FLEXI_FIELD_FILE_COUPON_EXPIRATION_DAYS" depend_class="multivalue-mode11" description="FLEXI_FIELD_FILE_COUPON_EXPIRATION_DAYS_DESC"/>
+
+			<field name="" type="separator" default="FLEXI_DL_LIMIT_TAB" description="" icon_class="icon-lock" level="tab_open" box_type="1" />
+			<field name="dl_limit_override" type="multilist" subtype="radio" default="0" label="FLEXI_DL_LIMIT_OVERRIDE" description="FLEXI_DL_LIMIT_OVERRIDE_DESC" toggle_related="1" class="btn-group group-fcinfo">
+				<option value="0" show_list="" hide_list="dl-limit-custom">FLEXI_DL_LIMIT_USE_COMPONENT</option>
+				<option value="1" show_list="dl-limit-custom" hide_list="">FLEXI_DL_LIMIT_USE_FIELD</option>
+				<option value="2" show_list="" hide_list="dl-limit-custom">FLEXI_DL_LIMIT_NONE</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_DL_LIMIT_INFO" level="level3" class="alert alert-info fcpadded" depend_class="dl-limit-custom" />
+			<field name="dl_limit_count_mode" type="radio" default="0" label="FLEXI_DL_LIMIT_COUNT_MODE" description="FLEXI_DL_LIMIT_COUNT_MODE_DESC" class="btn-group group-fcinfo" depend_class="dl-limit-custom">
+				<option value="0">FLEXI_DL_LIMIT_MODE_ANY</option>
+				<option value="1">FLEXI_DL_LIMIT_MODE_UNIQUE</option>
+			</field>
+			<field name="dl_limit_window" type="number" min="1" default="24" size="5" label="FLEXI_DL_LIMIT_WINDOW" description="FLEXI_DL_LIMIT_WINDOW_DESC" depend_class="dl-limit-custom" />
+			<field name="dl_limit_window_unit" type="list" default="60" label="FLEXI_DL_LIMIT_WINDOW_UNIT" description="FLEXI_DL_LIMIT_WINDOW_UNIT_DESC" depend_class="dl-limit-custom">
+				<option value="1">FLEXI_DL_LIMIT_UNIT_MINUTES</option>
+				<option value="60">FLEXI_DL_LIMIT_UNIT_HOURS</option>
+				<option value="1440">FLEXI_DL_LIMIT_UNIT_DAYS</option>
+			</field>
+			<field name="dl_limit_groups" type="subform" multiple="true" layout="joomla.form.field.subform.repeatable-table" label="FLEXI_DL_LIMIT_GROUPS" description="FLEXI_DL_LIMIT_GROUPS_DESC" depend_class="dl-limit-custom">
+				<form>
+					<field name="group_id" type="usergrouplist" label="FLEXI_DL_LIMIT_GROUP" />
+					<field name="limit" type="number" min="-1" default="" label="FLEXI_DL_LIMIT_LIMIT" />
+				</form>
+			</field>
+			<field name="dl_limit_guest_ip_factor" type="number" min="1" default="5" size="5" label="FLEXI_DL_LIMIT_IP_FACTOR" description="FLEXI_DL_LIMIT_IP_FACTOR_DESC" depend_class="dl-limit-custom" />
+			<field name="dl_limit_count_special" type="radio" default="0" label="FLEXI_DL_LIMIT_COUNT_SPECIAL" description="FLEXI_DL_LIMIT_COUNT_SPECIAL_DESC" class="btn-group btn-group-yesno" depend_class="dl-limit-custom">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="dl_limit_modal_html" type="textarea" filter="raw" rows="6" cols="60" default="" label="FLEXI_DL_LIMIT_MODAL_HTML" description="FLEXI_DL_LIMIT_MODAL_HTML_DESC" depend_class="dl-limit-custom" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_FILE_ACTIONS" level="tabset_close" box_type="1" />
 

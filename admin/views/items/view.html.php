@@ -15,13 +15,29 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecords' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * HTML View class for the items backend manager
  */
 class FlexicontentViewItems extends FlexicontentViewBaseRecords
 {
+	/**
+	 * Columns of this manager are shown / hidden / moved in the browser (see fc-table-tools.js),
+	 * so the old position based hiding (cookie of the old column chooser) must not apply
+	 */
+	public function hideCol($colposition)
+	{
+		return '';
+	}
+
+
 	var $proxy_option   = 'com_content';
 	var $title_propname = 'title';
 	var $state_propname = 'state';
@@ -36,11 +52,11 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		global $globalcats;
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getSession();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$perms    = FlexicontentHelperPerm::getPerm();
 
 		$option   = $jinput->getCmd('option', '');
@@ -58,8 +74,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
 		{
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get model
@@ -99,7 +115,6 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$count_filters = 0;
 
 		// File id filtering
-		$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
 		$filter_fileid     = $model->getState('filter_fileid');
 
 		// Category filtering
@@ -140,6 +155,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$csv_header       = $model->getState('csv_header');
 		$csv_raw_export   = $model->getState('csv_raw_export');
 		$csv_all_fields   = $model->getState('csv_all_fields');
+		$csv_zip_media    = $model->getState('csv_zip_media');
 
 		// Support for using 'ALL', 'ORPHAN' fake states, by clearing other values
 		if (is_array($filter_state) && in_array('ALL', $filter_state))     $filter_state = array('ALL');
@@ -218,16 +234,33 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			// Add css to document
 			if ($isAdmin)
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+
+				// 'Items using file' filter: search files by title while typing
+				$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/items_filter_file.css', array('version' => FLEXI_VHASH));
+				$document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/items_filter_file.js', array('version' => FLEXI_VHASH), array('defer' => true));
+
+				// Modern (multi-column) layout of the filters box, selected in component configuration
+				if ((int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('backend_filters_style', 1) === 1)
+				{
+					$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_filters_modern.css', array('version' => FLEXI_VHASH));
+
+					// Filter presets (stored in the browser)
+					foreach (array('FLEXI_PRESET_SAVE', 'FLEXI_PRESET_SAVE_TITLE', 'FLEXI_PRESET_NAME', 'FLEXI_PRESET_MAX', 'FLEXI_PRESET_DELETE', 'FLEXI_PRESET_DELETE_CONFIRM', 'FLEXI_PRESET_HELP') as $_preset_txt)
+					{
+						\Joomla\CMS\Language\Text::script($_preset_txt);
+					}
+					$document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/filter_presets.js', array('version' => FLEXI_VHASH), array('defer' => true));
+				}
 			}
 			else
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
@@ -248,30 +281,30 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		if ($filter_state || strlen($filter_featured))
 		{
-			$js .= "jQuery('.col_status').addClass('filtered_column');";
+			$js .= "document.querySelectorAll('.col_status').forEach(column => column.classList.add('filtered_column'));";
 		}
-		if (strlen($search)) $js .= "jQuery('.col_title').addClass('filtered_column');";
-		if ($filter_cats)    $js .= "jQuery('.col_cats').addClass('filtered_column');";
-		if ($filter_type)    $js .= "jQuery('.col_type').addClass('filtered_column');";
-		if ($filter_author)  $js .= "jQuery('.col_authors').addClass('filtered_column');";
-		if ($filter_lang)    $js .= "jQuery('.col_lang').addClass('filtered_column');";
-		if ($filter_access)  $js .= "jQuery('.col_access').addClass('filtered_column');";
-		if ($filter_meta)    $js .= "jQuery('.col_meta').addClass('filtered_column');";
-		if ($filter_tag)     $js .= "jQuery('.col_tag').addClass('filtered_column');";
-		if ($filter_id)      $js .= "jQuery('.col_id').addClass('filtered_column');";
+		if (strlen($search)) $js .= "document.querySelectorAll('.col_title').forEach(column => column.classList.add('filtered_column'));";
+		if ($filter_cats)    $js .= "document.querySelectorAll('.col_cats').forEach(column => column.classList.add('filtered_column'));";
+		if ($filter_type)    $js .= "document.querySelectorAll('.col_type').forEach(column => column.classList.add('filtered_column'));";
+		if ($filter_author)  $js .= "document.querySelectorAll('.col_authors').forEach(column => column.classList.add('filtered_column'));";
+		if ($filter_lang)    $js .= "document.querySelectorAll('.col_lang').forEach(column => column.classList.add('filtered_column'));";
+		if ($filter_access)  $js .= "document.querySelectorAll('.col_access').forEach(column => column.classList.add('filtered_column'));";
+		if ($filter_meta)    $js .= "document.querySelectorAll('.col_meta').forEach(column => column.classList.add('filtered_column'));";
+		if ($filter_tag)     $js .= "document.querySelectorAll('.col_tag').forEach(column => column.classList.add('filtered_column'));";
+		if ($filter_id)      $js .= "document.querySelectorAll('.col_id').forEach(column => column.classList.add('filtered_column'));";
 		if ($startdate || $enddate)
 		{
 			if ($date == 1) {
-				$js .= "jQuery('.col_created').addClass('filtered_column');";
+				$js .= "document.querySelectorAll('.col_created').forEach(column => column.classList.add('filtered_column'));";
 			} else if ($date == 2) {
-				$js .= "jQuery('.col_revised').addClass('filtered_column');";
+				$js .= "document.querySelectorAll('.col_revised').forEach(column => column.classList.add('filtered_column'));";
 			}
 		}
 
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');
@@ -491,7 +524,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$value     = $filter_id;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
-			'label' => \Joomla\CMS\Language\Text::_('FLEXI_ID'),
+			'label' => \Joomla\CMS\Language\Text::_('FLEXI_ITEM_ID'),
 			'label_extra_class' =>  ($value ? ' fc-lbl-inverted' : ''),
 			'html' => '<input type="text" name="'.$fieldname.'" id="'.$elementid.'" size="6" value="' . $value . '" class="fcfield_textval" style="width:auto;" />',
 		));
@@ -602,9 +635,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 						'class' => $this->select_class,
 						'multiple' => 'multiple',
 						'size' => '3',
-						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+						'onblur' => '',
 						'placeholder' => $filt_placeholder,
 					),
 					$elementid
@@ -632,9 +664,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 						'class' => $this->select_class,
 						'multiple' => 'multiple',
 						'size' => '3',
-						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+						'onblur' => '',
 					)
 				),
 			));
@@ -650,8 +681,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		 * Create note about dates displayed using current user's timezone
 		 */
 
-		$site_zone = $app->getCfg('offset');
-		$user_zone = \Joomla\CMS\Factory::getUser()->getParam('timezone', $site_zone);
+		$site_zone = $app->get('offset');
+		$user_zone = \Joomla\CMS\Factory::getApplication()->getIdentity()->getParam('timezone', $site_zone);
 
 		$tz = new DateTimeZone( $user_zone );
 		$tz_offset = $tz->getOffset(new \Joomla\CMS\Date\Date()) / 3600;
@@ -714,9 +745,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 						'class' => $this->select_class,
 						'multiple' => 'multiple',
 						'size' => '3',
-						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+						'onblur' => '',
 					),
 					$value,
 					$displaytype = 1
@@ -785,12 +815,14 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					'class' => $this->select_class,
 					'multiple' => 'multiple',
 					'size' => '3',
-					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onblur' => '',
 				),
 				$value,
-				$displaytype = 0
+				$displaytype = 0,
+				$tagid = null,
+				// Special value -1: items that have no tags
+				$extra_options = array(-1 => \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_WITHOUT_TAGS'))
 			),
 		));
 
@@ -842,9 +874,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 						'class' => $this->select_class,
 						'multiple' => 'multiple',
 						'size' => '3',
-						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+						'onblur' => '',
 					),
 					'list.select' => $value,
 				)
@@ -901,9 +932,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					'class' => $this->select_class,
 					'multiple' => 'multiple',
 					'size' => '3',
-					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onblur' => '',
 				),
 				'value',
 				'text',
@@ -955,38 +985,30 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$elementid = 'filter_fileid';
 		$value     = $filter_fileid;
 
-		if ($fileid_to_itemids && count($fileid_to_itemids))
-		{
-			$files_data = $model->getFileData(array_keys($fileid_to_itemids));
-			$file_options = array();
-			$file_options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  '', '-'/*.\Joomla\CMS\Language\Text::_( 'FLEXI_SELECT' ).' '.\Joomla\CMS\Language\Text::_( 'FLEXI_FILE' )*/ );
+		// The file is searched by title (altname) or filename while typing (AJAX), the list of files is not loaded here
+		$file_label = '';
 
-			foreach($files_data as $_file)
-			{
-				$file_options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $_file->id, $_file->altname );
-			}
-
-			$lists[$elementid] = $this->getFilterDisplay(array(
-				'label' => \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_USING') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_FILE'),
-				'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
-				'html' => \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
-					$file_options,
-					$fieldname,
-					array(
-						'size' => '1',
-						'class' => $this->select_class,
-						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
-					),
-					'value',
-					'text',
-					$value
-				),
-			));
-		}
-		else
+		if ($filter_fileid)
 		{
-			$lists[$elementid] = '';
+			$_files = $model->getFileData(array((int) $filter_fileid));
+			$file_label = !empty($_files) ? ($_files[0]->altname !== '' ? $_files[0]->altname : $_files[0]->filename) : '';
 		}
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_USING') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_FILE'),
+			'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
+			'html' => '
+				<div class="fc-filefilter" data-search-url="' . htmlspecialchars(\Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&task=items.searchfiles&format=raw&' . \Joomla\CMS\Session\Session::getFormToken() . '=1', ENT_QUOTES, 'UTF-8') . '"
+					data-no-results="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_NO_FILES_FOUND'), ENT_QUOTES, 'UTF-8') . '">
+					<input type="text" id="' . $elementid . '_search" class="fcfield_textval fc-filefilter-input" autocomplete="off"
+						placeholder="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_SEARCH_FILES'), ENT_QUOTES, 'UTF-8') . '"
+						value="' . htmlspecialchars($file_label, ENT_QUOTES, 'UTF-8') . '" />
+					<button type="button" class="fc-filefilter-clear" title="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_CLEAR'), ENT_QUOTES, 'UTF-8') . '"' . ($value ? '' : ' hidden') . '>&times;</button>
+					<input type="hidden" name="' . $fieldname . '" id="' . $elementid . '" value="' . (int) $value . '"
+						onchange="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();" />
+					<ul class="fc-filefilter-list" hidden></ul>
+				</div>',
+		));
 
 
 		/**
@@ -1121,6 +1143,26 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		));
 
 
+		// Build CSV export add media files to ZIP checkbox
+		$fieldname = 'csv_zip_media';
+		$elementid = 'csv_zip_media';
+		$value     = $csv_zip_media;
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => \Joomla\CMS\Language\Text::_('Add media files to ZIP'),
+			'label_extra_class' => $this->popover_class . ($value ? ' fc-lbl-inverted' : ''),
+			'label_extra_attrs' => array(
+				'data-placement' => 'bottom',
+				'data-content' => flexicontent_html::getToolTip('', 'Download a ZIP file containing the CSV file and the files of fields using the <b>Importable</b> rendered format: <br>- images inside folder fcimport_media <br>- local files inside folder fcimport_docs <br>Extract it inside the tmp folder of the target site before importing. Different files with same name are renamed, e.g. icon_2.webp', 0, 1),
+			),
+			'html' => '
+				<div class="group-fcset" style="display: inline-block;">
+					<input type="checkbox" id="'.$elementid.'" name="'.$fieldname.'" onchange="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform()" value="1" '.($value ? ' checked="checked" ' : '').' />
+					<label id="'.$elementid.'-lbl" for="'.$elementid.'" style="margin: 0 12px; vertical-align: middle; border: 0;"></label>
+				</div>',
+		));
+
+
 		/**
 		 * Assign data to template
 		 */
@@ -1160,7 +1202,6 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		$this->sidebar = null;
 
-		if(FLEXI_J30GE && !FLEXI_J40GE) $this->sidebar = JHtmlSidebar::render();
 		if(FLEXI_J40GE) $this->sidebar = \Joomla\CMS\HTML\Helpers\Sidebar::render();
 
 
@@ -1183,15 +1224,15 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		// Initialise variables
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$user 		= \Joomla\CMS\Factory::getUser();
-		$document	= \Joomla\CMS\Factory::getDocument();
+		$user 		= \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$document	= \Joomla\CMS\Factory::getApplication()->getDocument();
 		$contrl   = $this->ctrl . '.';
 
 		// Add css to document
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
@@ -1245,7 +1286,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			'tags[]',
 			array(
 				'id' => 'tags',
-				'class' => 'use_select2_lib',
+				// No checkbox mode: selected tags leave the list, keyboard works natively, search text is kept after a pick
+				'class' => 'use_select2_lib fc_select2_no_check fc_choices_keep_search',
 				'multiple' => 'multiple',
 				'size' => '10',
 			),
@@ -1285,7 +1327,31 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$lists['access'] = \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $levels, $fieldname, $attribs, 'value', 'text', $value='', $elementid, $translate = true);
 
 
+		// Custom fields that can be set in batch, for the types of the selected items
+		$itemTypeIds = array();
+		foreach ($rows as $row)
+		{
+			$itemTypeIds[] = (int) $row->type_id;
+		}
+		$batch_fields = $behaviour === 'translate' ? array() : $model->getBatchFields(array_unique($itemTypeIds));
+
+		// Fields assigned to a type, also become available when a different item type is selected, so offer all fields of the types that could be targeted
+		if ($behaviour !== 'translate')
+		{
+			$batch_fields_all = $model->getBatchFields(array_keys($types));
+			foreach ($batch_fields_all as $fid => $fld)
+			{
+				if (!isset($batch_fields[$fid]))
+				{
+					$batch_fields[$fid] = $fld;
+				}
+			}
+			uasort($batch_fields, function ($a, $b) { return strcasecmp($a->label, $b->label); });
+		}
+
 		//assign data to template
+		$this->batch_fields = $batch_fields;
+		$this->itemTypeIds = array_values(array_unique($itemTypeIds));
 		$this->lists = $lists;
 		$this->rows = $rows;
 		$this->itemCats = $itemCats;
@@ -1305,11 +1371,11 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 	 */
 	function setToolbar()
 	{
-		$user     = \Joomla\CMS\Factory::getUser();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$useAssocs= flexicontent_db::useAssociations();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
@@ -1369,7 +1435,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			 */
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&view=types&tmpl=component&layout=typeslist&action=new' . '&catid=' . $filter_cats;
 			$btn_name = 'add_item';
-			$full_js = "var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 1200, 0, false, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TYPE'), 2)."'}); return false;";
+			$full_js = "var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 1200, 0, false, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TYPE'), 2)."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'FLEXI_NEW', $btn_name, $full_js,
 				$msg_alert = '', $msg_confirm = '',
@@ -1490,9 +1556,9 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&view=items&tmpl=component&task=quicktranslate';
 				$btn_name = 'quicktranslate';
 				$full_js = "" .
-					"var url = jQuery(this).data('taskurl'); " .
-					"var cid = []; jQuery.each(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); " .
-					"url += '&' + cid.map(function(el, idx) { return 'cid[' + ']=' + el; }).join('&'); " .
+					"var url = this.dataset.taskurl; " .
+					"var cid = Array.from(document.querySelectorAll(\"input[name='cid[]']:checked\"), input => input.value); " .
+					"url += '&' + cid.map(function(el, idx) { return 'cid[]=' + encodeURIComponent(el); }).join('&'); " .
 					"fc_showDialog(url, 'fc_modal_popup_container', 0, 1200, 0, fc_edit_batch_modal_close, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Add translations'), 2)."'}); return false;";
 				$btn_arr[] = flexicontent_html::addToolBarButton(
 					'FLEXI_VERIFY_N_TRANSLATE', $btn_name, $full_js,
@@ -1508,9 +1574,9 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&view=items&tmpl=component&task=quicktranslateall';
 				$btn_name = 'quicktranslateall';
 				$full_js = "" .
-					"var url = jQuery(this).data('taskurl'); " .
-					"var cid = []; jQuery.each(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); " .
-					"url += '&' + cid.map(function(el, idx) { return 'cid[' + ']=' + el; }).join('&'); " .
+					"var url = this.dataset.taskurl; " .
+					"var cid = Array.from(document.querySelectorAll(\"input[name='cid[]']:checked\"), input => input.value); " .
+					"url += '&' + cid.map(function(el, idx) { return 'cid[]=' + encodeURIComponent(el); }).join('&'); " .
 					"fc_showDialog(url, 'fc_modal_popup_container', 0, 1200, 0, fc_edit_batch_modal_close, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TRANSLATE_SELECTED_ITEMS_ALL_LANGUAGES'), 2)."'}); return false;";
 				$btn_arr[] = flexicontent_html::addToolBarButton(
 					'FLEXI_TRANSLATE_SELECTED_ITEMS_ALL_LANGUAGES', $btn_name, $full_js,
@@ -1594,6 +1660,25 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 
 			/**
+			 * Add selected-items CSV Export button
+			 */
+
+			$btn_title = \Joomla\CMS\Language\Text::_('FLEXI_CSV_EXPORT_SELECTED_ITEMS', true);
+			$btn_info  = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_CSV_EXPORT_SELECTED_ITEMS_INFO'), 2);
+			$task_url  = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&view=items&format=csv&items_set=selected';
+
+			$full_js = "var cid = Array.from(document.querySelectorAll(\"input[name='cid[]']:checked\"), input => input.value); "
+				. "if (!cid.length) { FlexiForm.alert('" . \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED', true) . "'); return false; } "
+				. "window.location.replace('" . $task_url . "&' + cid.map(function(el){ return 'cid[]=' + encodeURIComponent(el); }).join('&')); return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				$btn_title, 'csvexport_selected', $full_js, $msg_alert='', $msg_confirm='',
+				$btn_task='', $extra_js="", $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon='icon-download',
+				'data-placement="right" data-title="' . $btn_info . '"', $auto_add = 0, $tag_type='button'
+			);
+
+
+			/**
 			 * Add all-items CSV Export button
 			 */
 
@@ -1607,7 +1692,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 				$full_js = $has_pro
 					? "window.location.replace('" . $task_url . "')"
-					: "var box = jQuery('#fc_available_in_pro'); fc_file_props_handle = fc_showAsDialog(box, 480, 320, null, {title:'" . \Joomla\CMS\Language\Text::_($btn_title) . "'}); return false;";
+					: "var box = document.getElementById('fc_available_in_pro'); fc_file_props_handle = fc_showAsDialog(box, 480, 320, null, {title:'" . \Joomla\CMS\Language\Text::_($btn_title) . "'}); return false;";
 
 				$btn_name='collaborate';
 				$btn_arr[$btn_name] = '<div id="fc_available_in_pro" style="display: none;">' . \Joomla\CMS\Language\Text::_('FLEXI_AVAILABLE_IN_PRO_VERSION') . '</div>' . flexicontent_html::addToolBarButton(
@@ -1624,7 +1709,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		{
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=items&amp;layout=indexer&amp;tmpl=component&amp;indexer=tag_assignments';
 			$btn_name = 'sync_tags';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC_DESC'), 2)) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+			$full_js="if (!(await FlexiForm.confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC_DESC'), 2)) . "'))) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC'), 2)."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC', $btn_name, $full_js,
@@ -1639,7 +1724,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				{
 						$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=items&amp;layout=indexer&amp;tmpl=component&amp;indexer=resave';
 						$btn_name = 'recalculate_alias';
-						$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate item aliases. <br>Only for new websites <br>as this can destroy your existing SEO ranks'), 2)) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						$full_js="if (!(await FlexiForm.confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate item aliases. <br>Only for new websites <br>as this can destroy your existing SEO ranks'), 2)) . "'))) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 												.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate aliases for all items'), 2)."'}); return false;";
 						$btn_arr[] = flexicontent_html::addToolBarButton(
 								'Recalculate aliases for all items', $btn_name, $full_js,
@@ -1653,11 +1738,11 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 						$no_selection_alert = \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED', true);
 						$confirm_msg = str_replace('<br>', '\\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate item aliases. <br>Only for new websites <br>as this can destroy your existing SEO ranks'), 2));
 						$modal_title = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate aliases for selected items'), 2);
-						$full_js = "var cid = []; jQuery.each(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); "
-								. "if (!cid.length) { alert('" . $no_selection_alert . "'); return false; } "
-								. "if (!confirm('" . $confirm_msg . "')) return false; "
-								. "var url = jQuery(this).data('taskurl'); "
-								. "url += '&' + cid.map(function(el){ return 'cid[]=' + el; }).join('&'); "
+						$full_js = "var cid = Array.from(document.querySelectorAll(\"input[name='cid[]']:checked\"), input => input.value); "
+								. "if (!cid.length) { FlexiForm.alert('" . $no_selection_alert . "'); return false; } "
+								. "if (!(await FlexiForm.confirm('" . $confirm_msg . "'))) return false; "
+								. "var url = this.dataset.taskurl; "
+								. "url += '&' + cid.map(function(el){ return 'cid[]=' + encodeURIComponent(el); }).join('&'); "
 								. "fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\\\"fc_loading_msg\\\">"
 								. $loading_msg . "<\\/span>'; window.location.reload(false)}, {'title': '" . $modal_title . "'}); return false;";
 						$btn_arr[] = flexicontent_html::addToolBarButton(
@@ -1693,7 +1778,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');

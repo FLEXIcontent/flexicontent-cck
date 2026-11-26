@@ -594,6 +594,45 @@ div table.adminform td {
 			box-sizing: content-box;
 		}
 
+		/* Checkbox of the toggle button: not shown, but it takes the click, the Tab key and the Space key */
+		.fcfavs-toggle-input {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			margin: -1px;
+			padding: 0;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			white-space: nowrap;
+			border: 0;
+			opacity: 0;
+		}
+		.fcfavs-toggle-input:focus-visible + * {
+			outline: 2px solid var(--fcfavs-color-primary);
+			outline-offset: 2px;
+			border-radius: 4px;
+		}
+
+		/* SVG heart of toggle styles 0 and 1: an outline when not a favourite, filled when a favourite */
+		.fcfavs-svg_icon {
+			width: 28px;
+			height: 28px;
+			vertical-align: middle;
+			fill: transparent;
+			stroke: #000;
+			stroke-width: 1;
+			stroke-linejoin: round;
+			transition: fill .15s, stroke .15s;
+		}
+		.fcfavs-svg_icon.fcfavs-heart-fill {
+			fill: #f44336;
+			stroke: #f44336;
+		}
+		.fcfavs-svg_icon.fcfavs-svg_login {
+			fill: #303c42;
+			stroke: #303c42;
+		}
+
 		[class^="fcfavs"], [class*=" fcfavs"] {
 			font-size: 14px;
 			line-height: 100%;
@@ -766,6 +805,13 @@ div table.adminform td {
 }
 
 
+@media (prefers-reduced-motion: reduce) {
+	.fav-block .fcfavs-icon_box .fcfavs-svg_icon {
+		transition: none;
+	}
+}
+
+
 /***********
  * JComments
  ***********/
@@ -895,15 +941,20 @@ dl.tabs dt a:link,
 }
 
 
-div.current {
+div.current:not(.gslide) {
 	border: 1px solid #cccccc;
 	clear: both;
 	padding: 10px 10px;
 }
 
-div.current dd {
+div.current:not(.gslide) dd {
 	margin: 0;
 	padding: 0;
+}
+
+div[class^="glightbox_fccontainer_"] {
+	display: flex;
+	flex-wrap: wrap;
 }
 
 #bottom-block {
@@ -1479,3 +1530,14 @@ div.fc-field-box {
 h2.fc_search_result_title a {
     text-decoration: none;
 }
+/** fix swiper **/
+.swiper.fc_swiper_main{
+	width: 100% !important;
+	}
+/* Wrap navigation controls instead of clipping letters or expanding the page. */
+#flexicontent .pagination { flex-wrap: wrap; max-width: 100%; }
+#fc_alpha .aichargrp {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 2px;
+  float: none; position: static; width: 100%;
+}
+#fc_alpha .fc_alpha_index { float: none; position: static; }

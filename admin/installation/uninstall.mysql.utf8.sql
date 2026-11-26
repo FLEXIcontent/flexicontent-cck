@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS
 `#__flexicontent_items_tmp`,
 `#__flexicontent_items_extravote`,
 `#__flexicontent_reviews`,
+`#__flexicontent_reviews_useful`,
 `#__flexicontent_items_versions`,
 `#__flexicontent_tags`,
 `#__flexicontent_tags_item_relations`,
@@ -17,6 +18,9 @@ DROP TABLE IF EXISTS
 `#__flexicontent_templates`,
 `#__flexicontent_layouts_conf`,
 `#__flexicontent_advsearch_index`,
+`#__flexicontent_basicsearch_index`,
 `#__flexicontent_authors_ext`,
 `#__flexicontent_download_coupons`,
-`#__flexicontent_download_history`;
+`#__flexicontent_download_history`,
+`#__flexicontent_download_log`,
+`#__flexicontent_search_log`;

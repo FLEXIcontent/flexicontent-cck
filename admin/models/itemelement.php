@@ -142,12 +142,12 @@ class FlexicontentModelItemelement extends FCModelAdminList
 			$item_lang   = $app->getUserStateFromRequest($p . 'item_lang', 'item_lang', '', 'string');
 			$created_by  = $app->getUserStateFromRequest($p . 'created_by', 'created_by', 0, 'int');
 
-			$assocanytrans = \Joomla\CMS\Factory::getUser()->authorise('flexicontent.assocanytrans', 'com_flexicontent');
+			$assocanytrans = \Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('flexicontent.assocanytrans', 'com_flexicontent');
 
 			// Limit to creator if creator not privileged
 			if (!$assocanytrans && !$created_by)
 			{
-				$created_by = \Joomla\CMS\Factory::getUser()->id;
+				$created_by = \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
 
 				$this->setState('created_by', $created_by);
 				$app->setUserState($p . 'created_by', $created_by);
@@ -193,7 +193,7 @@ class FlexicontentModelItemelement extends FCModelAdminList
 	function getData()
 	{
 		// Catch case of guest user submitting in frontend
-		if (!\Joomla\CMS\Factory::getUser()->id)
+		if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->id)
 		{
 			return $this->_data = array();
 		}
@@ -223,16 +223,17 @@ class FlexicontentModelItemelement extends FCModelAdminList
 				// 1, get filtered, limited, ordered items
 				$query = $this->_buildQuery();
 
+				// The SQL of the list query, read before the LIMIT of this page is stored on the query object
+				$count_sql = 'SELECT COUNT(*) FROM (' . $query . ') AS fc_list';
+
 				if ( $print_logging_info )  $start_microtime = microtime(true);
 				$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
 				$rows = $this->_db->loadObjectList();
 				if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
-				// 2, get current items total for pagination
-				$this->_db->setQuery("SELECT FOUND_ROWS()");
-				$this->_total = $this->_db->loadResult();
-				// Check if something intefered with the query, and SQL_CALC_FOUND_ROWS did not work, do extra query
-				if (count($rows) && !$this->_total) $this->_total = null;
+				// 2, get current items total for pagination: the number of rows of the same query without its LIMIT
+				// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+				$this->_total = $this->_db->setQuery($count_sql)->loadResult();
 
 				// 3, get item ids
 				$query_ids = array();
@@ -280,7 +281,7 @@ class FlexicontentModelItemelement extends FCModelAdminList
 	public function getTotal()
 	{
 		// Catch case of guest user submitting in frontend
-		if (!\Joomla\CMS\Factory::getUser()->id)
+		if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->id)
 		{
 			return $this->_total = 0;
 		}
@@ -315,7 +316,7 @@ class FlexicontentModelItemelement extends FCModelAdminList
 		if (!$query_ids)
 		{
 			$query = $this->_db->getQuery(true)
-				->select('SQL_CALC_FOUND_ROWS a.id')
+				->select('a.id')
 				->select('ua.name AS author')
 				->select('t.name AS type_name')
 				->from($tbl . ' AS a')
@@ -454,7 +455,9 @@ class FlexicontentModelItemelement extends FCModelAdminList
 					break;
 
 				case 'ie.search_index':
-					$textwhere[] = ' MATCH (ie.search_index) AGAINST (' . $this->_db->Quote($search_prefix . $escaped_search . '*', false ).' IN BOOLEAN MODE)';
+					$ft_input = str_replace(' ', '%', trim($search));
+					$ft_search = implode('%', flexicontent_db::getBooleanSearchWords(explode('%', $search_prefix . $ft_input)));
+					$textwhere[] = $ft_search === '' ? '0=1' : ' MATCH (ie.search_index) AGAINST (' . $this->_db->Quote($ft_search . '*').' IN BOOLEAN MODE)';
 					break;
 			}
 		}

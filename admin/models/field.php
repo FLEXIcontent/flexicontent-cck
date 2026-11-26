@@ -217,8 +217,6 @@ class FlexicontentModelField extends FCModelAdmin
 	{
 		$data_obj = $data && is_array($data) ? (object) $data : $data;
 
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.folder');
 
 		// Initialise variables.
 		$client = \Joomla\CMS\Application\ApplicationHelper::getClientInfo(0);

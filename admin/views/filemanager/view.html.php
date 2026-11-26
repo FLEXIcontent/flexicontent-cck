@@ -14,7 +14,13 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecords' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * HTML View class for the Filemanager View
@@ -36,11 +42,11 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		global $globalcats;
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getSession();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
@@ -56,8 +62,8 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
 		{
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get model
@@ -139,7 +145,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$filter_item      = $model->getState('filter_item');
 
 		$target_dir = $layout === 'image' ? 0 : 2;  // 0: Force media, 1: force secure, 2: allow selection
-		$optional_cols = array('state', 'access', 'lang', 'hits', 'target', 'stamp', 'usage', 'uploader', 'upload_time', 'file_id');
+		$optional_cols = array('state', 'access', 'lang', 'hits', 'target', 'stamp', 'usage', 'uploader', 'upload_time', 'file_id', 'custom1', 'custom2');
 		$cols = array();
 
 
@@ -168,7 +174,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 			unset($cols['_SAVED_']);
 		}
-		
+
 		/*
 		 * Column selection of optional columns not given)
 		 */
@@ -200,6 +206,14 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		{
 			unset($cols['lang']);
 			unset($cols['target']);
+		}
+
+		// Custom file properties: DB columns (not available in folder mode), each one shown only if it is enabled
+		require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/fileeditor.php';
+		$custom_headings = $folder_mode ? array() : flexicontent_fileeditor::customListHeadings();
+		foreach (array(1, 2) as $n)
+		{
+			if (!isset($custom_headings[$n])) unset($cols['custom' . $n]);
 		}
 
 		// Case of uploader column not applicable or not allowed
@@ -240,16 +254,29 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			// Add css to document
 			if ($isAdmin)
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+
+				// Modern (multi-column) layout of the filters box, selected in component configuration
+				if ((int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('backend_filters_style', 1) === 1)
+				{
+					$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_filters_modern.css', array('version' => FLEXI_VHASH));
+
+					// Filter presets (stored in the browser)
+					foreach (array('FLEXI_PRESET_SAVE', 'FLEXI_PRESET_SAVE_TITLE', 'FLEXI_PRESET_NAME', 'FLEXI_PRESET_MAX', 'FLEXI_PRESET_DELETE', 'FLEXI_PRESET_DELETE_CONFIRM', 'FLEXI_PRESET_HELP') as $_preset_txt)
+					{
+						\Joomla\CMS\Language\Text::script($_preset_txt);
+					}
+					$document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/filter_presets.js', array('version' => FLEXI_VHASH), array('defer' => true));
+				}
 			}
 			else
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
@@ -259,7 +286,6 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 			// Add JS frameworks
 			flexicontent_html::loadFramework('select2');
-			flexicontent_html::loadFramework('prettyCheckable');
 			flexicontent_html::loadFramework('flexi-lib');
 			flexicontent_html::loadFramework('flexi-lib-form');
 
@@ -299,7 +325,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get data from the model, note data retrieval must be before 
+		 * Get data from the model, note data retrieval must be before
 		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
@@ -617,7 +643,6 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$lists['order']     = $filter_order;
 
 		// Uploadstuff
-		jimport('joomla.client.helper');
 
 		$require_ftp = !\Joomla\CMS\Client\ClientHelper::hasCredentials('ftp');
 
@@ -629,6 +654,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$this->target_dir = $target_dir;
 		$this->optional_cols = $optional_cols;
 		$this->cols = $cols;
+		$this->custom_headings = $custom_headings;
 		$this->count_filters = $count_filters;
 
 		$this->params      = $cparams;
@@ -673,7 +699,6 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		{
 			$this->sidebar = null;
 
-			if(FLEXI_J30GE && !FLEXI_J40GE) $this->sidebar = JHtmlSidebar::render();
 			if(FLEXI_J40GE) $this->sidebar = \Joomla\CMS\HTML\Helpers\Sidebar::render();
 		}
 
@@ -683,6 +708,12 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
 
+		if ($jinput->getString('fc_confirm_unlink'))
+		{
+			// Use the same confirmation in the manager, modal and template overrides.
+			require JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/filemanager/tmpl/unlink_confirmation.php';
+			return;
+		}
 		parent::display($tpl);
 
 		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -698,11 +729,11 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 	 */
 	function setToolbar()
 	{
-		$user     = \Joomla\CMS\Factory::getUser();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$useAssocs= flexicontent_db::useAssociations();
 
 		$js = '';
@@ -738,6 +769,91 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		//\Joomla\CMS\Toolbar\ToolbarHelper::deleteList(\Joomla\CMS\Language\Text::_('FLEXI_ARE_YOU_SURE'), 'filemanager.remove');
 
 		/**
+		 * Batch actions for the selected files: Change State, Access, Delete (dropdowns, like in the other managers)
+		 */
+
+		$mk_btn = function ($text, $name, $full_js, $task, $icon, $desc = '', $btn_class = 'btn-info') use ($contrl)
+		{
+			return flexicontent_html::addToolBarButton(
+				$text, $name, $full_js,
+				$msg_alert = \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$task, $extra_js = '', $btn_list = true, $btn_menu = true, $btn_confirm = false,
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $btn_class : '') . ' ' . $this->tooltip_class, $icon,
+				'data-placement="right" title="' . flexicontent_html::encodeHTML($desc, 2) . '"', $auto_add = 0, $tag_type = 'button'
+			);
+		};
+
+		$mk_drop = function ($id, $icon, $text, $btn_arr, $group)
+		{
+			if (!count($btn_arr))
+			{
+				return;
+			}
+
+			$drop_btn = '
+				<button id="' . $id . '" class="' . $this->btn_sm_class . ' dropdown-toggle btn-fcaction" data-toggle="dropdown" data-bs-toggle="dropdown">
+					<span title="' . \Joomla\CMS\Language\Text::_($text) . '" class="' . $icon . '"></span>
+					' . \Joomla\CMS\Language\Text::_($text) . '
+					<span class="caret"></span>
+				</button>';
+			array_unshift($btn_arr, $drop_btn);
+			flexicontent_html::addToolBarDropMenu($btn_arr, $group, ' ');
+		};
+
+		if ($hasEditState)
+		{
+			// Change state
+			$btn_arr = array();
+			$btn_arr[] = $mk_btn('FLEXI_PUBLISHED', 'publish', "Joomla.submitbutton('" . $contrl . "publish', 'adminForm', false); return false;", '', 'icon-publish', \Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_BATCH_PUBLISH'));
+			$btn_arr[] = $mk_btn('FLEXI_UNPUBLISHED', 'unpublish', "Joomla.submitbutton('" . $contrl . "unpublish', 'adminForm', false); return false;", '', 'icon-unpublish', \Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_BATCH_UNPUBLISH'));
+			$mk_drop('toolbar-changestate', 'icon-checkmark', 'FLEXI_CHANGE_STATE', $btn_arr, 'files_state_btns_group');
+
+			if (\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('flexicontent.editfileproperties', 'com_flexicontent'))
+			{
+				// Access level
+				$btn_arr = array();
+
+				foreach (\Joomla\CMS\HTML\HTMLHelper::_('access.assetgroups') as $_level)
+				{
+					$set_js = "var f = document.getElementById('adminForm'); var access = f.elements.namedItem('batch_access');"
+						. " if (!access) { access = document.createElement('input'); access.type = 'hidden'; access.name = 'batch_access'; f.append(access); } access.value = " . (int) $_level->value . ";"
+						. " Joomla.submitbutton('" . $contrl . "access', 'adminForm', false); return false;";
+
+					$btn_arr[] = $mk_btn(
+						htmlspecialchars($_level->text, ENT_QUOTES, 'UTF-8'), 'access_' . (int) $_level->value, $set_js, '', 'icon-eye',
+						\Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_BATCH_ACCESS') . ': ' . $_level->text
+					);
+				}
+
+				$mk_drop('toolbar-batchaccess', 'icon-eye', 'FLEXI_ACCESS', $btn_arr, 'files_access_btns_group');
+			}
+
+		}
+
+		if ($hasDelete)
+		{
+			$btn_arr = array();
+			$confirm_js = function ($msg_key) use ($contrl)
+			{
+				return "if (await FlexiForm.confirm('" . flexicontent_html::escapeJsText(\Joomla\CMS\Language\Text::_($msg_key), 'd') . "')) { Joomla.submitbutton('%s', 'adminForm', false); } return false;";
+			};
+
+			$btn_arr[] = $mk_btn(
+				'FLEXI_DELETE', 'delete', sprintf($confirm_js('FLEXI_ARE_YOU_SURE'), $contrl . 'remove'), '', 'icon-remove',
+				\Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_DELETE_UNUSED_DESC'), 'btn-warning'
+			);
+			if ($user->authorise('flexicontent.deletefile', 'com_flexicontent') && $user->authorise('core.edit', 'com_content'))
+			{
+				$btn_arr[] = $mk_btn(
+					'FLEXI_FILEMAN_REMOVE_ASSOC_DELETE', 'delete_unlink', sprintf($confirm_js('FLEXI_FILEMAN_REMOVE_ASSOC_DELETE_CONFIRM'), $contrl . 'removeunlink'), '', 'icon-unlink',
+					\Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_REMOVE_ASSOC_DELETE_DESC'), 'btn-danger'
+				);
+			}
+			$mk_drop('toolbar-delete', 'icon-delete', 'FLEXI_DELETE', $btn_arr, 'files_delete_btns_group');
+		}
+
+
+		/**
 		 * Maintenance button (Check-in, Verify Tag mappings, Assignments + Record)
 		 */
 
@@ -758,7 +874,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=filemanager&amp;layout=indexer&amp;tmpl=component&amp;indexer=filemanager_stats';
 			$btn_text = \Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS') . ' (' . \Joomla\CMS\Language\Text::_('FLEXI_SIZE') . ', ' . \Joomla\CMS\Language\Text::_('FLEXI_USAGE') . ' )';
 			$btn_name = 'index_files_stats';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS_DESC'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+			$full_js="if (!(await FlexiForm.confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS_DESC'), 'd')) . "'))) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS'), 'd')."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				$btn_text, $btn_name, $full_js,
@@ -771,7 +887,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=filemanager&amp;layout=indexer&amp;tmpl=component&amp;indexer=filemanager_stats&amp;index_urls=1';
 			$btn_text = \Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS') . ' (' . \Joomla\CMS\Language\Text::_('FLEXI_SIZE') . ', ' . \Joomla\CMS\Language\Text::_('FLEXI_USAGE') . ', ' . \Joomla\CMS\Language\Text::_('FLEXI_URL') . ' )';
 			$btn_name = 'index_files_urls_stats';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS_DESC'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+			$full_js="if (!(await FlexiForm.confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS_DESC'), 'd')) . "'))) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS'), 'd')."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				$btn_text, $btn_name, $full_js,
@@ -787,10 +903,10 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$no_selection_msg = flexicontent_html::escapeJsText(\Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), 'd');
 			$confirm_msg      = flexicontent_html::escapeJsText(\Joomla\CMS\Language\Text::_('FLEXI_RECALCULATE_SIZES_SELECTED_DESC'), 'd');
 			$dialog_title     = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_RECALCULATE_SIZES_SELECTED'), 'd');
-			$full_js = "var cid = jQuery('[name=\"cid[]\"]').filter(':checked').map(function(){ return this.value; }).get();"
-				. " if (!cid.length) { alert('" . $no_selection_msg . "'); return false; }"
-				. " if (!confirm('" . $confirm_msg . "')) return false;"
-				. " var url = jQuery(this).data('taskurl') + '&selected_ids=' + cid.join(',');"
+			$full_js = "var cid = Array.from(document.querySelectorAll('[name=\"cid[]\"]:checked'), input => input.value);"
+				. " if (!cid.length) { FlexiForm.alert('" . $no_selection_msg . "'); return false; }"
+				. " if (!(await FlexiForm.confirm('" . $confirm_msg . "'))) return false;"
+				. " var url = this.dataset.taskurl + '&selected_ids=' + cid.join(',');"
 				. " fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">" . $loading_msg . "<\\/span>'; window.location.reload(false)}, {'title': '" . $dialog_title . "'});"
 				. " return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
@@ -800,6 +916,21 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 				'btn btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' : '') . $this->tooltip_class, 'icon-loop',
 				'data-placement="right" data-taskurl="' . $popup_load_url . '" title="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_RECALCULATE_SIZES_SELECTED_DESC'), 'd') . '"', $auto_add = 0, $tag_type='button')
 				;
+		}
+
+		if ($perms->CanConfig && \Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('flexicontent.deletefile', 'com_flexicontent'))
+		{
+			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=filemanager&amp;layout=indexer&amp;tmpl=component&amp;indexer=orphans';
+			$btn_name = 'delete_orphans';
+			$full_js = "var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 650, 450, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						. $loading_msg . "<\/span>'; window.location.reload(false)}, {'title': '" . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_ORPHANS_TITLE'), 'd') . "'}); return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				\Joomla\CMS\Language\Text::_('FLEXI_ORPHANS_TITLE'), $btn_name, $full_js,
+				$msg_alert = '', $msg_confirm = '',
+				$btn_task = '', $extra_js = '', $btn_list = false, $btn_menu = true, $btn_confirm = false,
+				'btn btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ btn-danger ' : '') . $this->tooltip_class, 'icon-trash',
+				'data-placement="right" data-taskurl="' . $popup_load_url . '" title="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_ORPHANS_DESC'), 'd') . '"', $auto_add = 0, $tag_type = 'button'
+			);
 		}
 
 		if (count($btn_arr))
@@ -834,7 +965,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 			if ($log_filename = $session->get('filemanager_stats_log_filename', null, 'flexicontent'))
 			{
-				\Joomla\CMS\Factory::getApplication()->enqueueMessage('You may see log file : <b>' . \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename) . '</b> for messages and errors', 'warning');
+				\Joomla\CMS\Factory::getApplication()->enqueueMessage('You may see log file : <b>' . \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename) . '</b> for messages and errors', 'warning');
 			}
 		}
 		$session->set('filemanager_stats_log_filename', null, 'flexicontent');
@@ -855,7 +986,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			{
 				\Joomla\CMS\Factory::getApplication()->enqueueMessage(
 					($error_count ? '' : 'Please see mediadata logfile. Processed all ' . $file_count . '  preview files') .
-					' You may see log file : <b>' . \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename) . '</b>' .
+					' You may see log file : <b>' . \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename) . '</b>' .
 					($error_count ? ' for messages and errors' : ' for more information'),
 					$error_count ? 'warning' : 'message'
 				);
@@ -877,7 +1008,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');

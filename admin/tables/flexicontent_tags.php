@@ -78,7 +78,6 @@ class flexicontent_tags extends flexicontent_basetable
 
 	public function __construct(& $db)
 	{
-		\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
 
 		$this->_records_dbtbl  = 'flexicontent_' . $this->_record_name . 's';
 		$this->_NAME = strtoupper($this->_record_name);
@@ -335,11 +334,35 @@ class flexicontent_tags extends flexicontent_basetable
 		$fk_ext = $this->_frn_key_ext;
 		$tk_ext = $this->_tbl_key_ext;
 
-		$record = \Joomla\CMS\Table\Table::getInstance($this->_jtbls[$this->_tbl][0], $this->_jtbls[$this->_tbl][1]);
+		$__tblType = $this->_jtbls[$this->_tbl][0];
+		$__tblPrefix = $this->_jtbls[$this->_tbl][1];
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$record = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$record = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$record = new $__tblClass($__tblDb);
+		}
 		$record->_tbl = $this->_tbl;
 		$record->_tbl_key = $k;
 
-		$record_ext = \Joomla\CMS\Table\Table::getInstance($this->_jtbls[$this->_tbl_ext][0], $this->_jtbls[$this->_tbl_ext][1]);
+		$__tblType = $this->_jtbls[$this->_tbl_ext][0];
+		$__tblPrefix = $this->_jtbls[$this->_tbl_ext][1];
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$record_ext = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$record_ext = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$record_ext = new $__tblClass($__tblDb);
+		}
 
 		if(FLEXI_J40GE && !$record_ext)
 		{
@@ -361,7 +384,7 @@ class flexicontent_tags extends flexicontent_basetable
 		if ($tags_table_fix_needed === null)
 		{
 			$query = 'SELECT COUNT(*) FROM #__tags WHERE parent_id = 0 AND id <> 1';
-			$tags_table_fix_needed = (boolean) $this->_db->setQuery($query)->execute();
+			$tags_table_fix_needed = (bool) $this->_db->setQuery($query)->execute();
 
 			// Fix Joomla tags table
 			if ($tags_table_fix_needed)
@@ -420,6 +443,9 @@ class flexicontent_tags extends flexicontent_basetable
 			}
 		}
 
+		// The values that the database stores when strict mode is off (a name cut to its column), so that it accepts the record in strict mode too
+		flexicontent_db::fitRecordToColumns($record, $this->_tbl_fields[$this->_tbl], !$this->$k, $updateNulls);
+
 		if ($this->$k)
 		{
 			$ret = $this->_db->updateObject($this->_tbl, $record, $k, $updateNulls);
@@ -436,6 +462,7 @@ class flexicontent_tags extends flexicontent_basetable
 		if ($ext_exists)
 		{
 			$record_ext->check();
+			flexicontent_db::fitRecordToColumns($record_ext, $record_ext->getFields());
 			$record_ext->store();
 		}
 
@@ -470,7 +497,7 @@ class flexicontent_tags extends flexicontent_basetable
 		$name  = $this->_getAssetName();
 		$title = $this->_getAssetTitle();
 
-		$asset = \Joomla\CMS\Table\Table::getInstance('Asset');
+		$asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$asset->loadByName($name);
 
 		// Check for an error.

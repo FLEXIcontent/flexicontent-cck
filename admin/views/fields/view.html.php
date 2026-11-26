@@ -14,7 +14,13 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecords' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * HTML View class for the FLEXIcontent fields screen
@@ -36,11 +42,11 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		global $globalcats;
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getSession();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
@@ -57,8 +63,8 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
 		{
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get model
@@ -114,16 +120,22 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			// Add css to document
 			if ($isAdmin)
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+
+				// Modern (multi-column) layout of the filters box, selected in component configuration
+				if ((int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('backend_filters_style', 1) === 1)
+				{
+					$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_filters_modern.css', array('version' => FLEXI_VHASH));
+				}
 			}
 			else
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
@@ -207,7 +219,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			// Find ids of master fields (if any)
 			if ($row->field_type === 'fieldgroup')
 			{
-				$FG_fieldids[$id] = array_filter(preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields', '')), function($v) { return (trim((string)$v) !== ''); });
+				$FG_fieldids[$id] = array_filter((is_array($row->parameters->get('fields', '')) ? $row->parameters->get('fields') : preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields', ''))), function($v) { return (trim((string)$v) !== ''); });
 				$FG_fieldids[$id] = ArrayHelper::toInteger($FG_fieldids[$id]);
 
 				$grouped_fids = array_merge($grouped_fids, $FG_fieldids[$id]);
@@ -236,7 +248,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			// Handle displaying information: FIELDGROUP feature
 			$row->parameters = new \Joomla\Registry\Registry($row->attribs);
 
-			$ingroup_fids = array_filter(preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields', '')), function($v) { return (trim((string)$v) !== ''); });
+			$ingroup_fids = array_filter((is_array($row->parameters->get('fields', '')) ? $row->parameters->get('fields') : preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields', ''))), function($v) { return (trim((string)$v) !== ''); });
 			$ingroup_fids = ArrayHelper::toInteger($ingroup_fids);
 
 			// For fields of group that are included in current list, add reference to their group field
@@ -301,7 +313,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			if (!$notice_content_type_order)
 			{
 				$app->setUserState( $option.'.'.$view.'.notice_content_type_order', 1 );
-				\Joomla\CMS\Factory::getDocument()->addStyleDeclaration("#system-message-container .alert.alert-info > .alert-heading { display:none; }");
+				\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleDeclaration("#system-message-container .alert.alert-info > .alert-heading { display:none; }");
 
 				$disable_use_notices = '<span class="fc-nowrap-box fc-disable-notices-box">'. \Joomla\CMS\Language\Text::_('FLEXI_USABILITY_MESSAGES_TURN_OFF_IN').' '.$conf_link.'</span><div class="fcclear"></div>';
 				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_FILTER_BY_TYPE_BEFORE_ACTIONS') .' '. $disable_use_notices, 'notice');
@@ -532,7 +544,6 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		{
 			$this->sidebar = null;
 
-			if(FLEXI_J30GE && !FLEXI_J40GE) $this->sidebar = JHtmlSidebar::render();
 			if(FLEXI_J40GE) $this->sidebar = \Joomla\CMS\HTML\Helpers\Sidebar::render();
 		}
 
@@ -557,11 +568,11 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 	 */
 	function setToolbar()
 	{
-		$user     = \Joomla\CMS\Factory::getUser();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$useAssocs= flexicontent_db::useAssociations();
 
 		$js = '';
@@ -684,7 +695,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent'.$ctrl_task.'&tmpl=component';
 
 			$btn_name = 'basicindex';
-				$full_js="var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 0, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+				$full_js="var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 0, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 							.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TOGGLE_SEARCH_FLAG'), 2)."'}); return false;";
 
 				flexicontent_html::addToolBarButton(
@@ -730,7 +741,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			$btn_icon = 'icon-download';
 			$btn_name = 'download';
 			$btn_task = 'appsman.exportxml';
-			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}).appendTo(jQuery(f));";
+			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; var input = Object.assign(document.createElement('input'), {type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}); f.append(input);";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'Export now',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=\Joomla\CMS\Language\Text::_('FLEXI_EXPORT_NOW_AS_XML'),
@@ -742,7 +753,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			$btn_icon = 'icon-box-add';
 			$btn_name = 'box-add';
 			$btn_task = 'appsman.addtoexport';
-			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}).appendTo(jQuery(f));";
+			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; var input = Object.assign(document.createElement('input'), {type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}); f.append(input);";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'Add to export',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=\Joomla\CMS\Language\Text::_('FLEXI_ADD_TO_EXPORT_LIST'),
@@ -801,7 +812,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');

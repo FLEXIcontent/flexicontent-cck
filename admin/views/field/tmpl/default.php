@@ -37,7 +37,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 
 // Add FC dependencies JS
 $js = "
-	jQuery(document).ready(function(){
+	FlexiForm.ready(function(){
 		fc_bindFormDependencies('#flexicontent', 0, '');
 	});
 ";
@@ -267,7 +267,7 @@ $this->document->addScriptDeclaration($js);
 								<?php echo
 									in_array($form->getValue('issearch'),array(-1,2)) ?
 										\Joomla\CMS\Language\Text::_($form->getValue('issearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- 
-										<a href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic" class="btn btn-warning" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;">'
+										<a href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic" class="btn btn-warning" onclick="var url = this.href; fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;">'
 											.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_DIRTY_REBUILD_SEARCH_INDEX').'
 										</a>' :
 										$form->getInput('issearch'); ?>
@@ -284,7 +284,7 @@ $this->document->addScriptDeclaration($js);
 								<?php echo
 									in_array($form->getValue('isfilter'),array(-1,2)) ?
 										\Joomla\CMS\Language\Text::_($form->getValue('isfilter')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- 
-										<a href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic" class="btn btn-warning" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;">'
+										<a href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic" class="btn btn-warning" onclick="var url = this.href; fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;">'
 											.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_DIRTY_REBUILD_SEARCH_INDEX').'
 										</a>' :
 										$form->getInput('isfilter'); ?>
@@ -310,7 +310,7 @@ $this->document->addScriptDeclaration($js);
 								<?php echo
 									in_array($form->getValue('isadvsearch'),array(-1,2)) ?
 										\Joomla\CMS\Language\Text::_($form->getValue('isadvsearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- 
-										<a href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced" class="btn btn-warning" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;">'
+										<a href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced" class="btn btn-warning" onclick="var url = this.href; fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;">'
 											.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_DIRTY_REBUILD_SEARCH_INDEX').'
 										</a>' :
 										$form->getInput('isadvsearch'); ?>
@@ -327,7 +327,7 @@ $this->document->addScriptDeclaration($js);
 								<?php echo
 									in_array($form->getValue('isadvfilter'),array(-1,2)) ?
 										\Joomla\CMS\Language\Text::_($form->getValue('isadvfilter')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- 
-										<a href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced" class="btn btn-warning" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;">'
+										<a href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced" class="btn btn-warning" onclick="var url = this.href; fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;">'
 											.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_DIRTY_REBUILD_SEARCH_INDEX').'
 										</a>' :
 										$form->getInput('isadvfilter'); ?>
@@ -447,4 +447,4 @@ $this->document->addScriptDeclaration($js);
 <?php
 //keep session alive while editing
 \Joomla\CMS\HTML\HTMLHelper::_('behavior.keepalive');
-HTMLHelper::_('bootstrap.popover', '.hasPopover', array('trigger' => 'click hover'));
+HTMLHelper::_('bootstrap.popover', '.hasPopover', array('trigger' => 'click hover focus'));

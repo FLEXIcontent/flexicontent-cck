@@ -182,7 +182,7 @@ if ($item_columns_std  >= 1 && $item_column_mode_std == 1 ){
 }
 //$cols_class_std     = $item_columns_std  <= 1 ? '' : 'cols_' . $item_columns_std;
 
-$document = \Joomla\CMS\Factory::getDocument();
+$document = Factory::getApplication()->getDocument();
 $jcookie  = \Joomla\CMS\Factory::getApplication()->input->cookie;
 
 
@@ -201,6 +201,11 @@ if (($item_placement_feat === 1 && $item_columns_feat > 1) || ($item_placement_s
  */
 if ($item_placement_feat === 2 || $item_placement_std === 2 || $item_placement_feat === 3 || $item_placement_std === 3)
 {
+	// The active tab / slide is remembered in a cookie (flexi-lib.js), native Bootstrap events update it
+
+	flexicontent_html::loadFramework('flexi-lib');
+	$wa->registerAndUseScript('mod_flexicontent.tabs', 'modules/mod_flexicontent/tmpl_common/js/tabs.js', [], [], ['core']);
+
 	$cookie_name = 'fc_modules_data';
 	$fcMods_conf = $jcookie->get($cookie_name, '{}', 'string');
 
@@ -221,8 +226,8 @@ if ($item_placement_feat === 2 || $item_placement_std === 2 || $item_placement_f
 		? $fcMods_conf->{$module->id}
 		: (new stdClass);
 
-	$active_tagids_feat = isset($fcMod_conf->active_tagids_feat) ? $fcMod_conf->active_tagids_feat : (new stdClass);
-	$active_tagids_std  = isset($fcMod_conf->active_tagids_std) ? $fcMod_conf->active_tagids_std : (new stdClass);
+	$active_tagids_feat = isset($fcMod_conf->active_tagids_feat) && is_object($fcMod_conf->active_tagids_feat) ? $fcMod_conf->active_tagids_feat : (new stdClass);
+	$active_tagids_std  = isset($fcMod_conf->active_tagids_std) && is_object($fcMod_conf->active_tagids_std) ? $fcMod_conf->active_tagids_std : (new stdClass);
 }
 
 
@@ -405,16 +410,17 @@ if ($std_builder_layout_num)
 				$first_item        = reset($list[$ord]['featured']);
 				$itemset_tagid     = 'fc_umod_itemset_feat_' . $uniq_ord_id;
 
-				$last_active_tagid = isset($active_tagids_feat->$itemset_tagid)
+				$last_active_tagid = property_exists($active_tagids_feat, $itemset_tagid)
 					? $active_tagids_feat->$itemset_tagid
 					: $itemset_tagid . '_' . $first_item->id;
 
-				$tagid_parts = explode('_', $last_active_tagid);
+				if ($last_active_tagid !== null && !is_string($last_active_tagid)) $last_active_tagid = '';
+				$tagid_parts = explode('_', (string) $last_active_tagid);
 				$activated_itemid = end($tagid_parts);
-
-				$last_active_tagid = isset($item_ids_index[$activated_itemid])
-					? $last_active_tagid
-					: $itemset_tagid . '_' . $first_item->id;
+				// null records an explicitly closed accordion; tabs always keep an active page.
+				$last_active_tagid = $last_active_tagid === null && $item_placement_feat === 3
+					? ''
+					: (isset($item_ids_index[$activated_itemid]) ? $last_active_tagid : $itemset_tagid . '_' . $first_item->id);
 
 				echo $item_placement_feat === 2
 					? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startTabSet', $itemset_tagid, array('active' => $last_active_tagid))
@@ -474,7 +480,7 @@ if ($std_builder_layout_num)
 						</div>
 					<?php endif; ?>
 
-				<?php $captured_title = ob_get_clean(); $hasTitle = (boolean) trim($captured_title); ?>
+				<?php $captured_title = ob_get_clean(); $hasTitle = (bool) trim($captured_title); ?>
 				<!-- EOF item title -->
 
 
@@ -505,7 +511,7 @@ if ($std_builder_layout_num)
 
 					<?php endif; ?>
 
-				<?php $captured_image = ob_get_clean(); $hasImage = (boolean) trim($captured_image); ?>
+				<?php $captured_image = ob_get_clean(); $hasImage = (bool) trim($captured_image); ?>
 				<!-- EOF item's image -->
 
 				<?php echo $content_layout_feat!=2 ? $captured_image : '';?>
@@ -630,53 +636,12 @@ if ($std_builder_layout_num)
 					? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endTabSet')
 					: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
 
-				\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
-				(function($) {
-					$(document).ready(function ()
-					{
-						$('#" . $itemset_tagid . ($item_placement_feat === 2 ? 'Tabs' : '') . "').on('shown', function ()
-						{
-							var fcMods_conf = fclib_getCookie('" . $cookie_name ."');
-							try { fcMods_conf = JSON.parse(fcMods_conf); } catch(e) { fcMods_conf = {}; }
-
-							fcMods_conf['" . $module->id ."'] = fcMods_conf['" . $module->id ."'] || {};
-							fcMods_conf['" . $module->id ."']['active_tagids_feat'] = fcMods_conf['" . $module->id ."']['active_tagids_feat'] || {};
-							" . ($item_placement_feat === 2
-								? "fcMods_conf['" . $module->id ."']['active_tagids_feat']['" . $itemset_tagid . "'] = $('#" . $itemset_tagid . "Tabs').next().find('.active').attr('id');"
-								: "fcMods_conf['" . $module->id ."']['active_tagids_feat']['" . $itemset_tagid . "'] = $('#" . $itemset_tagid . " .in').attr('id');") . "
-							fclib_setCookie('" . $cookie_name ."', JSON.stringify(fcMods_conf), 7);
-							window.console.log(JSON.stringify(fcMods_conf));
-						});
-
-						$('#" . $itemset_tagid . ($item_placement_feat === 2 ? 'Tabs' : '') . "').on('hidden', function ()
-						{
-							var fcMods_conf = fclib_getCookie('" . $cookie_name ."');
-							try { fcMods_conf = JSON.parse(fcMods_conf); } catch(e) { fcMods_conf = {}; }
-
-							fcMods_conf['" . $module->id ."'] = fcMods_conf['" . $module->id ."'] || {};
-							fcMods_conf['" . $module->id ."']['active_tagids_feat'] = fcMods_conf['" . $module->id ."']['active_tagids_feat'] || {};
-							fcMods_conf['" . $module->id ."']['active_tagids_feat']['" . $itemset_tagid . "'] = null;
-							fclib_setCookie('" . $cookie_name ."', JSON.stringify(fcMods_conf), 7);
-							window.console.log(JSON.stringify(fcMods_conf));
-						});
-
-						var fcMods_conf = fclib_getCookie('" . $cookie_name ."');
-						try { fcMods_conf = JSON.parse(fcMods_conf); } catch(e) { fcMods_conf = {}; }
-
-						fcMods_conf['" . $module->id ."'] = fcMods_conf['" . $module->id ."'] || {};
-						fcMods_conf['" . $module->id ."']['active_tagids_feat'] = fcMods_conf['" . $module->id ."']['active_tagids_feat'] || {};
-
-						if (!!fcMods_conf['" . $module->id ."']['active_tagids_feat']['" . $itemset_tagid . "'])
-						{
-							// Hide default active slide
-							$('#" . $itemset_tagid ." .collapse').removeClass('in');
-
-							// Show the last active slide
-							$('#' + fcMods_conf['" . $module->id ."']['active_tagids_feat']['" . $itemset_tagid . "']).addClass('in');
-						}
-					});
-				})(jQuery);
-				");
+				$wa->addInlineScript('fc_bindModuleTabs(' . json_encode(array(
+					'moduleId' => (int) $module->id,
+					'group' => 'active_tagids_feat',
+					'id' => $itemset_tagid,
+					'tabs' => $item_placement_feat === 2,
+				)) . ');');
 			}
 			?>
 
@@ -714,16 +679,17 @@ if ($std_builder_layout_num)
 				$first_item        = reset($list[$ord]['standard']);
 				$itemset_tagid     = 'fc_umod_itemset_std_' . $uniq_ord_id;
 
-				$last_active_tagid = isset($active_tagids_std->$itemset_tagid)
+				$last_active_tagid = property_exists($active_tagids_std, $itemset_tagid)
 					? $active_tagids_std->$itemset_tagid
 					: $itemset_tagid . '_' . $first_item->id;
 
-				$tagid_parts = explode('_', $last_active_tagid);
+				if ($last_active_tagid !== null && !is_string($last_active_tagid)) $last_active_tagid = '';
+				$tagid_parts = explode('_', (string) $last_active_tagid);
 				$activated_itemid = end($tagid_parts);
-
-				$last_active_tagid = isset($item_ids_index[$activated_itemid])
-					? $last_active_tagid
-					: $itemset_tagid . '_' . $first_item->id;
+				// null records an explicitly closed accordion; tabs always keep an active page.
+				$last_active_tagid = $last_active_tagid === null && $item_placement_std === 3
+					? ''
+					: (isset($item_ids_index[$activated_itemid]) ? $last_active_tagid : $itemset_tagid . '_' . $first_item->id);
 
 				echo $item_placement_std === 2
 					? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startTabSet', $itemset_tagid, array('active' => $last_active_tagid))
@@ -786,7 +752,7 @@ if ($std_builder_layout_num)
 						</div>
 					<?php endif; ?>
 
-				<?php $captured_title = ob_get_clean(); $hasTitle = (boolean) trim($captured_title); ?>
+				<?php $captured_title = ob_get_clean(); $hasTitle = (bool) trim($captured_title); ?>
 				<!-- EOF item title -->
 
 
@@ -817,7 +783,7 @@ if ($std_builder_layout_num)
 
 					<?php endif; ?>
 
-				<?php $captured_image = ob_get_clean(); $hasImage = (boolean) trim($captured_image); ?>
+				<?php $captured_image = ob_get_clean(); $hasImage = (bool) trim($captured_image); ?>
 				<!-- EOF item's image -->
 
 				<?php echo $content_layout!=2 ? $captured_image : '';?>
@@ -943,53 +909,12 @@ if ($std_builder_layout_num)
 					? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endTabSet')
 					: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
 
-				\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
-				(function($) {
-					$(document).ready(function ()
-					{
-						$('#" . $itemset_tagid . ($item_placement_std === 2 ? 'Tabs' : '') . "').on('shown', function ()
-						{
-							var fcMods_conf = fclib_getCookie('" . $cookie_name ."');
-							try { fcMods_conf = JSON.parse(fcMods_conf); } catch(e) { fcMods_conf = {}; }
-
-							fcMods_conf['" . $module->id ."'] = fcMods_conf['" . $module->id ."'] || {};
-							fcMods_conf['" . $module->id ."']['active_tagids_std'] = fcMods_conf['" . $module->id ."']['active_tagids_std'] || {};
-							" . ($item_placement_std === 2
-								? "fcMods_conf['" . $module->id ."']['active_tagids_std']['" . $itemset_tagid . "'] = $('#" . $itemset_tagid . "Tabs').next().find('.active').attr('id');"
-								: "fcMods_conf['" . $module->id ."']['active_tagids_std']['" . $itemset_tagid . "'] = $('#" . $itemset_tagid . " .in').attr('id');") . "
-							fclib_setCookie('" . $cookie_name ."', JSON.stringify(fcMods_conf), 7);
-							window.console.log(JSON.stringify(fcMods_conf));
-						});
-
-						$('#" . $itemset_tagid . ($item_placement_std === 2 ? 'Tabs' : '') . "').on('hidden', function ()
-						{
-							var fcMods_conf = fclib_getCookie('" . $cookie_name ."');
-							try { fcMods_conf = JSON.parse(fcMods_conf); } catch(e) { fcMods_conf = {}; }
-
-							fcMods_conf['" . $module->id ."'] = fcMods_conf['" . $module->id ."'] || {};
-							fcMods_conf['" . $module->id ."']['active_tagids_std'] = fcMods_conf['" . $module->id ."']['active_tagids_std'] || {};
-							fcMods_conf['" . $module->id ."']['active_tagids_std']['" . $itemset_tagid . "'] = null;
-							fclib_setCookie('" . $cookie_name ."', JSON.stringify(fcMods_conf), 7);
-							window.console.log(JSON.stringify(fcMods_conf));
-						});
-
-						var fcMods_conf = fclib_getCookie('" . $cookie_name ."');
-						try { fcMods_conf = JSON.parse(fcMods_conf); } catch(e) { fcMods_conf = {}; }
-
-						fcMods_conf['" . $module->id ."'] = fcMods_conf['" . $module->id ."'] || {};
-						fcMods_conf['" . $module->id ."']['active_tagids_std'] = fcMods_conf['" . $module->id ."']['active_tagids_std'] || {};
-
-						if (!!fcMods_conf['" . $module->id ."']['active_tagids_std']['" . $itemset_tagid . "'])
-						{
-							// Hide default active slide
-							$('#" . $itemset_tagid ." .collapse').removeClass('in');
-
-							// Show the last active slide
-							$('#' + fcMods_conf['" . $module->id ."']['active_tagids_std']['" . $itemset_tagid . "']).addClass('in');
-						}
-					});
-				})(jQuery);
-				");
+				$wa->addInlineScript('fc_bindModuleTabs(' . json_encode(array(
+					'moduleId' => (int) $module->id,
+					'group' => 'active_tagids_std',
+					'id' => $itemset_tagid,
+					'tabs' => $item_placement_std === 2,
+				)) . ');');
 			}
 			?>
 		</div>
@@ -1177,7 +1102,7 @@ if ($std_builder_layout_num)
 	{
 		$margin_left_right_feat = intval($margin_left_right_feat);
 		$js = "
-		jQuery(document).ready(function(){
+		document.addEventListener('DOMContentLoaded', function(){
 			var container_feat = document.querySelector('div#mod_fcitems_box_featured_".$uniq_ord_id."');
 			var msnry;
 			// initialize Masonry after all images have loaded
@@ -1198,7 +1123,7 @@ if ($std_builder_layout_num)
 	{
 		$margin_left_right = intval($margin_left_right);
 		$js = "
-		jQuery(document).ready(function(){
+		document.addEventListener('DOMContentLoaded', function(){
 			var container = document.querySelector('div#mod_fcitems_box_standard_".$uniq_ord_id."');
 			var msnry;
 			// initialize Masonry after all images have loaded

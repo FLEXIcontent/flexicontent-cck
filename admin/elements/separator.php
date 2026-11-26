@@ -23,9 +23,7 @@ defined('_JEXEC') or die('Restricted access');
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-jimport('cms.html.html');      // JHtml
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('spacer');   // \Joomla\CMS\Form\Field\SpacerField
 
 /**
@@ -52,7 +50,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		self::$css_js_added = true;
 
 		$app = \Joomla\CMS\Factory::getApplication();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view = $jinput->get('view', '', 'cmd');
@@ -63,7 +61,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		{
 			$isAdmin = $app->isClient('administrator');
 
-			if (!\Joomla\CMS\Factory::getLanguage()->isRtl())
+			if (!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl())
 			{
 				!$isAdmin ?
 					$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH)) :
@@ -76,7 +74,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 			}
 
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
@@ -84,7 +82,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			$this->add_tab_css_js();
 		}
 
-		flexicontent_html::loadJQuery();
+		flexicontent_html::loadFramework('form-utils');
 
 		// Add js function to overload the joomla submitform validation
 		\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');  // load default validation JS to make sure it is overriden
@@ -101,7 +99,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 	function add_tab_css_js()
 	{
 		self::$tab_css_js_added = true;
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		
 		// Load JS tabber lib
 		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
@@ -112,53 +110,46 @@ class JFormFieldSeparator extends JFormFieldSpacer
 
 	function add_comp_acl_headers()
 	{
-		\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('
-			jQuery(document).ready(function()
-			{
-				jQuery("div.control-group > div").each(function(i, el) {
-					if ( jQuery(el).html().trim() == "" && ( jQuery(el).attr("class") == "control-label" || jQuery(el).attr("class") == "controls" ))
-					{
-						jQuery(el).remove();
-					}
-				});
-				jQuery("div.control-group").each(function(i, el) {
-					if (jQuery(el).html().trim() == "")
-					{
-						jQuery(el).remove();
-					}
-				});
-
-				var tr1  = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(1)");
-				var tr4  = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(4)");
-				var tr11 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(11)");
-				var tr15 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(15)");
-				var tr18 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(18)");
-				var tr23 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(23)");
-				var tr28 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(28)");
-				var tr30 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(30)");
-				var tr37 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(37)");
-				var tr41 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(41)");
-				var tr45 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(45)");
-				var tr47 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(47)");
-				var tr48 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(48)");
-				
-				tr1.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_COMPONENT_ACCESS_TITLE').'<\/td><\/tr>");
-				tr4.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_ITEMS_CATEGORIES_TITLE').'<\/td><\/tr>");
-				tr11.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_ITEM_FORM_TITLE').'<\/td><\/tr>");
-				tr11.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_CATEGORY_TAGS_USAGE_TITLE').'<\/td><\/tr>");
-				tr15.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\" style=\"margin-left: 10% !important;\"><b>'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_EXISTING_ITEMS_TITLE').'<\/b>:  ('.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_OVERRIDABLE_IN_TYPE_TITLE').')<\/td><\/tr>");
-				tr18.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_VARIOUS_TITLE').'<\/td><\/tr>");
-				tr23.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_WORKFLOW_TITLE').'<\/td><\/tr>");
-				tr28.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_ITEMS_MANAGER_TITLE').'<\/td><\/tr>");
-				tr30.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_BACKEND_MANAGER_ACCESS_TITLE').'<\/td><\/tr>");
-				tr37.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_FIELDS_MANAGER_TITLE').'<\/td><\/tr>");
-				tr41.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_OVERRIDABLE_IN_FIELD_TITLE').'<\/td><\/tr>");
-				tr45.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_REVIEWS_MANAGER_TITLE').'<\/td><\/tr>");
-				tr47.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_FILES_MANAGER_TITLE').'<\/td><\/tr>");
-				tr48.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">'.\Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_ALSO_USED_IN_ITEM_FORM_TITLE').'<\/td><\/tr>");
-
+		$headings = [
+			[1, 2, 'COMPONENT_ACCESS'], [4, 2, 'ITEMS_CATEGORIES'], [11, 2, 'ITEM_FORM'],
+			[11, 3, 'CATEGORY_TAGS_USAGE'], [15, 3, 'EXISTING_ITEMS', 'OVERRIDABLE_IN_TYPE'],
+			[18, 3, 'VARIOUS'], [23, 2, 'WORKFLOW'], [28, 2, 'ITEMS_MANAGER'],
+			[30, 2, 'BACKEND_MANAGER_ACCESS'], [37, 2, 'FIELDS_MANAGER'],
+			[41, 3, 'OVERRIDABLE_IN_FIELD', ''], [45, 2, 'REVIEWS_MANAGER'],
+			[47, 2, 'FILES_MANAGER'], [48, 3, 'ALSO_USED_IN_ITEM_FORM', ''],
+		];
+		$headings = array_map(static function ($entry) {
+			$translate = static fn ($key) => \Joomla\CMS\Language\Text::_('FLEXI_PERMISSIONS_COMPONENT_' . $key . '_TITLE');
+			$label = $translate($entry[2]);
+			if (!empty($entry[3])) $label .= ': (' . $translate($entry[3]) . ')';
+			return [$entry[0], $entry[1], $label, array_key_exists(3, $entry)];
+		}, $headings);
+		$json = json_encode($headings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+		\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration(<<<JS
+		FlexiForm.ready(() => {
+			document.querySelectorAll('div.control-group > div.control-label, div.control-group > div.controls').forEach(element => {
+				if (!element.innerHTML.trim()) element.remove();
 			});
-		');
+			document.querySelectorAll('div.control-group').forEach(element => {
+				if (!element.innerHTML.trim()) element.remove();
+			});
+			const headings = $json;
+			document.querySelectorAll('#permissions-sliders .tab-content .tab-pane tbody').forEach(body => {
+				const rows = Array.from(body.rows);
+				for (const [index, level, text, isNote] of headings) {
+					if (!rows[index - 1]) continue;
+					const row = document.createElement('tr');
+					const cell = row.insertCell();
+					cell.colSpan = 3;
+					const label = document.createElement('span');
+					label.className = 'fcsep_level' + level + (isNote ? ' alert alert-info fcpadded' : '');
+					label.textContent = text;
+					cell.append(label);
+					rows[index - 1].before(row);
+				}
+			});
+		});
+JS);
 	}
 
 

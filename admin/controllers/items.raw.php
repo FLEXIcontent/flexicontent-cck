@@ -15,7 +15,13 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentControllerBaseAdmin' => JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 // Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
 require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'item.php';
@@ -73,26 +79,32 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
+		// The version table uses strings defined in the backend language file.
+		// Load it explicitly so frontend RAW requests get translated labels too.
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
+
 		@ob_end_clean();
 		$id     = $this->input->getInt('id', 0);
 		$active = $this->input->getInt('active', 0);
+		$compare_mode = $this->input->getCmd('compare_mode') === 'popup' ? 'popup' : 'inline';
 
 		if (!$id)
 		{
 			return;
 		}
 
-		$revert 	= \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', \Joomla\CMS\Language\Text::_('FLEXI_REVERT'));
-		$view 		= \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/magnifier.png', \Joomla\CMS\Language\Text::_('FLEXI_VIEW'));
-		$comment 	= \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/comments.png', \Joomla\CMS\Language\Text::_('FLEXI_COMMENT'));
-
 		$model = $this->getModel($this->record_name);
 		$model->setId($id);
-		$item = $model->getItem($id);
+		$item = \FLEXIUtilities::getVersionRecord($id);
+
+		if (!$item)
+		{
+			return;
+		}
 
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$versionsperpage = $cparams->get('versionsperpage', 10);
-		$currentversion = $item->version;
+		$currentversion = isset($item->current_version) ? $item->current_version : $item->version;
 		$page = $this->input->getInt('page', 0);
 		$versioncount = $model->getVersionCount();
 		$numpage = ceil($versioncount / $versionsperpage);
@@ -107,38 +119,235 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		$limitstart = ($page - 1) * $versionsperpage;
-		$versions = $model->getVersionList();
 		$versions	= $model->getVersionList($limitstart, $versionsperpage);
 
 		$jt_date_format = FLEXI_J16GE ? 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' : 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS';
 		$df_date_format = FLEXI_J16GE ? "d/M H:i" : "%d/%m %H:%M";
 		$date_format = \Joomla\CMS\Language\Text::_($jt_date_format);
 		$date_format = ( $date_format == $jt_date_format ) ? $df_date_format : $date_format;
-		$ctrl_task = 'task=items.edit';
 		$app     = \Joomla\CMS\Factory::getApplication();
 		$isSite  = $app->isClient('site');
 
-		foreach ($versions as $v)
-		{
-			$class = ($v->nr == $active) ? ' id="active-version"' : '';
-			echo '
-			<tr' . $class . '>
-				<td class="versions">#' . $v->nr . '</td>
-				<td class="versions">' . \Joomla\CMS\HTML\HTMLHelper::_('date', (($v->nr == 1) ? $item->created : $v->date), $date_format) . '</td>
-				<td class="versions">' . (($v->nr == 1) ? $item->creator : $v->modifier) . '</td>
-				<td class="versions" align="center">
-					<a href="javascript:;" class="hasTooltip" title="' . \Joomla\CMS\HTML\HTMLHelper::tooltipText(\Joomla\CMS\Language\Text::_('FLEXI_COMMENT'), ($v->comment ? $v->comment : 'No comment written'), 0, 1) . '">' . $comment . '</a>
-				' . (
-				((int) $v->nr === (int) $currentversion) ? // Is current version ?
-					'<a onclick="javascript:return clickRestore(\'index.php?option=com_flexicontent&' . $ctrl_task . '&' . ($isSite ? 'id=' : 'cid=') . $item->id . '&version=' . $v->nr . '\');" href="javascript:;">' . \Joomla\CMS\Language\Text::_('FLEXI_CURRENT') . '</a>' :
-					'<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=' . $item->id . '&version=' . $v->nr . '&tmpl=component" title="' . \Joomla\CMS\Language\Text::_('FLEXI_COMPARE_WITH_CURRENT_VERSION') . '" rel="{handler: \'iframe\', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}">' . $view . '</a>
-					<a onclick="javascript:return clickRestore(\'index.php?option=com_flexicontent&' . $ctrl_task . '&' . ($isSite ? 'id=' : 'cid=') . $item->id . '&version=' . $v->nr . '&' . \Joomla\CMS\Session\Session::getFormToken() . '=1\');" href="javascript:;" title="' . \Joomla\CMS\Language\Text::sprintf('FLEXI_REVERT_TO_THIS_VERSION', $v->nr) . '">' . $revert . '</a>
-				') . '
-				</td>
-			</tr>';
-		}
+		$options = array(
+			'item_id'         => (int) $item->id,
+			'current_version' => (int) $currentversion,
+			'is_site'         => $isSite,
+			'allow_comparing' => (int) $cparams->get('allow_versioncomparing', 1),
+			'can_keep'        => true,
+			'task_items'      => 'task=items.',
+			'token'           => \Joomla\CMS\Session\Session::getFormToken(),
+			'date_format'     => $date_format,
+			'compare_mode'    => $compare_mode,
+		);
+
+		echo flexicontent_html::renderVersionsTable($versions, $item, $options);
 
 		jexit();
+	}
+
+
+	/**
+	 * Toggle the permanent-backup flag of a version (Ajax, RAW format).
+	 * Only one version per item can be permanent; it is excluded from version rotation.
+	 *
+	 * @return void
+	 */
+	public function setversionkeep()
+	{
+		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		$app     = \Joomla\CMS\Factory::getApplication();
+		$app->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
+		$cid     = $this->input->get('cid', array(), 'array');
+		$id      = $this->input->getInt('id', !empty($cid[0]) ? (int) $cid[0] : 0);
+		$version = $this->input->getInt('version', 0);
+
+		$record_model = $this->getModel($this->record_name);
+		$record = $id ? \FLEXIUtilities::getVersionRecord($id) : null;
+
+		if (!$record || empty($record->id) || !$record_model->canEdit($record))
+		{
+			$app->setHeader('status', '403 Forbidden', true);
+			echo json_encode(array('success' => 0, 'message' => \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK')));
+			jexit();
+		}
+
+		$result = \FLEXIUtilities::setVersionKeep($id, $version);
+		if (!$result['success'])
+		{
+			$app->setHeader('status', '404', true);
+			echo json_encode(array('success' => 0, 'message' => $result['error']));
+			jexit();
+		}
+
+		$msg = \Joomla\CMS\Language\Text::sprintf(
+			$result['keep'] ? 'FLEXI_VERSION_KEPT' : 'FLEXI_VERSION_UNKEPT',
+			$version
+		);
+
+		echo json_encode(array('success' => 1, 'version' => $version, 'keep' => $result['keep'], 'message' => $msg));
+		jexit();
+	}
+
+
+	/**
+	 * Method to get the (edit) form of a custom field, for use inside the batch tool
+	 * Returns JSON: html of the field input + the assets (scripts / styles) that the field has added to the document
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	public function batchfieldform()
+	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(json_encode(array('error' => \Joomla\CMS\Language\Text::_('JINVALID_TOKEN'))));
+
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		@ob_end_clean();
+		header('Content-Type: application/json; charset=utf-8');
+
+		if (!$user->authorise('flexicontent.copyitems', 'com_flexicontent'))
+		{
+			jexit(json_encode(array('error' => \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'))));
+		}
+
+		$field_id = $this->input->getInt('field_id', 0);
+
+		// Types that the field is assigned to, and optionally the type the new value will be used for
+		$type_ids = $db->setQuery('SELECT type_id FROM #__flexicontent_fields_type_relations WHERE field_id = ' . (int) $field_id)->loadColumn();
+		$type_id  = $this->input->getInt('type_id', 0);
+		$type_id  = in_array($type_id, $type_ids) ? $type_id : (int) reset($type_ids);
+
+		// Only fields that can be batch-edited (and that the user can edit) are allowed
+		$items_model  = $this->getModel($this->record_name_pl);
+		$batch_fields = $type_id ? $items_model->getBatchFields(array($type_id)) : array();
+
+		if (!isset($batch_fields[$field_id]))
+		{
+			jexit(json_encode(array('error' => \Joomla\CMS\Language\Text::_('FLEXI_BATCH_FIELD_NOT_AVAILABLE'))));
+		}
+
+		// Create a new (empty) item of the type, and render the field of it, as the item form does
+		$model = $this->getModel($this->record_name);
+		$model->setId(0, null, $type_id, null);
+		$item   = $model->getItem(null, $check_view_access = false, $no_cache = true, $force_version = -1);
+		$fields = $model->getExtrafields(true);
+		$item->fields = & $fields;
+
+		$field = $fields[$batch_fields[$field_id]->name];
+		$field->value = array();
+
+		FlexicontentFields::getFieldFormDisplay($field, $item, $user);
+
+		$html = is_array($field->html) ? implode('', $field->html) : (string) $field->html;
+
+		// Collect the assets the field added to the document, so that they can be loaded by the batch page
+		$assets = array('scripts' => array(), 'inline' => array(), 'styles' => array(), 'style_inline' => array());
+		$importmap = array();
+
+		$to_text = function ($v) use (&$to_text)
+		{
+			if (is_string($v))
+			{
+				return $v;
+			}
+
+			if (is_array($v))
+			{
+				return isset($v['content']) ? $to_text($v['content']) : implode("\n", array_filter(array_map($to_text, $v)));
+			}
+
+			return '';
+		};
+
+		$to_url = function ($uri)
+		{
+			$uri = (string) $uri;
+
+			return ($uri === '' || preg_match('#^(https?:)?//#', $uri) || $uri[0] === '/') ? $uri : \Joomla\CMS\Uri\Uri::root(true) . '/' . $uri;
+		};
+
+		// Legacy API: addScript() / addScriptDeclaration() / addStyleSheet() / addStyleDeclaration()
+		foreach ((array) ($document->_scripts ?? array()) as $src => $attributes)
+		{
+			$assets['scripts'][] = array('src' => $to_url($src), 'module' => (($attributes['type'] ?? '') === 'module'));
+		}
+
+		foreach ((array) ($document->_script ?? array()) as $type => $code)
+		{
+			if (($code = trim($to_text($code))) !== '')
+			{
+				$assets['inline'][] = array('code' => $code, 'type' => $type);
+			}
+		}
+
+		foreach (array_keys((array) ($document->_styleSheets ?? array())) as $href)
+		{
+			$assets['styles'][] = $to_url($href);
+		}
+
+		foreach ((array) ($document->_style ?? array()) as $css)
+		{
+			if (($css = trim($to_text($css))) !== '')
+			{
+				$assets['style_inline'][] = $css;
+			}
+		}
+
+		// Web Asset Manager (Joomla 4+): the same calls are registered as web assets
+		if (method_exists($document, 'getWebAssetManager'))
+		{
+			$wa = $document->getWebAssetManager();
+
+			foreach (array('script' => array('scripts', 'inline'), 'style' => array('styles', 'style_inline')) as $type => $keys)
+			{
+				foreach ($wa->getAssets($type, true) as $asset)
+				{
+					$uri     = $asset->getUri(true);
+					$content = $asset->getOption('content');
+					$script_type = $asset->getAttributes()['type'] ?? 'text/javascript';
+
+					// Joomla import-map assets are module definitions, not classic scripts.
+					if ($type === 'script' && $uri && $asset->getOption('importmap'))
+					{
+						$name = $asset->getOption('importmapName') ?: $asset->getName();
+						$scope = $asset->getOption('importmapScope');
+						if ($scope) $importmap['scopes'][$scope][$name] = $to_url($uri);
+						else $importmap['imports'][$name] = $to_url($uri);
+						continue;
+					}
+
+					if ($uri)
+					{
+						$assets[$keys[0]][] = $type === 'script'
+							? array('src' => $to_url($uri), 'module' => ($script_type === 'module'))
+							: $to_url($uri);
+					}
+					elseif (is_string($content) && trim($content) !== '')
+					{
+						$assets[$keys[1]][] = $type === 'script'
+							? array('code' => trim($content), 'type' => $script_type)
+							: trim($content);
+					}
+				}
+			}
+		}
+
+		// Unique values (scripts are arrays, so compare them serialized)
+		foreach ($assets as $key => $list)
+		{
+			$assets[$key] = array_values(array_intersect_key($list, array_unique(array_map('serialize', $list))));
+		}
+
+		// Joomla script options (e.g. texts and settings used by calendar and other scripts)
+		if ($importmap) $assets['importmap'] = $importmap;
+		$assets['options'] = method_exists($document, 'getScriptOptions') ? (object) $document->getScriptOptions() : new stdClass;
+
+		jexit(json_encode(array('html' => $html, 'assets' => $assets)));
 	}
 
 
@@ -149,7 +358,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	function resethits()
 	{
-		// Check session token, item exists, is editable
+		// Check for request forgeries (the reset buttons already send the token)
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		// Check item exists, is editable
 		$itemmodel = $this->_getEditorModel();
 
 		if (!is_object($itemmodel))
@@ -172,7 +384,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	function resetvotes()
 	{
-		// Check session token, item exists, is editable
+		// Check for request forgeries (the reset buttons already send the token)
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		// Check item exists, is editable
 		$itemmodel = $this->_getEditorModel();
 
 		if (!is_object($itemmodel))
@@ -314,7 +529,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			header("Cache-Control: no-cache");
 			header("Pragma: no-cache");
 
-			$rtl_sfx = !\Joomla\CMS\Factory::getLanguage()->isRtl() ? '' : '_rtl';
+			$rtl_sfx = !\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl() ? '' : '_rtl';
 			$fc_css = \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x' . $rtl_sfx . '.css' : 'j3x' . $rtl_sfx . '.css');
 			echo '
 			<link rel="stylesheet" href="' . \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/flexicontentbackend.css?' . FLEXI_VHASH . '" />
@@ -363,11 +578,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				<!-- <img src="<?php echo $icon; ?>" style="margin:4px 0 0 0; border-width:0px; vertical-align:top;" alt="<?php echo \Joomla\CMS\Language\Text::_($statedata['desc']); ?>" /> &nbsp; -->
 				*/
 				?>
-				<span style="<?php echo $css; ?>" class="<?php echo $btn_class . ' ' . $statedata['btn_class']; ?>"
+				<button type="button" style="<?php echo $css; ?>" class="<?php echo $btn_class . ' ' . $statedata['btn_class']; ?>"
 					onclick="window.parent.fc_parent_form_submit('fc_modal_popup_container', 'adminForm', {'newstate':'<?php echo $shortname; ?>', 'task':'items.changestate'}, {'task':'items.changestate', 'is_list':true});"
 				>
 					<?php echo \Joomla\CMS\Language\Text::_($statedata['name']); ?>
-				</span>
+				</button>
 			</span>
 		<?php
 			if (isset($statedata['clear']))
@@ -420,9 +635,12 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	function bindextdata()
 	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
 		// Need to recheck post-installation / integrity tasks after,
 		// this should NOT effect RAW HTTP requests, used by AJAX ITEM binding
-		// \Joomla\CMS\Factory::getSession()->set('flexicontent.recheck_aftersave', true);
+		// \Joomla\CMS\Factory::getApplication()->getSession()->set('flexicontent.recheck_aftersave', true);
 
 		$bind_limit = $this->input->getInt('bind_limit', 25000);
 
@@ -448,6 +666,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	function fixmaincat()
 	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
 		$default_cat = $this->input->getInt('default_cat', 0);
 		$model = $this->getModel($this->record_name_pl);
 		$model->fixMainCat($default_cat);
@@ -490,8 +711,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
                 $selectedIds = array_values(array_filter($selectedIds));
                 $selectedMode = false;
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		// Get records model to call needed methods
@@ -503,7 +724,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		if ($indexer === 'tag_assignments')
 		{
-			$log_filename = 'tag_assignments_' . \Joomla\CMS\Factory::getUser()->id . '.php';
+			$log_filename = 'tag_assignments_' . \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.php';
 			$log_category = 'com_flexicontent.items.tag_assignments_indexer';
 
 			// Get ids of records to process
@@ -515,7 +736,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
                 elseif ($indexer === 'resave')
                 {
-                        $log_filename = 'resave_' . \Joomla\CMS\Factory::getUser()->id . '.php';
+                        $log_filename = 'resave_' . \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.php';
                         $log_category = 'com_flexicontent.items.resave_indexer';
 
                         if (!empty($selectedIds))
@@ -545,7 +766,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
                 }
 
 		// Get full logfile path
-		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
+		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename);
 
 		// Clear previous log file
 		if (file_exists($log_filename_full))
@@ -599,8 +820,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$start_microtime = microtime(true);
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		$has_zlib      = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
@@ -614,7 +835,6 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$log_filename = $session->get($indexer . '_log_filename', null, 'flexicontent');
 		$log_category = $session->get($indexer . '_log_category', null, 'flexicontent');
 
-		jimport('joomla.log.log');
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file
@@ -931,5 +1151,59 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Also clean this as it contains Joomla frontend view cache of the component)
 		$cache_site->clean('com_flexicontent');
+	}
+
+
+	/**
+	 * Search files by title (altname) or filename, used by the 'Items using file' filter of the items manager
+	 * Returns a JSON array of {id, label, name}
+	 *
+	 * @return void
+	 */
+	public function searchfiles()
+	{
+		@ob_end_clean();
+
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(json_encode(array()));
+
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+
+		if (!$user->authorise('core.manage', 'com_flexicontent'))
+		{
+			jexit(json_encode(array()));
+		}
+
+		$term = trim($this->input->get('term', '', 'string'));
+
+		// Require 2 characters, avoids listing a big part of the files table
+		if (StringHelper::strlen($term) < 2)
+		{
+			jexit(json_encode(array()));
+		}
+
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$like = $db->Quote('%' . $db->escape($term, true) . '%', false);
+
+		$query = $db->getQuery(true)
+			->select(array('f.id', 'f.altname', 'f.filename'))
+			->from($db->quoteName('#__flexicontent_files', 'f'))
+			->where('(' . $db->quoteName('f.altname') . ' LIKE ' . $like . ' OR ' . $db->quoteName('f.filename') . ' LIKE ' . $like . ')')
+			->order($db->quoteName('f.altname') . ' ASC')
+			->setLimit(30);
+
+		$rows = $db->setQuery($query)->loadObjectList();
+		$out  = array();
+
+		foreach ($rows as $row)
+		{
+			$out[] = array(
+				'id'    => (int) $row->id,
+				'label' => $row->altname !== '' ? $row->altname : $row->filename,
+				'name'  => $row->filename,
+			);
+		}
+
+		header('Content-Type: application/json; charset=utf-8');
+		jexit(json_encode($out));
 	}
 }

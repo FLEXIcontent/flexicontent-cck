@@ -14,7 +14,13 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecord' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * HTML View class for the Category screen
@@ -36,9 +42,9 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 
 		$app        = \Joomla\CMS\Factory::getApplication();
 		$jinput     = $app->input;
-		$document   = \Joomla\CMS\Factory::getDocument();
-		$user       = \Joomla\CMS\Factory::getUser();
-		$db         = \Joomla\CMS\Factory::getDbo();
+		$document   = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db         = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$perms      = FlexicontentHelperPerm::getPerm();
 
@@ -121,13 +127,14 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 		// Check no access to categories management (Global permission)
 		if ( !$perms->CanCats )
 		{
-			$app->redirect('index.php?option=com_flexicontent', \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS' ));
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS'), 'warning');
+			$app->redirect('index.php?option=com_flexicontent');
 		}
 
 		// Check no privilege to create new category under any category
 		if ( $isnew && (!$perms->CanCats || !FlexicontentHelperPerm::getPermAny('core.create')) )
 		{
-			JError::raiseWarning( 403, \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS_CREATE' ) );
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS_CREATE' ), 'warning');
 			$app->redirect( 'index.php?option=com_flexicontent' );
 		}
 
@@ -161,7 +168,7 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 		if ( $isnew && !$cancreate_cat )
 		{
 			$acc_msg = \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS_CREATE' ) ."<br/>". (FLEXI_J16GE ? \Joomla\CMS\Language\Text::_( 'FLEXI_CANNOT_ADD_CATEGORY_REASON' ) : "");
-			JError::raiseWarning( 403, $acc_msg);
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage($acc_msg, 'warning');
 			$app->redirect('index.php?option=com_flexicontent&view=categories');
 		}
 
@@ -169,7 +176,7 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 		if ( !$isnew && !$canedit_cat )
 		{
 			$acc_msg = \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS_EDIT' ) ."<br/>". \Joomla\CMS\Language\Text::_( 'FLEXI_CANNOT_EDIT_CATEGORY_REASON' );
-			JError::raiseWarning( 403, $acc_msg);
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage($acc_msg, 'warning');
 			$app->redirect( 'index.php?option=com_flexicontent&view=categories' );
 		}
 
@@ -181,16 +188,16 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 		// Add css to document
 		if ($isAdmin)
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 		else
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 		}
@@ -382,7 +389,7 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 			$edit_layout = htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8');
 			flexicontent_html::addToolBarButton(
 				'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', $btn_name='edit_layout_params',
-				$full_js="var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'".$edit_layout."'}); return false;",
+				$full_js="var url = this.getAttribute('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'".$edit_layout."'}); return false;",
 				$msg_alert='', $msg_confirm='',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info".$tip_class, $btn_icon="icon-pencil",
 				'data-placement="bottom" data-href="index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;tmpl=component&amp;ismodal=1&amp;folder=' . $row_clayout
@@ -464,7 +471,7 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 		if (empty($level_name))
 		{
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $row->access, 'Public'), 'warning');
-			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
+			$document->addScriptDeclaration("FlexiForm.ready(function() { const access = document.getElementById('jform_access'); if (access) { access.value = '1'; access.fc_choices_instance?.setChoiceByValue('1'); FlexiForm.change(access); } });");
 		}
 
 
@@ -474,7 +481,7 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 
 		if ($js)
 		{
-			$document->addScriptDeclaration('jQuery(document).ready(function(){'
+			$document->addScriptDeclaration('FlexiForm.ready(function(){'
 				.$js.
 			'});');
 		}

@@ -9,10 +9,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 /**
@@ -56,7 +53,7 @@ class JFormFieldFcauthor extends JFormFieldList
 
 			$options = array();
 
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 			// Construct the query
 			$query = $db->getQuery(true)

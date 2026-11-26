@@ -12,7 +12,8 @@
 defined('_JEXEC') or die('Restricted access');
 
 // Include the component HTML helpers.
-\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_COMPONENT.'/helpers/html');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/fc_service_registry.php';
+flexicontent_register_html_helpers(JPATH_COMPONENT.'/helpers/html');
 
 // Load the tooltip behavior.
 //\Joomla\CMS\HTML\HTMLHelper::_('behavior.tooltip');

@@ -11,7 +11,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Templates Model
@@ -88,7 +87,6 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	 */
 	function duplicate($source, $dest)
 	{
-		jimport('joomla.filesystem.folder');
 
 		$path 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
 		$dest	= $dest ? flexicontent_upload::sanitizedir($path, $dest) : '';
@@ -110,19 +108,20 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	 */
 	function delete($dir)
 	{
-		jimport('joomla.filesystem.folder');
 
 		$path 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
 
 		if (!$dir || ($dir === 'grid') || ($dir === 'table') || ($dir === 'faq') || ($dir === 'items-tabbed')) return false;
 		if (!\Joomla\Filesystem\Folder::delete($path.$dir)) return false;
 
-		// delete old record
-		$query 	= 'DELETE FROM #__flexicontent_templates'
-				. ' WHERE template = ' . $this->_db->Quote($dir)
-				;
-		$this->_db->setQuery($query);
-		$this->_db->execute();
+		// Remove both legacy positions and saved layout configurations. Otherwise
+		// recreating the same folder silently reuses the deleted template's settings.
+		foreach (array('#__flexicontent_templates', '#__flexicontent_layouts_conf') as $table)
+		{
+			$query = 'DELETE FROM ' . $table . ' WHERE template = ' . $this->_db->Quote($dir);
+			$this->_db->setQuery($query);
+			$this->_db->execute();
+		}
 
 		return true;
 	}

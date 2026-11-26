@@ -30,6 +30,9 @@ else
 $connected    = isset($check['connect']) && $check['connect'] == 1;
 $hasUpdate    = $connected && $remoteCurrent !== null && $remoteCurrent == -1;
 
+// Status used by the dashboard badge next to the "Update check" accordion title
+$versionStatus = !$connected ? 'error' : ($hasUpdate ? 'update' : 'ok');
+
 // URL pour déclencher la mise à jour via Joomla Update Manager
 $token       = \Joomla\CMS\Session\Session::getFormToken();
 $updateUrl   = 'index.php?option=com_flexicontent&task=flexicontent.fcupdateredirect&format=raw&' . $token . '=1';
@@ -45,6 +48,8 @@ if ($installedDate)
 	}
 }
 ?>
+
+<span data-status="<?php echo $versionStatus; ?>" id="fc-version-status" class="visually-hidden"></span>
 
 <table class="table" >
 	<thead>

@@ -2,43 +2,80 @@
 
 namespace Sabberworm\CSS\RuleSet;
 
+use Sabberworm\CSS\OutputFormat;
 use Sabberworm\CSS\Property\AtRule;
 
 /**
- * A RuleSet constructed by an unknown @-rule. @font-face rules are rendered into AtRuleSet objects.
+ * This class represents rule sets for generic at-rules which are not covered by specific classes, i.e., not
+ * `@import`, `@charset` or `@media`.
+ *
+ * A common example for this is `@font-face`.
  */
-class AtRuleSet extends RuleSet implements AtRule {
+class AtRuleSet extends RuleSet implements AtRule
+{
+    /**
+     * @var string
+     */
+    private $sType;
 
-	private $sType;
-	private $sArgs;
+    /**
+     * @var string
+     */
+    private $sArgs;
 
-	public function __construct($sType, $sArgs = '', $iLineNo = 0) {
-		parent::__construct($iLineNo);
-		$this->sType = $sType;
-		$this->sArgs = $sArgs;
-	}
+    /**
+     * @param string $sType
+     * @param string $sArgs
+     * @param int $iLineNo
+     */
+    public function __construct($sType, $sArgs = '', $iLineNo = 0)
+    {
+        parent::__construct($iLineNo);
+        $this->sType = $sType;
+        $this->sArgs = $sArgs;
+    }
 
-	public function atRuleName() {
-		return $this->sType;
-	}
+    /**
+     * @return string
+     */
+    public function atRuleName()
+    {
+        return $this->sType;
+    }
 
-	public function atRuleArgs() {
-		return $this->sArgs;
-	}
+    /**
+     * @return string
+     */
+    public function atRuleArgs()
+    {
+        return $this->sArgs;
+    }
 
-	public function __toString() {
-		return $this->render(new \Sabberworm\CSS\OutputFormat());
-	}
+    /**
+     * @return string
+     *
+     * @deprecated in V8.8.0, will be removed in V9.0.0. Use `render` instead.
+     */
+    public function __toString()
+    {
+        return $this->render(new OutputFormat());
+    }
 
-	public function render(\Sabberworm\CSS\OutputFormat $oOutputFormat) {
-		$sArgs = $this->sArgs;
-		if($sArgs) {
-			$sArgs = ' ' . $sArgs;
-		}
-		$sResult = "@{$this->sType}$sArgs{$oOutputFormat->spaceBeforeOpeningBrace()}{";
-		$sResult .= parent::render($oOutputFormat);
-		$sResult .= '}';
-		return $sResult;
-	}
-
+    /**
+     * @param OutputFormat|null $oOutputFormat
+     *
+     * @return string
+     */
+    public function render($oOutputFormat)
+    {
+        $sResult = $oOutputFormat->comments($this);
+        $sArgs = $this->sArgs;
+        if ($sArgs) {
+            $sArgs = ' ' . $sArgs;
+        }
+        $sResult .= "@{$this->sType}$sArgs{$oOutputFormat->spaceBeforeOpeningBrace()}{";
+        $sResult .= $this->renderRules($oOutputFormat);
+        $sResult .= '}';
+        return $sResult;
+    }
 }

@@ -20,15 +20,16 @@ use Joomla\Registry\Registry;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
 
-HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/fc_service_registry.php';
+flexicontent_register_html_helpers(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 
 global $globalcats;
 $app      = Factory::getApplication();
 $jinput   = $app->input;
-$config   = Factory::getConfig();
-$user     = Factory::getUser();
-$session  = Factory::getSession();
-$document = Factory::getDocument();
+$config   = Factory::getApplication()->getConfig();
+$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+$session  = Factory::getApplication()->getSession();
+$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 $cparams  = ComponentHelper::getParams('com_flexicontent');
 $global_col_appearance  = (int) $cparams->get('items_manager_cols_appearance', 0);
 $global_trim_chars      = (int) $cparams->get('items_manager_trim_chars', 100);
@@ -55,7 +56,7 @@ $edit_cat_title  = Text::_('FLEXI_EDIT_CATEGORY', true);
 $rem_filt_txt    = Text::_('FLEXI_REMOVE_FILTER', true);
 $rem_filt_tip    = ' class="' . $this->tooltip_class . ' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
 $_NEVER_         = Text::_('FLEXI_NEVER');
-$_NULL_DATE_     = Factory::getDbo()->getNullDate();
+$_NULL_DATE_     = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)->getNullDate();
 
 
 
@@ -72,13 +73,17 @@ $disable_columns = array_flip($disable_columns);
 $single_type_id = $single_type ? reset($filter_type) : 0;
 
 $this->data_tbl_id = 'adminListTableFC' . $this->view . '_type_' . $single_type_id;
-flexicontent_html::jscode_to_showhide_table(
-	'mainChooseColBox',
-	$this->data_tbl_id,
-	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>',
-	$toggle_on_init = 1 // Initial page load (JS Performance) we already hidden columns via PHP Logic
-);
+
+// Resizable / movable / hideable columns (replaces the old column chooser), settings are stored in the browser
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_table_tools.css', array('version' => FLEXI_VHASH));
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_type_tabs.css', array('version' => FLEXI_VHASH));
+$document->addScript(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/js/fc-table-tools.js', array('version' => FLEXI_VHASH));
+Text::script('FLEXI_TBL_MOVE_COL');
+Text::script('FLEXI_TBL_HIDE_COL');
+Text::script('FLEXI_TBL_SHOW_COL');
+Text::script('FLEXI_TBL_FIT_COL');
+Text::script('FLEXI_TBL_RESET_WIDTHS');
+Text::script('FLEXI_TBL_RESET_COLS');
 
 
 
@@ -122,12 +127,12 @@ $ordering_draggable = $cparams->get('draggable_reordering', 1);
 
 if ($this->reOrderingActive)
 {
-	$image_ordering_tip = '<span class="icon-info ' . $this->tooltip_class . '" title="' . flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1) . '"></span>';
+	$ordering_tip_title = flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1);
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="' . Text::_('FLEXI_ORDER_SAVE_WHEN_DONE', true) . '"></div>';
 }
 else
 {
-	$image_ordering_tip = '<span class="icon-info ' . $this->tooltip_class . '" title="' . flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1) . '"></span>';
+	$ordering_tip_title = flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1);
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="' . Text::_('FLEXI_ORDER_COLUMN_FIRST', true) . '" ></div>';
 	$image_saveorder    = '';
 }
@@ -231,33 +236,16 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 
 <script>
 
-function fetchcounter(el_id, task_name)
+async function fetchcounter(el_id, task_name)
 {
-	var url = "index.php?option=com_flexicontent&<?php echo $items_task; ?>"+task_name+"&tmpl=component&format=raw";
-
-	jQuery.ajax(
-	{
-		url : url,
-		type: 'get',
-		data : null,
-		success:function(data, textStatus, jqXHR)
-		{
-			jQuery('#' + el_id).html(data);
-
-			if (data == 0)
-			{
-				if (confirm("<?php echo Text::_( 'FLEXI_ITEMS_REFRESH_CONFIRM',true ); ?>"))
-				{
-					location.href = 'index.php?option=com_flexicontent&view=items';
-				}
-			}
-			return data;
-		},
-		error: function(jqXHR, textStatus, errorThrown)
-		{
-				//if fails
-		}
-	});
+	const url = "index.php?option=com_flexicontent&<?php echo $items_task; ?>" + task_name + "&tmpl=component&format=raw";
+	const response = await fetch(url, {headers: {'X-Requested-With': 'XMLHttpRequest'}});
+	if (!response.ok) return;
+	const count = (await response.text()).trim();
+	document.getElementById(el_id).textContent = count;
+	if (count === '0' && await FlexiForm.confirm("<?php echo Text::_('FLEXI_ITEMS_REFRESH_CONFIRM', true); ?>")) {
+		location.href = 'index.php?option=com_flexicontent&view=items';
+	}
 }
 
 // the function overloads joomla standard event
@@ -289,35 +277,69 @@ function submitform(pressbutton)
 // Delete a specific list filter
 function delFilter(name)
 {
-	//if(window.console) window.console.log('Clearing filter:'+name);
-	var myForm = jQuery('#adminForm');
-	var filter = jQuery('#'+name);
+	const filter = document.getElementById(name);
+	if (!filter) return;
+	if (filter.type === 'checkbox') filter.checked = false;
+	else if (filter.multiple) filter.selectedIndex = -1;
+	else filter.value = '';
+	if (filter.hasAttribute('data-alt-value')) filter.dataset.altValue = '';
+}
 
-	if (!filter.length)
-	{
-		return;
-	}
-	else if (filter.attr('type') == 'checkbox')
-	{
-		filter.removeAttr('checked');
-	}
-	else
-	{
-		filter.val('');
+function selectItemTypeFilter(button)
+{
+	const tabs = button.closest('nav');
+	const form = button.form;
+	const select = form.elements.namedItem('filter_type[]');
+	if (tabs.inert || !select || FlexiForm.visible(document.getElementById('fc_filter_form_blocker'))) return;
 
-		// Case that input has Calendar JS attached
-		if (filter.attr('data-alt-value'))
-		{
-			filter.attr('data-alt-value', '');
-		}
+	// Submit the shortcut independently of the filter panel's Apply mode. Keep the
+	// select and its Choices widget at the values belonging to the displayed list.
+	const requestedType = document.createElement('input');
+	requestedType.type = 'hidden';
+	requestedType.name = select.name;
+	requestedType.value = button.value;
+	const association = form.elements.filter_assockey;
+	const previousAssociation = association?.checked;
+	const previousPage = form.elements.limitstart?.value;
+	const wasDisabled = select.disabled;
+	try {
+		select.disabled = true;
+		if (button.value) form.append(requestedType);
+		if (association) association.checked = false;
+		if (form.elements.limitstart) form.elements.limitstart.value = '0';
+		Joomla.submitform('', form);
+	} finally {
+		requestedType.remove();
+		select.disabled = wasDisabled;
+		if (association) association.checked = previousAssociation;
+		if (form.elements.limitstart) form.elements.limitstart.value = previousPage;
 	}
+
+	const blocker = document.getElementById('fc_filter_form_blocker');
+	if (FlexiForm.visible(blocker)) {
+		tabs.inert = true;
+		tabs.setAttribute('aria-busy', 'true');
+		window.addEventListener('pageshow', function (event) {
+			if (!event.persisted) return;
+			tabs.inert = false;
+			tabs.removeAttribute('aria-busy');
+			FlexiForm.show(blocker, false);
+		}, {once: true});
+	}
+}
+
+function toggleItemAssignments(button, selector)
+{
+	const show = button.getAttribute('aria-expanded') !== 'true';
+	button.setAttribute('aria-expanded', String(show));
+	document.querySelectorAll(selector).forEach(box => FlexiForm.show(box, show));
 }
 
 function delAllFilters()
 {
-	jQuery('.fc_field_filter').val('');  // clear custom filters
+	document.querySelectorAll('.fc_field_filter').forEach(filter => delFilter(filter.id));  // clear custom filters
 	delFilter('search');
-	<?php $single_type ? '' : "delFilter('filter_type'); "; ?>
+	delFilter('filter_type');
 	delFilter('filter_state');
 	delFilter('filter_cats');
 	delFilter('filter_featured');
@@ -333,8 +355,8 @@ function delAllFilters()
 	delFilter('filter_assockey');
 	delFilter('filter_order');
 	delFilter('filter_order_Dir');
-	jQuery('#filter_subcats').attr('checked', 'checked');  // default: include subcats
-	jQuery('#filter_catsinstate').val('1');	  // default: published categories
+	document.getElementById('filter_subcats').checked = true;  // default: include subcats
+	document.getElementById('filter_catsinstate').value = '1';	  // default: published categories
 }
 
 <?php if ($this->reOrderingActive) : ?>
@@ -347,84 +369,59 @@ var move_within_ordering_groups_limits = <?php echo '"'.Text::_('FLEXI_MOVE_WITH
 
 <?php if ($this->unassociated && !$this->badcatitems) : ?>
 	var unassociated_items = <?php echo $this->unassociated; ?>;
-	function bindItems()
+	async function bindItems()
 	{
-		jQuery('#log-bind').html('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" />');
-		jQuery('#orphan_items_mssg').html("<?php echo Text::_( 'FLEXI_ITEMS_TO_BIND', true ); ?>");
-
-    var postData = jQuery('#bindToTypeBox').serializeArray();
-    var taskURL  = jQuery('#bindToTypeBox').attr("data-action");
-
-		taskURL += '&typeid=' + jQuery('#bindToTypeBox').find('#typeid').val();
-		taskURL += '&bind_limit=' + jQuery('#bindToTypeBox').find('#bind_limit').val();
-
-    jQuery.ajax(
-		{
-			url : taskURL,
-			type: "POST",
-			data : postData,
-			success:function(data, textStatus, jqXHR)
-			{
-				jQuery('#log-bind').html(data);
-				bind_limit = jQuery('#bind_limit').val();
-				unassociated_items = unassociated_items - bind_limit;
-
-				if (unassociated_items > 0)
-				{
-					jQuery('#orphan_items_count').html(unassociated_items);
-					bindItems();
-				}
-				else
-				{
-					jQuery('#orphan_items_count').html('0');
-					if(confirm("<?php echo Text::_( 'FLEXI_ITEMS_REFRESH_CONFIRM',true ); ?>"))
-					{
-						location.href = 'index.php?option=com_flexicontent&view=items';
-					}
-				}
-				//if (fetchcounter('orphan_items_count', 'getOrphansItems', jQuery('#bind_limit').val()) != 0) bindItems();
-			},
-			error: function(jqXHR, textStatus, errorThrown)
-			{
-			    //if fails
+		const box = document.getElementById('bindToTypeBox');
+		const log = document.getElementById('log-bind');
+		const limit = Number(box.querySelector('#bind_limit').value);
+		if (!(limit > 0)) return;
+		const url = new URL(box.dataset.action, document.baseURI);
+		url.searchParams.set('typeid', box.querySelector('#typeid').value);
+		url.searchParams.set('bind_limit', String(limit));
+		log.textContent = <?php echo json_encode(Text::_('FLEXI_LOADING')); ?>;
+		document.getElementById('orphan_items_mssg').textContent = <?php echo json_encode(Text::_('FLEXI_ITEMS_TO_BIND')); ?>;
+		try {
+			while (unassociated_items > 0) {
+				const response = await fetch(url, {method: 'POST', headers: {'X-Requested-With': 'XMLHttpRequest'}});
+				if (!response.ok) throw new Error('HTTP ' + response.status);
+				log.innerHTML = await response.text();
+				unassociated_items = Math.max(0, unassociated_items - limit);
+				document.getElementById('orphan_items_count').textContent = unassociated_items;
 			}
-		});
+			if (await FlexiForm.confirm("<?php echo Text::_('FLEXI_ITEMS_REFRESH_CONFIRM', true); ?>")) {
+				location.href = 'index.php?option=com_flexicontent&view=items';
+			}
+		} catch (error) {
+			Joomla.renderMessages({error: [FlexiForm.text('JERROR_AN_ERROR_HAS_OCCURRED')]});
+		}
 	}
 <?php endif; ?>
 
 <?php if ($this->badcatitems) : ?>
-jQuery(document).ready(function(){
-	jQuery('#button-fixcat').on('click', function(event)
-	{
-		var default_cat = jQuery('#fixCatBox').find('#default_cat');
-
-		if (!default_cat.val())
-		{
-			alert('Please select a category');
-			return false;
-		}
-
-		var action = jQuery('#fixCatBox').data('action') + '&default_cat=' + default_cat.val();
-
-		jQuery(this).parent().remove();
-		jQuery('#log-fixcat').html('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" />');
+FlexiForm.ready(function () {
+	const button = document.getElementById('button-fixcat');
+	button?.addEventListener('click', async event => {
+		event.preventDefault();
 		event.stopImmediatePropagation();
-
-    jQuery.ajax(
-		{
-			url : action,
-			type: 'post',
-			data : null,
-			success:function(data, textStatus, jqXHR)
-			{
-				jQuery('#log-fixcat').html(data);
-				fetchcounter('badcat_items_count', 'getBadCatItems');
-			},
-			error: function(jqXHR, textStatus, errorThrown)
-			{
-			    //if fails
-			}
-		});
+		const box = document.getElementById('fixCatBox');
+		const category = box.querySelector('#default_cat').value;
+		if (!category) {
+			FlexiForm.alert('Please select a category');
+			return;
+		}
+		const url = new URL(box.dataset.action, document.baseURI);
+		url.searchParams.set('default_cat', category);
+		button.disabled = true;
+		try {
+			const response = await fetch(url, {method: 'POST', headers: {'X-Requested-With': 'XMLHttpRequest'}});
+			if (!response.ok) throw new Error('HTTP ' + response.status);
+			document.getElementById('log-fixcat').innerHTML = await response.text();
+			await fetchcounter('badcat_items_count', 'getBadCatItems');
+		} catch (error) {
+			Joomla.renderMessages({error: [FlexiForm.text('JERROR_AN_ERROR_HAS_OCCURRED')]});
+		} finally {
+			button.disabled = false;
+		}
 	});
 });
 <?php endif; ?>
@@ -523,96 +520,131 @@ if ($this->max_tab_types && count($this->itemTypes) >= $this->max_tab_types)
 }
 elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 {
-	echo '
-	<div style="overflow: hidden; margin: -8px 0; ">
-		<div class="fctabber s-cblue" id="items_type_tabset">';
+	// Style of the tabs: global configuration (Items Manager - Appearance). "bootstrap" are the standard Bootstrap nav tabs
+	$tabs_mode = (string) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('iman_type_tabs_style', 'browser');
 
-	$type_class = empty($filter_type) ? ' tabbertabforced' : '';
-	$__tip_class = ''; //' hasTooltip';
-	$__tip_props = ''; //' data-placement="top" data-title="' . Text::_('FLEXI_ALL') . '" ';
-
-	echo '
-		<div class="tabbertab ' . $type_class . '" id="type_tab_all" style="padding-left: 0; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 0;">
-			<h3 class="tabberheading ' . $__tip_class . '" ' . $__tip_props . '
-				onmouseup="jQuery(\'#filter_assockey\').removeAttr(\'checked\'); jQuery(\'#filter_type\').val([]); jQuery(\'#filter_type\').trigger(\'change\')"
-			>' . Text::_('FLEXI_ALL') . '</h3>
-		</div>
-		';
-
-	if (count($filter_type) > 1)
+	if ($tabs_mode === 'bootstrap') :
+	// These controls filter the whole list. The returned list determines the active type.
+	$typeButtons = array('' => Text::_('FLEXI_ALL'));
+	$subtypeButtons = array();
+	foreach ($this->itemTypes as $itemType)
 	{
-		$type_class  = ' tabbertabforced';
-		$_name = count($filter_type) . ' ' . Text::_('FLEXI_TYPES');
-
-		$__tip_props = ''; //' data-placement="top" data-title="' . $_name . '" ';
-		$__tip_class = ''; //' hasTooltip';
-		echo '
-			<div class="tabbertab ' . $type_class . '" id="type_tab_all" style="padding-left: 0; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 0;">
-				<h3 class="tabberheading ' . $__tip_class . '" ' . $__tip_props . '
-				>' . $_name . '</h3>
-			</div>
-			';
+		if ($itemType->params->get('is_subtype', 0))
+		{
+			$subtypeButtons[$itemType->id] = Text::_($itemType->name);
+		}
+		else
+		{
+			$typeButtons[$itemType->id] = Text::_($itemType->name);
+		}
 	}
+	?>
+	<nav id="items_type_tabset" class="nav nav-tabs" aria-label="<?php echo htmlspecialchars(Text::_('FLEXI_TYPE'), ENT_QUOTES, 'UTF-8'); ?>">
+		<?php foreach ($typeButtons + $subtypeButtons as $id => $label) :
+			$active = $id === '' ? !$filter_type : $single_type && (int) $id === (int) $single_type_id;
+			if ($subtypeButtons && $id === array_key_first($subtypeButtons)) : ?>
+				<span class="nav-link disabled"><?php echo Text::_('FLEXI_SUBTYPES'); ?></span>
+			<?php endif; ?>
+			<button type="button" class="nav-link<?php echo $active ? ' active' : ''; ?>"<?php echo $active ? ' aria-current="page"' : ''; ?>
+				value="<?php echo $id === '' ? '' : (int) $id; ?>" onclick="selectItemTypeFilter(this)"><?php echo htmlspecialchars($label, ENT_QUOTES, 'UTF-8'); ?></button>
+			<?php if ($id === '' && count($filter_type) > 1) : ?>
+				<span class="nav-link active" aria-current="page"><?php echo count($filter_type) . ' ' . Text::_('FLEXI_TYPES'); ?></span>
+			<?php endif; ?>
+		<?php endforeach; ?>
+	</nav>
+	<?php else :
+	// Tabs of the content types (browser like tabs). A click sets the type filter and submits the form
+	$main_types = array();
+	$sub_types  = array();
 
-	$main_types = [];
-	$sub_types  = [];
-	foreach($this->itemTypes as $itemType) {
-		if ($itemType->params->get('is_subtype', 0)) {
+	foreach ($this->itemTypes as $itemType)
+	{
+		if ($itemType->params->get('is_subtype', 0))
+		{
 			$sub_types[] = $itemType;
-		} else {
+		}
+		else
+		{
 			$main_types[] = $itemType;
 		}
 	}
-	$sorted_itemTypes = array_merge($main_types, $sub_types);
 
-	$subtype_count = 0;
-	$itemType = reset($sorted_itemTypes);
-	do
+	$tab_html = function ($label, $type_id, $active, $extra_class = '', $static = false)
 	{
-		if ($itemType->params->get('is_subtype', 0) && $subtype_count == 0) {
-			$type_class = ' subtypes-header';
-			echo '
-				<div class="tabbertab ' . $type_class . '" id="type_tab_break_subtype" style="padding:0; border: 0;">
-					<h3 class="tabberheading ' . $type_class . '"
-						data-data_attr_a="' . (int) $itemType->id . '"
-					> Subtypes: </h3>
-			';
-			echo '</div>';
+		return '<button type="button" role="tab" class="fc-type-tab' . ($active ? ' is-active' : '') . ($static ? ' is-static' : '') . $extra_class . '"'
+			. ' data-type="' . ($type_id === null ? '' : (int) $type_id) . '" aria-selected="' . ($active ? 'true' : 'false') . '">'
+			. '<span class="fc-type-tab-label">' . htmlspecialchars(html_entity_decode((string) $label, ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8') . '</span></button>';
+	};
+
+	$tabs_style = in_array($tabs_mode, array('hanging', 'underline', 'flat', 'pills'), true) ? ' fc-tabs-' . $tabs_mode : '';
+
+	echo '<div class="fc-type-tabs' . $tabs_style . '" id="items_type_tabset" role="tablist">';
+
+	echo $tab_html(Text::_('FLEXI_ALL'), null, empty($filter_type));
+
+	// Several types selected via the filter: a tab that summarizes the selection
+	if (count($filter_type) > 1)
+	{
+		echo $tab_html(count($filter_type) . ' ' . Text::_('FLEXI_TYPES'), null, true, '', true);
+	}
+
+	foreach ($main_types as $itemType)
+	{
+		echo $tab_html(Text::_($itemType->name), $itemType->id, $single_type && in_array($itemType->id, $filter_type));
+	}
+
+	if ($sub_types)
+	{
+		echo '<span class="fc-type-tabs-sep">Subtypes</span>';
+
+		foreach ($sub_types as $itemType)
+		{
+			echo $tab_html(Text::_($itemType->name), $itemType->id, $single_type && in_array($itemType->id, $filter_type), ' fc-subtype');
 		}
+	}
 
-		$type_class = $single_type && in_array($itemType->id, $filter_type) ? ' tabbertabforced' : '';
-		$__tip_class = ''; //' hasTooltip';
-		$__tip_props = ''; //' data-placement="top" data-title="' . Text::_( $itemType->name ) . '" ';
-		if ($itemType->params->get('is_subtype', 0)) {
-			$type_class .= ' fc-subtype';
-			$subtype_count++;
-		}
-		echo '
-			<div class="tabbertab ' . $type_class . '" id="type_tab_' . (int) $itemType->id . '" style="padding-left: 0; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 0;">
-				<h3 class="tabberheading ' . $__tip_class . $type_class . '" ' . $__tip_props . '
-					data-data_attr_a="' . (int) $itemType->id . '"
-					onmouseup="jQuery(\'#filter_assockey\').removeAttr(\'checked\'); jQuery(\'#filter_type\').val([this.getAttribute(\'data-data_attr_a\')]); jQuery(\'#filter_type\').trigger(\'change\')"
-				>' . Text::_( $itemType->name ) . '</h3>
-		';
-		echo '</div>';
+	echo '</div>';
+	?>
+	<script>
+	(function () {
+		var tabs = document.querySelectorAll('#items_type_tabset .fc-type-tab:not(.is-static)');
 
-		$itemType = next($sorted_itemTypes);
-		if (0 && $itemType && $itemType->params->get('is_subtype', 0) && $subtype_count == 0) {
-			$type_class = ' break-subtypes';
-			echo '
-				<div class="tabbertab ' . $type_class . '" id="type_tab_break_subtype" style="padding:0; border: 0;">
-					<h3 class="tabberheading ' . $type_class . '"
-						data-data_attr_a="' . (int) $itemType->id . '"
-					></h3>
-			';
-			echo '</div>';
-		}
+		Array.prototype.forEach.call(tabs, function (tab) {
+			tab.addEventListener('click', function () {
+				if (tab.classList.contains('is-active') || document.getElementById('items_type_tabset').classList.contains('is-busy')) return;
 
-	} while($itemType);
+				// Immediate feedback, then filter the list (the type filter submits the form when it changes)
+				Array.prototype.forEach.call(tabs, function (t) { t.classList.remove('is-active'); t.setAttribute('aria-selected', 'false'); });
+				tab.classList.add('is-active');
+				tab.setAttribute('aria-selected', 'true');
+				document.getElementById('items_type_tabset').classList.add('is-busy');
 
-	echo '
-		</div>
-	</div>';
+				// Set the value of the type filter and submit the form directly: triggering the "change" event of the (enhanced)
+				// select was not reliable, the list was reloaded only after another click
+				var id   = tab.getAttribute('data-type');
+				var sel  = document.getElementById('filter_type');
+				var form = document.adminForm;
+
+				var assock = document.getElementById('filter_assockey');
+				if (assock) assock.checked = false;
+
+				if (sel) {
+					Array.prototype.forEach.call(sel.options, function (o) { o.selected = !!id && o.value === id; });
+				}
+				else if (id) {
+					var inp = document.createElement('input');
+					inp.type = 'hidden'; inp.name = 'filter_type[]'; inp.value = id;
+					form.appendChild(inp);
+				}
+
+				if (form.limitstart) form.limitstart.value = 0;
+				Joomla.submitform();
+			});
+		});
+	})();
+	</script>
+	<?php endif; ?>
+	<?php
 }
 ?>
 
@@ -627,11 +659,11 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<span class="badge" style="border-radius: 3px;" id="orphan_items_count"><?php echo $this->unassociated; ?></span>
 			<span id="orphan_items_mssg"><?php echo Text::_( 'FLEXI_ITEMS' ); ?></span>
 
-			<div id="bindToTypeBox" style="display: inline-block;" data-action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>bindextdata&amp;tmpl=component&amp;format=raw">
+			<div id="bindToTypeBox" style="display: inline-block;" data-action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>bindextdata&amp;tmpl=component&amp;format=raw&amp;<?php echo \Joomla\CMS\Session\Session::getFormToken(); ?>=1">
 
 				<input id="button-bind" type="button"
 					class="<?php echo $btn_class; ?> btn-primary" style='float:none !important; box-sizing: border-box; min-width: 200px;'
-					value="<?php echo Text::_('FLEXI_BIND'); ?>" onclick="jQuery(this).parent().hide(); bindItems();"
+					value="<?php echo Text::_('FLEXI_BIND'); ?>" onclick="FlexiForm.show(this.parentElement, false); bindItems();"
 				/>
 
 				<?php
@@ -658,7 +690,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<span id="badcat_items_count" class="badge" style="border-radius: 3px;"><?php echo $this->badcatitems; ?></span>
 			<?php echo Text::_( 'FLEXI_ITEMS' ); ?>
 
-			<div id="fixCatBox" style="display: inline-block;" data-action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>fixmaincat&amp;tmpl=component&amp;format=raw">
+			<div id="fixCatBox" style="display: inline-block;" data-action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>fixmaincat&amp;tmpl=component&amp;format=raw&amp;<?php echo \Joomla\CMS\Session\Session::getFormToken(); ?>=1">
 				<input id="button-fixcat" type="button"
 					class="<?php echo $btn_class; ?> btn-primary"
 					value="<?php echo Text::_( 'FLEXI_FIX' ); ?>" onclick="return false;"
@@ -672,7 +704,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 	<?php if ($this->unassociated && !count($this->rows)) echo '<div style="display: none;">'; ?>
 
 
-	<div id="fc-managers-header">
+	<div id="fc-managers-header" class="fc-mh-items">
 
 		<?php if (!empty($this->lists['scope_tip'])) : ?>
 		<div class="fc-filter-head-box filter-search nowrap_box" style="margin: 0;">
@@ -688,12 +720,16 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<input type="text" name="search" id="search" placeholder="<?php echo !empty($this->scope_title) ? $this->scope_title : Text::_('FLEXI_SEARCH'); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="fcfield_textval" />
 				<button title="" data-original-title="<?php echo Text::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : Text::_('FLEXI_GO'); ?></button>
 
-				<div id="fc_filters_box_btn" data-original-title="<?php echo Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
+				<button type="button" id="fc_filters_box_btn" aria-label="<?php echo htmlspecialchars(Text::_('FLEXI_FILTERS'), ENT_QUOTES, 'UTF-8'); ?>" data-original-title="<?php echo Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
 					<?php echo FLEXI_J30GE ? '<i class="icon-filter"></i>' : Text::_('FLEXI_FILTERS'); ?>
 					<?php echo ($this->count_filters  ? ' <sup>' . $this->count_filters . '</sup>' : ''); ?>
-				</div>
+				</button>
 
-				<div id="fc-filters-box" <?php if (!$this->count_filters || empty($tools_state->filters_box)) echo 'style="display:none;"'; ?> class="fcman-abs" onclick="var event = arguments[0] || window.event; event.stopPropagation();">
+				<?php
+				$filters_modern = (int) ComponentHelper::getParams('com_flexicontent')->get('backend_filters_style', 1) === 1;
+				$filters_apply_btn = $filters_modern && (int) ComponentHelper::getParams('com_flexicontent')->get('backend_filters_apply', 1) === 1;
+				?>
+				<div id="fc-filters-box" <?php if (!$this->count_filters || empty($tools_state->filters_box)) echo 'style="display:none;"'; ?> class="fcman-abs<?php echo $filters_modern ? ' fc-filters-modern' : ''; ?>">
 					<?php
 					echo $this->lists['filter_assockey'];
 					echo $this->lists['filter_fileid'];
@@ -705,11 +741,14 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					echo $this->lists['filter_access'];
 					echo $this->lists['filter_meta'];
 
+					// Modern style: the 'Subcategories' option is an extension of the Category filter, keep both in one cell
+					echo $filters_modern ? '<div class="fc-filter-group">' : '';
 					if (!$this->reOrderingActive)
 					{
 						echo $this->lists['filter_cats'];
 					}
 					echo $this->lists['filter_subcats'];
+					echo $filters_modern ? '</div>' : '';
 
 					echo $this->lists['filter_featured'];
 					echo $this->lists['filter_catsinstate'];
@@ -727,7 +766,9 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 					if (ComponentHelper::getParams('com_flexicontent')->get('show_csvbutton_be', 0))
 					{
-						echo '
+						echo $filters_modern
+							? '<div class="fc-filters-csv"><h4>' . Text::_('FLEXI_CSV_EXPORT') . '</h4>'
+							: '
 							<div class="clear"></div>
 							<h4>' . Text::_('FLEXI_CSV_EXPORT') . '</h4>
 							<div class="clear"></div>
@@ -735,11 +776,49 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 						echo $this->lists['csv_header'];
 						echo $this->lists['csv_raw_export'];
 						echo $this->lists['csv_all_fields'];
+						echo $this->lists['csv_zip_media'];
+						echo $filters_modern ? '</div>' : '';
 					}
 					?>
 
-					<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
+					<?php if ($filters_apply_btn) : ?>
+					<div class="fc-filters-actions">
+						<button type="button" class="btn btn-primary fc-filters-apply" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();">
+							<span class="icon-filter"></span> <?php echo Text::_('FLEXI_APPLY'); ?>
+						</button>
+					</div>
+					<?php endif; ?>
+
+					<button type="button" id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></button>
 				</div>
+
+				<?php if ($filters_apply_btn) : ?>
+				<script>
+					/* Apply-button mode: changing a filter inside the box does not reload the list immediately.
+					   The filters are applied by the Apply button or by clicking outside of the box (as before). */
+					(function() {
+						var box = document.getElementById('fc-filters-box');
+						if (!box) return;
+						var dirty = false;
+						var els = box.querySelectorAll('[onchange*="submitform"]');
+						for (var i = 0; i < els.length; i++) {
+							els[i].removeAttribute('onchange');
+							els[i].onchange = null;
+						}
+						var markDirty = function() { dirty = true; };
+						box.addEventListener('change', markDirty, true);
+						if (window.jQuery) jQuery(box).on('change', markDirty);
+						document.addEventListener('mousedown', function(e) {
+							// The Select2 (legacy) drop-down and its mask are appended to <body>, outside of the box:
+							// picking a (second) value there is not a click outside of the box
+							if (!dirty || box.contains(e.target) || e.target.closest?.('.select2-drop, #select2-drop-mask, #items_type_tabset')) return;
+							dirty = false;
+							if (!!document.adminForm.limitstart) document.adminForm.limitstart.value = 0;
+							Joomla.submitform();
+						}, true);
+					})();
+				</script>
+				<?php endif; ?>
 
 				<button title="" data-original-title="<?php echo Text::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-cancel"></i>' : Text::_('FLEXI_CLEAR'); ?></button>
 			</div>
@@ -751,22 +830,22 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 			<div class="btn-group">
 				<?php if (!isset($disable_columns['cats']) && $max_cats_cnt > 1): ?>
-					<div id="fc-toggle-cats_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>  hidden-phone" title="<?php echo Text::_('FLEXI_SECONDARY_CATEGORIES'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_cats').show(400) : jQuery('.fc_assignments_box.fc_cats').hide(400);" ><span class="icon-tree-2"></span></div>
+					<button type="button" id="fc-toggle-cats_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>  hidden-phone" title="<?php echo Text::_('FLEXI_SECONDARY_CATEGORIES'); ?>" onclick="toggleItemAssignments(this, '.fc_assignments_box.fc_cats');" ><span class="icon-tree-2"></span></button>
 				<?php endif; ?>
 				<?php if (!isset($disable_columns['tags']) && $max_tags_cnt > 1): ?>
-					<div id="fc-toggle-tags_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>  hidden-phone hidden-tablet" title="<?php echo Text::_('FLEXI_TAGS'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_tags').show(400) : jQuery('.fc_assignments_box.fc_tags').hide(400);" ><span class="icon-tags"></span></div>
+					<button type="button" id="fc-toggle-tags_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>  hidden-phone hidden-tablet" title="<?php echo Text::_('FLEXI_TAGS'); ?>" onclick="toggleItemAssignments(this, '.fc_assignments_box.fc_tags');" ><span class="icon-tags"></span></button>
 				<?php endif; ?>
 
-				<div id="fc_mainChooseColBox_btn" class="<?php echo $this->tooltip_class . ' ' . $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
+				<button type="button" id="fc_mainChooseColBox_btn" aria-label="<?php echo htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_COLUMNS'), ENT_QUOTES, 'UTF-8'); ?>" class="<?php echo $this->tooltip_class . ' ' . $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
 					<span class="icon-contract"></span><sup id="columnchoose_totals"></sup>
-				</div>
+				</button>
 
 				<?php if (!empty($this->minihelp) && FlexicontentHelperPerm::getPerm()->CanConfig): ?>
-				<div id="fc-mini-help_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?> hidden-phone hidden-tablet" title="<?php echo Text::_('FLEXI_IMAN_ABOUT_ADDING_MORE_COLUMNS_AND_FILTERS'); ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
+				<button type="button" id="fc-mini-help_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?> hidden-phone hidden-tablet" title="<?php echo Text::_('FLEXI_IMAN_ABOUT_ADDING_MORE_COLUMNS_AND_FILTERS'); ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
 					<span class="icon-cog"></span>
 					<span class="icon-help"></span>
 					<?php echo $this->minihelp; ?>
-				</div>
+				</button>
 				<?php endif; ?>
 			</div>
 			<div id="mainChooseColBox" class="group-fcset fcman-abs" style="display:none;"></div>
@@ -839,24 +918,20 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 		<div class="fcclear"></div>
 
-		<?php if ($canOrder): ?>
-		<div class="hidden-phone" style="z-index: 1; position: sticky; top: 30%; margin: 0 -20px;">
-			<div style="position: absolute; margin: 0; height: 0;">
-				<div style="padding: 0px; font-weight: normal; line-height: 28px; width: auto; text-align: center;">
-					<?php echo HTMLHelper::_($hlpname . '.saveorder_btn', $this->rows, $_config = null); ?>
-				</div>
+		<div class="fc-reorder-panel">
+			<div class="fc-reorder-help">
+				<span><?php echo Text::_($canOrder ? 'FLEXI_REORDER_HELP' : 'FLEXI_FCORDER_ONLY_VIEW'); ?></span>
+			</div>
+			<div class="fc-reorder-actions">
+				<?php if ($canOrder): ?>
+					<?php echo HTMLHelper::_($hlpname . '.manualorder_btn', $this->rows, (object) array('custom_txt' => 'FLEXI_REORDER_MANUAL')); ?>
+					<?php echo HTMLHelper::_($hlpname . '.saveorder_btn', $this->rows, (object) array('custom_txt' => 'FLEXI_REORDER_SAVE')); ?>
+				<?php endif; ?>
+				<button type="button" class="btn btn-sm btn-outline-secondary"
+					onclick="document.getElementById('filter_order').value='a.id'; document.getElementById('filter_order_Dir').value='DESC'; if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();"
+				><?php echo Text::_('FLEXI_REORDER_EXIT'); ?></button>
 			</div>
 		</div>
-		<div class="hidden-phone" style="z-index: 1; position: sticky; top: 30%; margin: 0 -20px;">
-			<div style="position: absolute; margin: 40px 0 0 0; height: 0;">
-				<div style="padding: 0px; font-weight: normal; line-height: 28px; width: auto; text-align: center;">
-					<?php echo HTMLHelper::_($hlpname . '.manualorder_btn', $this->rows, $_config = null); ?>
-				</div>
-			</div>
-		</div>
-		<?php else: ?>
-			<?php echo '<span class="icon-cancel ' . $this->tooltip_class . '" title="'.flexicontent_html::getToolTip('', 'FLEXI_FCORDER_ONLY_VIEW', 1, 1) . '"></span>'; ?>
-		<?php endif; ?>
 
 	<?php endif; ?>
 
@@ -871,53 +946,69 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo Text::_( 'FLEXI_NUM' ); ?>
 			</th-->
 
-			<th class="col_order center hidden-phone "><?php $colposition++; ?>
+			<th class="col_order center hidden-phone " data-col="order"><?php $colposition++; ?>
 				<?php
-				echo $canOrder ? $image_ordering_tip : '';
-				echo str_replace('_FLEXI_ORDER_',
+				$order_sort_html = str_replace('_FLEXI_ORDER_',
 					''/*Text::_('FLEXI_ORDER', true)*/,
 					str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2 btn btn-micro"></span></a>',
 					HTMLHelper::_('grid.sort', '_FLEXI_ORDER_', (!$this->filter_order_type ? 'a.ordering' : 'catsordering'), $this->lists['order_Dir'], $this->lists['order']))
 				);
+
+				// The reordering info is shown as the tooltip of the sort button (it used to be a separate "i" icon, making the header taller)
+				if ($canOrder)
+				{
+					$tip_attr = $ordering_tip_title;
+					$tip_cls  = $this->tooltip_class;
+
+					$order_sort_html = preg_match('/<a\b[^>]*\btitle="/', $order_sort_html)
+						? preg_replace_callback('/(<a\b[^>]*\b)title="[^"]*"/', function ($m) use ($tip_attr) { return $m[1] . 'title="' . $tip_attr . '"'; }, $order_sort_html, 1)
+						: preg_replace_callback('/<a\b/', function ($m) use ($tip_attr) { return '<a title="' . $tip_attr . '"'; }, $order_sort_html, 1);
+
+					$order_sort_html = preg_match('/<a\b[^>]*\bclass="/', $order_sort_html)
+						? preg_replace_callback('/(<a\b[^>]*\bclass=")/', function ($m) use ($tip_cls) { return $m[1] . $tip_cls . ' '; }, $order_sort_html, 1)
+						: preg_replace_callback('/<a\b/', function ($m) use ($tip_cls) { return '<a class="' . $tip_cls . '"'; }, $order_sort_html, 1);
+				}
+
+				echo $order_sort_html;
 				?>
 				<span class="column_toggle_lbl" style="display:none;"><?php echo Text::_( 'FLEXI_ORDER' ); ?></span>
 			</th>
 
-			<th class="col_cb left"><?php $colposition++; ?>
+			<th class="col_cb left" data-col="cb"><?php $colposition++; ?>
 				<div class="group-fcset">
 					<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo Text::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					<label for="checkall-toggle" class="green single"></label>
 				</div>
 			</th>
 
-			<th class="left"><?php $colposition++; ?>
+			<th class="left" data-col="notes" data-col-label="<?php echo Text::_('FLEXI_NOTES'); ?>"><?php $colposition++; ?>
 			</th>
 
-			<th class="col_status hideOnDemandClass nowrap left" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="status" class="col_status hideOnDemandClass nowrap left" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_state') || $this->getModel()->getState('filter_catsinstate') != 1) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_state'); jQuery('#filter_catsinstate').val('1'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_state'); document.getElementById('filter_catsinstate').value = '1'; document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
 
-			<th class="col_title hideOnDemandClass nowrap left" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="title" class="col_title hideOnDemandClass nowrap left" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_TITLE', 'a.' . $this->title_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if (strlen($this->getModel()->getState('search'))) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('search'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('search'); document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
 
 
 			<?php if (!isset($disable_columns['author'])) : ?>
-			<th class="col_authors hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="authors" class="col_authors hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_AUTHOR', 'a.created_by', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_author')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_author'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_author'); document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -925,11 +1016,11 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['lang'])) : ?>
-			<th class="col_lang hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="lang" class="col_lang hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_LANGUAGE', 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_lang')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_lang'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_lang'); document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -937,17 +1028,17 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if ($useAssocs && !isset($disable_columns['assocs'])) : ?>
-			<th class="col_assocs_count"><?php $colposition++; ?>
-				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo Text::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_<?php echo $this->data_tbl_id . '_'. $colposition; ?>_label').click();" >
+			<th class="col_assocs_count" data-col="assocs" data-col-label="<?php echo Text::_('FLEXI_ASSOCIATIONS'); ?>"><?php $colposition++; ?>
+				<button type="button" id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo Text::_('FLEXI_ASSOCIATIONS'); ?>" onclick="window.fcTableTools && fcTableTools.toggle('<?php echo $this->data_tbl_id; ?>', 'assocs');" >
 					<span class="icon-flag"></span>
-				</div>
+				</button>
 			</th>
 
-			<th class="col_assocs hideOnDemandClass nowrap hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="assocs" class="col_assocs hideOnDemandClass nowrap hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo Text::_('FLEXI_ASSOCIATIONS'); ?>
 				<?php if ($this->getModel()->getState('filter_assockey')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_assockey'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_assockey'); document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -955,11 +1046,11 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!$single_type || !isset($disable_columns['single_type'])): ?>
-			<th class="col_type hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="type" class="col_type hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_type')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_type'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_type'); document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -967,25 +1058,25 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['template'])): ?>
-			<th class="col_template hideOnDemandClass nowrap left hidden-phone hidden-tablet" colspan="2" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="template" class="col_template hideOnDemandClass nowrap left hidden-phone hidden-tablet" colspan="2" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo Text::_('FLEXI_TEMPLATE'); ?>
 			</th>
 			<?php endif; ?>
 
 
 			<?php foreach($this->extra_fields as $field) :?>
-				<th class="hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+				<th data-col="extra_<?php echo $this->escape($field->name); ?>" class="hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 					<?php echo $field->label; ?>
 				</th>
 			<?php endforeach; ?>
 
 
 			<?php if (!isset($disable_columns['access'])): ?>
-			<th class="col_access hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="access" class="col_access hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_access')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_access'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_access'); document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -993,12 +1084,12 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['cats'])): ?>
-			<th class="col_cats hideOnDemandClass nowrap left hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="cats" class="col_cats hideOnDemandClass nowrap left hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $categories_tip; ?>
 				<?php echo Text::_( 'FLEXI_CATEGORIES' ); ?>
 				<?php if ($this->getModel()->getState('filter_cats') || $this->getModel()->getState('filter_subcats') == 0) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_cats'); jQuery('#filter_subcats').attr('checked', 'checked'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_cats'); document.getElementById('filter_subcats').checked = true; document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -1006,11 +1097,11 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['tags'])): ?>
-			<th class="col_tag hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="tags" class="col_tag hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo Text::_( 'FLEXI_TAGS' ); ?>
 				<?php if ($this->getModel()->getState('filter_tag')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_tag'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_tag'); document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -1018,14 +1109,14 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['created'])): ?>
-			<th class="col_created hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="created" class="col_created hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort',   'FLEXI_CREATED', 'a.created', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '1') :
 					if (($this->startdate && ($this->startdate != Text::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != Text::_('FLEXI_TO')))) :
 				?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></button>
 				</span>
 				<?php
 					endif;
@@ -1036,14 +1127,14 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['modified'])) : ?>
-			<th class="col_revised hideOnDemandClass nowrap hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="revised" class="col_revised hideOnDemandClass nowrap hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort',   'FLEXI_REVISED', 'a.modified', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '2') :
 					if (($this->startdate && ($this->startdate != Text::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != Text::_('FLEXI_TO')))) :
 				?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></button>
 				</span>
 				<?php
 					endif;
@@ -1054,32 +1145,32 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['hits'])) : ?>
-			<th class="col_hits hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="hits" class="col_hits hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'JGLOBAL_HITS', 'a.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 			<?php endif; ?>
 
 
 			<?php if (!isset($disable_columns['votes'])) : ?>
-			<th class="col_votes hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="votes" class="col_votes hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'JGLOBAL_VOTES', 'rating_count', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 			<?php endif; ?>
 
 
 			<?php if (!isset($disable_columns['ratings'])) : ?>
-			<th class="col_ratings hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="ratings" class="col_ratings hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'JGLOBAL_RATINGS', 'rating', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 			<?php endif; ?>
 
 
 			<?php if (!isset($disable_columns['id'])) : ?>
-			<th class="col_id hideOnDemandClass nowrap center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="id" class="col_id hideOnDemandClass nowrap center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 				<?php if ($this->getModel()->getState('filter_id')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_id'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_id'); document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -1144,7 +1235,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 		<?php if ($canOrder) : ?>
 
-			<td class="col_order nowrap center hidden-phone"><?php $colposition++; ?>
+			<td class="col_order nowrap center hidden-phone" data-col="order"><?php $colposition++; ?>
 				<?php
 					if ($this->reOrderingActive)
 					{
@@ -1187,7 +1278,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 		<?php else : ?>
 
-			<td class="center hidden-phone"><?php $colposition++; ?>
+			<td class="center hidden-phone" data-col="order"><?php $colposition++; ?>
 				<?php
 				echo !$this->reOrderingActive
 					? '<span class="icon-move" style="color: #d0d0d0"></span>'
@@ -1197,12 +1288,12 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 		<?php endif; ?>
 
-			<td class="col_cb"><?php $colposition++; ?>
+			<td class="col_cb" data-col="cb"><?php $colposition++; ?>
 				<!--div class="adminlist-table-row"></div-->
 				<?php echo HTMLHelper::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
 
-			<td class="col_notes nowrap"><?php $colposition++; ?>
+			<td class="col_notes nowrap" data-col="notes"><?php $colposition++; ?>
 				<?php
 				// Display an icon if item has an unapproved latest version, thus needs revising
 				echo HTMLHelper::_($hlpname . '.reviewing_needed', $row, $user, $i);
@@ -1212,7 +1303,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				?>
 			</td>
 
-			<td class="col_status" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="status" class="col_status" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<div class="btn-group fc-group fc-items">
 					<?php
 					//echo HTMLHelper::_('jgrid.published', $row->state, $i, $ctrl, $stateIsChangeable, 'cb', $row->publish_up, $row->publish_down);
@@ -1228,7 +1319,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				</div>
 			</td>
 
-			<td class="col_title " style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="title" class="col_title " style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				/**
 				 * Display an edit pencil or a check-in button if: either (a) current user has Global
@@ -1270,7 +1361,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['author'])) : ?>
-			<td class="col_authors hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="authors" class="col_authors hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->author; ?>
 			</td>
 			<?php endif; ?>
@@ -1278,7 +1369,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			
 
 			<?php if (!isset($disable_columns['lang'])) : ?>
-			<td class="col_lang hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="lang" class="col_lang hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 					/**
 					 * Display language
@@ -1290,7 +1381,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 <?php if ($useAssocs && !isset($disable_columns['assocs'])) : ?>
 
-	<td><?php $colposition++; ?>
+	<td data-col="assocs"><?php $colposition++; ?>
 		<?php if (!empty($this->lang_assocs[$row->id])): ?>
 			<?php $row_assocs = $this->lang_assocs[$row->id]; ?>
 			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_assockey=<?php echo reset($row_assocs)->key; ?>&amp;fcform=1&amp;filter_state=ALL&amp;limit=50"
@@ -1301,7 +1392,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 		<?php endif; ?>
 	</td>
 
-	<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+	<td data-col="assocs" class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 		<?php
 		if (!empty($this->lang_assocs[$row->id]))
 		{
@@ -1342,7 +1433,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				}
 				
 				$_title = flexicontent_html::getToolTip(
-					$assoc_item->title,
+					htmlspecialchars((string) $assoc_item->title, ENT_QUOTES, 'UTF-8'),
 					(isset($state_icons[$assoc_item->state]) ? '<span class="' . $state_icons[$assoc_item->state] . '"></span>' : '') .
 					(isset($state_names[$assoc_item->state]) ? $state_names[$assoc_item->state] . '<br>': '') .
 					($is_oc_item ? '' : '<span class="icon-pencil"></span>' . Text::_( !$assoc_item->is_uptodate && $assoc_modified < $oc_item_modified ? 'FLEXI_TRANSLATION_IS_OUTDATED' : 'FLEXI_TRANSLATION_IS_UPTODATE')) .
@@ -1358,7 +1449,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 				echo '
 				<a class="fc_assoc_translation label label-association ' . $this->popover_class . $assoc_isstale_class . $assoc_state_class . ' hasTooltip"
-					target="_blank" href="'.$_link.'" data-placement="top" aria-label="'.$_title.' data-content="'.$_title.' data-bs-original-title="'.$_title.'"
+					target="_blank" href="'.$_link.'" data-placement="top" aria-label="'.$_title.'" data-content="'.$_title.'" data-bs-original-title="'.$_title.'"
 				>
 					<span>' . ($assoc_item->lang=='*' ? Text::_('FLEXI_ALL') : strtoupper($assoc_item->shortcode ?: '?')) . '</span>
 				</a>';
@@ -1371,17 +1462,17 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!$single_type || !isset($disable_columns['single_type'])): ?>
-			<td class="col_type hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="type" class="col_type hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo Text::_($row->type_name); ?>
 			</td>
 			<?php endif ; ?>
 
 
 			<?php if (!isset($disable_columns['template'])): ?>
-			<td class="col_edit_layout hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition); ?>" >
+			<td data-col="template" class="col_edit_layout hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition); ?>" >
 				<?php echo HTMLHelper::_($hlpname . '.edit_layout', $row, '__modal__', $i, $this->perms->CanTemplates, $row_ilayout); ?>
 			</td>
-			<td class="col_template hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="template" class="col_template hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row_ilayout.($row->config->get('ilayout') ? '' : '<sup>[1]</sup>') ?>
 			</td>
 			<?php endif; ?>
@@ -1389,7 +1480,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
     <?php foreach($this->extra_fields as $field) :?>
 
-			<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="extra_<?php echo $this->escape($field->name); ?>" class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 		    <?php
 				$raw_value        = isset($row->fields[$field->name]->{$field->methodname}) ? $row->fields[$field->name]->{$field->methodname} : '';
 				$field_appearance = (int) $field->parameters->get('backend_view_appearance', 0);
@@ -1406,7 +1497,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['access'])): ?>
-			<td class="col_access hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="access" class="col_access hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->canEditState && $this->perms->CanAccLvl
 					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'class="fcfield_selectval" onchange="return Joomla.listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
 					: $row->access_level; ?>
@@ -1415,7 +1506,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['cats'])): ?>
-			<td class="col_cats hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="cats" class="col_cats hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				// Reorder categories place item's MAIN category first or ...
 				// place first the category being filtered (if order is 'FLEXIcontent')
@@ -1450,6 +1541,15 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				}
 				$row->catids = $catids;
 
+				// Pill with the number of items of a category, a click lists the items of the category
+				$cat_count_pill = function ($category) {
+					return '<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_cats=' . (int) $category->id
+						. '&amp;filter_catsinstate=99&amp;fcform=1&amp;filter_state=ALL&amp;limit=50"'
+						. ' class="' . $this->btn_sm_class . ' fc_assocs_count fc_cat_items_count ' . $this->tooltip_class . '"'
+						. ' title="' . htmlspecialchars(Text::_('FLEXI_ITEMS'), ENT_QUOTES, 'UTF-8') . '">'
+						. (int) ($category->items_count ?? 0) . '</a>';
+				};
+
 				$nr = count($row->catids);
 				$ix = 0;
 				$nn = 0;
@@ -1473,26 +1573,26 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					$short_name = StringHelper::strlen($title) > 40  ? StringHelper::substr( $title , 0 , 40) . '...' : $title;
 					if (!$isMainCat)
 					{
-						$row_cats[] = !$this->perms->CanCats ? $short_name : '
+						$row_cats[] = (!$this->perms->CanCats ? $short_name : '
 							<span class="'.$catClass.'" title="'.$edit_cat_title.'">
 								<a href="'.$catLink.'">'.$short_name.'</a>
-							</span>';
+							</span>') . ' ' . $cat_count_pill($category);
 						$cat_names[] = $short_name;
 					}
 					else
 					{
-						$_maincat = !$this->perms->CanCats ? '<span class="badge">' . $short_name . '</span>' : '
+						$_maincat = (!$this->perms->CanCats ? '<span class="badge">' . $short_name . '</span>' : '
 						<span class="'.$catClass.'" title="'.$edit_cat_title.'">
 							<a href="'.$catLink.'">'.$short_name.'</a>
-						</span>';
+						</span>') . ' ' . $cat_count_pill($category);
 					}
 					$ix++;
 				}
 				echo $_maincat;
 				echo count($row_cats) ? '
-					<span class="btn btn-mini ' . $this->popover_class . ' nowrap_box" onclick="jQuery(this).next().toggle(400);" data-content="'.flexicontent_html::getToolTip(Text::_('FLEXI_CATEGORIES'), '<ul class="fc_plain"><li>'.implode('</li><li>', $cat_names).'</li></ul>', 0, 1).'">
+					<button type="button" class="btn btn-mini ' . $this->popover_class . ' nowrap_box" onclick="FlexiForm.show(this.nextElementSibling, !FlexiForm.visible(this.nextElementSibling));" data-content="'.flexicontent_html::getToolTip(Text::_('FLEXI_CATEGORIES'), '<ul class="fc_plain"><li>'.implode('</li><li>', $cat_names).'</li></ul>', 0, 1).'">
 						'.count($row_cats).' <i class="icon-tree-2"></i>
-					</span>
+					</button>
 					<div class="fc_assignments_box fc_cats">' : '';
 				echo count($row_cats) > 8
 					? implode(', ', $row_cats)
@@ -1504,41 +1604,50 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['tags'])): ?>
-			<td class="col_tag hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="tags" class="col_tag hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
+					// Chip of a tag: the name (link to edit the tag) and a small pill with the number of items having the tag (link to list them)
+					$tag_chip = function ($tag) {
+						$name  = htmlspecialchars((string) $tag->name, ENT_QUOTES, 'UTF-8');
+						$count = (int) ($tag->items_count ?? 0);
+						$label = !empty($this->perms->CanTags)
+							? '<a class="fc-tag-chip-name" href="index.php?option=com_flexicontent&amp;task=tag.edit&amp;id=' . (int) $tag->id . '" title="' . htmlspecialchars(Text::_('FLEXI_EDIT_TAG'), ENT_QUOTES, 'UTF-8') . ': ' . $name . '">' . $name . '</a>'
+							: '<span class="fc-tag-chip-name" title="' . $name . '">' . $name . '</span>';
+
+						return '<span class="fc-tag-chip">' . $label
+							. '<a class="fc-opt-count' . ($count ? '' : ' is-zero') . '" href="index.php?option=com_flexicontent&amp;view=items&amp;filter_tag[]=' . (int) $tag->id
+							. '&amp;filter_catsinstate=99&amp;fcform=1&amp;filter_state=ALL&amp;limit=50" title="' . htmlspecialchars(Text::_('FLEXI_ITEMS'), ENT_QUOTES, 'UTF-8') . '">' . $count . '</a></span>';
+					};
+
 					$row_tags  = array();
 					$tag_names = array();
 					foreach ($row->tagids as $key => $_itag)
 					{
 						if ( isset($this->itemTags[$_itag]) )
 						{
-							$row_tags[] = ' <span class="itemtag">'.$this->itemTags[$_itag]->name.'</span> ';
+							$row_tags[] = $tag_chip($this->itemTags[$_itag]);
 							$tag_names[] = $this->itemTags[$_itag]->name;
 						}
 					}
 					echo count($row_tags) ? '
-						<span class="btn btn-mini ' . $this->popover_class . ' nowrap_box" onclick="jQuery(this).next().toggle(400);" data-content="'.flexicontent_html::getToolTip(Text::_('FLEXI_TAGS'), '<ul class="fc_plain"><li>'.implode('</li><li>', $tag_names).'</li></ul>', 0, 1).'">
+						<button type="button" class="btn btn-mini fc_tags_toggle ' . $this->popover_class . ' nowrap_box" onclick="const box = this.nextElementSibling; FlexiForm.show(box, !FlexiForm.visible(box));" data-content="'.flexicontent_html::getToolTip(Text::_('FLEXI_TAGS'), '<ul class="fc_plain"><li>'.implode('</li><li>', $tag_names).'</li></ul>', 0, 1).'">
 							'.count($row_tags).' <i class="icon-tags"></i>
-						</span>
-						<div class="fc_assignments_box fc_tags">' : '';
-					echo count($row_tags) > 8
-						? implode(', ', $row_tags)
-						: (count($row_tags) ? '<ul class="fc_plain"><li>' . implode('</li><li>', $row_tags) . '</li></ul>' : '');
-					echo count($row_tags) ? '</div>' : '';
+						</button>
+						<div class="fc_assignments_box fc_tags"><div class="fc-tag-chips">' . implode('', $row_tags) . '</div></div>' : '';
 				?>
 			</td>
 			<?php endif; ?>
 
 
 			<?php if (!isset($disable_columns['created'])) : ?>
-			<td class="col_created hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="created" class="col_created hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('date',  $row->created, $date_format); ?>
 			</td>
 			<?php endif; ?>
 
 
 			<?php if (!isset($disable_columns['modified'])) : ?>
-			<td class="col_revised hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="revised" class="col_revised hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				if ($row->modified == $row->created)  echo Text::_('Same as creation');
 				else echo ($row->modified != $_NULL_DATE_) ? HTMLHelper::_('date', $row->modified, $date_format) : $_NEVER_;
@@ -1548,28 +1657,34 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['hits'])) : ?>
-			<td class="col_hits center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="hits" class="col_hits center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo '<span class="badge bg-info badge-info"> ' . ($row->hits ?: 0) . '</span>'; ?>
 			</td>
 			<?php endif; ?>
 
 
 			<?php if (!isset($disable_columns['votes'])) : ?>
-			<td class="col_votes center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="votes" class="col_votes center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo '<span class="badge bg-success badge-success"> ' . ($row->rating_count ?: 0) . '</span>'; ?>
 			</td>
 			<?php endif; ?>
 
 
 			<?php if (!isset($disable_columns['ratings'])) : ?>
-			<td class="col_ratings center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
-				<?php echo '<span class="badge bg-warning badge-warning"> ' .sprintf('%.0f', (float) $row->rating) .'%</span>'; ?>
+			<td data-col="ratings" class="col_ratings center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+				<?php
+				// An item without votes has no rating. Its 'rating' column holds the voting field's "default rating",
+				// a value that only places unrated items among the rated ones when a list is ordered by rating
+				echo (int) $row->rating_count
+					? '<span class="badge bg-warning badge-warning"> ' . sprintf('%.0f', (float) $row->rating) . '%</span>'
+					: '<span class="badge bg-secondary badge-secondary" title="' . htmlspecialchars(Text::_('FLEXI_NOT_RATED_YET'), ENT_QUOTES, 'UTF-8') . '">-</span>';
+				?>
 			</td>
 			<?php endif; ?>
 
 
 			<?php if (!isset($disable_columns['id'])) : ?>
-			<td class="col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="id" class="col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->id; ?>
 			</td>
 			<?php endif; ?>
@@ -1594,6 +1709,17 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 	</tbody>
 
 	</table>
+	<script>window.fcTableTools && fcTableTools.init('<?php echo $this->data_tbl_id; ?>');</script>
+	<?php if (!$this->reOrderingActive) : ?>
+	<script>
+	// Entering the ordering mode: the type filter is cleared (ordering is done per category, a type filter would often leave nothing to order)
+	document.addEventListener('click', function (e) {
+		if (!e.target.closest || !e.target.closest('th.col_order a')) return;
+		var sel = document.getElementById('filter_type');
+		if (sel) Array.prototype.forEach.call(sel.options, function (o) { o.selected = false; });
+	}, true);
+	</script>
+	<?php endif; ?>
 
 
 	<div>
@@ -1634,12 +1760,13 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 </div><!-- #flexicontent end -->
 
 <?php
-Factory::getDocument()->addScriptDeclaration('
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration('
 	function fc_edit_jarticle_modal_load( container )
 	{
-		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=articles") != -1 )
+		var frame = FlexiForm.element(container).querySelector("iframe");
+		if (frame && frame.contentWindow.location.href.indexOf("view=articles") !== -1)
 		{
-			container.dialog("close");
+			fc_closeDialog("fc_modal_popup_container");
 		}
 	}
 	function fc_edit_jarticle_modal_close()

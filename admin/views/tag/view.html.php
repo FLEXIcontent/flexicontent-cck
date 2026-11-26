@@ -14,7 +14,13 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecord' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * HTML View class for the Tag screen
@@ -34,9 +40,9 @@ class FlexicontentViewTag extends FlexicontentViewBaseRecord
 
 		$app        = \Joomla\CMS\Factory::getApplication();
 		$jinput     = $app->input;
-		$document   = \Joomla\CMS\Factory::getDocument();
-		$user       = \Joomla\CMS\Factory::getUser();
-		$db         = \Joomla\CMS\Factory::getDbo();
+		$document   = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db         = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$perms      = FlexicontentHelperPerm::getPerm();
 
@@ -105,16 +111,16 @@ class FlexicontentViewTag extends FlexicontentViewBaseRecord
 		// Add css to document
 		if ($isAdmin)
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 		else
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 		}
@@ -286,7 +292,19 @@ class FlexicontentViewTag extends FlexicontentViewBaseRecord
 				$jtag     = reset($jtag_id_arr);
 				$jtag_id  = $jtag->id;
 
-				$tagTable = \Joomla\CMS\Table\Table::getInstance($_type = 'flexicontent_tags', $_prefix = '', $_config = array());
+				$__tblType = $_type = 'flexicontent_tags';
+				$__tblPrefix = $_prefix = '';
+				$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+				if ($__tblPrefix === 'TagsTable') {
+					$tagTable = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+				} elseif ($__tblPrefix === 'JTable') {
+					$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+					$tagTable = new $__tblClass($__tblDb);
+				} else {
+					$__tblClass = $__tblPrefix . ucfirst($__tblType);
+					require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+					$tagTable = new $__tblClass($__tblDb);
+				}
 				$tagTable->load($row->id);
 				$tagTable->jtag_id = $jtag_id;
 				$tagTable->store();
@@ -299,9 +317,10 @@ class FlexicontentViewTag extends FlexicontentViewBaseRecord
 			$document->addScriptDeclaration('
 				function fc_edit_jtag_modal_load( container )
 				{
-					if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=tags") != -1 )
+					var frame = FlexiForm.element(container).querySelector("iframe");
+					if (frame && frame.contentWindow.location.href.indexOf("view=tags") !== -1)
 					{
-						container.dialog("close");
+						fc_closeDialog("fc_modal_popup_container");
 					}
 				}
 				function fc_edit_jtag_modal_close()
@@ -316,7 +335,7 @@ class FlexicontentViewTag extends FlexicontentViewBaseRecord
 			\Joomla\CMS\Toolbar\ToolbarHelper::divider();
 			flexicontent_html::addToolBarButton(
 				'FLEXI_EDIT_JTAG', $btn_name='edit_jtag',
-				$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_jtag_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_jtag_modal_load}); return false;",
+				$full_js="var url = this.getAttribute('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_jtag_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_jtag_modal_load}); return false;",
 				$msg_alert='', $msg_confirm='',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="spaced-btn btn-info".$tip_class, $btn_icon="icon-pencil",
 				'data-placement="bottom" data-href="index.php?option=com_tags&task=tag.edit&id='.$jtag_id.'" title="Edit all details of joomla tag"'
@@ -330,7 +349,7 @@ class FlexicontentViewTag extends FlexicontentViewBaseRecord
 
 		if ($js)
 		{
-			$document->addScriptDeclaration('jQuery(document).ready(function(){'
+			$document->addScriptDeclaration('FlexiForm.ready(function(){'
 				.$js.
 			'});');
 		}

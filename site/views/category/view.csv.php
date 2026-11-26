@@ -19,8 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.view.legacy');
-jimport('joomla.filesystem.file');
 
 /**
  * HTML View class for the Category View
@@ -38,10 +36,14 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 	 */
 	function display( $tpl = null )
 	{
+		$start_microtime = microtime(true);
+		$max_execution_time = (int) ini_get('max_execution_time');
+		$item_count = 0;
+
 		// Initialize framework variables
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$aid      = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 
 		// Get model
@@ -74,7 +76,8 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			die('CSV export not enabled for this view');
 		}
 
-		$field_sep  = $cparams->get('csv_export_field_sep', 0);
+		$field_sep = (string) $cparams->get('csv_export_field_sep', ',');
+		$this->csvSeparator = $field_sep;
 
 		// Check if current view is filtered by item type
 		$filter_type    = $model->getState('filter_type');
@@ -296,6 +299,13 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 					$delim = $field_sep;
 					$vals = '';
 
+					// Raw exports must enforce the same field view access as rendered output.
+					// The delimiter is already emitted, so denied fields keep an empty CSV cell.
+					if (empty($field->has_access))
+					{
+						continue;
+					}
+
 					// CASE 1: RENDERED value display !
 					if ($include_in_csv_export === 2)
 					{
@@ -335,19 +345,11 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 					// CASE 3: RAW value display !
 					elseif (isset($item->fieldvalues[$field->id]))
 					{
-						if (is_array(reset($item->fieldvalues[$field->id])))
-						{
-							$vals = array();
+						$vals = array();
 
-							foreach ($item->fieldvalues[$field->id] as $v)
-							{
-								$vals = implode(' | ', $v);
-							}
-						}
-
-						else
+						foreach ($item->fieldvalues[$field->id] as $v)
 						{
-							$vals = $item->fieldvalues[$field->id];
+							$vals[] = is_array($v) ? implode(' | ', $v) : $v;
 						}
 					}
 
@@ -367,11 +369,9 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			/**
 			 * Get time spent so far and break if near max_executime time
 			 */
-			$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			$_total_runtime      += $elapsed_microseconds;
-			$start_microtime      = microtime(true);
+			$elapsed_seconds = microtime(true) - $start_microtime;
 
-			if ($max_execution_time && $_total_runtime > 3 * $max_execution_time / 4)
+			if ($max_execution_time && $elapsed_seconds > 3 * $max_execution_time / 4)
 			{
 				// Message cannot be set when using jexit() ...
 				//$app->enqueueMessage('Exported ' . $item_count . ' items. <br> 3/4 of max execution time ' . $max_execution_time . ' reached before exporting all items.', 'warning');
@@ -401,9 +401,12 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 	}
 
 
+	protected $csvSeparator = ',';
+
 	protected function _encodeCSVField($string)
 	{
-		if (strpos($string, ',') !== false || strpos($string, '"') !== false || strpos($string, "\n") !== false) 
+		$string = (string) $string;
+		if (($this->csvSeparator !== '' && strpos($string, $this->csvSeparator) !== false) || strpos($string, '"') !== false || strpos($string, "\n") !== false || strpos($string, "\r") !== false)
 		{
 			$string = '"' . str_replace('"', '""', $string) . '"';
 		}

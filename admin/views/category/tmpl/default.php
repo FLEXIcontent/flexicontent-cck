@@ -27,7 +27,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flex
 $this->document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 $js = "
-	jQuery(document).ready(function(){
+	FlexiForm.ready(function(){
 		fc_bindFormDependencies('#flexicontent', 2, '.control-group');
 	});
 ";
@@ -286,7 +286,7 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 					<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_LAYOUT'); ?> </h3>
 
 					<span class="btn-group input-append" style="margin: 2px 0px 6px;">
-						<span id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo \Joomla\CMS\Language\Text::_('JHELP'); ?></span>
+						<button type="button" id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo \Joomla\CMS\Language\Text::_('JHELP'); ?></button>
 					</span>
 					<div class="fcclear"></div>
 
@@ -532,7 +532,7 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 					</div>
 
 					<span class="btn-group input-append" style="margin: 2px 0px 6px;">
-						<span id="fc-heritage-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-heritage-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_HERITAGE_OVERRIDE_ORDER'); ?></span>
+						<button type="button" id="fc-heritage-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-heritage-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_HERITAGE_OVERRIDE_ORDER'); ?></button>
 					</span>
 					<div class="fcclear"></div>
 

@@ -13,6 +13,8 @@ if ($is_ingroup)
 	return;
 }
 
+// The selected gallery loads its own dependencies, independently of Choices.
+
 
 // ***
 // *** Values loop
@@ -105,7 +107,7 @@ $(document).ready(function()
 
 	var sliderBox  = $('#gf_thumbs_" . $uid . "');
 
-	sliderBox.find('.gf_fancybox').fancybox({
+	if (" . ($enable_popup ? 'true' : 'false') . ") sliderBox.find('.gf_fancybox').fancybox({
 		'openEffect'	: 'elastic',
 		'closeEffect'	: 'elastic',
 		'openEasing'  : 'easeOutCubic',
@@ -162,7 +164,7 @@ $(document).ready(function()
 })(jQuery);
 ";
 
-if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+if ($js) \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript($js);
 
 
 /**
@@ -172,12 +174,7 @@ if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
 if ( !isset(static::$js_added[$field->id][__FILE__]) )
 {
 	flexicontent_html::loadFramework('galleriffic');
-
-	// Load Fancybox if needed
-	//if ( $enable_popup )
-	//{
-		flexicontent_html::loadFramework('fancybox');
-	//}
+	if ($enable_popup) flexicontent_html::loadFramework('fancybox');
 
 	static::$js_added[$field->id][__FILE__] = array();
 }
@@ -270,7 +267,7 @@ if ($result !== _FC_RETURN_)
 
 			'. $navigation_top .'
 
-		<div class="gf_controls_box" ' . ($over_image_btns ? 'style="height: 0; overflow: hidden;"' : '') . '>
+		<div class="gf_controls_box' . ($over_image_btns ? ' gf_controls_overlay' : '') . '">
 			<div id="gf_sscontrols_' . $uid . '" class="controls ss-controls-box"></div>
 			' . (!$over_image_btns ? '
 			<div id="gf_navcontrols_' . $uid . '" class="controls nav-controls-box"></div>

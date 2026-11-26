@@ -14,7 +14,13 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentController', JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentController' => JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 require_once('traitbase.php');
 
 #[AllowDynamicProperties] //php8.2 compatibility
@@ -71,6 +77,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		// These will be usable only if (plural) records model has 'canDelRelated' Flag
 		$this->registerTask('remove_cascade',   'remove');
 		$this->registerTask('remove_relations', 'remove');
+		$this->registerTask('remove_cascade_jtags', 'remove');
 
 		$this->registerTask('exportxml', 'export');
 		$this->registerTask('exportsql', 'export');
@@ -150,15 +157,15 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Standalone modes, set HTTP headers, also get value of 'status' header
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
-		$httpStatus = $this->exitSuccess ? '200 OK' : '400 Bad Request';
+		$httpStatus = $this->exitSuccess ? 200 : 400;
 
 		foreach	($this->exitHttpHead as $header)
 		{
 			if (key($header) == 'status')
 			{
-				$httpStatus = key($header);
+				$httpStatus = (int) reset($header);
 			}
 
 			$app->setHeader(key($header), reset($header), true);
@@ -170,7 +177,6 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			if (!empty($this->exitLogTexts))
 			{
 				$log_filename = 'filemanager_upload_' . ($user->id) . '.php';
-				jimport('joomla.log.log');
 				\Joomla\CMS\Log\Log::addLogger(
 					array(
 						'text_file' => $log_filename,  // Sets the target log file
@@ -237,7 +243,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Initialize variables
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$ctrl_task = 'task=' . $this->record_name_pl . '.';
 		$original_task = $this->task;
@@ -556,7 +562,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Set record ID (\Joomla\CMS\Form\Form) into the request array variable cid[] (expected by the 'checkin' task)
 		$raw_data = $this->input->get('jform', array(), 'array');
-		$cid = $raw_data['id'] ? (int) $raw_data['id'] : $this->input->getInt('id', 0);
+		$cid = !empty($raw_data['id']) ? (int) $raw_data['id'] : $this->input->getInt('id', 0);
 		$this->input->set('cid', $cid);
 
 		// Check in the record (if possible) and redirect (typically) to records manager
@@ -583,8 +589,8 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getDbo();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Get models
 		$model = $this->getModel($this->record_name_pl);
@@ -614,7 +620,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			'T'  => -2
 		);
 
-		$state = strlen($state)
+		$state = strlen((string) $state)
 			? $state
 			: $this->input->get('newstate', '', 'string');
 
@@ -760,14 +766,14 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Get model
 		$model   = $this->getModel($this->record_name_pl);
 		$model_s = $this->getModel($this->record_name);
 
 		// Check that request action is supported by the model
-		if (in_array($this->task, array('remove_cascade', 'remove_relations')) && !$model::canDelRelated)
+		if (in_array($this->task, array('remove_cascade', 'remove_relations', 'remove_cascade_jtags')) && !$model::canDelRelated)
 		{
 			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('Unsupported task called'), 'error');
 			$app->setHeader('status', 500, true);
@@ -792,7 +798,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Calculate access, if cascade removal, then pass via 'cid_locked' all records as ignore-assignments records
 		$cid_noauth = array();
-		$cid_locked = in_array($this->task, array('remove_cascade', 'remove_relations'))
+		$cid_locked = in_array($this->task, array('remove_cascade', 'remove_relations', 'remove_cascade_jtags'))
 			? $cid
 			: array();
 
@@ -834,6 +840,8 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			// Delete the record or records and their assignments
 			case 'remove':
 			case 'remove_cascade':
+			case 'remove_cascade_jtags':
+				$model->deleteJoomlaTags = ($this->task === 'remove_cascade_jtags');
 				$result = $model->delete($cid, $model_s);
 				break;
 		}
@@ -871,9 +879,9 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 	public function edit()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		$this->input->set('view', $this->record_name);
 		$this->input->set('hidemainmenu', 1);
@@ -969,7 +977,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Get model
 		$model = $this->getModel($this->record_name_pl);
@@ -1082,7 +1090,11 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		// Currently no cache cleaned for all cases
+		// Progressive module caches can contain item metadata in their saved document head.
+		$cache = FLEXIUtilities::getCache('', 0);
+		$cache->clean('com_modules');
+		// Full-page snapshots must not outlive content or access changes.
+		$cache->clean('page');
 	}
 
 
@@ -1134,7 +1146,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$app->enqueueMessage(\Joomla\CMS\Language\Text::_('Task ' . __FUNCTION__ . ' not implemented YET'), 'error');
 		$app->setHeader('status', 500, true);
@@ -1215,7 +1227,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 	 */
 	protected function _getRecordsQuery($cid, $cols)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$cid = ArrayHelper::toInteger($cid);
 		$cols_list = implode(',', array_filter($cols, array($db, 'quoteName')));

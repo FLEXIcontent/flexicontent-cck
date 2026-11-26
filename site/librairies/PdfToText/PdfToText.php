@@ -211,6 +211,7 @@ if  ( ! function_exists ( 'hex2bin' ) )
         Base class for all PDF objects defined here.
 
   ==============================================================================================================*/
+#[\AllowDynamicProperties]
 abstract class  PdfObjectBase		// extends  Object
    {
 	// Possible encoding types for streams inside objects ; "unknown" means that the object contains no stream
@@ -302,7 +303,7 @@ abstract class  PdfObjectBase		// extends  Object
 				else
 					$result		.=  self::$UnicodeToSimpleAscii [ $word ] ;
 
-				$code		 =  ( integer ) ( $code / 0xFFFF ) ;	// There is no unsigned right-shift operator in PHP...
+				$code		 =  ( int ) ( $code / 0xFFFF ) ;	// There is no unsigned right-shift operator in PHP...
 			    }
 
 			return ( $result ) ;
@@ -326,6 +327,25 @@ abstract class  PdfObjectBase		// extends  Object
 		Decodes a string that may contain constructs such as '#xy', where 'xy' are hex digits.
 
 	 *-------------------------------------------------------------------------------------------------------------*/
+	public static function  Latin1ToUtf8 ( $string )
+	   {
+		// Replaces utf8_encode(), deprecated since PHP 8.2 : converts ISO-8859-1 to UTF-8
+		if  ( function_exists ( 'mb_convert_encoding' ) )
+			return ( mb_convert_encoding ( $string, 'UTF-8', 'ISO-8859-1' ) ) ;
+
+		$string		=  ( string ) $string ;
+		$result		=  '' ;
+
+		for  ( $i = 0, $length = strlen ( $string ) ; $i  <  $length ; $i ++ )
+		   {
+			$ord	=  ord ( $string [$i] ) ;
+			$result	.=  ( $ord  <  0x80 ) ?  $string [$i] : chr ( 0xC0 | ( $ord >> 6 ) ) . chr ( 0x80 | ( $ord & 0x3F ) ) ;
+		    }
+
+		return ( $result ) ;
+	    }
+
+
 	public static function  DecodeRawName ( $str )
 	   {
 		return ( rawurldecode ( str_replace ( '#', '%', $str ) ) ) ;
@@ -492,14 +512,14 @@ abstract class  PdfObjectBase		// extends  Object
 			if  ( preg_match_all ( '/(?P<object> \d+) \s+ \d+ \s+ R/x', $object_list, $matches ) )
 			   {
 				foreach  ( $matches [ 'object' ]  as  $id )
-					$object_ids []	=  ( integer ) $id ;
+					$object_ids []	=  ( int ) $id ;
 			    }
 			else
 				$status		=  false ;
 		    }
 		else if  ( preg_match ( "#$searched_string \s+ (?P<object> \d+) \s+ \d+ \s+ R#ix", $object_data, $match ) )
 		   {
-			$object_ids []	=  ( integer ) $match [ 'object' ] ;
+			$object_ids []	=  ( int ) $match [ 'object' ] ;
 		    }
 		else
 			$status		=  false ;
@@ -822,7 +842,7 @@ abstract class  PdfObjectBase		// extends  Object
 				// Process each match
 				foreach  ( $matches [0]  as  $match )
 				   {
-					$offset		=  ( integer ) $match [1] ;
+					$offset		=  ( int ) $match [1] ;
 
 					// Append data from the last seen offset up to the current one
 					if  ( $last_offset  <  $offset )
@@ -961,7 +981,7 @@ abstract class  PdfObjectBase		// extends  Object
 						$count ++ ;
 					    }
 
-					$result		.=  chr ( $ord ) ;
+					$result		.=  chr ( $ord & 0xFF ) ;
 					$offset		 =  $backslash_index ;
 				    }
 			    }
@@ -1034,7 +1054,7 @@ abstract class  PdfObjectBase		// extends  Object
 
 							$i -- ;		// Count one character less since $i will be incremented at the end of the for() loop
 
-							$result .= chr ( $ord ) ;
+							$result .= chr ( $ord & 0xFF ) ;
 						    }
 						else
 							$result .=  $nch ;
@@ -1552,6 +1572,8 @@ class  PdfToText 	extends PdfObjectBase
 			// Build the character classes (used only for testing letters and digits)
 			if  ( self::$CharacterClasses  ===  false )
 			   {
+				self::$CharacterClasses	=  array ( ) ;
+
 				for  ( $ord = 0 ; $ord  <  256 ; $ord ++ )
 				   {
 					$ch	=  chr ( $ord ) ;
@@ -1578,7 +1600,7 @@ class  PdfToText 	extends PdfObjectBase
 			    }
 
 			// Global execution time limit
-			self::$PhpMaxExecutionTime	=  ( integer ) ini_get ( 'max_execution_time' ) ;
+			self::$PhpMaxExecutionTime	=  ( int ) ini_get ( 'max_execution_time' ) ;
 
 			if  ( ! self::$PhpMaxExecutionTime )					// Paranoia : default max script execution time to 120 seconds
 				self::$PhpMaxExecutionTime	=  120 ;
@@ -1664,7 +1686,7 @@ class  PdfToText 	extends PdfObjectBase
 			error ( new  PdfToTextDecodingException ( "File \"$filename\" does not exist." ) ) ;
 
 		// Load its contents
-		$contents 	=  @file_get_contents ( $filename, FILE_BINARY ) ;
+		$contents 	=  @file_get_contents ( $filename ) ;
 
 		if  ( $contents  ===  false ) 
 			error ( new  PdfToTextDecodingException ( "Unable to open \"$filename\"." ) ) ;
@@ -2147,7 +2169,7 @@ class  PdfToText 	extends PdfObjectBase
 
 		// Build the page locations (ie, starting and ending offsets)
 		$offset			=  0 ;
-		$page_separator		=  utf8_encode ( $this -> PageSeparator ) ;
+		$page_separator		=  self::Latin1ToUtf8 ( $this -> PageSeparator ) ;
 		$page_separator_length	=  strlen ( $page_separator ) ;
 
 		foreach  ( $this -> Pages  as  $page_number => &$page )
@@ -2229,7 +2251,7 @@ class  PdfToText 	extends PdfObjectBase
 	    DESCRIPTION
 	        Adobe supports 4 predefined fonts : standard, Mac, WinAnsi and PDF). All the characters in these fonts
 		are identified by a character time, a little bit like HTML entities ; for example, 'one' will be the
-		character '1', 'acircumflex' will be 'â', etc.
+		character '1', 'acircumflex' will be 'Ã¢', etc.
 		There are thousands of character names defined by Adobe (see https://mupdf.com/docs/browse/source/pdf/pdf-glyphlist.h.html).
 		Some of them are not in this list ; this is the case for example of the 'ax' character names, where 'x'
 		is a decimal number. When such a character is specified in a /Differences array, then there is somewhere
@@ -2279,7 +2301,7 @@ class  PdfToText 	extends PdfObjectBase
 			// Numeric value : the output array will contain 4 times the supplied value
 			else if  ( is_numeric ( $value ) )
 			   {
-				$value		=  ( integer ) $value ;
+				$value		=  ( int ) $value ;
 				$items		=  array ( $value, $value, $value, $value ) ;
 			    }
 			// Array value : make sure we will have an output array of 4 values
@@ -2295,7 +2317,7 @@ class  PdfToText 	extends PdfObjectBase
 					if  ( is_string ( $code ) )
 						$items []	=  ord ( $code ) ;
 					else
-						$items []	=  ( integer ) $code ;
+						$items []	=  ( int ) $code ;
 				    }
 
 				// Ensure that we have 4 values ; fill the missing ones with the last seen value if necessary
@@ -3166,7 +3188,7 @@ class  PdfToText 	extends PdfObjectBase
     					$sum 	=  ( $sum * 85 ) + $ords [ $j ] ;
 
     				for ( $j = 3  ; $j  >=  0  ; $j -- )
-    					$result 	.=  chr ( $sum >> ( $j * 8 ) ) ;
+    					$result 	.=  chr ( ( $sum >> ( $j * 8 ) ) & 0xFF ) ;
 			    }
 		    }
 
@@ -3178,7 +3200,7 @@ class  PdfToText 	extends PdfObjectBase
     				$sum 	+= ( $ords [ $i ] + ( $i == $ord_count - 1 ) ) * $exp85 [$i] ;
 
     			for  ( $i = 0  ; $i  <  $ord_count - 1  ; $i++ )
-    				$result 	.=  chr ( $sum >> ( ( 3 - $i ) * 8 ) ) ;
+    				$result 	.=  chr ( ( $sum >> ( ( 3 - $i ) * 8 ) ) & 0xFF ) ;
     		    }
 
 		// All done, return
@@ -3344,8 +3366,8 @@ class  PdfToText 	extends PdfObjectBase
 
 		for  ( $i = 0, $count = count ( $series ) ; $i  <  $count ; $i += 2 )
 		   {
-			$object_id	=  ( integer ) $series [$i] ;
-			$offset		=  ( integer ) $series [$i+1] ;
+			$object_id	=  ( int ) $series [$i] ;
+			$offset		=  ( int ) $series [$i+1] ;
 
 			// If there is a "next" object, extract only a substring within the object stream contents
 			if  ( isset ( $series [ $i + 3 ] ) ) 
@@ -3438,7 +3460,7 @@ class  PdfToText 	extends PdfObjectBase
 
 	    PARAMETERS
 		$page_number (integer) -
-			¨Page number that contains the text to be extracted.
+			Â¨Page number that contains the text to be extracted.
 
 	    	$object_id (integer) -
 	    		Object id of this text block.
@@ -3691,7 +3713,7 @@ class  PdfToText 	extends PdfObjectBase
 												$digit_count ++ ;
 											    }
 
-											$ch1	=  chr ( octdec ( $oct ) ) ;
+											$ch1	=  chr ( octdec ( $oct ) & 0xFF ) ;
 											$i -- ;
 										    }
 									    }
@@ -3717,7 +3739,7 @@ class  PdfToText 	extends PdfObjectBase
 												$digit_count ++ ;
 											    }
 
-											$ch2	=  chr ( octdec ( $oct ) ) ;
+											$ch2	=  chr ( octdec ( $oct ) & 0xFF ) ;
 											$i -- ;
 										    }
 									    }
@@ -3938,7 +3960,7 @@ class  PdfToText 	extends PdfObjectBase
 			   		   {
 			   		   	if  ( $instruction [ 'leading' ]  &&  $text_leading  &&  $current_font_size )
 			   		   	   {
-			   		   		$count 	=  ( integer ) ( ( $text_leading - $current_font_size ) / $current_font_size ) ;
+			   		   		$count 	=  ( int ) ( ( $text_leading - $current_font_size ) / $current_font_size ) ;
 
 			   		   		if  ( ! $count )
 			   		   			$count 	=  1 ;
@@ -3976,7 +3998,7 @@ class  PdfToText 	extends PdfObjectBase
 							$use_same_line		=  false ;
 
 							if  ( $last_relative_goto_y )
-								$extra_newlines		=  ( integer ) ( $current_font_size / $last_relative_goto_y ) ;
+								$extra_newlines		=  ( int ) ( $current_font_size / $last_relative_goto_y ) ;
 							else
 								$extra_newlines		=  0 ;
 						    }
@@ -4002,7 +4024,7 @@ class  PdfToText 	extends PdfObjectBase
 					   {
 					   	// Compute the number of newlines we have to insert between the current and the next lines
 					   	if  ( $current_font_size )
-					   		$extra_newlines =  ( integer ) ( ( $y - $instruction [ 'y' ] - $current_font_size ) / $current_font_size ) ;
+					   		$extra_newlines =  ( int ) ( ( $y - $instruction [ 'y' ] - $current_font_size ) / $current_font_size ) ;
 
 						$use_same_line 		=  ( $last_goto_y  ==  0 ) ;
 					    }
@@ -4457,7 +4479,7 @@ class  PdfToText 	extends PdfObjectBase
 
 	    PARAMETERS
 		$page_number (integer) -
-			¨Page number that contains the text to be extracted.
+			Â¨Page number that contains the text to be extracted.
 
 	    	$object_id (integer) -
 	    		Object id of this text block.
@@ -4615,12 +4637,12 @@ class  PdfToText 	extends PdfObjectBase
 
 					// Tm instruction
 					case	'm' :
-						$Tm [0]			=  ( double ) $operand_stack [0] ;
-						$Tm [1]			=  ( double ) $operand_stack [1] ;
-						$Tm [2]			=  ( double ) $operand_stack [2] ;
-						$Tm [3]			=  ( double ) $operand_stack [3] ;
-						$Tm [4]			=  ( double ) $operand_stack [4] ;
-						$Tm [5]			=  ( double ) $operand_stack [5] ;
+						$Tm [0]			=  ( float ) $operand_stack [0] ;
+						$Tm [1]			=  ( float ) $operand_stack [1] ;
+						$Tm [2]			=  ( float ) $operand_stack [2] ;
+						$Tm [3]			=  ( float ) $operand_stack [3] ;
+						$Tm [4]			=  ( float ) $operand_stack [4] ;
+						$Tm [5]			=  ( float ) $operand_stack [5] ;
 
 						$enhanced_statistics  &&  $this -> Statistics [ 'Distributions' ] [ 'Tm' ] ++ ;
 						break ;
@@ -4642,15 +4664,15 @@ class  PdfToText 	extends PdfObjectBase
 							$this -> MapIdBuffer [ $key ]	=  $current_font ;
 						    }
 
-						$current_font_height	=  ( double ) $operand_stack [1] ;
+						$current_font_height	=  ( float ) $operand_stack [1] ;
 						$this -> FontTable -> GetFontAttributes ( $page_number, $current_template, $current_font, $current_font_map_width, $current_font_mapped ) ;
 						$enhanced_statistics  &&  $this -> Statistics [ 'Distributions' ] [ 'Tf' ] ++ ;
 						break ;
 
 					// Td instruction
 					case	'd' :
-						$Tm [4]		+=  ( double ) $operand_stack [0]  ;
-						$Tm [5]		+=  ( double ) $operand_stack [1] ;
+						$Tm [4]		+=  ( float ) $operand_stack [0]  ;
+						$Tm [5]		+=  ( float ) $operand_stack [1] ;
 
 						$enhanced_statistics  &&  $this -> Statistics [ 'Distributions' ] [ 'Td' ] ++ ;
 						break ;
@@ -4662,8 +4684,8 @@ class  PdfToText 	extends PdfObjectBase
 
 					// TD instruction
 					case	'D' :
-						$Tm [4]		 +=  ( double ) $operand_stack [0] * $Tm [0] ;
-						$Tm [5]		 +=  ( double ) $operand_stack [1] * $Tm [3] ;
+						$Tm [4]		 +=  ( float ) $operand_stack [0] * $Tm [0] ;
+						$Tm [5]		 +=  ( float ) $operand_stack [1] * $Tm [3] ;
 						$text_leading	 -=  $Tm [5] ;
 
 						$enhanced_statistics  &&  $this -> Statistics [ 'Distributions' ] [ 'TD' ] ++ ;
@@ -4679,7 +4701,7 @@ class  PdfToText 	extends PdfObjectBase
 
 					// TL instruction - Set text leading. Currently not used.
 					case	'L' :
-						$text_leading		=  ( double ) $operand_stack [0] ;
+						$text_leading		=  ( float ) $operand_stack [0] ;
 						$enhanced_statistics  &&  $this -> Statistics [ 'Distributions' ] [ 'TL' ] ++ ;
 						break ;
 
@@ -4714,12 +4736,12 @@ class  PdfToText 	extends PdfObjectBase
 			// cm instruction
 			else if  ( $token  ==  'cm' )
 			   {
-				$a		=  ( double ) $operand_stack [0] ;
-				$b		=  ( double ) $operand_stack [1] ;
-				$c		=  ( double ) $operand_stack [2] ;
-				$d		=  ( double ) $operand_stack [3] ;
-				$e		=  ( double ) $operand_stack [4] ;
-				$f		=  ( double ) $operand_stack [5] ;
+				$a		=  ( float ) $operand_stack [0] ;
+				$b		=  ( float ) $operand_stack [1] ;
+				$c		=  ( float ) $operand_stack [2] ;
+				$d		=  ( float ) $operand_stack [3] ;
+				$e		=  ( float ) $operand_stack [4] ;
+				$f		=  ( float ) $operand_stack [5] ;
 
 				$CTM		=  array ( $a, $b, $c, $d, $e, $f ) ;
 				$operand_stack	=  array ( ) ;
@@ -5194,7 +5216,7 @@ class  PdfToText 	extends PdfObjectBase
 									$digit_count ++ ;
 								    }
 
-								$ch1	=  chr ( octdec ( $oct ) ) ;
+								$ch1	=  chr ( octdec ( $oct ) & 0xFF ) ;
 								$i -- ;
 							    }
 						    }
@@ -5220,7 +5242,7 @@ class  PdfToText 	extends PdfObjectBase
 									$digit_count ++ ;
 								    }
 
-								$ch2	=  chr ( octdec ( $oct ) ) ;
+								$ch2	=  chr ( octdec ( $oct ) & 0xFF ) ;
 								$i -- ;
 							    }
 						    }
@@ -5753,7 +5775,7 @@ class  PdfToText 	extends PdfObjectBase
 						$array [$i]  ==  '-'  ||  $array [$i]  ==  '+'  ||  $array [$i]  ==  '.' ) )
 					$value	.=  $array [$i++] ;
 
-				$offsets []	=  ( double ) $value ;
+				$offsets []	=  ( float ) $value ;
 
 				if  ( $value  !==  '' )
 					$i -- ;
@@ -5877,7 +5899,7 @@ class  PdfToText 	extends PdfObjectBase
 			else 
 				$padding	=  $this -> Separator ;
 
-			return ( utf8_encode ( self::Unescape ( $padding ) ) ) ;
+			return ( self::Latin1ToUtf8 ( self::Unescape ( $padding ) ) ) ;
 		    }
 		else
 			return ( '' ) ;
@@ -6480,8 +6502,8 @@ class  PdfToText 	extends PdfObjectBase
 		// Add this entry to form data information
 		$this -> FormData [ $object_id ]	=  array
 		   ( 
-			'values'	=>  ( integer ) $field_object,
-			'form'		=>  ( integer ) $form_object
+			'values'	=>  ( int ) $field_object,
+			'form'		=>  ( int ) $form_object
 		    ) ;
 	    }
 
@@ -6922,7 +6944,7 @@ class  PdfTexterFont		extends PdfObjectBase
 					   {
 						// Build the CharacterWidths table
 						foreach  ( $charwidths  as  $char => $width )
-							$this -> CharacterWidths [ chr ( $char ) ]	=  ( double ) $width ;
+							$this -> CharacterWidths [ chr ( $char ) ]	=  ( float ) $width ;
 
 						$this -> GotWidthInformation	=  true ;
 					    }
@@ -6956,15 +6978,15 @@ class  PdfTexterFont		extends PdfObjectBase
 		if  ( $first_char  &&  $widths )
 		   {
 			if  ( $missing_width  !==  false )
-				$this -> DefaultWidth		=  ( double ) $missing_width ;
+				$this -> DefaultWidth		=  ( float ) $missing_width ;
 
 			$widths				=  explode ( ' ', $widths ) ;
 
 			for  ( $i = 0, $count = count ( $widths ) ; $i  <  $count ; $i ++ )
 			   {
-				$value		=  ( double ) trim ( $widths [$i] ) ;
+				$value		=  ( float ) trim ( $widths [$i] ) ;
 
-				$this -> CharacterWidths [ chr ( $first_char + $i ) ]	=  ( $value ) ?  $value : $this -> DefaultWidth ;
+				$this -> CharacterWidths [ chr ( ( ( int ) ( $first_char + $i ) ) & 0xFF ) ]	=  ( $value ) ?  $value : $this -> DefaultWidth ;
 			    }
 
 			$this -> GotWidthInformation	=  true ;
@@ -7138,9 +7160,11 @@ abstract class	PdfTexterCharacterMap	extends		PdfObjectBase
 	        Interface implementations.
 
 	 *-------------------------------------------------------------------------------------------------------------*/
+	#[\ReturnTypeWillChange]
 	public function  offsetSet ( $offset, $value )
 	   { error ( new PdfToTextDecodingException ( "Unsupported operation." ) ) ; }
 
+	#[\ReturnTypeWillChange]
 	public function  offsetUnset ( $offset )
 	   { error ( new PdfToTextDecodingException ( "Unsupported operation." ) ) ; }
     }
@@ -7376,10 +7400,12 @@ class  PdfTexterUnicodeMap 	extends 	PdfTexterCharacterMap
 	        Interface implementations.
 
 	 *-------------------------------------------------------------------------------------------------------------*/
+	#[\ReturnTypeWillChange]
 	public function  count ( )
 	   { return ( count ( $this -> DirectMap ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetExists ( $offset )
 	   { return  ( $this -> offsetGetSafe ( $offset )  !==  false ) ; }
 
@@ -7431,6 +7457,7 @@ class  PdfTexterUnicodeMap 	extends 	PdfTexterCharacterMap
 	    }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetGet ( $offset )
 	   {
 		$code	=  $this -> offsetGetSafe ( $offset ) ;
@@ -7554,7 +7581,7 @@ class  PdfTexterEncodingMap 	extends  PdfTexterCharacterMap
 
 		   	// Integer value  : index of next character in map
 			if  ( is_numeric ( $item ) )
-				$index 	=  ( integer ) $item ;
+				$index 	=  ( int ) $item ;
 			// String value : a character name, as defined by Adobe
 			else
 			   {
@@ -7570,7 +7597,7 @@ class  PdfTexterEncodingMap 	extends  PdfTexterCharacterMap
 				// Not defined ; check if this is the "/gxx" notation, where "xx" is a number
 				else if  ( preg_match ( '/g (?P<value> \d+)/x', $item, $match ) )
 				   {
-					$value		=  ( integer ) $match [ 'value' ] ;
+					$value		=  ( int ) $match [ 'value' ] ;
 
 					// In my current state of investigations, the /g notation has the following characteristics :
 					// - The value 29 must be added to the number after the "/g" string (why ???)
@@ -7588,7 +7615,7 @@ class  PdfTexterEncodingMap 	extends  PdfTexterCharacterMap
 					$value		=  hexdec ( $match [ 'value' ] ) ;
 
 					$this -> Map [ $index ]			=  
-					$this -> SecondaryMap [ $index ]	=  ( integer ) $value ;
+					$this -> SecondaryMap [ $index ]	=  ( int ) $value ;
 				    }
 				// Otherwise, put a quotation mark instead
 				else
@@ -7611,10 +7638,12 @@ class  PdfTexterEncodingMap 	extends  PdfTexterCharacterMap
 	        Interface implementations.
 
 	 *-------------------------------------------------------------------------------------------------------------*/
+	#[\ReturnTypeWillChange]
 	public function  count ( )
 	   { return ( count ( $this -> Map ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetExists ( $offset )
 	   { 
 		return ( ( ! $this -> Secondary ) ?  
@@ -7623,6 +7652,7 @@ class  PdfTexterEncodingMap 	extends  PdfTexterCharacterMap
 	    }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetGet ( $offset )
 	   {
 		if  ( ! $this -> Secondary )
@@ -7702,14 +7732,17 @@ abstract class  PdfTexterAdobeMap	extends  PdfTexterCharacterMap
 	        Interface implementations.
 
 	 *-------------------------------------------------------------------------------------------------------------*/
+	#[\ReturnTypeWillChange]
 	public function  count ( )
 	   { return ( count ( $this -> $Map [ $this -> Variant ] ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetExists ( $offset )
 	   { return ( isset ( $this -> Map [ $this-> Variant ] [ $offset ] ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetGet ( $offset )
 	   {
 		if  ( isset ( $this -> Map [ $this-> Variant ] [ $offset ] ) )
@@ -8157,14 +8190,17 @@ abstract class	PdfTexterCIDMap		extends  PdfTexterCharacterMap
 	        Interface implementations.
 
 	 *-------------------------------------------------------------------------------------------------------------*/
+	#[\ReturnTypeWillChange]
 	public function  count ( )
 	   { return ( count ( $this -> Map ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetExists ( $offset )
 	   { return ( isset ( $this -> Map [ 'plain' ] [ $offset ] ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetGet ( $offset )
 	   {
 		if  ( isset ( $this -> Map [ 'plain' ] [ $offset ] ) )
@@ -8185,7 +8221,7 @@ abstract class	PdfTexterCIDMap		extends  PdfTexterCharacterMap
 						return ( '[UID:' . sprintf ( '%04x', $offset ) . "]" ) ;
 
 				case	self::ALT_CID :
-					$this -> LastAltOffset		=  ( integer ) $offset ;
+					$this -> LastAltOffset		=  ( int ) $offset ;
 
 					return ( '' ) ;
 
@@ -8533,11 +8569,11 @@ class  PdfTexterPageMap		extends  PdfObjectBase
 
 				// Get kid count (knowing that sometimes, it is missing...)
 				preg_match ( '#/Count \s+ (?P<count> \d+)#ix', $object_data, $match ) ;
-				$page_count				=  ( isset ( $match [ 'count' ] ) ) ?  ( integer ) $match [ 'count' ] : false ;
+				$page_count				=  ( isset ( $match [ 'count' ] ) ) ?  ( int ) $match [ 'count' ] : false ;
 				
 				// Get parent object id
 				preg_match ( '#/Parent \s+ (?P<parent> \d+)#ix', $object_data, $match ) ;
-				$parent					=  ( isset ( $match [ 'parent' ] ) ) ?  ( integer ) $match [ 'parent' ] : false ;
+				$parent					=  ( isset ( $match [ 'parent' ] ) ) ?  ( int ) $match [ 'parent' ] : false ;
 
 				$this -> PageKids [ $object_id ]	=  array
 				   (
@@ -8554,15 +8590,15 @@ class  PdfTexterPageMap		extends  PdfObjectBase
 			if  ( $this -> GetObjectReferences ( $object_id, $object_data, '/Contents', $references ) )
 			   {
 				preg_match ( '#/Parent \s+ (?P<parent> \d+)#ix', $object_data, $match ) ;
-				$parent					=  ( isset ( $match [ 'parent' ] ) ) ?  (integer) $match [ 'parent' ] : false ;
+				$parent					=  ( isset ( $match [ 'parent' ] ) ) ?  (int) $match [ 'parent' ] : false ;
 				$fonts					=  $this -> GetResourceMappings ( $object_id, $object_data, '/Font', $pdf_objects ) ;
 				$xobjects				=  $this -> GetResourceMappings ( $object_id, $object_data, '/XObject', $pdf_objects ) ;
 
 				// Find the width and height of the page (/Mediabox parameter) 
 				if  ( preg_match ( '#/MediaBox \s* \[ \s* (?P<x1> \d+) \s+ (?P<y1> \d+) \s+ (?P<x2> \d+) \s+ (?P<y2> \d+) \s* \]#imsx', $object_data, $match ) )
 				   {
-					$width		=  ( double ) ( $match [ 'x2' ] - $match [ 'x1' ] + 1 ) ;
-					$height		=  ( double ) ( $match [ 'y2' ] - $match [ 'y1' ] + 1 ) ;
+					$width		=  ( float ) ( $match [ 'x2' ] - $match [ 'x1' ] + 1 ) ;
+					$height		=  ( float ) ( $match [ 'y2' ] - $match [ 'y1' ] + 1 ) ;
 				    }
 				// Otherwise, fix an arbitrary width and length (but this should never happen, because all pdf files are correct, isn't it?)
 				else
@@ -8603,7 +8639,7 @@ class  PdfTexterPageMap		extends  PdfObjectBase
 		else if  ( preg_match ( '#/Type \s* /XObject\b#ix', $object_data ) )
 		   {
 			preg_match ( '#/Parent \s+ (?P<parent> \d+)#ix', $object_data, $match ) ;
-			$parent					=  ( isset ( $match [ 'parent' ] ) ) ?  (integer) $match [ 'parent' ] : false ;
+			$parent					=  ( isset ( $match [ 'parent' ] ) ) ?  (int) $match [ 'parent' ] : false ;
 			$fonts					=  $this -> GetResourceMappings ( $object_id, $object_data, '/Font', $pdf_objects ) ;
 			$xobjects				=  $this -> GetResourceMappings ( $object_id, $object_data, '/XObject', $pdf_objects ) ;
 
@@ -9345,16 +9381,16 @@ class  PdfInlinedImage		extends  PdfImage
 		// Get the image width & height
 		$match		=  null ;
 		preg_match ( '#/Width \s+ (?P<value> \d+)#ix', $object_data, $match ) ;
-		$width		=  ( integer ) $match [ 'value' ] ;
+		$width		=  ( int ) $match [ 'value' ] ;
 
 		$match		=  null ;
 		preg_match ( '#/Height \s+ (?P<value> \d+)#ix', $object_data, $match ) ;
-		$height		=  ( integer ) $match [ 'value' ] ;
+		$height		=  ( int ) $match [ 'value' ] ;
 
 		// Get the number of bits per color component
 		$match		=  null ;
 		preg_match ( '#/BitsPerComponent \s+ (?P<value> \d+)#ix', $object_data, $match ) ;
-		$bits_per_component	=  ( integer ) $match [ 'value' ] ;
+		$bits_per_component	=  ( int ) $match [ 'value' ] ;
 
 		// Get the target color space
 		// Sometimes, this refers to an object in the PDF file, which can also be embedded in a compound object
@@ -9732,14 +9768,14 @@ class  PdfEncryptionData		extends  PdfObjectBase
 
 		// Encryption algorithm version & revision
 		preg_match ( '#/V \s+ (?P<value> \d+)#ix', $object_data, $algorithm_match ) ;
-		$this -> AlgorithmVersion	=  ( integer ) $algorithm_match [ 'value' ] ;
+		$this -> AlgorithmVersion	=  ( int ) $algorithm_match [ 'value' ] ;
 
 		preg_match ( '#/R \s+ (?P<value> \d+)#ix', $object_data, $algorithm_revision_match ) ;
-		$this -> AlgorithmRevision	=  ( integer ) $algorithm_revision_match [ 'value' ] ;
+		$this -> AlgorithmRevision	=  ( int ) $algorithm_revision_match [ 'value' ] ;
 
 		// Encryption flags
 		preg_match ( '#/P \s+ (?P<value> \-? \d+)#ix', $object_data, $flags_match ) ;
-		$this -> Flags			=  ( integer) $flags_match [ 'value' ] ;
+		$this -> Flags			=  ( int) $flags_match [ 'value' ] ;
 
 		// Key length (40 bits, if not specified)
 		if  ( preg_match ( '#/Length \s+ (?P<value> \d+)#ix', $object_data, $key_length_match ) )
@@ -9907,6 +9943,7 @@ class  PdfEncryptionData		extends  PdfObjectBase
         Base class for algorithm decrypters.
 
   ==============================================================================================================*/
+#[\AllowDynamicProperties]
 abstract class	PdfDecryptionAlgorithm		//extends  Object
    {
 	protected		$EncryptionData ;
@@ -10065,6 +10102,7 @@ static Guchar rc4DecryptByte(Guchar *state, Guchar *x, Guchar *y, Guchar c) {
 	The GetFormData() returns an object containing the mapped properties with their respective values.
 
   ==============================================================================================================*/
+#[\AllowDynamicProperties]
 class  PdftoTextFormDefinitions		// extends		Object
 					implements	ArrayAccess, Countable, IteratorAggregate
    {
@@ -10219,26 +10257,32 @@ class  PdftoTextFormDefinitions		// extends		Object
 		Interfaces implementations to retrieve form definitions.
 
 	 *-------------------------------------------------------------------------------------------------------------*/
+	#[\ReturnTypeWillChange]
 	public function  count ( )
 	   { return ( count ( $this - Definitions ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  getIterator ( )
 	   { return ( new ArrayIterator ( $this -> Definitions ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetExists ( $offset )
 	   { return ( $offset  >=  0  &&  $offset  <  count ( $this -> Definitions ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetGet ( $offset )
 	   { return ( $this -> Definitions [ $offset ] ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetSet ( $offset, $value ) 
 	   { error ( new PdfToTextException ( "Unsupported operation." ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetunset ( $offset ) 
 	   { error ( new PdfToTextException ( "Unsupported operation." ) ) ; }
     }	
@@ -10250,6 +10294,7 @@ class  PdftoTextFormDefinitions		// extends		Object
         Holds the description of a form inside a form XML template.
 
   ==============================================================================================================*/
+#[\AllowDynamicProperties]
 class  PdfToTextFormDefinition		// extends  Object
    {
 	// Class of the object returned by GetFormData( )
@@ -10696,6 +10741,7 @@ class  PdfToTextFormDefinition		// extends  Object
         Contains an XML template form field definition.
 
   ==============================================================================================================*/
+#[\AllowDynamicProperties]
 class  PdfToTextFormFieldDefinition	// extends  Object
    {
 	// Supported field types
@@ -10844,6 +10890,7 @@ class  PdfToTextFormFieldDefinition	// extends  Object
         Base class for all Pdf form templates data.
 
   ==============================================================================================================*/
+#[\AllowDynamicProperties]
 class  PdfToTextFormData		// extends  Object 
    {
 	// Doc comments provide information about form data fields (mainly to handle grouped field values)
@@ -11016,6 +11063,7 @@ class  PdfToTextFormData		// extends  Object
         Holds text capture definitions, whose XML data has been supplied to the PdfToText::SetCapture() method.
 
   ==============================================================================================================*/
+#[\AllowDynamicProperties]
 class  PdfToTextCaptureDefinitions	// extends		Object 
 					implements	ArrayAccess, Countable, Iterator
    {
@@ -11260,23 +11308,28 @@ class  PdfToTextCaptureDefinitions	// extends		Object
 	 *-------------------------------------------------------------------------------------------------------------*/
 
 	// Countable interface
+	#[\ReturnTypeWillChange]
 	public function  count ( )
 	   { return ( count ( $this -> ShapeDefinitions ) ) ; }
 
 
 	// ArrayAccess interface
+	#[\ReturnTypeWillChange]
 	public function  offsetExists ( $offset )
 	   { return ( isset ( $this -> ShapeDefinitions [ $offset ] ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetGet ( $offset )
 	   { return ( $this -> ShapeDefinitions [ $offset ] ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetSet ( $offset, $value )
 	   { error ( new PdfToTextException ( "Unsupported operation" ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetunset ( $offset )
 	   { error ( new PdfToTextException ( "Unsupported operation" ) ) ; }
 
@@ -11285,18 +11338,23 @@ class  PdfToTextCaptureDefinitions	// extends		Object
 	//	Iteration is made through shape names, which are supplied by the $ShapeNames property
 	private		$__iterator_index	=  0 ;
 
+	#[\ReturnTypeWillChange]
 	public function  rewind ( )
 	   { $this -> __iterator_index = 0 ; }
 
+	#[\ReturnTypeWillChange]
 	public function  valid ( )
 	   { return ( $this -> __iterator_index  >=  0  &&  $this -> __iterator_index  <  count ( $this -> ShapeNames ) ) ; }
 
+	#[\ReturnTypeWillChange]
 	public function  key ( )
 	   { return ( $this -> ShapeNames [ $this -> __iterator_index ] ) ; }
 
+	#[\ReturnTypeWillChange]
 	public function  next ( )
 	   { $this -> __iterator_index ++ ; }
 
+	#[\ReturnTypeWillChange]
 	public function  current ( )
 	   { return ( $this -> ShapeDefinitions [ $this -> ShapeNames [ $this -> __iterator_index ] ] ) ; }
     }
@@ -11308,6 +11366,7 @@ class  PdfToTextCaptureDefinitions	// extends		Object
         Base class for capturing shapes.
 
   ==============================================================================================================*/
+#[\AllowDynamicProperties]
 abstract class  PdfToTextCaptureShapeDefinition		//extends  Object
    {
 	const	SHAPE_RECTANGLE		=  1 ;
@@ -11360,10 +11419,10 @@ abstract class  PdfToTextCaptureShapeDefinition		//extends  Object
 	 *-------------------------------------------------------------------------------------------------------------*/
 	protected function  GetFragmentData ( $fragment, &$text, &$left, &$top, &$right, &$bottom )
 	   {
-		$left		=  ( double ) $fragment [ 'x' ] ;
-		$top		=  ( double ) $fragment [ 'y' ] ;
-		$right		=  $left + ( double ) $fragment [ 'width' ] - 1 ;
-		$bottom		=  $top  - ( double ) $fragment [ 'font-height' ] ;
+		$left		=  ( float ) $fragment [ 'x' ] ;
+		$top		=  ( float ) $fragment [ 'y' ] ;
+		$right		=  $left + ( float ) $fragment [ 'width' ] - 1 ;
+		$bottom		=  $top  - ( float ) $fragment [ 'font-height' ] ;
 		$text		=  $fragment [ 'text' ] ;
 	    }
 
@@ -11607,7 +11666,7 @@ class	PdfToTextCaptureLinesDefinition		extends  PdfToTextCaptureShapeDefinition
 					// attribute to "column-bottom", in order for it not to be mistaken with actual column rectangle
 					// (only the "height" attribute of the <page> tag gives the height of a line)
 					$page_attributes [ 'column-top' ]	=  $page_attributes [ 'top' ] ;
-					$page_attributes [ 'column-bottom' ]	=  ( double ) $page_attributes [ 'bottom' ] ;
+					$page_attributes [ 'column-bottom' ]	=  ( float ) $page_attributes [ 'bottom' ] ;
 					unset ( $page_attributes [ 'bottom' ] ) ;
 					
 					// Add this page to the list of applicable pages for this shape
@@ -11830,8 +11889,8 @@ class	PdfToTextCaptureLinesDefinition		extends  PdfToTextCaptureShapeDefinition
 			   {
 				if  ( ! isset ( $this -> Tops [ $page ] ) )
 				   {
-					$this -> Tops    [ $page ]		=  ( double ) $this -> ApplicablePages -> ExtraPageMapData [ $page ] [ 'column-top' ] ;
-					$this -> Bottoms [ $page ]		=  ( double ) $this -> ApplicablePages -> ExtraPageMapData [ $page ] [ 'column-bottom' ] ;
+					$this -> Tops    [ $page ]		=  ( float ) $this -> ApplicablePages -> ExtraPageMapData [ $page ] [ 'column-top' ] ;
+					$this -> Bottoms [ $page ]		=  ( float ) $this -> ApplicablePages -> ExtraPageMapData [ $page ] [ 'column-bottom' ] ;
 				    }
 
 				$area	=  new PdfToTextCaptureArea ( $column, $this -> ApplicablePages -> ExtraPageMapData [ $page ], $column [ 'name' ] ) ;
@@ -11856,6 +11915,7 @@ class	PdfToTextCaptureLinesDefinition		extends  PdfToTextCaptureShapeDefinition
         Holds a list of applicable pages given by the "number" attribute of <page> tags.
 
   ==============================================================================================================*/
+#[\AllowDynamicProperties]
 class  PdfToTextCaptureApplicablePages		//extends		Object
 						implements	ArrayAccess, Countable, Iterator
    {
@@ -12004,23 +12064,28 @@ class  PdfToTextCaptureApplicablePages		//extends		Object
 	 *-------------------------------------------------------------------------------------------------------------*/
 
 	// Countable interface
+	#[\ReturnTypeWillChange]
 	public function  count ( )
 	   { return ( count ( $this -> PageMap ) ) ; }
 
 
 	// Array access interface
+	#[\ReturnTypeWillChange]
 	public function  offsetExists ( $offset )
 	   { return ( isset ( $this -> PageMap [ $offset ] ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetGet ( $offset )
 	   { return ( ( isset ( $this -> PageMap [ $offset ] ) ) ?  true : false ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetSet ( $offset, $value )
 	   { error ( new PdfToTextException ( "Unsupported operation" ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetunset ( $offset )
 	   { error ( new PdfToTextException ( "Unsupported operation" ) ) ; }
 
@@ -12028,22 +12093,27 @@ class  PdfToTextCaptureApplicablePages		//extends		Object
 	// Iterator interface
 	private		$__iterator_value	=  1 ;
 
+	#[\ReturnTypeWillChange]
 	public function   rewind ( ) 
 	   { $this -> __iterator_value = 1 ; }
 
 	
+	#[\ReturnTypeWillChange]
 	public function  valid ( )
 	   { return ( $this -> __iterator_value  >=  1  &&  $this -> __iterator_value  <=  $this -> PageCount ) ; }
 
 	
+	#[\ReturnTypeWillChange]
 	public function  key ( )
 	   { return ( $this -> __iterator_value ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  next ( )
 	   { $this -> __iterator_value ++ ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  current ( )
 	   { return ( ( isset ( $this -> PageMap [ $this -> __iterator_value ] ) ) ?  true : false ) ; }
 
@@ -12074,7 +12144,7 @@ class  PdfToTextCaptureApplicablePages		//extends		Object
 				// (low and high range values will be the same)
 				case	1 :
 					if  ( is_numeric ( $items [0] ) )
-						$low	=  $high	=  ( integer ) $items [0] ;
+						$low	=  $high	=  ( int ) $items [0] ;
 					else
 						$low	=  $high	=  trim ( $items [0] ) ;
 					
@@ -12082,8 +12152,8 @@ class  PdfToTextCaptureApplicablePages		//extends		Object
 
 				// If range, store the low and high values
 				case	2 :
-					$low	=  ( is_numeric ( $items [0] ) ) ?  ( integer ) $items [0] : trim ( $items [0] ) ;
-					$high	=  ( is_numeric ( $items [1] ) ) ?  ( integer ) $items [1] : trim ( $items [1] ) ;
+					$low	=  ( is_numeric ( $items [0] ) ) ?  ( int ) $items [0] : trim ( $items [0] ) ;
+					$high	=  ( is_numeric ( $items [1] ) ) ?  ( int ) $items [1] : trim ( $items [1] ) ;
 					break ;
 
 				// Other cases : throw an exception
@@ -12123,6 +12193,7 @@ class  PdfToTextCaptureApplicablePages		//extends		Object
 	its top/left coordinates, and its width and height.
 
   ==============================================================================================================*/
+#[\AllowDynamicProperties]
 class  PdfToTextCaptureArea	//extends  Object 
    {
 	// List of authorzed keyword for defining the rectangle dimensions
@@ -12216,12 +12287,12 @@ class  PdfToTextCaptureArea	//extends  Object
 		if  ( $left  ===  false ) 
 			error ( new PdfToTextCaptureException ( "Attribute \"left\" is mandatory." ) );
 		else 
-			$left	=  ( double ) $left ;
+			$left	=  ( float ) $left ;
 
 		if  ( $top  ===  false ) 
 			error ( new PdfToTextCaptureException ( "Attribute \"top\" is mandatory." ) ) ;
 		else 
-			$top	=  ( double ) $top ;
+			$top	=  ( float ) $top ;
 
 		// Either the 'right' or 'width' entries are required
 		if  ( $right  ===  false )
@@ -12229,10 +12300,10 @@ class  PdfToTextCaptureArea	//extends  Object
 			if  ( $width  ===  false )
 				error ( new PdfToTextCaptureException ( "Either the \"right\" or the \"width\" attribute must be specified." ) ) ;
 			else 
-				$right		=  $left + ( double ) $width - 1 ;
+				$right		=  $left + ( float ) $width - 1 ;
 		    }
 		else 
-			$right	=  ( double ) $right ;
+			$right	=  ( float ) $right ;
 
 		// Same for 'bottom' and 'height'
 		if  ( $bottom  ===  false )
@@ -12240,10 +12311,10 @@ class  PdfToTextCaptureArea	//extends  Object
 			if  ( $height  ===  false )
 				error ( new PdfToTextCaptureException ( "Either the \"bottom\" or the \"height\" attribute must be specified." ) ) ;
 			else 
-				$bottom		=  $top - ( double ) $height + 1 ;
+				$bottom		=  $top - ( float ) $height + 1 ;
 		    }
 		else 
-			$bottom	=  ( double ) $bottom ;
+			$bottom	=  ( float ) $bottom ;
 
 		// All done, we have the coordinates we wanted
 		$this -> Left		=  $left ;
@@ -12285,7 +12356,7 @@ class  PdfToTextCaptureArea	//extends  Object
 
 	public function  __set ( $member, $value )
 	   {
-		$value		=  ( double ) $value ;
+		$value		=  ( float ) $value ;
 
 		switch  ( $member ) 
 		   {
@@ -12347,6 +12418,7 @@ class  PdfToTextCaptureArea	//extends  Object
          Base class for captured text enclosed by shapes.
  
    ==============================================================================================================*/
+ #[\AllowDynamicProperties]
  abstract class  PdfToTextCapturedText		//extends  Object 
     {
 	// Shape name (as specified by the "name" attribute of the <rectangle> or <lines> tags, for example)
@@ -12490,14 +12562,17 @@ class  PdfToTextCapturedLine			extends		PdfToTextCapturedText
 		Interfaces implementations.
 	
 	 *-------------------------------------------------------------------------------------------------------------*/
+	#[\ReturnTypeWillChange]
 	public function  count ( )
 	   { return ( $this -> Columns ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  getIterator ( )
 	   { return ( new ArrayIterator ( $this -> Columns ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetExists ( $offset )
 	   { 
 		if  ( is_numeric ( $offset ) )
@@ -12507,6 +12582,7 @@ class  PdfToTextCapturedLine			extends		PdfToTextCapturedText
 	    }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetGet ( $offset )
 	   {
 		if  ( is_numeric ( $offset ) )
@@ -12516,10 +12592,12 @@ class  PdfToTextCapturedLine			extends		PdfToTextCapturedText
 	    }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetSet ( $offset, $value )
 	   { error ( new PdfToTextCaptureException ( "Unsupported operation." ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetUnset ( $offset )
 	   { error ( new PdfToTextCaptureException ( "Unsupported operation." ) ) ; }
     }
@@ -12531,6 +12609,7 @@ class  PdfToTextCapturedLine			extends		PdfToTextCapturedText
          Implements a set of lines.
  
    ==============================================================================================================*/
+#[\AllowDynamicProperties]
 class  PdfToTextCapturedLines			//extends		Object 
 						implements	ArrayAccess, Countable, IteratorAggregate
    {
@@ -12563,26 +12642,32 @@ class  PdfToTextCapturedLines			//extends		Object
 		Interfaces implementations.
 	
 	 *-------------------------------------------------------------------------------------------------------------*/
+	#[\ReturnTypeWillChange]
 	public function  count ( )
 	   { return ( $this -> Lines ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  getIterator ( )
 	   { return ( new ArrayIterator ( $this -> Lines ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetExists ( $offset )
 	   { return ( $offset  >=  0  &&  $offset  <  count ( $this -> Lines ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetGet ( $offset )
 	   { return ( $this -> Captures [ $offset ] ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetSet ( $offset, $value )
 	   { error ( new PdfToTextCaptureException ( "Unsupported operation." ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetUnset ( $offset )
 	   { error ( new PdfToTextCaptureException ( "Unsupported operation." ) ) ; }
     }
@@ -12607,6 +12692,7 @@ class  PdfToTextCapturedLines			//extends		Object
         Represents all the areas in a PDF file captured by the supplied XML definitions.
 
   ==============================================================================================================*/
+#[\AllowDynamicProperties]
 class  PdfToTextCaptures			//extends  Object
    {
 	// Captured objects - May not exactly reflect the PdfToTextCapture*Shape classes
@@ -12746,6 +12832,7 @@ class  PdfToTextCaptures			//extends  Object
         Base class for all capture classes accessible to the caller.
 
   ==============================================================================================================*/
+#[\AllowDynamicProperties]
 class  PdfToTextCapture				//extends		Object
 						implements	ArrayAccess, Countable, IteratorAggregate
    {
@@ -12771,26 +12858,32 @@ class  PdfToTextCapture				//extends		Object
 		Interfaces implementations.
 	
 	 *-------------------------------------------------------------------------------------------------------------*/
+	#[\ReturnTypeWillChange]
 	public function  count ( )
 	   { return ( $this -> Captures ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  getIterator ( )
 	   { return ( new ArrayIterator ( $this -> Captures ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetExists ( $offset )
 	   { return ( $offset  >=  0  &&  $offset  <  count ( $this -> Captures ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetGet ( $offset )
 	   { return ( $this -> Captures [ $offset ] ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetSet ( $offset, $value )
 	   { error ( new PdfToTextCaptureException ( "Unsupported operation." ) ) ; }
 
 
+	#[\ReturnTypeWillChange]
 	public function  offsetUnset ( $offset )
 	   { error ( new PdfToTextCaptureException ( "Unsupported operation." ) ) ; }
 

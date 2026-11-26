@@ -22,7 +22,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // Joomla version variables
 if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE'))
 {
-	jimport('cms.version.version');
 	$jversion = new \Joomla\CMS\Version;
 }
 if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
@@ -31,6 +30,16 @@ if (!defined('FLEXI_J40GE'))   define('FLEXI_J40GE', version_compare( $jversion-
 
 class com_flexicontentInstallerScript
 {
+	/**
+	 * The storage engine of the DB tables of a NEW installation: 'MyISAM' (as until now) or 'InnoDB'.
+	 * Existing sites are never changed by an upgrade, they have an optional dashboard task for it
+	 */
+	const NEW_INSTALL_ENGINE = 'MyISAM';
+
+	public $release;
+	public $release_existing;
+	public $minimum_joomla_release;
+
 	/*
 	* $parent is the class calling this method.
 	* $type is the type of change (install, update or discover_install, not uninstall).
@@ -39,10 +48,6 @@ class com_flexicontentInstallerScript
 	*/
 	function preflight( $type, $parent )
 	{
-		// Display fatal errors, warnings, notices
-		error_reporting(E_ERROR || E_WARNING || E_NOTICE);
-		ini_set('display_errors',1);
-
 		// Try to increment some limits
 		@ set_time_limit( 150 );   // try to set execution time 2.5 minutes
 		ignore_user_abort( true ); // continue execution if client disconnects
@@ -73,12 +78,12 @@ class com_flexicontentInstallerScript
 		}
 
 		// First check PHP minimum version is running
-		$PHP_VERSION_NEEDED = '5.4.0';
+		$PHP_VERSION_NEEDED = '8.2.0';
 		if (version_compare(PHP_VERSION, $PHP_VERSION_NEEDED, '<'))
 		{
 			// load english language file for 'com_flexicontent' component then override with current language file
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_UPGRADE_PHP_VERSION_GE', $PHP_VERSION_NEEDED), 'warning');
 			return false;
@@ -97,7 +102,7 @@ class com_flexicontentInstallerScript
 		$this->release_existing = $existing_manifest[ 'version' ];
 
 		// Manifest file minimum Joomla version
-		$this->minimum_joomla_release = $parent->getManifest()->attributes()->version;
+		$this->minimum_joomla_release = (string) $parent->getManifest()->attributes()->version;
 
 		// Only execute during install / update not during uninstallation (J4 will run post flight during uninstall too)
 		if ($type=='update' || $type=='install') :
@@ -244,7 +249,7 @@ class com_flexicontentInstallerScript
 		$extensions = array();
 
 		// clear a cache
-		$cache = \Joomla\CMS\Factory::getCache();
+		$cache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => '']);
 		$cache->clean( '_system' );  // This might be necessary as installing-uninstalling in same session may result in wrong extension ids, etc
 		$cache->clean( 'com_flexicontent' );
 		$cache->clean( 'com_flexicontent_tmpl' );
@@ -253,14 +258,34 @@ class com_flexicontentInstallerScript
 		$cache->clean( 'com_flexicontent_filters' );
 
 		// reseting post installation session variables
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$session->set('flexicontent.postinstall', false);
 		$session->set('flexicontent.allplgpublish', false);
 		$session->set('flexicontent.allplgpublish', false);
 		$session->set('unbounded_noext', false, 'flexicontent');
 		$session->set('unbounded_badcat', false, 'flexicontent');
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		// Both installation and upgrade need a field-attributed basic autocomplete index.
+		// Never copy the legacy merged text: it cannot be checked against field permissions.
+		$basic_index_exists = in_array($db->getPrefix() . 'flexicontent_basicsearch_index', $db->getTableList(), true);
+		$db->setQuery('CREATE TABLE IF NOT EXISTS #__flexicontent_basicsearch_index ('
+			. 'item_id INT UNSIGNED NOT NULL, field_id INT UNSIGNED NOT NULL, search_index LONGTEXT NOT NULL,'
+			. 'PRIMARY KEY (item_id, field_id), KEY field_id (field_id), FULLTEXT KEY search_index (search_index)'
+			. ') ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci')->execute();
+		if (!$basic_index_exists && !FLEXI_NEW_INSTALL)
+		{
+			// The preflight language cache may still contain the previous package's strings.
+			$language_source = isset($parent) ? $parent->getParent()->getPath('source') : $this->parent->getPath('source');
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', $language_source . '/admin', 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(
+				\Joomla\CMS\Language\Text::_('FLEXI_BASIC_AUTOCOMPLETE_REBUILD'), 'notice');
+
+			// The notice above is shown only once: also flag the basic-searchable fields as 'dirty',
+			// so that the backend keeps asking for a rebuild of the Basic index until it has been done
+			$db->setQuery('UPDATE #__flexicontent_fields SET issearch = 2 WHERE issearch = 1 AND published = 1')->execute();
+		}
 
 		// Parse XML file to identify additional extensions,
 		// This code part (for installing additional extensions) originates from Zoo J1.5 Component:
@@ -344,9 +369,9 @@ class com_flexicontentInstallerScript
 		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'additional-extensions', \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_LOG') . ' : ' . \Joomla\CMS\Language\Text::_( 'COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS' ), 'additional-extensions-slide0' );
 		?>
 
-		<span class="btn btn-primary" onclick="var tbl = document.getElementById('fc_additional_extensions_log'); tbl.style.display = tbl.style.display === 'none' ? '' : 'none';">
+		<button type="button" class="btn btn-primary" onclick="var tbl = document.getElementById('fc_additional_extensions_log'); tbl.style.display = tbl.style.display === 'none' ? '' : 'none';">
 			<?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_LOG') . ' : ' . \Joomla\CMS\Language\Text::_( 'COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS' ); ?>
-		</span>
+		</button>
 
 		<table class="adminlist" id="fc_additional_extensions_log" style="display: none;">
 			<thead>
@@ -431,6 +456,40 @@ class com_flexicontentInstallerScript
 
 
 	/*
+	* Create the Joomla mail templates used by the FLEXIcontent notifications.
+	* Existing templates are left untouched, so user customisations are preserved.
+	*/
+	function _createNotificationMailTemplates()
+	{
+		if (!class_exists('\\Joomla\\CMS\\Mail\\MailTemplate'))
+		{
+			return;
+		}
+
+		$helper = JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/notificationmail.php';
+
+		if (!is_file($helper))
+		{
+			return;
+		}
+
+		require_once $helper;
+
+		try
+		{
+			FlexicontentHelperNotificationMail::ensureTemplates(true);
+		}
+		catch (\Throwable $e)
+		{
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(
+				'FLEXIcontent notification mail templates: ' . $e->getMessage(),
+				'warning'
+			);
+		}
+	}
+
+
+	/*
 	* $parent is the class calling this method.
 	* $type is the type of change (install, update or discover_install, not uninstall).
 	* postflight is run after the extension is registered in the database.
@@ -444,9 +503,19 @@ class com_flexicontentInstallerScript
 		}
 
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db = \Joomla\CMS\Factory::getDbo();
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbname   = $app->getCfg('db');
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$dbprefix = $app->get('dbprefix');
+		$dbname   = $app->get('db');
+
+		// Copy our data source plugin into JSitemap (com_jmap), if it is installed
+		$this->_installJsitemapPlugin($parent->getParent()->getPath('source'));
+
+		// Create the FLEXIcontent notification mail templates, without overwriting customised ones
+		$this->_createNotificationMailTemplates();
+
+		// Delete files of earlier versions that are no longer part of the package
+		$this->_removeObsoleteFiles();
+		$this->removeLegacyMediaOverrides();
 
 		/*
 		// always create or modify these parameters
@@ -478,9 +547,9 @@ class com_flexicontentInstallerScript
 		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'upgrade-tasks', \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_LOG') . ' : ' . \Joomla\CMS\Language\Text::_( 'COM_FLEXICONTENT_UPGRADE_TASKS' ), 'upgrade-tasks-slide0' );
 		?>
 
-		<span class="btn btn-primary" onclick="var tbl = document.getElementById('fc_upgrade_tasks_log'); tbl.style.display = tbl.style.display === 'none' ? '' : 'none';">
+		<button type="button" class="btn btn-primary" onclick="var tbl = document.getElementById('fc_upgrade_tasks_log'); tbl.style.display = tbl.style.display === 'none' ? '' : 'none';">
 			<?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_LOG') . ' : ' . \Joomla\CMS\Language\Text::_( 'COM_FLEXICONTENT_UPGRADE_TASKS' ); ?>
-		</span>
+		</button>
 
 		<table class="adminlist" id="fc_upgrade_tasks_log" style="display: none;">
 			<thead>
@@ -521,87 +590,100 @@ class com_flexicontentInstallerScript
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_fields_item_relations"';
 		$db->setQuery($query);
-		$fi_rels_tbl_exists = (boolean) count($db->loadObjectList());
+		$fi_rels_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_items_versions"';
 		$db->setQuery($query);
-		$fi_vers_tbl_exists = (boolean) count($db->loadObjectList());
+		$fi_vers_tbl_exists = (bool) count($db->loadObjectList());
+
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_versions"';
+		$db->setQuery($query);
+		$fv_vers_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_favourites"';
 		$db->setQuery($query);
-		$favs_tbl_exists = (boolean) count($db->loadObjectList());
+		$favs_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_files"';
 		$db->setQuery($query);
-		$files_tbl_exists = (boolean) count($db->loadObjectList());
+		$files_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_fields"';
 		$db->setQuery($query);
-		$fields_tbl_exists = (boolean) count($db->loadObjectList());
+		$fields_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_types"';
 		$db->setQuery($query);
-		$types_tbl_exists = (boolean) count($db->loadObjectList());
+		$types_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_tags"';
 		$db->setQuery($query);
-		$tags_tbl_exists = (boolean) count($db->loadObjectList());
+		$tags_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_items_ext"';
 		$db->setQuery($query);
-		$iext_tbl_exists = (boolean) count($db->loadObjectList());
+		$iext_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_advsearch_index"';
 		$db->setQuery($query);
-		$advsearch_index_tbl_exists = (boolean) count($db->loadObjectList());
+		$advsearch_index_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_authors_ext"';
 		$db->setQuery($query);
-		$authors_ext_tbl_exists = (boolean) count($db->loadObjectList());
+		$authors_ext_tbl_exists = (bool) count($db->loadObjectList());
 
 		// BETA table
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews_dev"';
 		$db->setQuery($query);
-		$reviews_beta_tbl_exists = (boolean) count($db->loadObjectList());
+		$reviews_beta_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews"';
 		$db->setQuery($query);
-		$reviews_tbl_exists = (boolean) count($db->loadObjectList());
+		$reviews_tbl_exists = (bool) count($db->loadObjectList());
+
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews_useful"';
+		$db->setQuery($query);
+		$reviews_useful_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . '__flexicontent_mediadatas"';
 		$db->setQuery($query);
-		$mediadatas_tbl_exists = (boolean) count($db->loadObjectList());
+		$mediadatas_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_templates"';
 		$db->setQuery($query);
-		$templates_tbl_exists = (boolean) count($db->loadObjectList());
+		$templates_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_layouts_conf"';
 		$db->setQuery($query);
-		$layouts_conf_tbl_exists = (boolean) count($db->loadObjectList());
+		$layouts_conf_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_items_tmp"';
 		$db->setQuery($query);
-		$content_cache_tbl_exists = (boolean) count($db->loadObjectList());
+		$content_cache_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_download_history"';
 		$db->setQuery($query);
-		$dl_history_tbl_exists = (boolean) count($db->loadObjectList());
+		$dl_history_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_download_coupons"';
 		$db->setQuery($query);
-		$dl_coupons_tbl_exists = (boolean) count($db->loadObjectList());
+		$dl_coupons_tbl_exists = (bool) count($db->loadObjectList());
+
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_download_log"';
+		$db->setQuery($query);
+		$dl_log_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_file_usage"';
 		$db->setQuery($query);
-		$file_usage_tbl_exists = (boolean) count($db->loadObjectList());
+		$file_usage_tbl_exists = (bool) count($db->loadObjectList());
 
 		// Data Types of columns
 		$tbl_names_arr = array('flexicontent_files', 'flexicontent_fields', 'flexicontent_types');
 		foreach ($tbl_names_arr as $tbl_name)
 		{
 			$full_tbl_name = $dbprefix . $tbl_name;
-			$query = "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$full_tbl_name."'";// ." AND COLUMN_NAME = 'attribs'";
+			$query = "SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, CHARACTER_SET_NAME, COLLATION_NAME, COLUMN_COMMENT, EXTRA"
+				. " FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = " . $db->quote($dbname) . " AND TABLE_NAME = " . $db->quote($full_tbl_name);
 			$db->setQuery($query);
 			$tbl_datatypes[$tbl_name] = $db->loadAssocList('COLUMN_NAME');
 		}
@@ -735,6 +817,7 @@ class com_flexicontentInstallerScript
 					$tbls = array();
 					if ($fi_rels_tbl_exists) $tbls[] = "#__flexicontent_fields_item_relations";
 					if ($fi_vers_tbl_exists) $tbls[] = "#__flexicontent_items_versions";
+					if ($fv_vers_tbl_exists) $tbls[] = "#__flexicontent_versions";
 					if ($favs_tbl_exists)    $tbls[] = "#__flexicontent_favourites";
 					if ($files_tbl_exists)   $tbls[] = "#__flexicontent_files";
 					if ($fields_tbl_exists)  $tbls[] = "#__flexicontent_fields";
@@ -767,6 +850,11 @@ class com_flexicontentInstallerScript
 					}
 					if ($fi_vers_tbl_exists && !array_key_exists('suborder', $tbl_fields['#__flexicontent_items_versions'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_items_versions` ADD `suborder` INT(11) NOT NULL DEFAULT '1' AFTER `valueorder`";
+					}
+
+					// Versions metadata TABLE: permanent backup flag (excluded from rotation)
+					if ($fv_vers_tbl_exists && !array_key_exists('keep', $tbl_fields['#__flexicontent_versions'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_versions` ADD `keep` TINYINT(1) NOT NULL DEFAULT '0' AFTER `state`";
 					}
 
 					if ($fi_rels_tbl_exists && !array_key_exists('value_integer', $tbl_fields['#__flexicontent_fields_item_relations'])) {
@@ -803,6 +891,10 @@ class com_flexicontentInstallerScript
 					if ( $favs_tbl_exists && !array_key_exists('type', $tbl_fields['#__flexicontent_favourites'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_favourites` ADD `type` INT(11) NOT NULL DEFAULT '0' AFTER `notify`";
 					}
+					if ($favs_tbl_exists && !$db->setQuery("SHOW INDEX FROM `#__flexicontent_favourites` WHERE Key_name = 'type' OR (Column_name = 'type' AND Seq_in_index = 1)")->loadObject())
+					{
+						$queries[] = "ALTER TABLE `#__flexicontent_favourites` ADD INDEX `type` (`type`)";
+					}
 
 					// Files TABLE
 					$tbl_name = 'flexicontent_files';
@@ -830,8 +922,14 @@ class com_flexicontentInstallerScript
 					if ( $files_tbl_exists && !array_key_exists('stamp', $tbl_fields['#__'.$tbl_name])) {
 						$changes[] = "ADD `stamp` tinyint(3) unsigned NOT NULL default '1' AFTER `assignments`";
 					}
+					if ( $files_tbl_exists && !array_key_exists('custom1', $tbl_fields['#__'.$tbl_name])) {
+						$changes[] = "ADD `custom1` MEDIUMTEXT NULL AFTER `stamp`";
+					}
+					if ( $files_tbl_exists && !array_key_exists('custom2', $tbl_fields['#__'.$tbl_name])) {
+						$changes[] = "ADD `custom2` MEDIUMTEXT NULL AFTER `custom1`";
+					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
-						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
+						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT NOT NULL";
 					}
 
 					if ($changes)
@@ -844,6 +942,11 @@ class com_flexicontentInstallerScript
 					// Fields TABLE
 					$tbl_name = 'flexicontent_fields';
 					$changes = array();
+					$asset = $tbl_datatypes[$tbl_name]['asset_id'] ?? null;
+					if ($asset && $asset['IS_NULLABLE'] === 'NO' && $asset['COLUMN_DEFAULT'] === null)
+					{
+						$changes[] = "ALTER COLUMN `asset_id` SET DEFAULT 0";
+					}
 
 					if ( $fields_tbl_exists && !array_key_exists('untranslatable', $tbl_fields['#__'.$tbl_name])) {
 						$changes[] = "ADD `untranslatable` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isadvsearch`";
@@ -864,7 +967,7 @@ class com_flexicontentInstallerScript
 						$changes[] = "ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
 					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
-						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
+						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT NOT NULL";
 					}
 
 					if ($changes)
@@ -883,7 +986,7 @@ class com_flexicontentInstallerScript
 						$changes[] = "ADD `itemscreatable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `published`";
 					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
-						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
+						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT NOT NULL";
 					}
 					if ( $types_tbl_exists && !array_key_exists('description', $tbl_fields['#__'.$tbl_name])) {
 						$changes[] = "ADD `description` TEXT NULL AFTER `alias`";
@@ -956,8 +1059,8 @@ class com_flexicontentInstallerScript
 							KEY `field_id` (`field_id`),
 							KEY `item_id` (`item_id`),
 							FULLTEXT `search_index` (`search_index`),
-							KEY `value_id` (`value_id`)
-							) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+							KEY `value_id` (`value_id`(191))
+							) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 					/*
@@ -1016,10 +1119,10 @@ class com_flexicontentInstallerScript
 						$queries[] = "
 						CREATE TABLE IF NOT EXISTS `#__flexicontent_authors_ext` (
 						  `user_id` int(11) unsigned NOT NULL,
-						  `author_basicparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-						  `author_catparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+						  `author_basicparams` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+						  `author_catparams` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 						  PRIMARY KEY  (`user_id`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 					$upgrade_count = 0;
@@ -1066,6 +1169,7 @@ class com_flexicontentInstallerScript
 							`average_rating` int NOT NULL,
 							`custom_ratings` text NULL,
 							`user_id` int(11) NOT NULL DEFAULT '0',
+							`name` varchar(255) NOT NULL DEFAULT '',
 							`email` varchar(255) NOT NULL DEFAULT '',
 							`title` varchar(255) NULL,
 							`title_old` varchar(255) NULL,
@@ -1082,19 +1186,37 @@ class com_flexicontentInstallerScript
 							`checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
 							`attribs` mediumtext NULL,
 							PRIMARY KEY  (`id`),
-							KEY (`content_id`, `user_id`, `type`),
-							KEY (`content_id`, `type`),
-							KEY `user_id` (`user_id`)
+							KEY (`content_id`, `user_id`, `type`(191)),
+							KEY (`content_id`, `type`(191)),
+							KEY `user_id` (`user_id`),
 							FULLTEXT KEY `title` (`title`),
 							FULLTEXT KEY `text` (`text`),
-							KEY `state` (`state`)
-							KEY `approved` (`approved`)
-							KEY `verified` (`verified`)
-							KEY `useful_yes` (`useful_yes`)
+							KEY `state` (`state`),
+							KEY `approved` (`approved`),
+							KEY `verified` (`verified`),
+							KEY `useful_yes` (`useful_yes`),
 							KEY `useful_no` (`useful_no`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;";
 					}
 
+					// Table with the 'useful' votes of the reviews
+					if (!$reviews_useful_tbl_exists)
+					{
+						$queries[] = "
+						CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews_useful` (
+							`review_id` int(11) NOT NULL,
+							`user_id` int(11) NOT NULL DEFAULT '0',
+							`ip` varchar(50) NOT NULL DEFAULT '',
+							`vote` tinyint(1) NOT NULL DEFAULT '1',
+							`vote_date` datetime NOT NULL,
+							PRIMARY KEY  (`review_id`, `user_id`, `ip`),
+							KEY `user_id` (`user_id`)
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;";
+					}
+
+					if ( $reviews_tbl_exists && !array_key_exists('name', $tbl_fields['#__flexicontent_reviews']) ) {
+						$queries[] = "ALTER TABLE `#__flexicontent_reviews` ADD `name` varchar(255) NOT NULL DEFAULT '' AFTER `user_id`";
+					}
 					if ( $reviews_tbl_exists && !array_key_exists('title_old', $tbl_fields['#__flexicontent_reviews']) ) {
 						$queries[] = "ALTER TABLE `#__flexicontent_reviews` ADD `title_old` varchar(255) NULL AFTER `title`";
 					}
@@ -1168,16 +1290,16 @@ class com_flexicontentInstallerScript
 							UNIQUE `file_id` (`file_id`),
 							KEY `state` (`state`),
 							KEY `media_type` (`media_type`),
-							KEY `media_format` (`media_format`),
-							KEY `resolution` (`resolution`),
+							KEY `media_format` (`media_format`(191)),
+							KEY `resolution` (`resolution`(191)),
 							KEY `fps` (`fps`),
 							KEY `bit_rate` (`bit_rate`),
 							KEY `bits_per_sample` (`bits_per_sample`),
 							KEY `sample_rate` (`sample_rate`),
 							KEY `duration` (`duration`),
-							KEY `channels` (`channels`),
-							KEY `channel_layout` (`channel_layout`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
+							KEY `channels` (`channels`(191)),
+							KEY `channel_layout` (`channel_layout`(191))
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;";
 					}
 
 					$upgrade_count = 0;
@@ -1244,7 +1366,7 @@ class com_flexicontentInstallerScript
 							 `is_uptodate` tinyint(3) unsigned NOT NULL default '0',
 							 `lang_parent_id` int(11) NOT NULL DEFAULT '0',
 							 PRIMARY KEY (`id`)
-							) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+							) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 						";
 					} else {
 						$_querycols = array();
@@ -1298,7 +1420,26 @@ class com_flexicontentInstallerScript
 							PRIMARY KEY (`id`),
 							KEY `user_id` (`user_id`),
 							KEY `file_id` (`file_id`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
+					}
+
+					if ( !$dl_log_tbl_exists ) {
+						$queries[] = "
+						CREATE TABLE `#__flexicontent_download_log` (
+							`id` int(11) NOT NULL AUTO_INCREMENT,
+							`user_id` int(11) NOT NULL DEFAULT 0,
+							`visitor_id` varchar(32) NOT NULL DEFAULT '',
+							`ip_hash` varchar(32) NOT NULL DEFAULT '',
+							`file_id` int(11) NOT NULL,
+							`field_id` int(11) NOT NULL DEFAULT 0,
+							`downloaded_on` datetime NOT NULL,
+							`expire_on` datetime NOT NULL,
+							PRIMARY KEY (`id`),
+							KEY `user_time` (`user_id`, `downloaded_on`),
+							KEY `visitor_time` (`visitor_id`, `downloaded_on`),
+							KEY `ip_time` (`ip_hash`, `downloaded_on`),
+							KEY `expire_on` (`expire_on`)
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 					if ( !$dl_coupons_tbl_exists ) {
@@ -1314,8 +1455,8 @@ class com_flexicontentInstallerScript
 							PRIMARY KEY (`id`),
 							KEY `user_id` (`user_id`),
 							KEY `file_id` (`file_id`),
-							KEY `token` (`token`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+							KEY `token` (`token`(191))
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 
@@ -1328,9 +1469,9 @@ class com_flexicontentInstallerScript
 							`prop` varchar(255) NOT NULL,
 							KEY  `id` (`id`),
 							KEY  `file_id` (`file_id`),
-							KEY  `context` (`context`),
-							KEY  `prop` (`prop`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+							KEY  `context` (`context`(191)),
+							KEY  `prop` (`prop`(191))
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 					$upgrade_count = 0;
@@ -1368,9 +1509,9 @@ class com_flexicontentInstallerScript
 						  `template` varchar(50) NOT NULL default '',
 						  `cfgname` varchar(50) NOT NULL default '',
 						  `layout` varchar(20) NOT NULL default '',
-						  `attribs` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+						  `attribs` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 						  PRIMARY KEY  (`template`,`cfgname`,`layout`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 					$upgrade_count = 0;
@@ -1402,8 +1543,14 @@ class com_flexicontentInstallerScript
 					<?php
 
 			    $queries = array();
-					if ( !$fields_tbl_exists ) {
-						$queries[] = "ALTER TABLE #__flexicontent_fields MODIFY description TEXT NOT NULL";
+					$description = $tbl_datatypes['flexicontent_fields']['description'] ?? null;
+					if ($description && $description['DATA_TYPE'] === 'varchar' && $description['EXTRA'] === ''
+						&& in_array($description['COLUMN_DEFAULT'], array(null, '', "''", 'NULL'), true))
+					{
+						// Match the capacity of a new site without changing existing text, collation or nullability.
+						$queries[] = "ALTER TABLE `#__flexicontent_fields` MODIFY `description` TEXT CHARACTER SET "
+							. $db->quoteName($description['CHARACTER_SET_NAME']) . ' COLLATE ' . $db->quoteName($description['COLLATION_NAME'])
+							. ($description['IS_NULLABLE'] === 'YES' ? ' NULL' : ' NOT NULL') . ' COMMENT ' . $db->quote($description['COLUMN_COMMENT']);
 					}
 
 					if ( !empty($queries) ) {
@@ -1493,17 +1640,106 @@ class com_flexicontentInstallerScript
 					</td>
 				</tr>
 
+		<?php
+		// DATETIME columns of older installations default to the zero date, which a database server in its default (strict)
+		// mode refuses in every ALTER TABLE that is run outside of Joomla. Give them the default of a new installation
+		?>
+				<tr class="row0">
+					<td class="key" style="font-size:11px;">Zero-date column defaults: </td>
+					<td>
+					<?php
+					require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+
+					try {
+						$date_cols = FlexicontentDbEngine::fixZeroDateDefaults($db);
+
+						echo $date_cols
+							? '<span class="badge bg-success badge-success">' . count($date_cols) . ' column(s) updated</span> ' . htmlspecialchars(implode(', ', $date_cols), ENT_QUOTES, 'UTF-8')
+							: '<span class="badge bg-info badge-info">nothing to do</span>';
+					}
+					catch (Exception $e) {
+						echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+					}
+					?>
+					</td>
+				</tr>
+
+		<?php
+		// Convert the tables that still use the 3-byte utf8 character set to utf8mb4. Every table is copied by its ALTER,
+		// so the large ones are left for the dashboard's post-installation task, which converts one table per request
+		?>
+				<tr class="row1">
+					<td class="key" style="font-size:11px;">Convert DB tables to utf8mb4: </td>
+					<td>
+					<?php
+					require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbcharset.php';
+
+					try {
+						// Tables up to 32 MB, and no new table once 15 seconds have passed
+						$charset_log = FlexicontentDbCharset::convertPending($db, 32 * 1024 * 1024, 15);
+						$charset_left = count(FlexicontentDbCharset::getPendingTables($db));
+
+						foreach ($charset_log as $tbl_name => $result) {
+							echo ($result[0]
+								? '<span class="badge bg-success badge-success">converted</span> '
+								: '<span class="badge badge-error">SQL Error</span> '
+							) . htmlspecialchars($tbl_name . ': ' . $result[1], ENT_QUOTES, 'UTF-8') . '<br/>';
+						}
+
+						echo $charset_left
+							? '<span class="badge bg-warning badge-warning">' . $charset_left . ' table(s) left for the dashboard\'s post-installation task</span>'
+							: ($charset_log ? '' : '<span class="badge bg-info badge-info">nothing to do</span>');
+					}
+					catch (Exception $e) {
+						echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+					}
+					?>
+					</td>
+				</tr>
+
 			</tbody>
 		</table>
 		<?php
 		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
 		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
+
+		// New installation: give the (still empty) DB tables the engine chosen by NEW_INSTALL_ENGINE
+		if (FLEXI_NEW_INSTALL && self::NEW_INSTALL_ENGINE === 'InnoDB')
+		{
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+
+			try {
+				while (($engine_result = FlexicontentDbEngine::convertNext($db)) && $engine_result[1]);
+
+				if (!empty($engine_result)) {
+					echo '<span class="badge badge-error">SQL Error</span> ' . htmlspecialchars($engine_result[0] . ': ' . $engine_result[2], ENT_QUOTES, 'UTF-8') . '<br/>';
+				}
+			}
+			catch (Exception $e) {
+				echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+			}
+		}
+		?>
+
+		<?php
+		// Upgrade of a site that was moved to InnoDB: a table that this upgrade has just created must not stay MyISAM
+		if (!FLEXI_NEW_INSTALL)
+		{
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+
+			try {
+				FlexicontentDbEngine::followSiteEngineForEmptyTables($db);
+			}
+			catch (Exception $e) {
+				echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+			}
+		}
 		?>
 
 		<div class="alert alert-success" style="margin: 8px 0 64px 0;">
-			<span class="btn btn-info" onclick="window.open('index.php?option=com_flexicontent','_self');" style="cursor: pointer;">
+			<button type="button" class="btn btn-info" onclick="window.open('index.php?option=com_flexicontent','_self');" style="cursor: pointer;">
 				<?php echo \Joomla\CMS\Language\Text::_('FLEXI_DASHBOARD'); ?>
-  		</span>
+		</button>
 			<?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_PLEASE_COMPLETE_POST_INSTALL_TASKS_AT_DASHBOARD'); ?>
   	</div>
 
@@ -1531,10 +1767,6 @@ class com_flexicontentInstallerScript
 	*/
 	function uninstall( $parent )
 	{
-		// Display fatal errors, warnings, notices
-		error_reporting(E_ERROR || E_WARNING || E_NOTICE);
-		ini_set('display_errors',1);
-
 		$app = \Joomla\CMS\Factory::getApplication();
 
 		// Extra CSS needed for J3.x+
@@ -1549,9 +1781,9 @@ class com_flexicontentInstallerScript
 		// init vars
 		$error = false;
 		$extensions = array();
-		$db = \Joomla\CMS\Factory::getDbo();
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbname   = $app->getCfg('db');
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$dbprefix = $app->get('dbprefix');
+		$dbname   = $app->get('db');
 
 		// Uninstall additional flexicontent modules/plugins found in Joomla DB,
 		// This code part (for uninstalling additional extensions) originates from Zoo J1.5 Component:
@@ -1621,6 +1853,10 @@ class com_flexicontentInstallerScript
 		for ($i = 0; $i < count($extensions); $i++) {
 			$extension =& $extensions[$i];
 
+			// Joomla 6 no longer gives a new Installer its database: without this every uninstall below throws
+			// and the bundled plugins / modules stay installed (the system plugin then breaks every page)
+			$extension['installer']->setDatabase($db);
+
 			if ($extension['id'] > 0 && $extension['installer']->uninstall($extension['type'], $extension['id'], $extension['client_id'])) {
 				$extension['status'] = true;
 			}
@@ -1685,9 +1921,9 @@ class com_flexicontentInstallerScript
 						<?php
 						$queries = array();
 
-						$query = 'SHOW TABLES LIKE "' . \Joomla\CMS\Factory::getApplication()->getCfg('dbprefix') . 'jcomments"';
+						$query = 'SHOW TABLES LIKE "' . \Joomla\CMS\Factory::getApplication()->get('dbprefix') . 'jcomments"';
 						$db->setQuery($query);
-						$jcomments_tbl_exists = (boolean) count($db->loadObjectList());
+						$jcomments_tbl_exists = (bool) count($db->loadObjectList());
 						if ($jcomments_tbl_exists) {
 							$queries['jcomments'] = 'UPDATE #__jcomments AS j SET j.object_group="com_content" WHERE j.object_group="com_flexicontent" ';
 							$queries['jcomments_objects'] = 'UPDATE #__jcomments_objects AS j SET j.object_group="com_content" WHERE j.object_group="com_flexicontent" ';
@@ -1721,12 +1957,12 @@ class com_flexicontentInstallerScript
 					<td class="key" style="font-size:11px;">Restore com_content top-level category assets</td>
 					<td>
 						<?php
-						$asset	= \Joomla\CMS\Table\Table::getInstance('asset');
+						$asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 						$asset_loaded = $asset->loadByName('com_content');  // Try to load component asset for com_content
 						if (!$asset_loaded) {
 							$result = 0;
 						} else {
-							$cc_asset	= \Joomla\CMS\Table\Table::getInstance('asset');
+							$cc_asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 							$query = 'SELECT s.id FROM #__assets AS s'
 								.' JOIN #__categories AS c ON s.id=c.asset_id'
 								.' WHERE c.parent_id=1 AND c.extension="com_content"';
@@ -1806,41 +2042,14 @@ class com_flexicontentInstallerScript
 
 
 		<?php
-		// Remove template overrides, TODO make this more robust ...
+		// Remove stock template overrides from earlier versions
 		?>
 				<tr class="row0">
 					<td class="key" style="font-size:11px;">Remove template overrides</td>
 					<td>
 						<?php
-						// Get DEFAULT backend ('administrator') and frontend ('site') Joomla template names
-						$admin_tmpl = $app->getTemplate();
-						$site_tmpl  = $db->setQuery('SELECT template FROM #__template_styles WHERE client_id = 0 AND home = 1')->loadResult();
-
-						$tmpl_override_files = array(
-							JPATH_ADMINISTRATOR . '/templates/' . $admin_tmpl . '/html/com_media/images/default_fc.php',
-							JPATH_ADMINISTRATOR . '/templates/' . $admin_tmpl . '/html/com_media/imageslist/default_fc.php',
-							JPATH_SITE . '/templates/' . $site_tmpl . '/html/com_media/images/default_fc.php',
-							JPATH_SITE . '/templates/' . $site_tmpl . '/html/com_media/imageslist/default_fc.php',
-						);
-
-						$count_removed = 0;
-
-						if (!empty($tmpl_override_files))
-						{
-							foreach($tmpl_override_files as $file)
-							{
-								if (\Joomla\Filesystem\File::exists($file))
-								{
-									if (!\Joomla\Filesystem\File::delete($file))
-									{
-										echo 'Cannot delete legacy file: ' . $file . '<br />';
-									}
-									else $count_removed++;
-								}
-							}
-							echo '<span class="badge bg-success badge-success">template override(s) removed: ' . $count_removed . '</span>';
-						}
-						else echo '<span class="badge bg-info badge-info">nothing to do</span>';
+						$count_removed = $this->removeLegacyMediaOverrides();
+						echo '<span class="badge bg-success badge-success">template override(s) removed: ' . $count_removed . '</span>';
 						?>
 					</td>
 				</tr>
@@ -1858,23 +2067,185 @@ class com_flexicontentInstallerScript
 		static $paramsArr = null;
 		if ($paramsArr !== null) return $paramsArr;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$db->setQuery( 'SELECT manifest_cache FROM #__extensions WHERE element = '. $db->quote($name) .' AND type= '. $db->quote($type) );
 		$manifest_cache =  $db->loadResult();
 
-		$paramsArr = json_decode($manifest_cache, true );
+		$paramsArr = json_decode((string) $manifest_cache, true);
+		$paramsArr = is_array($paramsArr) ? $paramsArr : array();
+		$paramsArr['version'] = (string) ($paramsArr['version'] ?? '0.0.0');
 		return $paramsArr;
 	}
 
 	/*
 	* sets parameter values in the component's row of the extension table
 	*/
+	/**
+	 * JSitemap (com_jmap) data sources are not Joomla extensions, they are folders inside com_jmap/plugins/,
+	 * so the installer cannot install them: copy our data source there, but only if com_jmap is installed
+	 *
+	 * @param   string  $source  Path of the extracted installation package
+	 *
+	 * @return  void
+	 */
+	private function _installJsitemapPlugin($source)
+	{
+		$src = rtrim($source, '/\\') . '/plugins/jsitemap/flexicontent';
+		$dst = JPATH_ADMINISTRATOR . '/components/com_jmap/plugins/flexicontent';
+
+		// JSitemap is not installed (or too old to have the external plugins folder), nothing to do
+		if (!is_dir(JPATH_ADMINISTRATOR . '/components/com_jmap/plugins') || !is_dir($src))
+		{
+			return;
+		}
+
+		try
+		{
+			if (!is_dir($dst) && !mkdir($dst, 0755, true))
+			{
+				throw new RuntimeException('cannot create folder ' . $dst);
+			}
+
+			$iterator = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator($src, FilesystemIterator::SKIP_DOTS),
+				RecursiveIteratorIterator::SELF_FIRST
+			);
+
+			foreach ($iterator as $file)
+			{
+				$target = $dst . '/' . $iterator->getSubPathName();
+
+				if ($file->isDir())
+				{
+					if (!is_dir($target) && !mkdir($target, 0755, true))
+					{
+						throw new RuntimeException('cannot create folder ' . $target);
+					}
+				}
+				elseif (!@copy($file->getPathname(), $target))
+				{
+					// Existing file may be owned by another system user (e.g. copied manually): it is not writable
+					// by the web server, but it can be replaced if the folder is writable
+					if (!is_file($target) || !@unlink($target) || !@copy($file->getPathname(), $target))
+					{
+						throw new RuntimeException('cannot copy file ' . $target
+							. (is_file($target) ? ' (existing file is not writable, owner uid ' . @fileowner($target) . ', web server uid ' . (function_exists('posix_geteuid') ? posix_geteuid() : '?') . ')' : ''));
+					}
+				}
+			}
+
+			// README is for the repository only
+			if (is_file($dst . '/README.md'))
+			{
+				unlink($dst . '/README.md');
+			}
+
+			echo '<div class="alert alert-success" style="margin:8px 0px 8px 0px;">FLEXIcontent data source for JSitemap (com_jmap) was installed / updated</div>';
+		}
+		catch (Throwable $e)
+		{
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage('Could not install the FLEXIcontent data source for JSitemap: ' . $e->getMessage() . '. You can copy plugins/jsitemap/flexicontent manually to ' . $dst, 'warning');
+		}
+	}
+
+
+	/** Remove copies installed by previous releases, including those in inactive templates. */
+	private function removeLegacyMediaOverrides(): int
+	{
+		// SHA-256 of the shipped layouts, normalized to LF across Git and ZIP installations.
+		$stockHashes = [
+			'images' => [
+				'd223a067e299a2f423c7c49c419adde7d9f4011c69d70bb6aab212f71772971a', // 234df181b
+				'da40791134464094711fb2f33b9912031f5f88b77e16c0774771028e87fb134e', // 7a302ccd4
+				'8799232f340d9c00d504402484ea5b491706dfc54aecb8e5789dfb176676f2fc', // 90f3832db
+				'9c8b0b0ec6f66904c8ddd5001a02da20aca4d4d7a127eea803dcb93311481d60', // a4cda1ac8
+				'83d4d6ade68c11e030739b108271d1718451b8aeccd58b174ac5978b1b7ee1bc', // ef718f34c
+				'9e96bbd915395e4eca9f6c015c56b33a66a8992df9d43b9b14e00d43442e2e62', // dd75d7ab9
+				'fa52c77b9e6e6d2ed1f6acc90d46777f9cb9fceca303676ceda0da801f45d1e7', // 5aeef1daf
+				'4d8f8fdc53672d5f10e1684013f70df8ebefe1389ea0b539a737021cf86b236a', // 23ae0cd68
+				'55a10b0c750adeb9203a85fe9678933ff3da42b831fb08c4c092ecd18655909e', // 5d9038eb4
+			],
+			'imageslist' => [
+				'3935c352719dbf5d933fee7b43b401ceab971bc34515eedce4778018ce56202d', // 234df181b
+				'6da8a18068a3dbdb498681a1aff28be5183b7a7db192cf2b71d93e855122d568', // a4cda1ac8
+				'f0c61bb42646f10084b26a2bea19eda0d8e7ce7d2dd268ba3c34edf15c94dc4f', // ef718f34c
+				'2ade77373c860979ed8234cf31c66d940608dec849feb9667dea5e08b9449987', // dd75d7ab9
+				'322bbdcd46d5c681f72ab94d7921660501a37e22c823ecad80433b76798ec704', // 600d1c233
+				'6b48fc41f4a1a88b7657dbea7b5f3640d3bc3ebb3b2903055c136b493e7b2050', // 23ae0cd68
+				'92f3b5442a768039073753c131f3e4c829224ed8b2e75aad5f05b6d47cc69bac', // 5d9038eb4
+			],
+		];
+		$removed = 0;
+
+		foreach ([JPATH_SITE, JPATH_ADMINISTRATOR] as $base)
+		{
+			foreach ($stockHashes as $view => $hashes)
+			{
+				foreach (glob($base . '/templates/*/html/com_media/' . $view . '/default_fc.php') ?: [] as $file)
+				{
+					if (!is_file($file) || is_link($file))
+					{
+						continue;
+					}
+
+					$contents = file_get_contents($file);
+					if ($contents !== false && in_array(hash('sha256', str_replace("\r\n", "\n", $contents)), $hashes, true))
+					{
+						if (unlink($file))
+						{
+							$removed++;
+						}
+					}
+				}
+			}
+		}
+		return $removed;
+	}
+
+
+	/**
+	 * An update copies the new files but does not delete files that left the package: remove them here
+	 *
+	 * Only the listed files are deleted, and a folder only if it is empty afterwards
+	 *
+	 * @return  void
+	 */
+	private function _removeObsoleteFiles()
+	{
+		$obsolete = array(
+			JPATH_SITE . '/components/com_flexicontent/layouts/html/com_media/images' => array('default_fc.php'),
+			JPATH_SITE . '/components/com_flexicontent/layouts/html/com_media/imageslist' => array('default_fc.php'),
+			// json_encode() / json_decode() fallback for PHP < 5.2, removed in 5.3
+			JPATH_SITE . '/components/com_flexicontent/librairies/json' => array('JSON.php', 'jsonwrapper_inner.php'),
+		);
+
+		foreach ($obsolete as $folder => $files)
+		{
+			if (!is_dir($folder))
+			{
+				continue;
+			}
+
+			foreach ($files as $file)
+			{
+				if (is_file($folder . '/' . $file))
+				{
+					@unlink($folder . '/' . $file);
+				}
+			}
+
+			// rmdir() only removes an empty folder: files added by the site owner are left alone
+			@rmdir($folder);
+		}
+	}
+
+
 	private function _setComponentParams($param_array)
 	{
 		if ( count($param_array) > 0 )
 		{
 			// read the existing component value(s)
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$db->setQuery('SELECT params FROM #__extensions WHERE element = "com_flexicontent"');
 			$params = json_decode( $db->loadResult(), true );
 			// add the new variable(s) to the existing one(s)
@@ -1897,7 +2268,7 @@ class com_flexicontentInstallerScript
 	private function _renameExtensionLegacyParameters($map, $dbtbl_name, $dbcol_name, $record_id)
 	{
 		// Load parameters directly from DB
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT ' . $dbcol_name
 			. ' FROM #__' . $dbtbl_name . ' '
 			. ' WHERE '
@@ -1952,7 +2323,7 @@ class com_flexicontentInstallerScript
 			$attr_vals_fix = array()  // For an example see groupmarker case
 	)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		
 		$where = array();
 		foreach($match_cols as $col => $val)
@@ -2034,7 +2405,7 @@ class com_flexicontentInstallerScript
 	 */
 	private function _deprecate_field($old_type, $new_type, & $msg, & $n)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query = 'UPDATE #__flexicontent_fields'
 			.' SET field_type = ' .$db->Quote($new_type)

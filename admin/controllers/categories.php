@@ -14,7 +14,13 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentControllerBaseAdmin' => JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 // Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
 require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'category.php';
@@ -82,8 +88,8 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 		$this->msg_records_deleted         = 'FLEXI_CATEGORIES_DELETED';
 
 		// Load Joomla 'com_categories' language files
-		\Joomla\CMS\Factory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, null, true);
 	}
 
 
@@ -209,7 +215,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Get model
 		$model = $this->getModel($this->record_name_pl);
@@ -293,11 +299,13 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 	 */
 	protected function _cleanCache()
 	{
+		parent::_cleanCache();
+
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 		// Clean cache
-		$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
+		$cache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent']);
 		$cache->clean();
-		$catscache = \Joomla\CMS\Factory::getCache('com_flexicontent_cats');
+		$catscache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_cats']);
 		$catscache->clean();
 	}
 

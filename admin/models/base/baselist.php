@@ -15,7 +15,6 @@ use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('legacy.model.list');
 require_once('traitbase.php');
 require_once('traitlegacylist.php');
 
@@ -212,7 +211,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		 * Pagination: limit, limitstart
 		 */
 
-		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int') : $app->getUserStateFromRequest($p . 'limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limit      = $fcform ? $jinput->get('limit', $app->get('list_limit'), 'int') : $app->getUserStateFromRequest($p . 'limit', 'limit', $app->get('list_limit'), 'int');
 		$limitstart = $fcform ? $jinput->get('limitstart', 0, 'int') : $app->getUserStateFromRequest($p . 'limitstart', 'limitstart', 0, 'int');
 
 		// In case limit has been changed, adjust limitstart accordingly
@@ -301,8 +300,22 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		// Lets load the records if it doesn't already exist
 		if ($this->_data === null)
 		{
+			// A copy of the list query without a LIMIT, for counting: Joomla stores the LIMIT of a page on the query object itself
+			$count_query = clone $this->_getListQuery();
+			$count_query->clear('limit');
+
 			$this->_data  = $this->_getList($this->_getListQuery(), $this->getState('limitstart'), $this->getState('limit'));
-			$this->_total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+
+			// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them. Count the rows of the same list query instead.
+			// A list query with two columns of the same name cannot be a derived table: then count as getTotal() does
+			try
+			{
+				$this->_total = $this->_db->setQuery('SELECT COUNT(*) FROM (' . $count_query . ') AS fc_list')->loadResult();
+			}
+			catch (\Exception $e)
+			{
+				$this->_total = (int) $this->_getListCount($count_query);
+			}
 		}
 
 		return $this->_data;
@@ -368,7 +381,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
 		$query = $this->_db->getQuery(true)
-			->select('SQL_CALC_FOUND_ROWS a.*')
+			->select('a.*')
 			->select($editor_col_quoted . ' AS editor')
 			->from('#__' . $this->records_dbtbl . ' AS a')
 			->group('a.id');
@@ -397,6 +410,10 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		$this->_buildContentWhere($query);
 		$this->_buildContentHaving($query);
 		$this->_buildContentOrderBy($query);
+
+		// A unique last sort key. Without SQL_CALC_FOUND_ROWS the database may stop sorting at the LIMIT,
+		// and rows with equal sort values could then repeat or go missing across pages
+		$query->order('a.id');
 
 		// Add always-active ("hard") filters
 		$this->_buildHardFiltersWhere($query);
@@ -444,7 +461,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	protected function _buildContentWhere($q = false)
 	{
 		$table = $this->getTable($this->records_jtable, '');
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Various filters
 		$filter_state  = $this->getState('filter_state');
@@ -542,7 +559,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 			}
 
 			// Filter via View Level Access, if user is not super-admin
-			if (!\Joomla\CMS\Factory::getUser()->authorise('core.admin') && (\Joomla\CMS\Factory::getApplication()->isClient('site') || $this->listViaAccess))
+			if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.admin') && (\Joomla\CMS\Factory::getApplication()->isClient('site') || $this->listViaAccess))
 			{
 				$groups  = implode(',', \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id));
 				$where[] = 'a.access IN (' . $groups . ')';
@@ -653,7 +670,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		if (count($ids))
 		{
-			$user = \Joomla\CMS\Factory::getUser();
+			$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 			// This is already done by controller task / caller but redo
 			$ids = ArrayHelper::toInteger($ids);
@@ -882,15 +899,37 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 			$ids = ArrayHelper::toInteger($ids);
 			$cid_list = implode(',', $ids);
 
-			// Delete records themselves
-			$query = $this->_db->getQuery(true)
-				->delete('#__' . $this->records_dbtbl)
-				->where('id IN (' . $cid_list . ')');
-
-			$this->_db->setQuery($query)->execute();
+			// Asset-tracked records must use Joomla's table API so ACL nodes are removed safely.
+			$table = $this->getTable($this->records_jtable, '');
+			if (property_exists($table, 'asset_id'))
+			{
+				foreach ($ids as $id)
+				{
+					$table->reset();
+					if (!$table->load($id))
+					{
+						$this->setError($table->getError() ?: 'The record could not be loaded for deletion.');
+						return false;
+					}
+					// Never delete unselected children implicitly; the controller checked each selected ID.
+					$deleted = $table instanceof \Joomla\CMS\Table\Nested ? $table->delete($id, false) : $table->delete($id);
+					if (!$deleted)
+					{
+						$this->setError($table->getError());
+						return false;
+					}
+				}
+			}
+			else
+			{
+				$query = $this->_db->getQuery(true)
+					->delete('#__' . $this->records_dbtbl)
+					->where('id IN (' . $cid_list . ')');
+				$this->_db->setQuery($query)->execute();
+			}
 
 			// Also delete related Data, like 'assignments'
-			$this->delete_relations($cid);
+			$this->delete_relations($ids);
 		}
 
 		/**
@@ -992,7 +1031,11 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		$table = $this->getTable($this->records_jtable, '');
 
 		$cid      = is_array($id) ? $id : array($id);
-		$accesses = is_array($access) ? $access : array($access);
+
+		// One access level for the given record(s): the category list passes one id and one level. It was then looked up by
+		// record id in a one-element list, was not found, and the record got access level NULL: stored as 0 with strict mode
+		// off, refused (Column 'access' cannot be null) with strict mode on
+		$accesses = is_array($access) ? $access : array_fill_keys($cid, $access);
 
 		foreach ($cid as $id)
 		{
@@ -1031,7 +1074,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	 */
 	public function filterByPermission($cid, $action)
 	{
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$table = $this->getTable($this->records_jtable, '');
 
 		$cid   = ArrayHelper::toInteger($cid);

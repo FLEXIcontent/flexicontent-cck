@@ -14,7 +14,13 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecords' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * HTML View class for the FLEXIcontent (backend) dashboard screen
@@ -29,23 +35,27 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 	function display( $tpl = null )
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$config   = \Joomla\CMS\Factory::getConfig();
+		$config   = \Joomla\CMS\Factory::getApplication()->getConfig();
 		$params   = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$document	= \Joomla\CMS\Factory::getDocument();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$document	= \Joomla\CMS\Factory::getApplication()->getDocument();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$print_logging_info = $params->get('print_logging_info');
 
 		// Load the file system librairies
-		jimport('joomla.filesystem.folder');
-		jimport('joomla.filesystem.file');
 
 		// activate the tooltips
 		//\Joomla\CMS\HTML\HTMLHelper::_('behavior.tooltip');
 
 		// Get model
 		$model = $this->getModel('flexicontent');
+
+		// The optional task that moves the DB tables to InnoDB has its own page
+		if ($this->getLayout() === 'dbengine')
+		{
+			return $this->_displayDbEngine($tpl);
+		}
 
 		// initialise template related variables
 		$template	= $app->getTemplate();
@@ -105,9 +115,10 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 			$missingversion		= true; //!$use_versioning || !$model->checkCurrentVersionData();
 			$cachethumb				= $model->getCacheThumbPerms();
 
-			$existdbindexes    = ! (boolean) ($missingindexes = $model->getExistDBindexes($check_only=false));
+			$existdbindexes    = ! (bool) ($missingindexes = $model->getExistDBindexes($check_only=false));
 			$itemcountingdok   = $model->getItemCountingDataOK();
 			$initialpermission = $model->checkInitialPermission();
+			$dbcharsetok       = ! (bool) ($dbcharsetpending = $model->getDBCharsetPending());
 		}
 
 		else if ($optional_tasks)  // IF optional tasks do not recheck instead just set the FLAGS to true
@@ -116,8 +127,8 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 			$existfplg = $existseplg = $existsyplg = true;
 		  $existcats = $langsynced = $existversions = $existversionsdata = $existauthors = true;
 		  $deprecatedfiles = $nooldfieldsdata = $missingversion = $cachethumb = true;
-		  $existdbindexes = $itemcountingdok = $initialpermission = true;
-		  $missingindexes = array();
+		  $existdbindexes = $itemcountingdok = $initialpermission = $dbcharsetok = true;
+		  $missingindexes = $dbcharsetpending = array();
 		}
 
 
@@ -126,12 +137,15 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		// Add css and js to document
 		// **************************
 
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+
+		// Dashboard cards + update column, loaded last so legacy dashboard floats are overridden
+		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexi_dashboard.css', array('version' => FLEXI_VHASH));
 
 
 
@@ -140,6 +154,15 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		// *****************************
 
 		$perms = FlexicontentHelperPerm::getPerm();
+
+		// Number of DB tables that an administrator could move to InnoDB (optional task, shown as a note)
+		$this->dbengine_pending = 0;
+
+		if ($user->authorise('core.admin', 'com_flexicontent'))
+		{
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+			$this->dbengine_pending = count(FlexicontentDbEngine::getPendingTables($db));
+		}
 
 
 
@@ -156,41 +179,12 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		\Joomla\CMS\Toolbar\ToolbarHelper::title( $doc_title, 'home' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
-		$js = "jQuery(document).ready(function(){";
 
 		// Create the toolbar
 		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
-		$loading_msg = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_LOADING') .' ... '. \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_WAIT'), 2);
 
 		if($perms->CanConfig)
 		{
-			if (0) // FLEXI_J37GE
-			{
-				$btn_task = '';
-				$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&layout=import&format=raw';
-				//$toolbar->appendButton('Popup', 'download', \Joomla\CMS\Language\Text::_('FLEXI_IMPORT_JOOMLA'), str_replace('&', '&amp;', $popup_load_url), 780, 500);
-				$js .= "
-					jQuery('#toolbar-download a.toolbar, #toolbar-download button')
-						.attr('href', '".$popup_load_url."')
-						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 500, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
-							.$loading_msg."<\/span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_IMPORT_JOOMLA'), 2)."\'}); return false;');
-				";
-				\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task, 'download.png', 'download_f2.png', 'FLEXI_IMPORT_JOOMLA', false );
-			}
-
-			if (0) // TODO evaluate for e.g. submiting a template
-			{
-				$btn_task = '';
-				$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&layout=language&tmpl=component';
-				//$toolbar->appendButton('Popup', 'language', \Joomla\CMS\Language\Text::_('FLEXI_SEND_LANGUAGE'), str_replace('&', '&amp;', $popup_load_url), 780, 540);
-				$js .= "
-					jQuery('#toolbar-language a.toolbar, #toolbar-language button')
-						.attr('href', '".$popup_load_url."')
-						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 540, false, {\'title\': \'".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_SEND_LANGUAGE'), 2)."\'}); return false;');
-				";
-				\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task, 'language.png', 'language_f2.png', 'FLEXI_SEND_LANGUAGE', false );
-			}
-
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
@@ -198,8 +192,6 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 			\Joomla\CMS\Toolbar\ToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 
-		$js .= "});";
-		$document->addScriptDeclaration($js);
 
 		// Add modal edit code
 		if (1)
@@ -208,10 +200,9 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 			$document->addScriptDeclaration('
 				function fc_edit_fcitem_modal_load( container )
 				{
-					if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=items") != -1 )
-					{
-						container.dialog("close");
-					}
+					const dialog = FlexiForm.element(container);
+					const frame = dialog?.querySelector("iframe");
+					if (frame?.contentDocument?.location.href.includes("view=items")) fc_closeDialog(dialog.id);
 				}
 				function fc_edit_fcitem_modal_close()
 				{
@@ -222,7 +213,6 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		}
 
 		// Lists
-		jimport('joomla.filesystem.folder');
 		$lists 		= array();
 		$options 	= array();
 		$folder 	= JPATH_ADMINISTRATOR.DS.'language';
@@ -238,9 +228,9 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		$lists['missing_lang'] = $model->createLanguagePack();
 
 		// Get the default copyright values to populate the form automatically
-		$mailfrom = $app->getCfg('mailfrom');
-		$fromname = $app->getCfg('fromname');
-		$website 	= $app->getCfg('live_site');
+		$mailfrom = $app->get('mailfrom');
+		$fromname = $app->get('fromname');
+		$website 	= $app->get('live_site');
 
 
 		$this->pending = $pending;
@@ -286,6 +276,8 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		$this->missingindexes = isset($missingindexes) ? $missingindexes : null;
 		$this->itemcountingdok = isset($itemcountingdok) ? $itemcountingdok : null;
 		$this->initialpermission = isset($initialpermission) ? $initialpermission : null;
+		$this->dbcharsetok = isset($dbcharsetok) ? $dbcharsetok : null;
+		$this->dbcharsetpending = isset($dbcharsetpending) ? $dbcharsetpending : array();
 
 		// assign Rights to the template
 		$this->perms = $perms;
@@ -293,7 +285,6 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 
 		$this->sidebar = null;
 
-		if(FLEXI_J30GE && !FLEXI_J40GE) $this->sidebar = JHtmlSidebar::render();
 		if(FLEXI_J40GE) $this->sidebar = \Joomla\CMS\HTML\Helpers\Sidebar::render();
 
 		parent::display($tpl);
@@ -311,9 +302,9 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 	function quickiconButton( $link, $image, $iconfont, $text, $modal = 0, $modal_create_iframe = 1, $modal_width=0, $modal_height=0, $close_function = 'false')
 	{
 		// Initialise variables
-		$lang = \Joomla\CMS\Factory::getLanguage();
+		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
 		$link_attribs = $modal
-			? ' onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.((int)(!$modal_create_iframe)).', '.$modal_width.', '.$modal_height.', ' . $close_function . ', {\'title\': \''.flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_($text), 2).'\'}); return false;"'
+			? ' onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.((int)(!$modal_create_iframe)).', '.$modal_width.', '.$modal_height.', ' . $close_function . ', {\'title\': \''.flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_($text), 2).'\'}); return false;"'
 			: '';
 		$img_attribs  = ' class="fc-board-btn-img"';
   	?>
@@ -333,5 +324,37 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		</span>
 		<?php
 	}
-}
 
+
+	/**
+	 * Page of the optional task that moves FLEXIcontent's DB tables to InnoDB:
+	 * the checks to read before starting, the tables to convert and the start button
+	 */
+	protected function _displayDbEngine($tpl = null)
+	{
+		$app  = \Joomla\CMS\Factory::getApplication();
+		$user = $app->getIdentity();
+
+		if (!$user->authorise('core.admin', 'com_flexicontent'))
+		{
+			throw new \Exception(\Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'), 403);
+		}
+
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+
+		!FLEXI_J40GE
+			? $app->getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/j3x.css', array('version' => FLEXI_VHASH))
+			: $app->getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/j4x.css', array('version' => FLEXI_VHASH));
+		$app->getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH));
+
+		FLEXIUtilities::ManagerSideMenu(null);
+
+		$doc_title = \Joomla\CMS\Language\Text::_('FLEXI_DBENGINE_TITLE');
+		\Joomla\CMS\Toolbar\ToolbarHelper::title($doc_title, 'database');
+		$app->getDocument()->setTitle($doc_title . ' - ' . $app->getDocument()->getTitle());
+
+		$this->dbengine = FlexicontentDbEngine::getPreflight(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
+
+		parent::display($tpl);
+	}
+}

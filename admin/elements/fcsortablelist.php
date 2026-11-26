@@ -23,10 +23,7 @@ defined('_JEXEC') or die('Restricted access');
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 
@@ -59,9 +56,9 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 	
 	function add_css_js()
 	{
-		flexicontent_html::loadJQuery();
+		flexicontent_html::loadFramework('flexi-lib-form');
 
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$js = "";
 		if ($js) $document->addScriptDeclaration($js);
 	}
@@ -76,8 +73,8 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 			$js_css_added = true;
 		}
 		
-		$doc	= \Joomla\CMS\Factory::getDocument();
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$doc	= \Joomla\CMS\Factory::getApplication()->getDocument();
+		$db		= \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$attributes = $this->element->attributes();
 
 		$iselements = $attributes->subtype =='elements';
@@ -230,27 +227,27 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 				<div class="'.($attributes->editbtns_class ? ' '.$attributes->editbtns_class : '').'">
 					<span class="btn-group">'.
 						($edit_inline ? '
-						<span class="btn fcrecords_show_btn" title="'.\Joomla\CMS\Language\Text::_('FLEXI_SHOW').'" onclick="fcrecord_ui_edit(jQuery(\'#'.$sortable_id.'\'), 0, jQuery(this), jQuery(this).next());">
+						<button type="button" class="btn fcrecords_show_btn" title="'.\Joomla\CMS\Language\Text::_('FLEXI_SHOW').'" onclick="fcrecord_ui_edit(document.getElementById(\''.$sortable_id.'\'), 0, this, this.nextElementSibling);">
 							<span class="icon-downarrow"></span>'.\Joomla\CMS\Language\Text::_('FLEXI_EDIT_PROPERTIES').'
-						</span>
-						<span class="btn fcrecords_hide_btn" title="'.\Joomla\CMS\Language\Text::_('FLEXI_HIDE').'" onclick="fcrecord_ui_edit(jQuery(\'#'.$sortable_id.'\'), 0, jQuery(this).prev(), jQuery(this));" style="display:none;">
+						</button>
+						<button type="button" class="btn fcrecords_hide_btn" title="'.\Joomla\CMS\Language\Text::_('FLEXI_HIDE').'" onclick="fcrecord_ui_edit(document.getElementById(\''.$sortable_id.'\'), 0, this.previousElementSibling, this);" style="display:none;">
 							<span class="icon-uparrow"></span>'.\Joomla\CMS\Language\Text::_('FLEXI_HIDE_PROPERTIES').'
-						</span>
+						</button>
 						' : '').
 						($edit_popup ? '
-						<span class="btn" title="'.\Joomla\CMS\Language\Text::_('FLEXI_POPUP').'" onclick="fcrecord_ui_edit(jQuery(\'#'.$sortable_id.'\'), 1); fcrecord_toggle_details_btns(jQuery(this), 0);">
+						<button type="button" class="btn" title="'.\Joomla\CMS\Language\Text::_('FLEXI_POPUP').'" onclick="fcrecord_ui_edit(document.getElementById(\''.$sortable_id.'\'), 1); fcrecord_toggle_details_btns(this, 0);">
 							<span class="icon-pencil" style="font-size: 80%;"></span>'.\Joomla\CMS\Language\Text::_('FLEXI_EDIT').'
-						</span>
+						</button>
 						' : '').
 						($raw_inline ? '
-						<span class="btn" title="'.\Joomla\CMS\Language\Text::_('FLEXI_POPUP').'" onclick="fcrecord_direct_edit(jQuery(\'#'.$sortable_id.'\'), 0); fcrecord_toggle_details_btns(jQuery(this), 0);">
+						<button type="button" class="btn" title="'.\Joomla\CMS\Language\Text::_('FLEXI_POPUP').'" onclick="fcrecord_direct_edit(document.getElementById(\''.$sortable_id.'\'), 0); fcrecord_toggle_details_btns(this, 0);">
 							<span class="icon-paragraph-justify"></span>'.\Joomla\CMS\Language\Text::_('FLEXI_RAW_EDIT').'
-						</span>
+						</button>
 						' : '').
 						($raw_popup ? '
-						<span class="btn" title="'.\Joomla\CMS\Language\Text::_('FLEXI_POPUP').' '.\Joomla\CMS\Language\Text::_('FLEXI_RAW_EDIT').'" onclick="fcrecord_direct_edit(jQuery(\'#'.$sortable_id.'\'), 1); fcrecord_toggle_details_btns(jQuery(this), 0);">
+						<button type="button" class="btn" title="'.\Joomla\CMS\Language\Text::_('FLEXI_POPUP').' '.\Joomla\CMS\Language\Text::_('FLEXI_RAW_EDIT').'" onclick="fcrecord_direct_edit(document.getElementById(\''.$sortable_id.'\'), 1); fcrecord_toggle_details_btns(this, 0);">
 							<span class="'.($raw_inline ? 'icon-expand-2' : 'icon-paragraph-justify').'"></span>'.($raw_inline ? \Joomla\CMS\Language\Text::_('FLEXI_POPUP').' ' : '').\Joomla\CMS\Language\Text::_('FLEXI_RAW_EDIT').'
-						</span>
+						</button>
 						' : '').'
 					</span>
 					<div class="fcclear"></div>
@@ -291,7 +288,7 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 						$_classes = $_unused ? ' fcrec_unused' : '';
 						$_styles  = isset($prop_widths[$i]) ? ' width:'.$prop_widths[$i].'!important;' : '';
 
-						$props_html[] = '<input type="text"  value="'.htmlspecialchars( $prop_v, ENT_COMPAT, 'UTF-8' ).'" class="fcrecord_prop '.$_classes.'" onblur="fcrecord_store_values(jQuery(this).closest(\'ul\'));" style="'.$_styles.'" '.($_unused ? $_unused_col : '').'/>';
+						$props_html[] = '<input type="text"  value="'.htmlspecialchars( $prop_v, ENT_COMPAT, 'UTF-8' ).'" class="fcrecord_prop '.$_classes.'" onblur="fcrecord_store_values(this.closest(\'ul\'));" style="'.$_styles.'" '.($_unused ? $_unused_col : '').'/>';
 					}
 				}
 				else {
@@ -305,21 +302,21 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 								implode(' ', $props_html) :
 								'<span class="fcprop_box">'.$_v.'</span>'
 							).'
-							<span class="delfield_handle" title="'.\Joomla\CMS\Language\Text::_('FLEXI_REMOVE').'" onclick="fcrecord_del_sortable_element(this);"></span>
-							'.($add_after  ? '<span class="addfield_handle fc_after"  title="'.\Joomla\CMS\Language\Text::_('FLEXI_ADD').'" onclick="fcrecord_add_sortable_element_ext(jQuery(this).parent(), 1);"></span>' : '').'
-							'.($add_before ? '<span class="addfield_handle fc_before" title="'.\Joomla\CMS\Language\Text::_('FLEXI_ADD').'" onclick="fcrecord_add_sortable_element_ext(jQuery(this).parent(), 0);"></span>' : '').'
+							<button type="button" class="delfield_handle" title="'.\Joomla\CMS\Language\Text::_('FLEXI_REMOVE').'" onclick="fcrecord_del_sortable_element(this);"></button>
+							'.($add_after  ? '<button type="button" class="addfield_handle fc_after"  title="'.\Joomla\CMS\Language\Text::_('FLEXI_ADD').'" onclick="fcrecord_add_sortable_element_ext(this.parentElement, 1);"></button>' : '').'
+							'.($add_before ? '<button type="button" class="addfield_handle fc_before" title="'.\Joomla\CMS\Language\Text::_('FLEXI_ADD').'" onclick="fcrecord_add_sortable_element_ext(this.parentElement, 0);"></button>' : '').'
 							'.($iselements ? '<span class="ordfield_handle" title="'.\Joomla\CMS\Language\Text::_('FLEXI_MOVE').'"></span>' : '').'
 						</li>';
 			}
 			$sorter_html .= '
 					</ul>
-				'.($add_end ? '<span class="btn" title="'.\Joomla\CMS\Language\Text::_('FLEXI_ADD').'" onclick="fcrecord_add_sortable_element_ext(jQuery(\'#'.$sortable_id.'\'), 1);" style="float:right;"><span class="icon-new"></span>'.\Joomla\CMS\Language\Text::_('FLEXI_ADD').'</span>' : '').'
+				'.($add_end ? '<button type="button" class="btn" title="'.\Joomla\CMS\Language\Text::_('FLEXI_ADD').'" onclick="fcrecord_add_sortable_element_ext(document.getElementById(\''.$sortable_id.'\'), 1);" style="float:right;"><span class="icon-new"></span>'.\Joomla\CMS\Language\Text::_('FLEXI_ADD').'</button>' : '').'
 				</div>
 			</div>
 			<div class="fcclear"></div>';
 			
 			$js = "";
-			if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+			if ($js) \Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 		}
 
 		return

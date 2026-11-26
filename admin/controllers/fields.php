@@ -14,7 +14,13 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentControllerBaseAdmin' => JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 // Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
 require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'field.php';
@@ -111,7 +117,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$model = $this->getModel($this->record_name_pl);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Calculate ACL access
 		$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
@@ -186,7 +192,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$model = $this->getModel($this->record_name_pl);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Calculate ACL access
 		$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
@@ -413,7 +419,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$task   = $this->input->get('task', 'copy', 'cmd');
 		$option = $this->input->get('option', '', 'cmd');
 
@@ -490,7 +496,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		if (!$ids_map)
 		{
 			$msg = \Joomla\CMS\Language\Text::_('FLEXI_FIELDS_COPY_FAILED');
-			JError::raiseWarning(500, $model->getError());
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage($model->getError(), 'warning');
 		}
 		else
 		{
@@ -516,7 +522,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 				$msg .= \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELDS_UNEDITABLE_FIELDS_NOT_COPIED', count($non_auth_cid)) . ' ';
 			}
 
-			$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
+			$cache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent']);
 			$cache->clean();
 		}
 
@@ -576,7 +582,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Get model
 		$model = $this->getModel($this->record_name_pl);
@@ -667,12 +673,12 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 	 */
 	function selectsearchflag()
 	{
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		flexicontent_html::loadFramework('flexi-lib');
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
@@ -709,7 +715,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 			function field_toggleprop(shortname, onoff)
 			{
 				if (window.parent.document.adminForm.boxchecked.value==0) {
-					alert("' . \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED', true) . '");
+					window.parent.FlexiForm.alert("' . \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED', true) . '");
 					return false;
 				}
 				var fc_blocker_mssg = document.getElementsByClassName("fc_blocker_mssg")[0];

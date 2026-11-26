@@ -125,7 +125,6 @@ class FlexicontentCronTasks
 	public function transferFiles()
 	{
 		$log_filename = 'cron_estorage.php';
-		jimport('joomla.log.log');
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file
@@ -135,7 +134,7 @@ class FlexicontentCronTasks
 			array('com_flexicontent.estorage')  // category of logged messages
 		);
 
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 
 		/**

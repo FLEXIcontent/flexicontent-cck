@@ -22,7 +22,13 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecords' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * HTML View class for the Stats View
@@ -37,9 +43,9 @@ class FlexicontentViewStats extends FlexicontentViewBaseRecords
 	function display( $tpl = null )
 	{
 		//initialise variables
-		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		
 		// Get data from the model
 		$genstats   = $this->get( 'Generalstats' );
@@ -69,10 +75,10 @@ class FlexicontentViewStats extends FlexicontentViewBaseRecords
 		// Add css and js to document
 		// **************************
 		
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
@@ -80,7 +86,26 @@ class FlexicontentViewStats extends FlexicontentViewBaseRecords
 
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		$document->addStyleSheet('//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css');
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/esl/esl.js');
+		// ESL exposes AMD globals: load it only after Joomla's scripts have initialized.
+		$chart_base = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/';
+		$local_charts = is_dir(JPATH_SITE . '/components/com_flexicontent/librairies/echarts')
+			&& is_dir(JPATH_SITE . '/components/com_flexicontent/librairies/zrender');
+		$document->addScriptOptions('flexicontent.stats', array(
+			'loader' => $chart_base . 'librairies/esl/esl.js',
+			'packages' => $local_charts ? array(
+				array('name' => 'echarts', 'location' => $chart_base . 'librairies/echarts', 'main' => 'echarts'),
+				array('name' => 'zrender', 'location' => $chart_base . 'librairies/zrender', 'main' => 'zrender'),
+			) : array(),
+			'scripts' => $local_charts ? array() : array(
+				'https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/echarts.js',
+				'https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/line.js',
+				'https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/bar.js',
+				'https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/pie.js',
+				'https://cdnjs.cloudflare.com/ajax/libs/zrender/2.0.7/zrender.js',
+			),
+		));
+		\Joomla\CMS\Language\Text::script('FLEXI_STATS_CHARTS_UNAVAILABLE');
+		$document->addScript($chart_base . 'assets/js/stats.js', array('version' => (string) filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/stats.js')), array('defer' => true));
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		
 		
@@ -138,7 +163,6 @@ class FlexicontentViewStats extends FlexicontentViewBaseRecords
 
 		$this->sidebar = null;
 
-		if(FLEXI_J30GE && !FLEXI_J40GE) $this->sidebar = JHtmlSidebar::render();
 		if(FLEXI_J40GE) $this->sidebar = \Joomla\CMS\HTML\Helpers\Sidebar::render();
 
 		parent::display($tpl);

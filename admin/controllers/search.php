@@ -14,7 +14,13 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentControllerBaseAdmin' => JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 // Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
 require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'search.php';
@@ -45,6 +51,8 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 
 	function purge()
 	{
+		$this->requireIndexMutation();
+
 		$model = $this->getModel('search');
 		$model->purge();
 		$msg = \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_PURGED');
@@ -54,8 +62,31 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 
 	function custom_order()
 	{
+		$this->requireIndexMutation();
 		flexicontent_db::setValues_commonDataTypes(null, true);
 		$msg = \Joomla\CMS\Language\Text::_('FLEXI_CUSTOM_ORDER_INDEXES_UPDATED');
 		$this->setRedirect('index.php?option=com_flexicontent&view=search', $msg);
+	}
+
+	/** Enforce the same authority as the Search screen before changing indexes. */
+	private function requireIndexMutation()
+	{
+		$app = \Joomla\CMS\Factory::getApplication();
+		$user = $app->getIdentity();
+		if (!$app->isClient('administrator') || !$user->id
+			|| !$user->authorise('flexicontent.managefields', 'com_flexicontent')
+			|| !($user->authorise('flexicontent.createfield', 'com_flexicontent')
+				|| $user->authorise('flexicontent.editfield', 'com_flexicontent')))
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'), 403);
+		}
+		if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST')
+		{
+			throw new \RuntimeException('POST request required', 405);
+		}
+		if (!\Joomla\CMS\Session\Session::checkToken('post'))
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'), 403);
+		}
 	}
 }

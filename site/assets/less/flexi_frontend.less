@@ -601,6 +601,45 @@ div table.adminform td {
 			box-sizing: content-box;
 		}
 
+		/* Checkbox of the toggle button: not shown, but it takes the click, the Tab key and the Space key */
+		.fcfavs-toggle-input {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			margin: -1px;
+			padding: 0;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			white-space: nowrap;
+			border: 0;
+			opacity: 0;
+		}
+		.fcfavs-toggle-input:focus-visible + * {
+			outline: 2px solid var(--fcfavs-color-primary);
+			outline-offset: 2px;
+			border-radius: 4px;
+		}
+
+		/* SVG heart of toggle styles 0 and 1: an outline when not a favourite, filled when a favourite */
+		.fcfavs-svg_icon {
+			width: 28px;
+			height: 28px;
+			vertical-align: middle;
+			fill: transparent;
+			stroke: #000;
+			stroke-width: 1;
+			stroke-linejoin: round;
+			transition: fill .15s, stroke .15s;
+		}
+		.fcfavs-svg_icon.fcfavs-heart-fill {
+			fill: #f44336;
+			stroke: #f44336;
+		}
+		.fcfavs-svg_icon.fcfavs-svg_login {
+			fill: #303c42;
+			stroke: #303c42;
+		}
+
 		[class^="fcfavs"], [class*=" fcfavs"] {
 			font-size: 14px;
 			line-height: 100%;
@@ -773,6 +812,13 @@ div table.adminform td {
 }
 
 
+@media (prefers-reduced-motion: reduce) {
+	.fav-block .fcfavs-icon_box .fcfavs-svg_icon {
+		transition: none;
+	}
+}
+
+
 /***********
  * JComments
  ***********/
@@ -902,15 +948,20 @@ dl.tabs dt a:link,
 }
 
 
-div.current {
+div.current:not(.gslide) {
 	border: 1px solid #cccccc;
 	clear: both;
 	padding: 10px 10px;
 }
 
-div.current dd {
+div.current:not(.gslide) dd {
 	margin: 0;
 	padding: 0;
+}
+
+div[class^="glightbox_fccontainer_"] {
+	display: flex;
+	flex-wrap: wrap;
 }
 
 #bottom-block {
@@ -1042,6 +1093,64 @@ fc_search_result_category .fc-mssg-inline {
 .flexicontent.fcsearch  .fc_mublock {
 	display: block;
 	float: right;
+}
+.flexicontent.fcsearch .fc_search_result_meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px 8px;
+	clear: both;
+	margin: 4px 0 6px 0;
+}
+.flexicontent.fcsearch .fc_search_result_meta .fc_search_result_category {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px 8px;
+}
+.flexicontent.fcsearch .fc_search_result_meta .fc-mssg-inline {
+	margin: 0;
+}
+.flexicontent.fcsearch .fc_search_result_fields {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	clear: both;
+	margin-top: 10px;
+}
+.flexicontent.fcsearch .fc_search_result_fields .fc_search_field_container {
+	display: inline-flex;
+	align-items: stretch;
+	border: 1px solid #d0d7e2;
+	border-radius: 999px;
+	overflow: hidden;
+	background: #ffffff;
+	font-size: 13px;
+	line-height: 1.4;
+}
+.flexicontent.fcsearch .fc_search_result_fields .fc_search_field_label {
+	display: inline-flex;
+	align-items: center;
+	padding: 3px 10px 3px 12px;
+	margin: 0;
+	background: #eef2f7;
+	border-radius: 0;
+	color: #4a5568;
+	font-size: 12px;
+	font-weight: 600;
+	text-shadow: none;
+	white-space: nowrap;
+}
+.flexicontent.fcsearch .fc_search_result_fields .fc_search_field_value {
+	display: inline-flex;
+	align-items: center;
+	padding: 3px 12px 3px 10px;
+	color: #1f2933;
+}
+.flexicontent.fcsearch .fc_search_result_fields .fc_search_field_value * {
+	display: inline;
+	margin: 0;
+	padding: 0;
 }
 #fc_fieldfilters_tbl ul {
     padding: 0;
@@ -1650,3 +1759,99 @@ h2.fc_search_result_title a {
 .mod_flexifilter_wrapper  .field-calendar .btn-primary {
     height: calc(var(--ctrls-inp-height) + 2px) !important;
 }
+/** fix swiper **/
+.swiper.fc_swiper_main{
+	width: 100% !important;
+	}
+
+/** Vanilla text-search autocomplete dropdown (see tmpl-common.js) **/
+ul.fc_ac_dropdown {
+	position: absolute;
+	z-index: 5000;
+	display: none;
+	list-style: none;
+	margin: 0;
+	padding: 2px 0;
+	background: #fff;
+	border: 1px solid #ccc;
+	border-top: none;
+	max-height: 260px;
+	overflow: auto;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, .15);
+	box-sizing: border-box;
+}
+ul.fc_ac_dropdown > li.fc_ac_item {
+	padding: 5px 10px;
+	cursor: pointer;
+	font-size: 13px;
+	line-height: 1.4;
+}
+ul.fc_ac_dropdown > li.fc_ac_item:hover,
+ul.fc_ac_dropdown > li.fc_ac_item.is-active {
+	background: #eee;
+}
+/** Rich suggestions (image + title + extra fields) **/
+.fc_ac_item_inner {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	width: 100%;
+	box-sizing: border-box;
+}
+.fc_ac_item_inner.fc_ac_pos_right {
+	flex-direction: row-reverse;
+}
+.fc_ac_thumb {
+	flex: 0 0 auto;
+	line-height: 0;
+}
+.fc_ac_thumb img {
+	display: block;
+	max-width: none;
+	border-radius: 3px;
+}
+.fc_ac_thumb_crop img {
+	object-fit: cover;
+}
+.fc_ac_thumb_scale img {
+	object-fit: contain;
+}
+.fc_ac_content {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+.fc_ac_title {
+	font-weight: 600;
+	line-height: 1.3;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+}
+.fc_ac_infos {
+	margin-top: 2px;
+	font-size: 12px;
+	line-height: 1.35;
+	color: #666;
+}
+.fc_ac_info {
+	display: block;
+}
+.fc_ac_info_label {
+	font-weight: 600;
+	color: #444;
+	margin-right: 3px;
+}
+.fc_ac_info_value {
+	color: #666;
+}
+.ui-autocomplete .ui-menu-item > a {
+	display: block;
+	text-decoration: none;
+	color: inherit;
+}
+/* Wrap navigation controls instead of clipping letters or expanding the page. */
+#flexicontent .pagination { flex-wrap: wrap; max-width: 100%; }
+#fc_alpha .aichargrp {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 2px;
+  float: none; position: static; width: 100%;
+}
+#fc_alpha .fc_alpha_index { float: none; position: static; }

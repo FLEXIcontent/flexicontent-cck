@@ -5,7 +5,7 @@
  * 
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright � 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -23,13 +23,11 @@ require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'
 //require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'category.php');
 
 //require_once (JPATH_SITE.DS.'modules'.DS.'mod_flexicontent'.DS.'classes'.DS.'datetime.php');
-//\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-JLoader::register('\Joomla\CMS\Form\FormFieldFclayoutbuilder', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'elements' . DS . 'fclayoutbuilder.php');
 
 
 // Decide whether to show module contents
 $app     = \Joomla\CMS\Factory::getApplication();
-$config  = \Joomla\CMS\Factory::getConfig();
+$config  = \Joomla\CMS\Factory::getApplication()->getConfig();
 $jinput  = $app->input;
 $option  = $jinput->get('option', '', 'cmd');
 $view    = $jinput->get('view', '', 'cmd');
@@ -87,7 +85,6 @@ if ( !$show_mod )  return;
 
 
 global $modfc_jprof;
-jimport('joomla.profiler.profiler');
 $modfc_jprof = new \Joomla\CMS\Profiler\Profiler();
 $modfc_jprof->mark('START: FLEXIcontent Categories Module');
 
@@ -103,14 +100,11 @@ if ($mod_initialized === null)
 }
 
 // Initialize various variables
-$document = \Joomla\CMS\Factory::getDocument();
+$document = $app->getDocument();
 $flexiparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 // Include the helper only once
 require_once (dirname(__FILE__).DS.'helper.php');
-
-// Include \Joomla\CMS\Categories\CategoryNode class file
-JLoader::register('\Joomla\CMS\Categories\CategoryNode', JPATH_BASE . '/libraries/legacy/categories/categories.php');
 
 // Get module's basic display parameters
 $cacheid = md5($module->id);

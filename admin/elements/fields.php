@@ -25,11 +25,7 @@ defined('_JEXEC') or die('Restricted access');
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
 
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 
 /**
  * Renders a fields element
@@ -56,14 +52,13 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 
 		if ($js_css_added === null)
 		{
-			flexicontent_html::loadJQuery();
 			flexicontent_html::loadFramework('flexi-lib-form');
 			$js_css_added = true;
 		}
 
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$doc	= \Joomla\CMS\Factory::getDocument();
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$doc	= \Joomla\CMS\Factory::getApplication()->getDocument();
+		$db		= \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 		$node = & $this->element;
@@ -75,11 +70,15 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 		 * Option labels and option values (for the created SELECT form field)
 		 */
 
-		$fieldnameastext = (boolean) @ $attributes['fieldnameastext'];
-		$groupables = (boolean) @ $attributes['groupables'];
+		$fieldnameastext = (bool) @ $attributes['fieldnameastext'];
+		$groupables = (bool) @ $attributes['groupables'];
+
+		// Sortable list only: keep an optional ":suffix" of the stored values (e.g. "fieldname:displaymethod:title"),
+		// so that values that were typed manually in older versions are not lost when the list is re-saved
+		$keepsuffix = (bool) @ $attributes['keepsuffix'];
 		
 		// NOTE: ELSE should always be 'id', otherwise we break compatiblity with all previous FC versions !
-		$ovalue = ((boolean) @ $attributes['fieldnameasvalue']) ?
+		$ovalue = ((bool) @ $attributes['fieldnameasvalue']) ?
 			'name' :
 			'id' ;
 
@@ -128,7 +127,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 
 		// For 'Filters' type not set means true otherwise false
 		$issortable = strlen(@$attributes['issortable'] ?? '') ?
-			(boolean) $attributes['issortable'] :
+			(bool) $attributes['issortable'] :
 			($this->type=='Filters' ? true : false);
 
 
@@ -295,7 +294,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 
 		else
 		{
-			if ((boolean) @ $attributes['display_useglobal'] && !$issortable)
+			if ((bool) @ $attributes['display_useglobal'] && !$issortable)
 			{
 				array_unshift($options, \Joomla\CMS\HTML\HTMLHelper::_('select.option', '' , '- '.\Joomla\CMS\Language\Text::_('FLEXI_USE_GLOBAL').' -'));
 				array_unshift($options, \Joomla\CMS\HTML\HTMLHelper::_('select.option', '0', '- '.\Joomla\CMS\Language\Text::_('FLEXI_NOT_SET').' -'));   // Compatibility with older FC versions
@@ -337,21 +336,30 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 
 			foreach($values as $val)
 			{
-				if( !isset($v2f[$val]) ) continue;
+				$base = $val;
+				$suffix = '';
+
+				if ($keepsuffix && strpos($val, ':') !== false)
+				{
+					list($base, $suffix) = explode(':', $val, 2);
+				}
+
+				if( !isset($v2f[$base]) ) continue;
 				$sorter_html .= '
-					<li data-value="field_'.$val.'" class="fcrecord">
-						<span class="fcprop_box">'.$v2f[$val]->option_text.'</span>
-						<span class="delfield_handle" title="'.\Joomla\CMS\Language\Text::_('FLEXI_REMOVE').'" onclick="fcfield_del_sortable_element(this);"></span>
+					<li data-value="field_'.htmlspecialchars($val, ENT_QUOTES, 'UTF-8').'" class="fcrecord">
+						<span class="fcprop_box">'.$v2f[$base]->option_text
+							.($suffix !== '' ? ' <small class="fcprop_suffix">('.htmlspecialchars($suffix, ENT_QUOTES, 'UTF-8').')</small>' : '').'</span>
+						<button type="button" class="delfield_handle" title="'.\Joomla\CMS\Language\Text::_('FLEXI_REMOVE').'" onclick="fcfield_del_sortable_element(this);"></button>
 					</li>';
 			}
 			$sorter_html .= '
 				</ul>
-				<input type="text" id="'.$element_id_sorter.'" name="'.$fieldname_sorter.'" value="'.implode(',', $values).'" class="fc_hidden_value" />
+				<input type="text" id="'.$element_id_sorter.'" name="'.$fieldname_sorter.'" value="'.htmlspecialchars(implode(',', $values), ENT_QUOTES, 'UTF-8').'" class="fc_hidden_value" />
 			</div>
 			<div class="fcclear"></div>';
 
 			$js = "";
-			if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+			if ($js) \Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 
 			$attribs .= ' class="use_select2_lib" ';
 			flexicontent_html::loadFramework('select2');
@@ -368,15 +376,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 
 		if ($inline_tip = @$attributes['inline_tip'])
 		{
-			$tip_img = @$attributes['tip_img'];
-			$tip_img = $tip_img ? $tip_img : 'comments.png';
-			$preview_img = @$attributes['preview_img'];
-			$preview_img = $preview_img ? $preview_img : '';
-			$tip_class = @$attributes['tip_class'];
-			$tip_class .= ' hasTooltip';
-			$hintmage = \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
-			$previewimage = $preview_img ? \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
-			$tip_text = '<span class="'.$tip_class.'" style="float:left;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
+			$tip_text = flexicontent_html::getInlineTip($inline_tip, @$attributes['tip_img'], @$attributes['tip_class'], @$attributes['preview_img'], 'float: left;');
 		}
 
 

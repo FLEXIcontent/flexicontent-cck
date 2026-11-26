@@ -15,7 +15,6 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('legacy.model.list');
 
 /**
  * FLEXIcontent Component types Model
@@ -60,8 +59,8 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 	function getTableCreateSQL($table, $backup_filename=false, $where='', $id_colname=null, $clear_id=false)
 	{
 		$app = \Joomla\CMS\Factory::getApplication();
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbtype   = $app->getCfg('dbtype');
+		$dbprefix = $app->get('dbprefix');
+		$dbtype   = $app->get('dbtype');
 
 		$this->_db->setQuery('SHOW CREATE TABLE '.$table);
 		$showTable = $this->_db->loadRow();
@@ -239,7 +238,9 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 		// *****************************************************
 
 		$template_names = array();
-		$type = \Joomla\CMS\Table\Table::getInstance('flexicontent_types', '');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_types.php';
+		$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$type = new flexicontent_types($__fcTableDb);
 		foreach ($type_ids as $type_id)
 		{
 			$type->id = $type_id;
@@ -320,7 +321,7 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 
 	function doImport_flexicontent_fields_type_relations($rows, $remap)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$table_name = 'flexicontent_fields_type_relations';
 		foreach ($rows as $row)
 		{

@@ -1,382 +1,163 @@
-	var fcfield_sharemedia = {};
-	
-	fcfield_sharemedia.fc_mediaID_tmp = null;
-	fcfield_sharemedia.fc_elemID_tmp = null;
-	fcfield_sharemedia.debugToConsole = [];
-	fcfield_sharemedia.use_native_apis = [];
-	fcfield_sharemedia.youtube_key = [];
+/** Shared Media editor controls and provider metadata. */
+window.fcfield_sharemedia = (() => {
+  const debugToConsole = [];
+  const use_native_apis = [];
+  const youtube_key = [];
+  const field = (id, name) => document.getElementById(id + '_' + name);
+  const message = id => document.getElementById('fcfield_message_box_' + id);
+  const legacyFrames = 'iframe.sharedmedia:not(.fc-video-preview-box iframe)';
 
+  function setHeight(selector, factor) {
+    for (const frame of document.querySelectorAll(selector)) frame.style.height = Math.floor(factor * frame.clientWidth) + 'px';
+  }
 
-	fcfield_sharemedia.youtubeDurationToSeconds = function(duration)
-	{
-		var match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-		var hours = (parseInt(match[1]) || 0);
-		var minutes = (parseInt(match[2]) || 0);
-		var seconds = (parseInt(match[3]) || 0);
-		return hours * 3600 + minutes * 60 + seconds;
-	}
+  function setMetaData(id, data) {
+    for (const key of ['title', 'author', 'duration', 'description', 'thumb']) {
+      const control = field(id, key);
+      if (control) control.value = data[key] ?? '';
+    }
+  }
 
+  function toggleMETArows(id, action = 0) {
+    const props = document.querySelector('.sm_value_props[data-name="' + CSS.escape(id) + '"]');
+    if (props) { togglePanel(props, '.fc-sm-edit-btn', id, action); return; }
+    for (const key of ['title', 'author', 'duration', 'description', 'api_type', 'embed_url', 'media_id', 'preview', 'width', 'height']) {
+      const row = field(id, key)?.closest('tr');
+      if (row) row.style.display = action === -1 || (!action && row.style.display !== 'none') ? 'none' : '';
+    }
+  }
 
-	fcfield_sharemedia.setHeight = function(selector, factor)
-	{
-		jQuery(selector).each( function() {
-			jQuery(this).css("height", parseInt(factor*jQuery(this).width()));
-		});
-	}
+  function togglePanel(panel, selector, id, action = 0) {
+    if (!panel) return;
+    const show = action === 1 || (action === 0 && getComputedStyle(panel).display === 'none');
+    panel.style.display = show ? 'block' : 'none';
+    const button = document.querySelector(selector + '[data-for="' + CSS.escape(id) + '"]');
+    button?.classList.toggle('active', show);
+    button?.setAttribute('aria-expanded', String(show));
+  }
 
+  function toggleURL(id) {
+    togglePanel(document.querySelector('.sm_url_props[data-name="' + CSS.escape(id) + '"]'), '.fc-sm-url-btn', id);
+  }
 
-	fcfield_sharemedia.clearData = function(element_id_n, config_name)
-	{
-		// Clear embed Data and its preview HTML
-		fcfield_sharemedia.setEmbedData(element_id_n, "", "", config_name);
+  function toggleFields(id) { toggleMETArows(id); }
 
-		// Clear META Data
-		fcfield_sharemedia.setMetaData(element_id_n, {title: "", author: "", duration: "", description: "", thumb: ""}, config_name);
+  const embedHosts = {
+    youtube: 'https://www.youtube.com/embed/',
+    vimeo: 'https://player.vimeo.com/video/',
+    dailymotion: 'https://www.dailymotion.com/embed/video/',
+  };
 
-		// Clear other data
-		jQuery("#" + element_id_n + "_height").val("");
-		jQuery("#" + element_id_n + "_width").val("");
+  function setEmbedData(id, type, clip) {
+    const host = embedHosts[type];
+    const url = FlexiMediaMetadata.webURL(host && clip ? host + encodeURIComponent(clip) : clip);
+    field(id, 'api_type').value = url ? type : '';
+    field(id, 'media_id').value = url && host ? clip : '';
+    field(id, 'embed_url').value = url && !host ? url.href : '';
+    const preview = field(id, 'preview');
+    preview.replaceChildren();
+    if (!url) return;
+    const frame = document.createElement('iframe');
+    frame.className = 'sharedmedia seamless';
+    frame.src = url.href;
+    frame.title = FlexiForm.text('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PREVIEW');
+    frame.style.cssText = 'width:100%;height:100%;border:0;';
+    frame.allowFullscreen = true;
+    preview.append(frame);
+    requestAnimationFrame(() => setHeight(legacyFrames, 2/3));
+  }
 
-		// Hide the value rows
-		fcfield_sharemedia.toggleMETArows(element_id_n, -1);
-	}
+  function clearData(id) {
+    FlexiMediaMetadata.cancel(field(id, 'url'));
+    FlexiMediaMetadata.notice(message(id), '');
+    setEmbedData(id, '', '');
+    setMetaData(id, {});
+    for (const key of ['height','width']) { const control = field(id, key); if (control) control.value = ''; }
+    toggleMETArows(id, -1);
+  }
 
+  function providerRequest(source, provider, clip, config) {
+    switch (provider) {
+      case 'youtube': {
+        const url = new URL('https://www.googleapis.com/youtube/v3/videos');
+        url.search = new URLSearchParams({ id:clip, key:youtube_key[config] || '', part:'snippet,contentDetails,statistics,status' });
+        return url;
+      }
+      case 'vimeo': return new URL('https://vimeo.com/api/v2/video/' + clip + '.json');
+      case 'dailymotion': return new URL('https://api.dailymotion.com/video/' + clip + '?fields=description,duration,owner.screenname,thumbnail_60_url,title');
+      default: return FlexiMediaMetadata.noembed(source);
+    }
+  }
 
-	fcfield_sharemedia.fetchData = function(element_id_n, config_name)
-	{
-    // Joomla Base URL
-		var base_url = !!jbase_url_fc ? jbase_url_fc : '';
+  function youtubeDurationToSeconds(value) {
+    const parts = /^P(?:(\d+)D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/.exec(value || '');
+    return parts ? (Number(parts[1] || 0) * 86400 + Number(parts[2] || 0) * 3600 + Number(parts[3] || 0) * 60 + Number(parts[4] || 0)) : '';
+  }
 
-		var msg_box = jQuery("#fcfield_message_box_"+element_id_n);
+  function parseMetadata(data, provider, clip) {
+    if (data.error || data.type === 'error') throw new Error(data.error?.message || data.error_message || data.error || 'Media unavailable');
+    switch (provider) {
+      case 'youtube': {
+        const item = data.items?.[0];
+        if (!item?.snippet) throw new Error('Video not found');
+        return { type:provider, clip, title:item.snippet.title, author:item.snippet.channelTitle,
+          duration:youtubeDurationToSeconds(item.contentDetails?.duration), description:item.snippet.description, thumb:item.snippet.thumbnails?.medium?.url };
+      }
+      case 'vimeo': {
+        const item = data[0];
+        if (!item) throw new Error('Video not found');
+        return { type:provider, clip, title:item.title, author:item.user_name, duration:item.duration, description:item.description, thumb:item.thumbnail_small };
+      }
+      case 'dailymotion':
+        return { type:provider, clip, title:data.title, author:data['owner.screenname'], duration:data.duration, description:data.description, thumb:data.thumbnail_60_url };
+      default: {
+        const markup = document.createElement('template');
+        markup.innerHTML = data.html || '';
+        const embed = FlexiMediaMetadata.webURL(markup.content.querySelector('iframe[src], embed[src]')?.getAttribute('src'));
+        if (!embed) throw new Error('Media response has no embed URL');
+        return { type:'noembed:' + String(data.provider_name || '').toLowerCase(), clip:embed.href, title:data.title, author:data.author_name,
+          duration:data.duration, description:data.description, thumb:data.thumbnail_url };
+      }
+    }
+  }
 
-		// Clear any existing message
-		msg_box.html("");
+  async function fetchData(id, config) {
+    clearData(id);
+    const input = field(id, 'url');
+    if (!input?.value.trim()) return;
+    const source = FlexiMediaMetadata.webURL(input.value);
+    const box = message(id);
+    if (!source) {
+      FlexiMediaMetadata.notice(box, FlexiForm.text('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_URL_NOT_MEDIA'));
+      return;
+    }
+    const { provider, id:clip } = use_native_apis[config] ? FlexiMediaMetadata.video(source) : {};
+    try {
+      const data = await FlexiMediaMetadata.load(input, providerRequest(source, provider, clip, config), true);
+      if (!data) return;
+      const result = parseMetadata(data, provider, clip);
+      setEmbedData(id, result.type, result.clip);
+      setMetaData(id, result);
+      toggleMETArows(id, 1);
+    } catch (error) {
+      if (debugToConsole[config]) console.warn(error);
+      FlexiMediaMetadata.notice(box, FlexiForm.text('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR') + ' ' + error.message);
+    }
+  }
 
-		// Clear existing value
-		fcfield_sharemedia.clearData(element_id_n, config_name);
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' || event.defaultPrevented || event.isComposing || event.keyCode === 229 || !event.target.matches?.('input.sm_url')) return;
+    const fetchButton = event.target.closest('.fc-video-card')?.querySelector('.fc-sm-fetch-btn');
+    if (!fetchButton) return;
+    event.preventDefault();
+    if (!event.repeat) fetchButton.click();
+  });
 
-		// if URL field is empty then nothing to do, else continue with creating the fetch URL
-		var url = jQuery("#"+element_id_n+"_url").val();
-		if (url=="") return;
+  window.addEventListener('resize', () => setHeight(legacyFrames, 2/3));
+  document.addEventListener('DOMContentLoaded', () => setHeight(legacyFrames, 2/3), {once:true});
+  document.addEventListener('mouseenter', event => {
+    if (event.target.matches?.('.fcfield_sharedmedia_valuebox')) setHeight(legacyFrames, 2/3);
+  }, true);
 
-		msg_box.html('<img src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;">');
-
-		fcfield_sharemedia.debugToConsole[config_name] ? window.console.log("Fetching "+url) : "";
-
-		var mediaID = "";
-		var apiType = "";
-
-		if (fcfield_sharemedia.use_native_apis[config_name])
-		{
-			// Try youtube
-			var myregexp = /(?:youtube(?:-nocookie)?\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
-			if (url.match(myregexp) != null)
-			{
-				mediaID = url.match(myregexp)[1];
-				apiType = "youtube";
-			}
-
-			// Try vimeo
-			var myregexp = /https?:\/\/(www\.)?vimeo.com\/(\d+)($|\/)/;
-			if (url.match(myregexp) != null)
-			{
-				mediaID = url.match(myregexp)[2];
-				apiType = "vimeo";
-			}
-
-			// Try dailymotion
-			var myregexp = /^.+dailymotion.com\/(video|hub)\/([^_]+)[^#]*(#video=([^_&]+))?/;
-			if (url.match(myregexp) != null)
-			{
-				mediaID = url.match(myregexp)[4]!== undefined ? url.match(myregexp)[4] : url.match(myregexp)[2];
-				apiType = "dailymotion";
-			}
-		}
-
-		// Global variables, needed if set-embed-data functions are called as callbacks, thus these can not be passed as parameters
-		fcfield_sharemedia.fc_elemID_tmp = element_id_n;
-		fcfield_sharemedia.fc_mediaID_tmp = mediaID;
-
-		// Create AJAX url
-		var ajax_url;
-		var ajax_type;
-		if (mediaID && apiType)
-		{
-			fcfield_sharemedia.debugToConsole[config_name] ? window.console.log("Media type: "+apiType) : "";
-			fcfield_sharemedia.debugToConsole[config_name] ? window.console.log("Media ID: "+mediaID) : "";
-			switch(apiType)
-			{
-				case "youtube"    : ajax_url = "https://www.googleapis.com/youtube/v3/videos?id="+mediaID+"&key="+fcfield_sharemedia.youtube_key[config_name]+"&part=snippet,contentDetails,statistics,status";/*&callback=fcfield_sharemedia.youtubeCallback";*/  break;
-				case "vimeo"      : ajax_url = "//vimeo.com/api/v2/video/"+mediaID+".json";/*?callback=fcfield_sharemedia.vimeoCallback";*/  break;
-				case "dailymotion": ajax_url = "https://api.dailymotion.com/video/"+mediaID+"?fields=description,duration,owner.screenname,thumbnail_60_url,title";/*&callback=fcfield_sharemedia.dailymotionCallback";*/  break;
-			}
-			ajax_type = "jsonp";
-		}
-		else
-		{
-			// try noembed.com
-			ajax_url = "https://noembed.com/embed?url="+encodeURIComponent(url); // TODO check if needed to add more URL vars
-			ajax_type = "jsonp";
-		}
-
-		// Make AJAX call
-		jQuery.ajax({
-			/*beforeSend: function(xhrObj) {
-				xhrObj.setRequestHeader("Access-Control-Allow-Headers", "Origin, X-CSRF-Token, X-Requested-With, Content-Type, Accept, Authorization");
-			},*/
-			url: ajax_url,
-			dataType: ajax_type,
-			success: function(data) {
-				fcfield_sharemedia.debugToConsole[config_name] ? window.console.log("Received Server response") : "";
-				var response;
-				try {
-					if (ajax_type=="html") 	data = data.replace(/_cbfunc_\(/, "").replace(/\)?;?$/, "");
-					response = typeof data !== "object" ? jQuery.parseJSON( data ) : data;
-					fcfield_sharemedia.debugToConsole[config_name] ? window.console.log("Calling callback "+(apiType ? apiType : "embedly")+" function on data:") : "";
-					fcfield_sharemedia.debugToConsole[config_name] ? window.console.log(response) : "";
-
-					if (mediaID && apiType)
-					{
-						switch(apiType)
-						{
-							case "youtube"     : fcfield_sharemedia.youtubeCallback(element_id_n, response, mediaID, config_name);  break;
-							case "vimeo"       : fcfield_sharemedia.vimeoCallback(element_id_n, response, mediaID, config_name);  break;
-							case "dailymotion" : fcfield_sharemedia.dailymotionCallback(element_id_n, response, mediaID, config_name);  break;
-						}
-					}
-					else
-					{
-						fcfield_sharemedia.noembedCallback(element_id_n, response, config_name);
-					}
-				}
-				catch(err) {
-					msg_box.html("<span class=\"alert alert-warning fc-iblock\">"
-						+ Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_RESPONSE_PARSING_FAILED')
-						+ ": " + err.message +
-					"</span>");
-				}
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				fcfield_sharemedia.debugToConsole[config_name] ? window.console.log("Error, responseText is:") : "";
-				fcfield_sharemedia.debugToConsole[config_name] ? window.console.log(jqXHR.responseText) : "";
-				var response;
-				try {
-					response = jQuery.parseJSON( jqXHR.responseText );
-				} catch(err) {
-					response = jqXHR.responseText;
-				}
-				var errorText = typeof response !== "object"
-					? response : (mediaID && (apiType=="dailymotion" || apiType=="youtube")
-						? response.error.message
-						: response.error_message
-					);
-				if (apiType=="youtube" && typeof response == "object")
-				{
-					errorText += '<br>' + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_REASON') + ': ' + response.error.errors[0].reason;
-				}
-				msg_box.html("<span class=\"alert alert-warning fc-iblock\"><i>" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR') + "</i><br/><br/>" + errorText + "</span>");
-			}
-		});
-	}
-
-
-	fcfield_sharemedia.youtubeCallback = function(element_id_n, data, mediaID, config_name)
-	{
-		mediaID = typeof mediaID === "undefined" || !mediaID  ?  fcfield_sharemedia.fc_mediaID_tmp : mediaID;    // *** mediaID not set if called as callback
-		element_id_n = typeof element_id_n === "undefined" || !element_id_n  ?  fcfield_sharemedia.fc_elemID_tmp : element_id_n;    // *** element_id_n not set if called as callback
-
-		if (typeof data === "object" && typeof data.error === "undefined" )
-		{
-			if (data.items.length == 0)
-			{
-				jQuery("#fcfield_message_box_" + element_id_n).html("<span class=\"alert alert-warning fc-iblock\">Not found</span>");
-				return;
-			}
-			fcfield_sharemedia.toggleMETArows(element_id_n, 1);
-			fcfield_sharemedia.setEmbedData(element_id_n, "youtube", mediaID, config_name);
-			fcfield_sharemedia.setMetaData(element_id_n, {
-				title: data.items[0].snippet.title,
-				author: data.items[0].snippet.channelTitle,
-				duration: fcfield_sharemedia.youtubeDurationToSeconds(data.items[0].contentDetails.duration),
-				description: data.items[0].snippet.description,
-				thumb: data.items[0].snippet.thumbnails.medium.url
-			}, config_name);
-			jQuery("#fcfield_message_box_" + element_id_n).html("");
-		}
-		else
-		{
-			var errorText = typeof data === "object"
-				? data.error.message + '<br>' + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_REASON') + ": " + data.error.errors[0].reason
-				: data;
-			jQuery("#fcfield_message_box_" + element_id_n).html("<span class=\"alert alert-warning fc-iblock\"><i>" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR') + "</i><br/><br/>" + errorText + "</span>");
-		}
-	}
-
-
-	fcfield_sharemedia.vimeoCallback = function(element_id_n, data, mediaID, config_name)
-	{
-		mediaID = typeof mediaID === "undefined" || !mediaID  ?  fcfield_sharemedia.fc_mediaID_tmp : mediaID;    // *** mediaID not set if called as callback
-		element_id_n = typeof element_id_n === "undefined" || !element_id_n  ?  fcfield_sharemedia.fc_elemID_tmp : element_id_n;    // *** element_id_n not set if called as callback
-
-		if (typeof data === "object" && data.type != "error")
-		{
-			fcfield_sharemedia.toggleMETArows(element_id_n, 1);
-			fcfield_sharemedia.setEmbedData(element_id_n, "vimeo", mediaID, config_name);
-			fcfield_sharemedia.setMetaData(element_id_n, {
-				title: data[0].title,
-				author: data[0].user_name,
-				duration: data[0].duration,
-				description: data[0].description,
-				thumb: data[0].thumbnail_small
-			}, config_name);
-			jQuery("#fcfield_message_box_" + element_id_n).html("");
-		}
-		else
-		{
-			var errorText = typeof data === "object" ? data.error_message : data;
-			jQuery("#fcfield_message_box_" + element_id_n).html("<span class=\"alert alert-warning fc-iblock\"><i>" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR') + "</i><br/><br/>"+errorText+"</span>");
-		}
-	}
-
-
-	fcfield_sharemedia.dailymotionCallback = function(element_id_n, data, mediaID, config_name)
-	{
-		mediaID = typeof mediaID === "undefined" || !mediaID  ?  fcfield_sharemedia.fc_mediaID_tmp : mediaID;    // *** mediaID not set if called as callback
-		element_id_n = typeof element_id_n === "undefined" || !element_id_n  ?  fcfield_sharemedia.fc_elemID_tmp : element_id_n;    // *** element_id_n not set if called as callback
-
-		if (typeof data === "object" && typeof data.error === "undefined")
-		{
-			fcfield_sharemedia.toggleMETArows(element_id_n, 1);
-			fcfield_sharemedia.setEmbedData(element_id_n, "dailymotion", mediaID, config_name);
-			fcfield_sharemedia.setMetaData(element_id_n, {
-				title: data.title,
-				author: data["owner.screenname"],
-				duration: data.duration,
-				description: data.description,
-				thumb: data.thumbnail_60_url
-			}, config_name);
-			jQuery("#fcfield_message_box_" + element_id_n).html("");
-		}
-		else
-		{
-			var errorText = typeof data === "object" ? data.error.message : data;
-			jQuery("#fcfield_message_box_" + element_id_n).html("<span class=\"alert alert-warning fc-iblock\"><i>" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR') + "</i><br/><br/>" + errorText + "</span>");
-		}
-	}
-
-
-	fcfield_sharemedia.noembedCallback = function(element_id_n, data, config_name)
-	{
-		element_id_n = typeof element_id_n === "undefined" || !element_id_n  ?  fcfield_sharemedia.fc_elemID_tmp : element_id_n;    // *** element_id_n not set if called as callback
-
-		if (typeof data === "object" && typeof data.error === "undefined")
-		{
-			if (1)  // TODO Possibly add more checks
-			{
-				var urlregex = /(http:|ftp:|https:)?\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
-				if (data.html.match(urlregex) != null)
-				{
-					fcfield_sharemedia.toggleMETArows(element_id_n, 1);
-					var embed_url = data.html.match(urlregex)[0];
-					fcfield_sharemedia.setEmbedData(element_id_n, "noembed:"+data.provider_name.toLowerCase(), embed_url, config_name);
-					fcfield_sharemedia.setMetaData(element_id_n, {
-						title: data.title,
-						author: data.author_name,
-						duration: data.duration,
-						description: data.description,
-						thumb: data.thumbnail_url
-					}, config_name);
-					jQuery("#fcfield_message_box_" + element_id_n).html("");
-				}
-				else
-				{
-					jQuery("#fcfield_message_box_" + element_id_n).html("IFRAME SRC parameter not found in response");
-				}
-			}
-			else
-			{
-				jQuery("#fcfield_message_box_" + element_id_n).html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">?</button>'. \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_URL_NOT_MEDIA').'</div>");
-			}
-		}
-		else
-		{
-			var errorText = typeof data === "object" ? data.error_message : data;
-			jQuery("#fcfield_message_box_" + element_id_n).html("<span class=\"alert alert-warning fc-iblock\"><i>" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR') + "</i><br/><br/>" + errorText + "</span>");
-		}
-	}
-
-
-	fcfield_sharemedia.setEmbedData = function(element_id_n, apiType, mediaID, config_name)
-	{
-		mediaID = typeof mediaID === "undefined" || !mediaID  ?  fcfield_sharemedia.fc_mediaID_tmp : mediaID;
-		element_id_n = typeof element_id_n === "undefined" || !element_id_n  ?  fcfield_sharemedia.fc_elemID_tmp : element_id_n;
-
-		if (apiType=="") mediaID = "";
-		document.getElementById(element_id_n+"_api_type").value  = apiType;
-		document.getElementById(element_id_n+"_media_id").value  = mediaID;
-		document.getElementById(element_id_n+"_embed_url").value = "";
-
-		if (apiType!="" && mediaID!="")
-		{
-			var preview_html = '<iframe class="sharedmedia seamless" src="';
-			switch(apiType) {
-				case "youtube"    :  preview_html += "//www.youtube.com/embed/";   break;
-				case "vimeo"      :  preview_html += "//player.vimeo.com/video/";  break;
-				case "dailymotion":  preview_html += "//www.dailymotion.com/embed/video/"; break;
-				default:
-					// Other embed API, e.g. noembed.com, full embed URL is inside mediaID
-					document.getElementById(element_id_n+"_media_id").value   = "";
-					document.getElementById(element_id_n+"_embed_url").value = mediaID;
-					break;
-			}
-			preview_html += mediaID + '" style="width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden;" allowFullScreen></iframe>';
-			document.getElementById(element_id_n+"_preview").innerHTML = preview_html;
-			setTimeout(function() { fcfield_sharemedia.setHeight("iframe.sharedmedia", 2/3); }, 200);
-		}
-		else
-		{
-			document.getElementById(element_id_n+"_preview").innerHTML = "";
-		}
-	}
-
-
-	fcfield_sharemedia.setMetaData = function(element_id_n, data, config_name)
-	{
-		element_id_n = typeof element_id_n === "undefined" || !element_id_n  ?  fcfield_sharemedia.fc_elemID_tmp : element_id_n;
-
-		// If replaced with native JS then must check properties exist
-		jQuery("#"+element_id_n+"_title").val(data.title);
-		jQuery("#"+element_id_n+"_author").val(data.author);
-		jQuery("#"+element_id_n+"_duration").val(data.duration);
-		jQuery("#"+element_id_n+"_description").val(data.description);
-		jQuery("#"+element_id_n+"_thumb").val(data.thumb);
-	}
-
-
-	fcfield_sharemedia.toggleMETArows = function(element_id_n, action)
-	{
-		action = typeof action === "undefined" ? 0 : action;
-
-		var fields = ['title', 'author', 'duration', 'description', 'api_type', 'embed_url', 'media_id', 'preview', 'width', 'height'];
-		var fields_selector = "#" + element_id_n + "_" + fields.join(", " + "#" + element_id_n + "_");
-
-		switch (action)
-		{
-			case 1: jQuery(fields_selector).closest("tr").fadeIn(2000); break;
-			case -1: jQuery(fields_selector).closest("tr").hide(); break;
-			case 0: jQuery(fields_selector).closest("tr").toggle(0); break;
-		}
-	}
-
-
-	jQuery(window).resize(function() {
-		fcfield_sharemedia.setHeight("iframe.sharedmedia", 2/3);
-	});
-
-
-	jQuery(document).ready(function(){
-		fcfield_sharemedia.setHeight("iframe.sharedmedia", 2/3);
-		jQuery(document).on("mouseenter", ".fcfield_sharedmedia_valuebox", function(event) {
-			fcfield_sharemedia.setHeight("iframe.sharedmedia", 2/3);
-		});
-	});
+  return { debugToConsole, use_native_apis, youtube_key, fetchData, clearData, setMetaData, setEmbedData, toggleMETArows, toggleURL, toggleFields, setHeight, youtubeDurationToSeconds };
+})();

@@ -14,7 +14,6 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('legacy.view.legacy');
 
 /**
  * HTML View class for backend managers (Base)
@@ -246,7 +245,7 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 		$cookie_name = 'fc_managers_conf';
 		$fc_man_name = $fc_man_name ?: 'fc_' . $this->view_id;
 
-		\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('
+		\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration('
 		var FCMAN_conf = {};
 		FCMAN_conf.fc_man_config_cookie = "' . $cookie_name . '";
 		FCMAN_conf.fc_man_manager_name  = "' . $fc_man_name . '";
@@ -329,7 +328,7 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 			array(
 				'size' => '1',
 				'class' => $this->select_class . ' fc_is_selarrow ' . $this->tooltip_class,
-				'onchange' => 'jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text()); jQuery(this).blur();',
+				'onchange' => 'document.getElementById(\'search\').placeholder = this.selectedOptions[0]?.text || \'\'; this.blur();',
 				'title' => \Joomla\CMS\Language\Text::_('FLEXI_SEARCH_TEXT_INSIDE'),
 			),
 			'value',

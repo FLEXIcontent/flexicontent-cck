@@ -14,7 +14,13 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecords' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * HTML View class for the FLEXIcontent itemelement screen
@@ -36,11 +42,11 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 		global $globalcats;
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getSession();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$perms    = FlexicontentHelperPerm::getPerm();
 
 		$option   = $jinput->getCmd('option', '');
@@ -58,8 +64,8 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
 		{
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
 		if (\Joomla\CMS\Factory::getApplication()->isClient('site'))
@@ -68,8 +74,8 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 			// TODO: remove this need by moving common language string to different file ?
 
 			// Load english language file for 'com_flexicontent' component then override with current language file
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get model
@@ -171,16 +177,16 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 			// Add css to document
 			if ($isAdmin)
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 			}
 			else
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
@@ -201,18 +207,18 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 
 		if ($filter_state)
 		{
-			$js .= "jQuery('.col_status').addClass('filtered_column');";
+			$js .= "document.querySelectorAll('.col_status').forEach(el => el.classList.add('filtered_column'));";
 		}
-		if (strlen($search)) $js .= "jQuery('.col_title').addClass('filtered_column');";
-		if ($filter_cats)    $js .= "jQuery('.col_cats').addClass('filtered_column');";
-		if ($filter_type)    $js .= "jQuery('.col_type').addClass('filtered_column');";
-		if ($filter_author)  $js .= "jQuery('.col_authors').addClass('filtered_column');";
-		if ($filter_lang)    $js .= "jQuery('.col_lang').addClass('filtered_column');";
-		if ($filter_access)  $js .= "jQuery('.col_access').addClass('filtered_column');";
+		if (strlen($search)) $js .= "document.querySelectorAll('.col_title').forEach(el => el.classList.add('filtered_column'));";
+		if ($filter_cats)    $js .= "document.querySelectorAll('.col_cats').forEach(el => el.classList.add('filtered_column'));";
+		if ($filter_type)    $js .= "document.querySelectorAll('.col_type').forEach(el => el.classList.add('filtered_column'));";
+		if ($filter_author)  $js .= "document.querySelectorAll('.col_authors').forEach(el => el.classList.add('filtered_column'));";
+		if ($filter_lang)    $js .= "document.querySelectorAll('.col_lang').forEach(el => el.classList.add('filtered_column'));";
+		if ($filter_access)  $js .= "document.querySelectorAll('.col_access').forEach(el => el.classList.add('filtered_column'));";
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');
@@ -311,9 +317,9 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 					$displaytype = '-',
 					array(
 						'class' => $this->select_class,
-						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = FlexiForm.value(this); this.valChanged = false;',
+						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(FlexiForm.value(this)); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onblur' => 'this.oVal = FlexiForm.value(this); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
 						'placeholder' => $filt_placeholder,
 					),
 					$elementid
@@ -346,9 +352,9 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 					$displaytype = '-',
 					array(
 						'class' => $this->select_class,
-						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = FlexiForm.value(this); this.valChanged = false;',
+						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(FlexiForm.value(this)); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onblur' => 'this.oVal = FlexiForm.value(this); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
 					)
 				),
 			));
@@ -357,7 +363,7 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 		{
 			$lists[$elementid] = $this->getFilterDisplay(array(
 				'label' => \Joomla\CMS\Language\Text::_('FLEXI_AUTHOR'),
-				'html' => '<span class="add-on"><i>' . \Joomla\CMS\Factory::getUser($created_by)->name . '</i></span>',
+				'html' => '<span class="add-on"><i>' . \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $created_by)->name . '</i></span>',
 			));
 		}
 
@@ -376,9 +382,9 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 					$fieldname,
 					array(
 						'class' => $this->select_class,
-						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = FlexiForm.value(this); this.valChanged = false;',
+						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(FlexiForm.value(this)); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onblur' => 'this.oVal = FlexiForm.value(this); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
 					),
 					$value,
 					$displaytype = '-'
@@ -444,9 +450,9 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 				$fieldname,
 				array(
 					'class' => $this->select_class,
-					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = FlexiForm.value(this); this.valChanged = false;',
+					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(FlexiForm.value(this)); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onblur' => 'this.oVal = FlexiForm.value(this); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
 				),
 				'value',
 				'text',
@@ -505,9 +511,9 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 				$fieldname,
 				array(
 					'class' => $this->select_class,
-					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = FlexiForm.value(this); this.valChanged = false;',
+					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(FlexiForm.value(this)); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onblur' => 'this.oVal = FlexiForm.value(this); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
 				),
 				'value',
 				'text',

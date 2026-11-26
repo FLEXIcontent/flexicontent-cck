@@ -12,15 +12,16 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
-\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/fc_service_registry.php';
+flexicontent_register_html_helpers(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 
 global $globalcats;
 $app      = \Joomla\CMS\Factory::getApplication();
 $jinput   = $app->input;
-$config   = \Joomla\CMS\Factory::getConfig();
-$user     = \Joomla\CMS\Factory::getUser();
-$session  = \Joomla\CMS\Factory::getSession();
-$document = \Joomla\CMS\Factory::getDocument();
+$config   = \Joomla\CMS\Factory::getApplication()->getConfig();
+$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 $cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'categories.';
 $hlpname  = 'fccategoryelement';
@@ -35,7 +36,7 @@ $onclick  = $this->escape($function);
 if (!empty($editor))
 {
 	// This view is used also in com_menus. Load the xtd script only if the editor is set!
-	\Joomla\CMS\Factory::getDocument()->addScriptOptions('xtd-fccats', array('editor' => $editor));
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptOptions('xtd-fccats', array('editor' => $editor));
 	$onclick = "jSelectFccategory";
 }
 
@@ -57,7 +58,7 @@ flexicontent_html::jscode_to_showhide_table(
 	'mainChooseColBox',
 	'adminListTableFC' . $this->view,
 	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . \Joomla\CMS\Language\Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . \Joomla\CMS\Language\Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
+	$end_html = '<button type="button" id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . \Joomla\CMS\Language\Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/button>'
 );
 
 
@@ -198,33 +199,17 @@ $js .= (!$isXtdBtn ? "" : "
 // Delete a specific list filter
 function delFilter(name)
 {
-	//if(window.console) window.console.log('Clearing filter:'+name);
-	var myForm = jQuery('#adminForm');
-	var filter = jQuery('#'+name);
-
-	if (!filter.length)
-	{
-		return;
-	}
-	else if (filter.attr('type') == 'checkbox')
-	{
-		filter.checked = '';
-	}
-	else
-	{
-		filter.val('');
-
-		// Case that input has Calendar JS attached
-		if (filter.attr('data-alt-value'))
-		{
-			filter.attr('data-alt-value', '');
-		}
-	}
+    const filter = document.getElementById(name);
+    if (!filter) return;
+    if (filter.type === 'checkbox') filter.checked = false;
+    else if (filter.tagName === 'SELECT') FlexiForm.clearSelect(filter);
+    else filter.value = '';
+    if (filter.hasAttribute('data-alt-value')) filter.setAttribute('data-alt-value', '');
 }
 
 function delAllFilters()
 {
-	jQuery('.fc_field_filter').val('');
+	document.querySelectorAll('.fc_field_filter').forEach(filter => delFilter(filter.id));
 	delFilter('search');
 	delFilter('filter_level');
 	delFilter('filter_state');
@@ -269,12 +254,12 @@ if ($js)
 				<input type="text" name="search" id="search" placeholder="<?php echo !empty($this->scope_title) ? $this->scope_title : \Joomla\CMS\Language\Text::_('FLEXI_SEARCH'); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="fcfield_textval" />
 				<button title="" data-original-title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : \Joomla\CMS\Language\Text::_('FLEXI_GO'); ?></button>
 
-				<div id="fc_filters_box_btn" data-original-title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
+				<button type="button" id="fc_filters_box_btn" aria-label="<?php echo htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_FILTERS'), ENT_QUOTES, 'UTF-8'); ?>" data-original-title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
 					<?php echo FLEXI_J30GE ? '<i class="icon-filter"></i>' : \Joomla\CMS\Language\Text::_('FLEXI_FILTERS'); ?>
 					<?php echo ($this->count_filters  ? ' <sup>' . $this->count_filters . '</sup>' : ''); ?>
-				</div>
+				</button>
 
-				<div id="fc-filters-box" <?php if (!$this->count_filters || empty($tools_state->filters_box)) echo 'style="display:none;"'; ?> class="fcman-abs" onclick="var event = arguments[0] || window.event; event.stopPropagation();">
+				<div id="fc-filters-box" <?php if (!$this->count_filters || empty($tools_state->filters_box)) echo 'style="display:none;"'; ?> class="fcman-abs">
 					<?php
 					echo $this->lists['filter_author'];
 					echo $this->lists['filter_level'];
@@ -284,7 +269,7 @@ if ($js)
 					echo $this->lists['filter_cats'];
 					?>
 
-					<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
+					<button type="button" id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></button>
 				</div>
 
 				<button title="" data-original-title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-cancel"></i>' : \Joomla\CMS\Language\Text::_('FLEXI_CLEAR'); ?></button>
@@ -296,15 +281,15 @@ if ($js)
 		<div class="fc-filter-head-box nowrap_box">
 
 			<div class="btn-group">
-				<div id="fc_mainChooseColBox_btn" class="<?php echo $this->tooltip_class . ' ' . $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
+				<button type="button" id="fc_mainChooseColBox_btn" aria-label="<?php echo htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_COLUMNS'), ENT_QUOTES, 'UTF-8'); ?>" class="<?php echo $this->tooltip_class . ' ' . $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
 					<span class="icon-contract"></span><sup id="columnchoose_totals"></sup>
-				</div>
+				</button>
 
 				<?php if (!empty($this->minihelp) && FlexicontentHelperPerm::getPerm()->CanConfig): ?>
-				<div id="fc-mini-help_btn" class="<?php echo $out_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
+				<button type="button" id="fc-mini-help_btn" class="<?php echo $out_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
 					<span class="icon-help"></span>
 					<?php echo $this->minihelp; ?>
-				</div>
+				</button>
 				<?php endif; ?>
 			</div>
 			<div id="mainChooseColBox" class="group-fcset fcman-abs" style="display:none;"></div>
@@ -433,7 +418,7 @@ if ($js)
 
 					<?php else: ?>
 
-						<a style="cursor: default;" href="javascript:;" onclick="var box = jQuery('#assoc_not_allowed_msg'); fc_itemelement_view_handle = fc_showAsDialog(box, 300, 200, null, { title: '<?php echo \Joomla\CMS\Language\Text::_('FLEXI_ABOUT', true); ?>'}); return false;">
+						<a style="cursor: default;" href="javascript:;" onclick="var box = document.getElementById('assoc_not_allowed_msg'); fc_itemelement_view_handle = fc_showAsDialog(box, 300, 200, null, { title: '<?php echo \Joomla\CMS\Language\Text::_('FLEXI_ABOUT', true); ?>'}); return false;">
 
 					<?php endif; ?>
 

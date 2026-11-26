@@ -10,7 +10,6 @@
 // Check to ensure this file is within the rest of the framework
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-jimport('joomla.event.dispatcher');
 
 /**
  * Class to handle dispatching of events.

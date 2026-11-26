@@ -11,6 +11,36 @@ use Joomla\CMS\Table\Table;
  */
 class flexicontent_db
 {
+	/** Replace field-attributed basic-index text for approved item saves / indexer batches. */
+	static function replaceBasicSearchIndex($item_ids, array $rows)
+	{
+		$item_ids = array_values(array_unique(array_filter(array_map('intval', $item_ids))));
+		if (!$item_ids) return;
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$db->setQuery('DELETE FROM #__flexicontent_basicsearch_index WHERE item_id IN (' . implode(',', $item_ids) . ')')->execute();
+		$prefix = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('add_search_prefix') ? 'vvv' : '';
+		$values = array();
+		$bytes = 0;
+		foreach ($rows as $item_id => $fields)
+		{
+			if (!in_array((int) $item_id, $item_ids, true)) continue;
+			foreach ($fields as $field_id => $text)
+			{
+				if (!(int) $field_id || !strlen((string) $text)) continue;
+				if ($prefix) $text = preg_replace('/(\b[^\s,\.]+\b)/u', $prefix . '$0', trim($text));
+				$value = '(' . (int) $item_id . ',' . (int) $field_id . ',' . $db->quote($text) . ')';
+				$values[] = $value;
+				$bytes += strlen($value);
+				if ($bytes >= 1000000)
+				{
+					$db->setQuery('INSERT INTO #__flexicontent_basicsearch_index (item_id,field_id,search_index) VALUES ' . implode(',', $values))->execute();
+					$values = array(); $bytes = 0;
+				}
+			}
+		}
+		if ($values) $db->setQuery('INSERT INTO #__flexicontent_basicsearch_index (item_id,field_id,search_index) VALUES ' . implode(',', $values))->execute();
+	}
+
 	/**
 	 * Method to get the overridden language string (frontend in backend and backend in frontend)
 	 *
@@ -22,7 +52,7 @@ class flexicontent_db
 		// static variable (array) so that we load overrides only once per language
 		static $lang_overrides_site;
 		static $lang_overrides_admin;
-		$oLang = $oLang ?: \Joomla\CMS\Factory::getLanguage()->getTag();
+		$oLang = $oLang ?: \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 
 		// Check if we have loaded the override file already, (aka we load it only once)
 		if ($oLang && (!isset($lang_overrides_site[$oLang]) || !isset($lang_overrides_site[$oLang])))
@@ -68,7 +98,7 @@ class flexicontent_db
 	 */
 	static function setValues_commonDataTypes($obj, $all=false)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'UPDATE IGNORE #__flexicontent_fields_item_relations'
 			. ' SET value_integer = CAST(value AS SIGNED), value_decimal = CAST(value AS DECIMAL(65,15)), value_datetime = CAST(value AS DATETIME) '
 			. (!$all ? ' WHERE item_id = ' . (int) $obj->item_id . ' AND field_id = ' . (int) $obj->field_id . ' AND valueorder = ' . (int) $obj->valueorder. ' AND suborder = ' . (int) $obj->suborder : '');
@@ -85,7 +115,7 @@ class flexicontent_db
 	 */
 	static function check_fix_JSON_column($colname, $tblname, $idname, $id, & $attribs=null)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		// This extra may seem redudant, but it is to avoid clearing valid data, due to coding or other errors
 		$db->setQuery('SELECT '.$colname.' FROM #__'.$tblname.' WHERE '.$idname.' = ' . $db->Quote($id));
@@ -119,7 +149,7 @@ class flexicontent_db
 	 */
 	static function assign_default_WF($pk, $record = null, $extension = 'com_content.article', $stage_id = 0)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		if (!FLEXI_J40GE || !$pk) return;
 
 		// This extra may seem redudant, but it is to avoid clearing valid data, due to coding or other errors
@@ -173,7 +203,7 @@ class flexicontent_db
 
 		if ( $accessid!==null && isset($access_names[$accessid]) ) return $access_names[$accessid];
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$db->setQuery('SELECT id, title FROM #__viewlevels');
 		$_arr = $db->loadObjectList();
 		$access_names = array(0=>'Public');  // zero does not exist in J2.5+ but we set it for compatibility
@@ -207,7 +237,7 @@ class flexicontent_db
 			return $typeparams[$typeid];
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query	= 'SELECT t.id, t.attribs'
 			. ' FROM #__flexicontent_types AS t'
 			. ($itemid ? ' JOIN #__flexicontent_items_ext as ie ON ie.type_id = t.id' : '')
@@ -267,7 +297,7 @@ class flexicontent_db
 	 */
 	static function getFavourites($type, $item_id)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query = '
 			SELECT COUNT(id) AS favs
@@ -288,7 +318,7 @@ class flexicontent_db
 	 */
 	static function getFavoured($type, $item_id, $user_id)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query = '
 			SELECT COUNT(id) AS fav
@@ -311,7 +341,7 @@ class flexicontent_db
 	 */
 	static function removefav($type, $item_id, $user_id)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query = '
 			DELETE FROM #__flexicontent_favourites
@@ -333,7 +363,7 @@ class flexicontent_db
 	 */
 	static function addfav($type, $item_id, $user_id)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$obj = new stdClass();
 		$obj->itemid = (int)$item_id;
@@ -359,7 +389,7 @@ class flexicontent_db
 			return $userConfig[$user_id];
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT author_basicparams'
 			. ' FROM #__flexicontent_authors_ext'
 			. ' WHERE user_id = ' . $user_id;
@@ -371,6 +401,277 @@ class flexicontent_db
 	}
 
 
+	/**
+	 * The storage engine of a FLEXIcontent table, in lower case: 'myisam', 'innodb', ...
+	 *
+	 * @param   string  $tbl  The table name without prefix, e.g. 'flexicontent_items_ext'
+	 */
+	static function getTableEngine($tbl = 'flexicontent_items_ext')
+	{
+		static $engines = null;
+
+		// One query per request for all FLEXIcontent tables
+		if ($engines === null)
+		{
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$engines = $db->setQuery(
+				'SELECT t.TABLE_NAME AS name, LOWER(t.ENGINE) AS engine FROM information_schema.TABLES AS t'
+				. ' WHERE t.TABLE_SCHEMA = DATABASE()'
+				. '  AND t.TABLE_NAME LIKE ' . $db->quote($db->escape($db->getPrefix() . 'flexicontent_', true) . '%', false)
+			)->loadAssocList('name', 'engine');
+		}
+
+		$name = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)->getPrefix() . $tbl;
+
+		return isset($engines[$name]) ? $engines[$name] : '';
+	}
+
+
+	/**
+	 * The shortest word that the database adds to the FULLTEXT index of a table.
+	 * MyISAM and InnoDB each have their own server setting for it (defaults: 4 and 3 characters)
+	 *
+	 * @param   string  $tbl  The table name without prefix
+	 */
+	static function getMinWordLen($tbl = 'flexicontent_items_ext')
+	{
+		static $lengths = array();
+
+		$variable = self::getTableEngine($tbl) === 'innodb' ? 'innodb_ft_min_token_size' : 'ft_min_word_len';
+
+		if (!isset($lengths[$variable]))
+		{
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$_dbvariable = $db->setQuery("SHOW VARIABLES LIKE '" . $variable . "'")->loadObject();
+			$lengths[$variable] = (int) @ $_dbvariable->Value;
+		}
+
+		return $lengths[$variable];
+	}
+
+
+	/**
+	 * Whether a text search runs as LIKE %text% and not on the FULLTEXT index ("No space languages" setting).
+	 *
+	 * The FULLTEXT index holds text of a language that does not separate its words with spaces as whole phrases,
+	 * so a word inside a phrase is never found there. With the setting enabled the LIKE search is used when
+	 * - the language of the page is Chinese, Japanese or Thai, or
+	 * - the searched text itself is Chinese or Japanese: a site can show its interface in another language
+	 *   and hold Chinese content,
+	 * unless the page language has a dictionary word splitter (Thai), which makes the index usable.
+	 *
+	 * @param   mixed   $like_any  The "filter_word_like_any" parameter
+	 * @param   string  $text      The searched text
+	 *
+	 * @return  bool
+	 */
+	static function useLikeSearch($like_any, $text)
+	{
+		if (!(int) $like_any)
+		{
+			return false;
+		}
+
+		if (FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag(), $_hasHandlerOnly = true))
+		{
+			return false;
+		}
+
+		return in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th'))
+			|| preg_match('/[\p{Han}\p{Hiragana}\p{Katakana}]/u', (string) $text) === 1;
+	}
+
+
+	/** Split all/any searches into ordinary words and double-quoted phrases. */
+	static function getQuotedSearchTerms($text, $phrase)
+	{
+		if (!in_array($phrase, array('all', 'any'), true) || !preg_match('/"[^"]+"/u', $text))
+		{
+			return null;
+		}
+
+		preg_match_all('/"(?<quoted>[^"]+)"|(?<word>[^"\s]+)/u', $text, $matches, PREG_SET_ORDER | PREG_UNMATCHED_AS_NULL);
+		return $matches;
+	}
+
+	/** Build one boolean expression, keeping the words in a quoted phrase together. */
+	static function getQuotedFulltextCondition($column, $terms, $phrase, $prefix = '')
+	{
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$required = $phrase === 'all' ? '+' : '';
+		$groups = array();
+
+		foreach ($terms as $term)
+		{
+			preg_match_all('/[\p{L}\p{M}\p{N}_]+/u', $term['quoted'] ?? $term['word'], $matches);
+			$words = array_map(static fn($word) => $prefix . $word, $matches[0]);
+			if ($term['quoted'] !== null && $words)
+			{
+				$groups[] = $required . '"' . implode(' ', $words) . '"';
+			}
+			else foreach ($words as $word)
+			{
+				$groups[] = $required . $word . '*';
+			}
+		}
+
+		return $groups
+			? ' MATCH (' . $column . ') AGAINST (' . $db->quote(implode(' ', $groups)) . ' IN BOOLEAN MODE) '
+			: ' 0=1 ';
+	}
+
+	/**
+	 * The condition of a LIKE %text% search on a column, see useLikeSearch().
+	 *
+	 * The words of the text are searched one by one: all of them must be found, or with the "any word" phrase
+	 * at least one of them. The "exact" phrase searches the text as it was typed.
+	 *
+	 * @param   string  $column  The column to search, e.g. ie.search_index
+	 * @param   string  $text    The searched text, without the search prefix: it is matched inside words
+	 * @param   string  $phrase  The search phrase: all, any, exact ...
+	 * @param   string  $prefix  The search prefix, when the words of the column have it ("Small / common words searchable")
+	 *
+	 * @return  string
+	 */
+	static function getLikeSearchCondition($column, $text, $phrase = 'all', $prefix = '')
+	{
+		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$text  = trim((string) $text);
+
+		// A phrase in double quotes is searched as it was typed too
+		if (preg_match('/^"([^"]+)"$/us', $text, $quoted))
+		{
+			$text   = trim($quoted[1]);
+			$phrase = 'exact';
+		}
+
+		// In a column with prefixed words the words of a phrase follow each other as "one vvvtwo"
+		if (($terms = self::getQuotedSearchTerms($text, $phrase)) !== null)
+		{
+			$words = array();
+			foreach ($terms as $term)
+			{
+				$word = trim($term['quoted'] ?? $term['word']);
+				if ($word !== '')
+				{
+					$words[] = $term['quoted'] === null || $prefix === '' ? $word : preg_replace('/\s+/u', ' ' . $prefix, $word);
+				}
+			}
+		}
+		else
+		{
+			$words = $phrase === 'exact'
+				? array($prefix === '' ? $text : preg_replace('/\s+/u', ' ' . $prefix, $text))
+				: array_unique(preg_split('/\s+/u', $text, -1, PREG_SPLIT_NO_EMPTY));
+		}
+		$conds = array();
+
+		foreach ($words as $word)
+		{
+			$conds[] = 'LOWER (' . $column . ') LIKE ' . $db->Quote('%' . $db->escape($word, true) . '%', false);
+		}
+
+		if (!$conds)
+		{
+			return ' 0=1 ';
+		}
+
+		return count($conds) === 1
+			? ' ' . $conds[0]
+			: ' (' . implode($phrase === 'any' ? ' OR ' : ' AND ', $conds) . ') ';
+	}
+
+
+	/**
+	 * Make the words of a search text safe for a boolean FULLTEXT search on an InnoDB table.
+	 *
+	 * MyISAM reads a character such as - ' or @ inside a word as part of the word or as a word separator.
+	 * InnoDB reads some of them as operators: "mid-century" then excludes "century", and "user@example.com",
+	 * a lone "*" or a trailing "+" are SQL errors. Others split the word in the index, so that "O'Neill" or
+	 * "l'atelier" are stored as "neill" and "atelier" and the full word finds nothing.
+	 *
+	 * So on InnoDB a word is split at every character that is not a letter, a digit or a combining mark,
+	 * as InnoDB's own index does. The parts of such a word that the index does not hold are left out:
+	 * parts shorter than the minimum word length, and parts (except the last, which may be unfinished)
+	 * that the index does not find as a word, such as "com" or "the" from InnoDB's list of ignored words.
+	 * Nothing is changed for a MyISAM table.
+	 *
+	 * @param   array   $words  The words of the search text, with the search prefix already added
+	 * @param   string  $tbl    The table (without prefix) that will be searched
+	 * @param   string  $col    The column with the FULLTEXT index
+	 * @param   bool    $required_words  True when every word but the last will be a required whole word (search suggestions):
+	 *                                   then also whole words that the index does not hold are left out
+	 *
+	 * @return  array
+	 */
+	static function getBooleanSearchWords($words, $tbl = 'flexicontent_items_ext', $col = 'search_index', $required_words = false)
+	{
+		if (self::getTableEngine($tbl) !== 'innodb')
+		{
+			return $words;
+		}
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$min_word_len = self::getMinWordLen($tbl);
+		$safe_words   = array();
+
+		// Does the index hold this word?
+		$is_indexed = function ($word) use ($db, $tbl, $col)
+		{
+			return (bool) $db->setQuery(
+				'SELECT 1 FROM #__' . $tbl
+				. ' WHERE MATCH (' . $col . ') AGAINST (' . $db->quote('+' . $word) . ' IN BOOLEAN MODE)', 0, 1
+			)->loadResult();
+		};
+
+		$last_word = count($words) - 1;
+
+		foreach (array_values($words) as $n => $word)
+		{
+			$parts = preg_split('/[^\p{L}\p{N}\p{M}_]+/u', (string) $word, -1, PREG_SPLIT_NO_EMPTY);
+
+			if ($parts === array((string) $word))
+			{
+				if (!$required_words || $n === $last_word || $is_indexed($word))
+				{
+					$safe_words[] = $word;
+				}
+
+				continue;
+			}
+
+			$last = count($parts) - 1;
+			$kept = array();
+
+			foreach ($parts as $i => $part)
+			{
+				if (StringHelper::strlen($part) < $min_word_len)
+				{
+					continue;
+				}
+
+				if (($i < $last || ($required_words && $n < $last_word)) && !$is_indexed($part))
+				{
+					continue;
+				}
+
+				$kept[] = $part;
+			}
+
+			// The last part may be the unfinished start of a word (mid-cent), so it was not checked above.
+			// Leave it out if the index has no row with the parts before it and a word starting with it
+			if (count($kept) > 1 && end($kept) === $parts[$last] && !$is_indexed(implode(' +', array_slice($kept, 0, -1)) . ' +' . $parts[$last] . '*'))
+			{
+				array_pop($kept);
+			}
+
+			$safe_words = array_merge($safe_words, $kept);
+		}
+
+		return $safe_words;
+	}
+
+
 	/*
 	 * Find stopwords and too small words
 	 *
@@ -379,7 +680,7 @@ class flexicontent_db
 	 */
 	static function removeInvalidWords($words, &$stopwords, &$shortwords, $tbl='flexicontent_items_ext', $col='search_index', $isprefix=1)
 	{
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$option = $app->input->get('option', '', 'cmd');
 		$min_word_len = $app->getUserState( $option.'.min_word_len', 0 );
@@ -393,7 +694,7 @@ class flexicontent_db
 		$_words = array();
 		foreach ($words as $word)
 		{
-			$quoted_word = $db->escape($word, true);
+			$quoted_word = $db->escape($word);
 			$q = sprintf($query, $quoted_word);
 			$result = $db->setQuery($q)->loadAssocList();
 
@@ -428,7 +729,7 @@ class flexicontent_db
 		$queries = file_get_contents( $sql_file );
 		$queries = preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $queries);
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		foreach ($queries as $query)
 		{
@@ -448,10 +749,10 @@ class flexicontent_db
 	 */
 	static function & directQuery($query, $assoc = false, $unbuffered = false)
 	{
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbtype   = $app->getCfg('dbtype');
+		$dbprefix = $app->get('dbprefix');
+		$dbtype   = $app->get('dbtype');
 		$dbtype   = $dbtype == 'mysql' && !function_exists('mysql_query') ? 'mysqli' : $dbtype;  // PHP 7 removes mysql but 'mysql' database may still be in the configuration file
 
 		$query = $db->replacePrefix($query);  //echo "<pre>"; print_r($query); echo "\n\n";
@@ -782,7 +1083,7 @@ class flexicontent_db
 				break;
 			case 'random':
 				// Convert session id to array of hex strings (4 bytes each)
-				$sid = \Joomla\CMS\Factory::getSession()->getId();
+				$sid = \Joomla\CMS\Factory::getApplication()->getSession()->getId();
 				$sid = str_split(md5($sid), 8);
 				// Create a SEED doing a XOR operation on session-ID to keep SEED to 4 bytes
 				$seed = null;
@@ -922,7 +1223,7 @@ class flexicontent_db
 				break;
 			case 'random':
 				// Convert session id to array of hex strings (4 bytes each)
-				$sid = \Joomla\CMS\Factory::getSession()->getId();
+				$sid = \Joomla\CMS\Factory::getApplication()->getSession()->getId();
 				$sid = str_split(md5($sid), 8);
 				// Create a SEED doing a XOR operation on session-ID to keep SEED to 4 bytes
 				$seed = null;
@@ -961,7 +1262,7 @@ class flexicontent_db
 		$cid = \Joomla\CMS\Factory::getApplication()->input->get('cid', array(0), 'array');
 		$cid = ArrayHelper::toInteger($cid);
 
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$controller->setRedirect($redirect_url, '');
 
 		static $canCheckinRecords = null;
@@ -984,7 +1285,19 @@ class flexicontent_db
 			}
 
 			// Get a new (DB) Table instance of the row to checkin.
-			$table = \Joomla\CMS\Table\Table::getInstance($jtable_name, '');
+			$__tblType = $jtable_name;
+			$__tblPrefix = '';
+			$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			if ($__tblPrefix === 'TagsTable') {
+				$table = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+			} elseif ($__tblPrefix === 'JTable') {
+				$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+				$table = new $__tblClass($__tblDb);
+			} else {
+				$__tblClass = $__tblPrefix . ucfirst($__tblType);
+				require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+				$table = new $__tblClass($__tblDb);
+			}
 
 			if (!$table->load($pk))
 			{
@@ -1044,7 +1357,7 @@ class flexicontent_db
 	 */
 	static function getFieldTypes($group=false, $usage=false, $published=false)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT plg.element AS field_type, plg.name as title'
 			.($usage ? ', count(f.id) as assigned' : '')
 			.' FROM #__extensions AS plg'
@@ -1053,14 +1366,29 @@ class flexicontent_db
 			.'  AND plg.`type` = ' . $db->Quote('plugin')
 			.'  AND plg.`folder` = ' . $db->Quote('flexicontent_fields')
 			.'  AND plg.`element` <> ' . $db->Quote('core')
-			.($usage ? ' GROUP BY plg.element' : '')
+			.($usage ? ' GROUP BY plg.element, plg.name' : '')
 			.' ORDER BY title ASC'
 			;
 
 		$db->setQuery($query);
 		$field_types = $db->loadObjectList('field_type');
+		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
 
 		foreach($field_types as $field_type) {
+			// A plugin manifest may name the plugin with a language key, as Joomla's own do (the Comments field:
+			// PLG_FLEXICONTENT_FIELDS_COMMENTS). That key is stored as the name, so load the plugin's language
+			// (administrator folder first, then the plugin's own) and show its translation.
+			if (preg_match('/^[A-Z][A-Z0-9_]*$/', $field_type->title)) {
+				$extension = 'plg_flexicontent_fields_' . $field_type->field_type;
+
+				foreach (array($extension, $extension . '.sys') as $file) {
+					$lang->load($file, JPATH_ADMINISTRATOR)
+						|| $lang->load($file, JPATH_PLUGINS . '/flexicontent_fields/' . $field_type->field_type);
+				}
+
+				$field_type->title = \Joomla\CMS\Language\Text::_($field_type->title);
+			}
+
 			$field_type->friendly = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $field_type->title);
 		}
 		if (!$group) return $field_types;
@@ -1114,7 +1442,7 @@ class flexicontent_db
 		}
 
 		// Retrieve item's Content Type parameters
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = $db->getQuery(true)
 			->select('*')
 			->from('#__flexicontent_types AS t');
@@ -1153,7 +1481,7 @@ class flexicontent_db
 		}
 
 		// Get associated translations
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT a.id as id, k.id as original_id'
 			. ' FROM #__associations AS a'
 			. ' JOIN #__associations AS k ON a.`key`=k.`key`'
@@ -1182,7 +1510,7 @@ class flexicontent_db
 			'modified' => 'modified',
 		);
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT a.id as item_id, i.id as id, i.title, i.' . $config->created . ' as created, i.' . $config->modified . ' as modified, '
 			. ' i.language as language, i.language as lang, ' . $db->qn('a.key') . ' as ' . $db->qn('key') 
 			. (!empty($config->state) ?', i.' . $config->state . ' AS state ' : '')
@@ -1238,7 +1566,7 @@ class flexicontent_db
 		$all_language = $item->language == '*';
 		if ($all_language && !empty($associations))
 		{
-			JError::raiseNotice(403, \Joomla\CMS\Language\Text::_('FLEXI_ERROR_ALL_LANGUAGE_ASSOCIATED'));
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ERROR_ALL_LANGUAGE_ASSOCIATED'), 'notice');
 		}
 
 		// Add current item to associations if this is desired
@@ -1250,7 +1578,7 @@ class flexicontent_db
 		// Make sure associations ids are integers
 		$associations = ArrayHelper::toInteger($associations);
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = $db->getQuery(true)
 			->select($db->qn('key'))
 			->from('#__associations')
@@ -1317,6 +1645,206 @@ class flexicontent_db
 
 
 	/**
+	 * Get non-translatable flags of the category fields: 'main' (coreprops field 'form_category') and 'secondary' (core field 'categories')
+	 *
+	 * @return  array  array('main' => bool, 'secondary' => bool)
+	 */
+	static function getCategoriesUntranslatable()
+	{
+		static $flags = null;
+
+		if ($flags === null)
+		{
+			$flags = array('main' => false, 'secondary' => false);
+
+			if (static::useAssociations())
+			{
+				$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+				$rows = $db->setQuery(
+					'SELECT name, untranslatable FROM #__flexicontent_fields'
+					. ' WHERE (iscore = 1 AND field_type = ' . $db->quote('categories') . ')'
+					. ' OR (field_type = ' . $db->quote('coreprops') . ' AND name = ' . $db->quote('form_category') . ')'
+				)->loadObjectList();
+
+				foreach ($rows as $row)
+				{
+					$key = $row->name === 'form_category' ? 'main' : 'secondary';
+					$flags[$key] = $flags[$key] || (bool) $row->untranslatable;
+				}
+			}
+		}
+
+		return $flags;
+	}
+
+
+	/**
+	 * Check if the user can modify an item that is associated (language association) with an item being saved
+	 * Association membership does not grant permission to edit the target item, also skip items checked out by other users
+	 *
+	 * @param   int                           $item_id  The associated (target) item
+	 * @param   \Joomla\CMS\User\User|null  $user     The user, defaults to the current user
+	 *
+	 * @return  boolean
+	 */
+	static function canEditAssocItem($item_id, $user = null)
+	{
+		$item_id = (int) $item_id;
+		$user = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		$row = $db->setQuery('SELECT created_by, checked_out FROM #__content WHERE id = ' . $item_id)->loadObject();
+		$asset = 'com_content.article.' . $item_id;
+
+		if (!$row || (!empty($row->checked_out) && (int) $row->checked_out !== (int) $user->id))
+		{
+			return false;
+		}
+
+		return $user->authorise('core.edit', $asset)
+			|| (!empty($row->created_by) && (int) $row->created_by === (int) $user->id && $user->authorise('core.edit.own', $asset));
+	}
+
+
+	/**
+	 * Method to check if the main or the secondary categories are configured as non-translatable
+	 *
+	 * @return  boolean
+	 */
+	static function isCategoriesFieldUntranslatable()
+	{
+		$flags = static::getCategoriesUntranslatable();
+
+		return $flags['main'] || $flags['secondary'];
+	}
+
+
+	/**
+	 * Copy the main and/or secondary categories of an item to the items it is associated with (according to the non-translatable flags)
+	 * If a category has an associated category in the language of the target item, then that category is used, otherwise the same category
+	 *
+	 * @param   int  $item_id  The item having the categories to be copied
+	 *
+	 * @return  int[]  IDs of items that were updated
+	 */
+	static function propagateCategoriesToAssocs($item_id)
+	{
+		$item_id = (int) $item_id;
+		$updated = array();
+		$flags = static::getCategoriesUntranslatable();
+
+		if (!$item_id || (!$flags['main'] && !$flags['secondary']))
+		{
+			return $updated;
+		}
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		$assocs = static::getLangAssocs(array($item_id));
+		$assoc_ids = isset($assocs[$item_id]) ? array_diff(array_keys($assocs[$item_id]), array($item_id)) : array();
+
+		if (!$assoc_ids)
+		{
+			return $updated;
+		}
+
+		$catid = (int) $db->setQuery('SELECT catid FROM #__content WHERE id = ' . $item_id)->loadResult();
+		$cats  = array_map('intval', (array) $db->setQuery('SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . $item_id)->loadColumn());
+
+		if (!$catid)
+		{
+			return $updated;
+		}
+
+		$cats[] = $catid;
+		$cats = array_values(array_unique($cats));
+		$secondary_cats = array_values(array_diff($cats, array($catid)));
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+
+		// Categories (and their associated categories by language)
+		$cat_assocs = $db->setQuery(
+			'SELECT a.id AS src_id, c.id, c.language'
+			. ' FROM #__associations AS a'
+			. ' JOIN #__associations AS k ON a.' . $db->qn('key') . ' = k.' . $db->qn('key') . ' AND k.context = a.context'
+			. ' JOIN #__categories AS c ON c.id = k.id'
+			. ' WHERE a.context = ' . $db->quote('com_categories.item') . ' AND a.id IN (' . implode(',', $cats) . ')'
+		)->loadObjectList();
+
+		$cat_map = array();
+		foreach ($cat_assocs as $ca)
+		{
+			$cat_map[(int) $ca->src_id][$ca->language] = (int) $ca->id;
+		}
+
+		foreach ($assoc_ids as $assoc_id)
+		{
+			$assoc_id = (int) $assoc_id;
+
+			if (!static::canEditAssocItem($assoc_id, $user))
+			{
+				continue;
+			}
+
+			$lang = $assocs[$item_id][$assoc_id]->language;
+
+			$map = function ($cid) use ($cat_map, $lang)
+			{
+				return isset($cat_map[$cid][$lang]) ? $cat_map[$cid][$lang] : (int) $cid;
+			};
+
+			$t_catid_old = (int) $db->setQuery('SELECT catid FROM #__content WHERE id = ' . $assoc_id)->loadResult();
+
+			$t_old   = array_map('intval', (array) $db->setQuery('SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . $assoc_id)->loadColumn());
+			$t_catid = $flags['main'] ? $map($catid) : $t_catid_old;
+
+			if ($flags['secondary'])
+			{
+				$t_cats = array_map($map, $secondary_cats);
+				// Main category was not shared: keep its own main category
+				$t_cats[] = $t_catid;
+			}
+			else
+			{
+				// Secondary categories were not shared: keep the existing ones, only make sure the main category is in
+				$t_cats = array_values(array_diff($t_old, array($t_catid_old)));
+				$t_cats[] = $t_catid;
+			}
+
+			$t_cats = array_values(array_unique($t_cats));
+
+			if ($flags['main'])
+			{
+				$db->setQuery('UPDATE #__content SET catid = ' . $t_catid . ' WHERE id = ' . $assoc_id)->execute();
+				$db->setQuery('UPDATE #__flexicontent_items_tmp SET catid = ' . $t_catid . ' WHERE id = ' . $assoc_id)->execute();
+
+				// Item permissions are inherited from the main category: move the item's asset under the new category's asset
+				$asset     = new \Joomla\CMS\Table\Asset($db);
+				$cat_asset = (int) $db->setQuery('SELECT asset_id FROM #__categories WHERE id = ' . $t_catid)->loadResult();
+
+				if ($cat_asset && $asset->loadByName('com_content.article.' . $assoc_id) && (int) $asset->parent_id !== $cat_asset)
+				{
+					$asset->setLocation($cat_asset, 'last-child');
+					$asset->store();
+				}
+			}
+
+			$db->setQuery('DELETE FROM #__flexicontent_cats_item_relations WHERE itemid = ' . $assoc_id)->execute();
+
+			$vals = array();
+			foreach ($t_cats as $c)
+			{
+				$vals[] = '(' . (int) $c . ',' . $assoc_id . ')';
+			}
+
+			$db->setQuery('INSERT INTO #__flexicontent_cats_item_relations (catid, itemid) VALUES ' . implode(',', $vals))->execute();
+			$updated[] = $assoc_id;
+		}
+
+		return $updated;
+	}
+
+
+	/**
 	 * Method to determine if J3.1+ associations should be used
 	 *
 	 * @return  boolean True if using J3 associations; false otherwise.
@@ -1344,7 +1872,10 @@ class flexicontent_db
 		else
 		{
 			$hname = $cname . 'HelperAssociation';
-			JLoader::register($hname, JPATH_SITE . '/components/' . $component . '/helpers/association.php');
+			// Lazy class loading (was JLoader::register): loaded only if/when used.
+			spl_autoload_register(static function ($class) use ($component, $hname) {
+				if ($class === $hname && is_file(JPATH_SITE . '/components/' . $component . '/helpers/association.php')) require_once JPATH_SITE . '/components/' . $component . '/helpers/association.php';
+			}, true, true);
 
 			$assoc = class_exists($hname) && !empty($hname::$category_association);
 		}
@@ -1369,10 +1900,10 @@ class flexicontent_db
 			return;
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query = 'SELECT COUNT(*) FROM #__tags WHERE parent_id = 0 AND id <> 1';
-		$tags_table_fix_needed = (boolean) $db->setQuery($query)->loadResult();
+		$tags_table_fix_needed = (bool) $db->setQuery($query)->loadResult();
 
 		// Fix Joomla tags table
 		if ($tags_table_fix_needed)
@@ -1388,12 +1919,86 @@ class flexicontent_db
 					->createTable('Tag', 'Administrator');
 			} else
 			{
-				JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
-				$tbl = JTable::getInstance('Tag', 'TagsTable');
+				$tbl = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable('Tag', 'Administrator');
 			}
 
 			$tbl->rebuild();
 		}
+	}
+
+
+	/**
+	 * Give a record the values that the database stores for it when strict mode is off, so that strict mode accepts it too.
+	 *
+	 * With strict mode off, the database cuts a text that is longer than its VARCHAR column, stores an empty string in
+	 * a number column as 0, fills a NOT NULL column that has no default and that an INSERT leaves out with an empty
+	 * string or 0, and stores the same for a NULL that an UPDATE writes into a NOT NULL column. With strict mode on
+	 * (the mode Joomla sets on its connection) it refuses the statement in all four cases. Here the record gets those
+	 * same values before it is stored.
+	 *
+	 * @param   object  $record       The record that will be stored
+	 * @param   array   $columns      The columns of its table, as returned by getTableColumns($table, false)
+	 * @param   bool    $isNew        True for an INSERT: the required columns that the record does not set are filled too
+	 * @param   bool    $updateNulls  True for an UPDATE that also writes the properties that are NULL
+	 *
+	 * @return  void
+	 */
+	static function fitRecordToColumns($record, $columns, $isNew = false, $updateNulls = false)
+	{
+		foreach ($columns as $name => $column)
+		{
+			$type    = strtolower((string) $column->Type);
+			$numeric = (bool) preg_match('/^(tinyint|smallint|mediumint|int|bigint|decimal|float|double|bit)/', $type);
+
+			if (!isset($record->$name))
+			{
+				// Leave out: columns that may be NULL, the auto-increment key, and dates
+				if ($column->Null !== 'NO' || stripos((string) $column->Extra, 'auto_increment') !== false || preg_match('/^(date|time|year)/', $type))
+				{
+					continue;
+				}
+
+				// An INSERT leaves the column out: the database needs a value only if the column has no default
+				if ($isNew ? $column->Default !== null : (!$updateNulls || !property_exists($record, $name)))
+				{
+					continue;
+				}
+
+				$record->$name = $numeric ? 0 : '';
+			}
+
+			elseif ($numeric && $record->$name === '')
+			{
+				$record->$name = 0;
+			}
+
+			elseif (is_string($record->$name) && preg_match('/^(?:var)?char\((\d+)\)/', $type, $m) && StringHelper::strlen($record->$name) > (int) $m[1])
+			{
+				$record->$name = StringHelper::substr($record->$name, 0, (int) $m[1]);
+			}
+		}
+	}
+
+
+	/**
+	 * The same for a record of the given table: see fitRecordToColumns()
+	 *
+	 * @param   object  $record  The record that will be stored
+	 * @param   string  $table   The name of its table, e.g. '#__flexicontent_files'
+	 * @param   bool    $isNew   True for an INSERT
+	 *
+	 * @return  void
+	 */
+	static function fitRecordToTable($record, $table, $isNew = false)
+	{
+		static $columns = array();
+
+		if (!isset($columns[$table]))
+		{
+			$columns[$table] = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)->getTableColumns($table, false);
+		}
+
+		self::fitRecordToColumns($record, $columns[$table], $isNew);
 	}
 
 
@@ -1420,8 +2025,7 @@ class flexicontent_db
 		}
 
 		// We will use the tags table to store them
-		//Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
-		$tagTable  = Table::getInstance('Tag', 'TagsTable');
+		$tagTable = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable('Tag', 'Administrator');
 
 		if(FLEXI_J40GE && !$tagTable)
         {
@@ -1431,7 +2035,7 @@ class flexicontent_db
 				->createTable('Tag', 'Administrator');
 		}
 
-		$canCreate = \Joomla\CMS\Factory::getUser()->authorise('core.create', 'com_tags');
+		$canCreate = \Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.create', 'com_tags');
 
 		foreach ($tags as $key => $tag)
 		{
@@ -1507,6 +2111,10 @@ class flexicontent_db
 						// Assign the alias as path (autogenerated tags have always level 1)
 						$tagTable->path = $tagTable->alias;
 
+						// A new row of Joomla's tags table: its required columns (description, ...) need a value,
+						// or strict mode refuses the INSERT
+						self::fitRecordToColumns($tagTable, $tagTable->getFields(), true);
+
 						if ($tagTable->store())
 						{
 							$loaded = true;
@@ -1572,7 +2180,7 @@ class flexicontent_db
 	 */
 	private static function _getUserGroupIDs()
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query = $db->getQuery(true);
 		$query
@@ -1599,7 +2207,7 @@ class flexicontent_db
 		}
 
 		// Find usergroups with Super Admin privilege
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$groupIDs = flexicontent_db::_getUserGroupIDs();
 		$suGroupIDs = array();
 

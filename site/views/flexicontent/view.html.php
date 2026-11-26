@@ -19,7 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.view.legacy');
 
 /**
  * HTML View class for the FLEXIcontent View
@@ -39,7 +38,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 	{
 		//initialize variables
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$menus = $app->getMenu();
 		$menu  = $menus->getActive();
 		$uri   = \Joomla\CMS\Uri\Uri::getInstance();
@@ -66,7 +65,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		if (!$params->get('disablecss', ''))
 		{
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
@@ -140,12 +139,12 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		$doc_title = $params->get( 'page_title' );
 		
 		// Check and prepend or append site name to page title
-		if ( $doc_title != $app->getCfg('sitename') ) {
-			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
-				$doc_title = \Joomla\CMS\Language\Text::sprintf('JPAGETITLE', $app->getCfg('sitename'), $doc_title);
+		if ( $doc_title != $app->get('sitename') ) {
+			if ($app->get('sitename_pagetitles', 0) == 1) {
+				$doc_title = \Joomla\CMS\Language\Text::sprintf('JPAGETITLE', $app->get('sitename'), $doc_title);
 			}
-			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
-				$doc_title = \Joomla\CMS\Language\Text::sprintf('JPAGETITLE', $doc_title, $app->getCfg('sitename'));
+			elseif ($app->get('sitename_pagetitles', 0) == 2) {
+				$doc_title = \Joomla\CMS\Language\Text::sprintf('JPAGETITLE', $doc_title, $app->get('sitename'));
 			}
 		}
 		

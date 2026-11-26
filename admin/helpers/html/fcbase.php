@@ -124,8 +124,9 @@ abstract class JHtmlFcbase
 			? \Joomla\CMS\Language\Text::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->editor, $row->checked_out_time)
 			: \Joomla\CMS\Language\Text::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK_DESC', $row->editor, $row->checked_out_time);
 
-		return 
-		($row->checked_out != $user->id ? '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none!important;">' : '') . '
+		// The manager already renders this row's checkbox through grid_id().
+		// A second control duplicates both its DOM id and submitted cid value.
+		return '
 		<a class="btn btn-micro btn-outline-secondary ntxt ' . static::$tooltip_class . '" title="' . \Joomla\CMS\HTML\HTMLHelper::tooltipText('', $_tip_title, true, false) . '" href="javascript:;" onclick="var ccb=document.getElementById(\'cb'.$i.'\'); ccb.checked=1; ccb.form.task.value=\'' . static::$ctrl . '.checkin\'; ccb.form.submit();">
 			<span class="icon-checkedout"></span>
 		</a>
@@ -255,7 +256,7 @@ abstract class JHtmlFcbase
 			: '';
 
 		// Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
-		if (!$canEdit || ($row->checked_out && (int) $row->checked_out !== (int) \Joomla\CMS\Factory::getUser()->id))
+		if (!$canEdit || ($row->checked_out && (int) $row->checked_out !== (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id))
 		{
 			return $title_cut . $title_untranslated;
 		}
@@ -295,7 +296,7 @@ abstract class JHtmlFcbase
 		}
 		elseif (!empty($config['useModal']))
 		{
-			$attrs .= ' onclick="' . 'var url = jQuery(this).attr(\'data-href\'); ' .
+			$attrs .= ' onclick="' . 'var url = this.getAttribute(\'data-href\'); ' .
 				'var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, ' . \Joomla\CMS\Language\Text::_($config['useModal']->onclosefunc) . ', ' .
 				'{title:\'' . \Joomla\CMS\Language\Text::_($config['useModal']->title,  true) . '\', loadFunc: ' . \Joomla\CMS\Language\Text::_($config['useModal']->onloadfunc) . '}); return false;' .
 			'"';
@@ -393,7 +394,7 @@ abstract class JHtmlFcbase
 		if ($target === '__modal__')
 		{
 			$edit_title = htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true), ENT_QUOTES, 'UTF-8');
-			$target_attr = ' onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'' . $edit_title . '\'}); return false;"';
+			$target_attr = ' onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'' . $edit_title . '\'}); return false;"';
 		}
 		else
 		{
@@ -468,7 +469,7 @@ abstract class JHtmlFcbase
 			'icon_class' => (!empty($config->icon_class) ? $config->icon_class: 'icon-cog'),
 			'custom_txt' => (!empty($config->custom_txt) ? $config->custom_txt : ''),
 			'custom_tip' => (!empty($config->custom_tip) ? $config->custom_tip : \Joomla\CMS\Language\Text::_('FLEXI_MANUAL_ORDER')),
-			'click_attr' => (!empty($config->click_attr) ? $config->click_attr : 'jQuery(\'.fcitem_order_no\').slideToggle();'),
+			'click_attr' => (!empty($config->click_attr) ? $config->click_attr : 'fc_toggle_box_via_btn(document.querySelectorAll(\'.fcitem_order_no\'), this);'),
 		);
 
 		return '
@@ -531,12 +532,17 @@ abstract class JHtmlFcbase
 	 */
 	public static function lang_display($row, $i, $langs, $use_icon = false, $undefined = 'JUNDEFINED')
 	{
+		// The language title is plain text: encode it for the cell, and for the tooltip (which is rendered as HTML)
+		$lang_name = !empty($row->language) && isset($langs->{$row->language}->name)
+			? htmlspecialchars((string) $langs->{$row->language}->name, ENT_QUOTES, 'UTF-8')
+			: '';
+
 		if ($use_icon && !empty($row->language) && !empty($langs->{$row->language}->imgsrc))
 		{
 			return '<img class="' . static::$tooltip_class . '" '.
-				' title=' . flexicontent_html::getToolTip(\Joomla\CMS\Language\Text::_('FLEXI_LANGUAGE'), ($row->language === '*' ? \Joomla\CMS\Language\Text::_('FLEXI_ALL') : (!empty($row->language) ? $langs->{$row->language}->name : '')), 0, 1) . '" ' .
-				' src="' . $langs->{$row->language}->imgsrc . '" alt="'. $row->language . '" /> ' .
-				($use_icon === 2 ? $langs->{$row->language}->name : '')
+				' title="' . flexicontent_html::getToolTip(\Joomla\CMS\Language\Text::_('FLEXI_LANGUAGE'), ($row->language === '*' ? \Joomla\CMS\Language\Text::_('FLEXI_ALL') : $lang_name), 0, 1) . '" ' .
+				' src="' . htmlspecialchars((string) $langs->{$row->language}->imgsrc, ENT_QUOTES, 'UTF-8') . '" alt="'. htmlspecialchars((string) $row->language, ENT_QUOTES, 'UTF-8') . '" /> ' .
+				($use_icon === 2 ? $lang_name : '')
 				;
 		}
 		elseif ($row->language === '*')
@@ -545,7 +551,7 @@ abstract class JHtmlFcbase
 		}
 		else
 		{
-			return !empty($row->language) ? $langs->{$row->language}->name : \Joomla\CMS\Language\Text::_($undefined);
+			return !empty($row->language) ? $lang_name : \Joomla\CMS\Language\Text::_($undefined);
 		}
 	}
 }

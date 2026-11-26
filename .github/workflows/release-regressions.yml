@@ -1,0 +1,73 @@
+name: Release regressions
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  release-regressions:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4', '8.5']
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: simplexml, gd
+          coverage: none
+      - name: Release regressions
+        run: |
+          php -d error_reporting=-1 tests/item-comments-selector.php
+          php -d error_reporting=-1 tests/manager-checkin-controls.php
+          php -d error_reporting=-1 tests/favourites-controller.php
+          php -d error_reporting=-1 tests/gallery-options.php
+          php -d error_reporting=-1 tests/phone-country-roundtrip.php
+          php -d error_reporting=-1 tests/flexibreak-layouts.php
+          php -d error_reporting=-1 tests/module-tab-state.php
+          php -d error_reporting=-1 tests/upload-field-restrictions.php
+          php -d error_reporting=-1 tests/template-deletion.php
+          php -d error_reporting=-1 tests/optional-jquery-assets.php fancybox auto defaults
+          php -d error_reporting=-1 tests/optional-jquery-assets.php photoswipe auto defaults
+          for framework in fancybox galleriffic elastislide multibox fcxSlide image-picker zTree photoswipe glightbox swiper; do
+            php -d error_reporting=-1 tests/optional-jquery-assets.php "$framework"
+            php -d error_reporting=-1 tests/optional-jquery-assets.php "$framework" manual
+          done
+          php -d error_reporting=-1 tests/statistics-data.php
+          php -d error_reporting=-1 tests/group-by-columns.php
+          php -d error_reporting=-1 tests/search-index-order.php
+          php -d error_reporting=-1 tests/category-module-items-layout.php
+          php -d error_reporting=-1 tests/tag-assignment-removal.php
+          php -d error_reporting=-1 tests/finder-query.php
+          php -d error_reporting=-1 tests/finder-parameters.php
+          php -d error_reporting=-1 tests/finder-state-events.php
+          php -d error_reporting=-1 tests/finder-identifiers.php
+          php -d error_reporting=-1 tests/route-menu-context.php
+          php -d error_reporting=-1 tests/relation-values.php
+          php -d error_reporting=-1 tests/batch-values.php
+          php -d error_reporting=-1 tests/strict-mode-records.php
+          php -d error_reporting=-1 tests/sql-mode-untouched.php
+          php -d error_reporting=-1 tests/category-csv.php
+          php -d error_reporting=-1 tests/cache-path.php
+          php -d error_reporting=-1 tests/cache-invalidation.php
+          php -d error_reporting=-1 tests/extra-votes-without-rating.php
+          php -d error_reporting=-1 tests/plain-page-item-data.php
+          php -d error_reporting=-1 tests/items-stable-order.php
+          php -d error_reporting=-1 tests/list-totals.php
+          php -d error_reporting=-1 tests/like-search.php
+          php -d error_reporting=-1 tests/thumbnail-widths.php
+          php -d error_reporting=-1 tests/webp-generation.php
+          php -d error_reporting=-1 tests/pdftotext-php8.php
+          node tests/image-media-clone.cjs
+          php -d error_reporting=-1 tests/installer-platform.php 4.4.0
+          php -d error_reporting=-1 tests/installer-platform.php 5.0.0
+          php -d error_reporting=-1 tests/installer-platform.php 6.2.0
+          for cache_case in missing empty invalid no-version null-version existing; do
+            php -d error_reporting=-1 tests/installer-manifest-cache.php "$cache_case"
+          done

@@ -19,7 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Model
@@ -85,7 +84,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -241,7 +240,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 	 */
 	function _buildQuery()
 	{
-		$user		= \Joomla\CMS\Factory::getUser();
+		$user		= \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Show special state items
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
@@ -388,8 +387,8 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
-		$user   = \Joomla\CMS\Factory::getUser();
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$show_owned = $this->_params->get('show_owned', 1);     // Show items owned by current user, regardless of their state
 		$show_trashed = $this->_params->get('show_trashed', 1);   // Show trashed items (to authorized users)
@@ -414,7 +413,11 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 		$where_favs[] = $user->get('id') ? 'fav.userid = ' . (int)$user->get('id') : '0';
 		$where_favs[] = !empty($favs)    ? 'i.id IN (' . implode(',', $favs) . ')' : '0';
 
-		$where = ' WHERE (' . implode(' OR ', $where_favs) . ')';
+		// A visitor without favourites: a condition on a column that no item meets, and not a constant "0 OR 0".
+		// With a constant false WHERE, MySQL does not see that the columns of the query depend on GROUP BY i.id (ONLY_FULL_GROUP_BY)
+		$where = !$user->get('id') && empty($favs)
+			? ' WHERE (i.id = 0)'
+			: ' WHERE (' . implode(' OR ', $where_favs) . ')';
 
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
 		// NOTE:  ACL view level is checked at a different place
@@ -456,9 +459,10 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 
 		$si_tbl = 'flexicontent_items_ext';
 
+		$quoted_terms = flexicontent_db::getQuotedSearchTerms($text, $phrase);
 		$search_prefix = $this->_params->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$text = !$search_prefix  ?  trim( $text )  :  preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($text));
-		$words = preg_split('/\s\s*/u', $text);
+		$words = flexicontent_db::getBooleanSearchWords(preg_split('/\s\s*/u', $text));
 
 		if( strlen($text) )
 		{
@@ -466,7 +470,11 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 			$escaped_text = $db->escape($text, true);
 			$quoted_text = $db->Quote( $escaped_text, false );
 
-			switch ($phrase)
+			if ($quoted_terms !== null)
+			{
+				$_text_match = flexicontent_db::getQuotedFulltextCondition($ts . '.search_index', $quoted_terms, $phrase, $search_prefix);
+			}
+			else switch ($phrase)
 			{
 				case 'natural':
 					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.') ';
@@ -497,7 +505,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 					else
 					{
 						$newtext = '+' . implode( ' +', $words );
-						$quoted_text = $db->escape($newtext, true);
+						$quoted_text = $db->escape($newtext);
 						$quoted_text = $db->Quote( $quoted_text, false );
 						$exact_text  = $db->Quote( '%'. $escaped_text .'%', false );
 						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND '.$ts.'.search_index LIKE '.$exact_text;
@@ -516,9 +524,9 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 					$jinput->set('shortwords', implode(' ', $shortwords));
 
 					$newtext = '+' . implode( '* +', $words ) . '*';
-					$quoted_text = $db->escape($newtext, true);
+					$quoted_text = $db->escape($newtext);
 					$quoted_text = $db->Quote( $quoted_text, false );
-					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					$_text_match = empty($words) ? ' 0=1 ' : ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 
 				case 'any':
@@ -534,9 +542,9 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 					$jinput->set('shortwords', implode(' ', $shortwords));
 
 					$newtext = implode( '* ', $words ) . '*';
-					$quoted_text = $db->escape($newtext, true);
+					$quoted_text = $db->escape($newtext);
 					$quoted_text = $db->Quote( $quoted_text, false );
-					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					$_text_match = empty($words) ? ' 0=1 ' : ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 			}
 

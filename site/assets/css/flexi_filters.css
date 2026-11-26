@@ -273,6 +273,19 @@ form > .fc_filter_line {
   clear: both;
   width: 100%;
 }
+/* ===========================
+   MIN WIDTH OF FILTER CONTROLS
+   =========================== */
+/* Filter controls (choices.js widget, native select, text input) must keep a
+   usable minimum width, especially when the filter label is displayed OUTSIDE
+   of the control (label outside mode): the control then carries the whole
+   field content. Tunable via the --fc-filter-min-width CSS variable. */
+.fc_filter_box .fc_filter_html .choices,
+.fc_filter_box .fc_filter_html > select.fc_field_filter,
+.fc_filter_box .fc_filter_html > input.fc_field_filter,
+.fc_filter_box .fc_filter_html > input.fc_text_filter {
+  min-width: var(--fc-filter-min-width, 150px) !important;
+}
 /* Slider filter container */
 .fc_filter_html > .noUi-target {
   margin: 24px 24px 6px 24px;
@@ -340,7 +353,7 @@ form > .fc_filter_line {
   /* any element with less z-index to be placed above this element, */
   /* e.g. the span element for showing an inner is placed above, thus preventing focusing of the input !! */
   border: 1px solid gray;
-  min-width: 120px;
+  min-width: var(--fc-filter-min-width, 150px);
   vertical-align: top;
   border: 1px solid #aaa;
   background: #fff url('../images/select2.png') no-repeat 99% -22px !important;

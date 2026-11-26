@@ -14,9 +14,6 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
 //jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 //\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
@@ -25,7 +22,6 @@ jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 
 /**
@@ -65,7 +61,9 @@ class JFormFieldFctag extends \Joomla\CMS\Form\FormField
 			$element_id = $this->id;
 		}
 
-		$item = \Joomla\CMS\Table\Table::getInstance('flexicontent_tags', '');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_tags.php';
+		$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$item = new flexicontent_tags($__fcTableDb);
 		if ($this->value)
 		{
 			$item->load($this->value);
@@ -87,29 +85,29 @@ class JFormFieldFctag extends \Joomla\CMS\Form\FormField
 			$js = "
 			function qfClearSelectedTag(element_id)
 			{
-				jQuery('#'+element_id+'_name').val('');
-				jQuery('#'+element_id+'_name').attr('placeholder', '".\Joomla\CMS\Language\Text::_( 'FLEXI_FORM_SELECT',true )."');
-				jQuery('#'+element_id).val('');
-				jQuery('#'+element_id + '_clear').addClass('hidden');
-				jQuery('#'+element_id + '_edit').addClass('hidden');
+				document.getElementById(element_id+'_name').value = '';
+				document.getElementById(element_id+'_name').setAttribute('placeholder', '".\Joomla\CMS\Language\Text::_( 'FLEXI_FORM_SELECT',true )."');
+				document.getElementById(element_id).value = ''; FlexiForm.change(document.getElementById(element_id));
+				document.getElementById(element_id + '_clear')?.classList.add('hidden');
+				document.getElementById(element_id + '_edit')?.classList.add('hidden');
 				return false;
 			};
 
 			var fc_select_tag_element_id;
 			function qfSelectTag(id, title)
 			{
-				document.getElementById(fc_select_tag_element_id).value = id;
+				document.getElementById(fc_select_tag_element_id).value = id; FlexiForm.change(document.getElementById(fc_select_tag_element_id));
 				document.getElementById(fc_select_tag_element_id+'_name').value = title;"
 			.($allowEdit  ? "
-				jQuery('#'+fc_select_tag_element_id+'_edit').removeClass('hidden');" : '')
+				document.getElementById(fc_select_tag_element_id+'_edit')?.classList.remove('hidden');" : '')
 			.($allowClear ? "
-				jQuery('#'+fc_select_tag_element_id+'_clear').removeClass('hidden');" : '')
+				document.getElementById(fc_select_tag_element_id+'_clear')?.classList.remove('hidden');" : '')
 			."
 				//$('sbox-btn-close').fireEvent('click');
 				fc_field_dialog_handle_record.dialog('close');
 			}
 			";
-			\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+			\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 			flexicontent_html::loadFramework('flexi-lib');
 		}
 
@@ -146,7 +144,7 @@ class JFormFieldFctag extends \Joomla\CMS\Form\FormField
 		<span class="input-append">
 			<input type="text" id="'.$element_id.'_name" placeholder="'.\Joomla\CMS\Language\Text::_( 'FLEXI_FORM_SELECT',true ).'" value="'.$title.'" '.$required_param.' readonly="readonly" />
 			'. //<a class="modal btn hasTooltip" onclick="fc_select_tag_element_id=\''.$element_id.'\'" href="'.$link.'" rel="'.$rel.'" title="'.$_select.'">
-			'<a class="btn hasTooltip" onclick="fc_select_tag_element_id=\''.$element_id.'\'; var url = jQuery(this).attr(\'href\'); window.fc_field_dialog_handle_record = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''.$_select.'\'}); return false;" href="'.$link.'" title="'.$_select.'" >
+			'<a class="btn hasTooltip" onclick="fc_select_tag_element_id=\''.$element_id.'\'; var url = this.href; window.fc_field_dialog_handle_record = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''.$_select.'\'}); return false;" href="'.$link.'" title="'.$_select.'" >
 				'.\Joomla\CMS\Language\Text::_( 'FLEXI_FORM_SELECT' ).'
 			</a>
 			'.($allowEdit ? '

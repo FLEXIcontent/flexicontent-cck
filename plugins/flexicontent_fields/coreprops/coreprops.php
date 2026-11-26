@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright � 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -14,8 +14,14 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
-JLoader::register('FlexicontentHelperRoute', JPATH_SITE . '/components/com_flexicontent/helpers/route.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField'                 => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+		'FlexicontentHelperRoute' => JPATH_SITE . '/components/com_flexicontent/helpers/route.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 class plgFlexicontent_fieldsCoreprops extends FCField
 {
@@ -72,7 +78,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -201,7 +207,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$formfieldname = 'filter_'.$filter->id;
 
 		$_s = $isSearchView ? '_s' : '';
@@ -338,7 +344,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$value_quoted = array();
 		foreach ($value as $i => $v)
 		{
@@ -386,7 +392,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$value_quoted = array();
 		foreach ($value as $i => $v)
 		{

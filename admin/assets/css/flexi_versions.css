@@ -1,0 +1,124 @@
+/**
+ * FLEXIcontent version history table
+ * Loaded after j3x/j4x stylesheets so it is not affected by their local overrides.
+ */
+
+.fc-versions-panel {
+	margin: 0 10px 10px;
+}
+
+.fc-versions-panel > h3 {
+	margin: 4px 0 10px;
+}
+
+table.fc-version-table {
+	width: 100%;
+	max-width: 100%;
+	margin: 0;
+	border-collapse: collapse;
+}
+
+table.fc-version-table th,
+table.fc-version-table td {
+	padding: 6px 10px;
+	vertical-align: middle;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+table.fc-version-table thead th {
+	background: #f4f4f4;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+table.fc-version-table tbody tr:hover {
+	background: #f9f9f9;
+}
+
+table.fc-version-table td.versions-first {
+	padding: 12px 10px;
+	border: 1px dashed #ccc;
+	color: #666;
+}
+
+table.fc-version-table tr.active-version > td {
+	background: #ffffdd;
+}
+
+table.fc-version-table tr.is-kept > td.fc-version-keep-cell {
+	background: #fff5d6;
+}
+
+.fc-version-nr {
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+}
+
+.fc-version-date {
+	white-space: nowrap;
+}
+
+.fc-version-keep-cell,
+.fc-version-actions {
+	text-align: center;
+	white-space: nowrap;
+}
+
+.fc-version-table a {
+	margin: 0 3px;
+	text-decoration: none;
+}
+
+.fc-version-keep.is-unlocked {
+	opacity: .65;
+}
+
+.fc-version-keep.is-kept {
+	color: #b58900;
+	opacity: 1;
+}
+
+.fc-version-current {
+	font-weight: 600;
+}
+
+#fc_pager {
+	margin-top: 10px;
+}
+
+/**
+ * Dark mode. Joomla Atum switches [data-bs-theme="dark"] on the root element,
+ * so override the hardcoded light colours of the table here.
+ */
+[data-bs-theme="dark"] table.fc-version-table th,
+[data-bs-theme="dark"] table.fc-version-table td {
+	border-bottom-color: rgba(255, 255, 255, .12);
+}
+
+[data-bs-theme="dark"] table.fc-version-table thead th {
+	background: var(--tertiary-bg, #2b3035);
+	color: var(--emphasis-color, #fff);
+}
+
+[data-bs-theme="dark"] table.fc-version-table tbody tr:hover {
+	background: rgba(255, 255, 255, .05);
+}
+
+[data-bs-theme="dark"] table.fc-version-table td.versions-first {
+	border-color: rgba(255, 255, 255, .2);
+	color: var(--tertiary-color, #dee2e680);
+}
+
+/* Active and kept versions: amber tint that stays readable on a dark background */
+[data-bs-theme="dark"] table.fc-version-table tr.active-version > td {
+	background: rgba(255, 193, 7, .16);
+}
+
+[data-bs-theme="dark"] table.fc-version-table tr.is-kept > td.fc-version-keep-cell {
+	background: rgba(255, 193, 7, .26);
+}
+
+[data-bs-theme="dark"] .fc-version-keep.is-kept {
+	color: var(--warning-text-emphasis, #f6ce95);
+}
+

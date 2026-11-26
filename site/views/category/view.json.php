@@ -19,8 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.view.legacy');
-jimport('joomla.filesystem.file');
 
 /**
  * HTML View class for the Category View
@@ -41,7 +39,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		// Initialize framework variables
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$aid      = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 
 		// Get model

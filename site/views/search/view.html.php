@@ -19,7 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.view.legacy');
 
 use Joomla\CMS\Filter\InputFilter;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -53,8 +52,8 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
 
-		$document = \Joomla\CMS\Factory::getDocument();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$menus    = $app->getMenu();
 		$menu     = $menus->getActive();
 		$uri      = \Joomla\CMS\Uri\Uri::getInstance();
@@ -108,7 +107,6 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		 * Load needed JS libs & CSS styles
 		 */
 
-		flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('flexi_tmpl_common');
 
 		// Add css files to the document <head> section (also load CSS joomla template override)
@@ -116,7 +114,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		{
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexi_filters.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
@@ -134,16 +132,12 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		// NOTE: if zero search areas are posted then search model will search in ALL areas (including flexicontent)
 		$document->addScriptDeclaration("
 			var _toggle_content_area = function() {
-				let count = 0;
-				let contenttypes_filter_list = jQuery('#contenttypes_filter_list');
-				if (contenttypes_filter_list.length) {
-					contenttypes_filter_list.find('input').each(function() {
-						if (jQuery(this).prop('checked')) count++;
-					});
-					console.log(count);
-					!count
-						? jQuery('#area_flexicontent').attr('disabled', 'disabled')
-						: jQuery('#area_flexicontent').removeAttr('disabled');
+				var contenttypes_filter_list = document.getElementById('contenttypes_filter_list');
+				var area = document.getElementById('area_flexicontent');
+				if (contenttypes_filter_list && area) {
+					contenttypes_filter_list.querySelectorAll('input:checked').length
+						? area.removeAttribute('disabled')
+						: area.setAttribute('disabled', 'disabled');
 				}
 			}
 		");
@@ -211,12 +205,12 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		$doc_title = $params->get( 'page_title' );
 
 		// Check and prepend or append site name to page title
-		if ( $doc_title != $app->getCfg('sitename') ) {
-			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
-				$doc_title = Text::sprintf('JPAGETITLE', $app->getCfg('sitename'), $doc_title);
+		if ( $doc_title != $app->get('sitename') ) {
+			if ($app->get('sitename_pagetitles', 0) == 1) {
+				$doc_title = Text::sprintf('JPAGETITLE', $app->get('sitename'), $doc_title);
 			}
-			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
-				$doc_title = Text::sprintf('JPAGETITLE', $doc_title, $app->getCfg('sitename'));
+			elseif ($app->get('sitename_pagetitles', 0) == 2) {
+				$doc_title = Text::sprintf('JPAGETITLE', $doc_title, $app->get('sitename'));
 			}
 		}
 
@@ -470,6 +464,21 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 					: array();
 			}
 		}
+
+
+		/**
+		 * The search form must respect field view access, as the search results do (plgSearchFlexiadvsearch, #1306):
+		 * do not offer filters (with the list of their values) or text-search fields of fields that the user may not view
+		 */
+
+		$field_view_levels = array_map('intval', \Joomla\CMS\Factory::getApplication()->getIdentity()->getAuthorisedViewLevels());
+		$can_view_field = static function ($field) use ($field_view_levels)
+		{
+			return !(int) $field->access || in_array((int) $field->access, $field_view_levels, true);
+		};
+
+		$fields_text = array_filter($fields_text, $can_view_field);
+		$filters     = array_filter($filters, $can_view_field);
 
 
 		/**
@@ -784,6 +793,13 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		$min = $min_word_len ? $min_word_len  : $params->get('minchars', 3);
 		$max = $params->get('maxchars', 200);
 
+		// A LIKE %word% search ("No space languages") does not use the FULLTEXT index, so the shortest word of that index
+		// does not apply to it: most Chinese words have two characters
+		if (flexicontent_db::useLikeSearch($params->get('filter_word_like_any', 0), $searchword))
+		{
+			$min = 1;
+		}
+
 		if (FLEXIadvsearchHelper::limitSearchWord($searchword, $min, $max))
 		{
 			$error = Text::sprintf( 'FLEXI_SEARCH_MESSAGE', $min, $max );
@@ -866,7 +882,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 				}
 			}
 
-			$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getConfig()->get('sef');
+			$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getApplication()->getConfig()->get('sef');
 			if ($_sh404sef)
 			{
 				$pageNav->setAdditionalUrlParam('limit', $model->getState('limit'));
@@ -883,15 +899,27 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 				//print_r($searchwords);
 			}
 
-			// Create regular expressions, for highlighting the matched words
-			$w_regexp_highlight = array();
+			// Create ONE regular expression matching ANY of the searched words, so that every occurrence is highlighted as a whole
+			// (longer words first, so that the longest match wins), words may be adjacent e.g. 'ios 27.3 beta'
+			$w_regexp_alts = array();
 
 			foreach($searchwords as $n => $_word)
 			{
-				$w_regexp_highlight[$_word] = StringHelper::strlen($_word) <= 2  ||  $n+1 < count($searchwords)
-					? '#\b('. preg_quote($_word, '#') .')\b#iu'   // Non-last word or word too small avoid highlighting non exact matches
-					: '#\b('. preg_quote($_word, '#') .')#iu';
+				if (!strlen($_word))
+				{
+					continue;
+				}
+
+				$w_regexp_alts[$_word] = StringHelper::strlen($_word) <= 2  ||  $n+1 < count($searchwords)
+					? '\b'. preg_quote($_word, '#') .'\b'   // Non-last word or word too small avoid highlighting non exact matches
+					: '\b'. preg_quote($_word, '#');
 			}
+
+			uksort($w_regexp_alts, function ($a, $b) {
+				return StringHelper::strlen($b) - StringHelper::strlen($a);
+			});
+
+			$w_regexp_highlight = count($w_regexp_alts) ? '#(?:' . implode('|', $w_regexp_alts) . ')#iu' : '';
 
 			for ($i=0; $i < count($results); $i++)
 			{
@@ -902,16 +930,40 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 					$parts = FLEXIadvsearchHelper::prepareSearchContent( $result->text, $params->get('text_chars', 200), $searchwords );
 					//if( count($parts)>1 ) { echo "<pre>"; print_r($parts); exit;}
 
+					// Remove duplicate parts (e.g. short text, where every searched word gives the very same part),
+					// and highlight ALL searched words inside the remaining parts
+					$kept_plain = array();
+					$unique_parts = array();
+
 					foreach ($parts as $word_found => $part)
 					{
-						if (!$word_found)
+						$plain = trim(str_replace(array('&nbsp;', '...'), ' ', strip_tags($part)));
+						$plain = trim(preg_replace('/\s+/u', ' ', $plain));
+
+						foreach ($kept_plain as $_kept)
 						{
-							continue;
+							if ($plain === $_kept || ($plain !== '' && StringHelper::strpos($_kept, $plain) !== false))
+							{
+								continue 2;
+							}
 						}
 
-						$searchRegex = $w_regexp_highlight[$word_found];
-						$parts[$word_found] = preg_replace($searchRegex, '_fc_highlight_start_\0_fc_highlight_end_', $part );
+						$kept_plain[] = $plain;
+
+						if ($word_found && $w_regexp_highlight)
+						{
+							$part = preg_replace_callback($w_regexp_highlight, function ($m) {
+								return '_fc_highlight_start_' . $m[0] . '_fc_highlight_end_';
+							}, $part);
+
+							// Merge highlights of adjacent words, so that a matched phrase is highlighted as a whole
+							$part = preg_replace('/_fc_highlight_end_((?:\s|&nbsp;)+)_fc_highlight_start_/u', '$1', $part);
+						}
+
+						$unique_parts[$word_found] = $part;
 					}
+
+					$parts = $unique_parts;
 					$result->text = implode(' <br/> ', $parts);
 
 					$replace_count_total = 0;
@@ -921,10 +973,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 					 * (1) Skip / Ignore this for languages with spaces,
 					 * (2) Skip / Ignore this if current language supports splitting via dictionary
 					 */
-					if ($filter_word_like_any
-						&& in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th'))
-						&& ! FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getLanguage()->getTag(), $_hasHandlerOnly = true)
-					)
+					if (flexicontent_db::useLikeSearch($filter_word_like_any, $searchword))
 					{
 						// Do not highlight too small words, since we do not consider spaces
 						if (strlen($word_found) <= 2)

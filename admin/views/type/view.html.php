@@ -14,7 +14,13 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecord' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * HTML View class for the Type screen
@@ -34,9 +40,9 @@ class FlexicontentViewType extends FlexicontentViewBaseRecord
 
 		$app        = \Joomla\CMS\Factory::getApplication();
 		$jinput     = $app->input;
-		$document   = \Joomla\CMS\Factory::getDocument();
-		$user       = \Joomla\CMS\Factory::getUser();
-		$db         = \Joomla\CMS\Factory::getDbo();
+		$document   = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db         = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$perms      = FlexicontentHelperPerm::getPerm();
 
@@ -105,16 +111,16 @@ class FlexicontentViewType extends FlexicontentViewBaseRecord
 		// Add css to document
 		if ($isAdmin)
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 		else
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 		}
@@ -301,7 +307,7 @@ class FlexicontentViewType extends FlexicontentViewBaseRecord
 		if (empty($level_name))
 		{
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $row->access, 'Public'), 'warning');
-			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
+			$document->addScriptDeclaration("FlexiForm.ready(function() { const access = document.getElementById('jform_access'); if (access) { access.value = '1'; access.fc_choices_instance?.refresh(); FlexiForm.change(access); } });");
 		}
 
 
@@ -311,7 +317,7 @@ class FlexicontentViewType extends FlexicontentViewBaseRecord
 
 		if ($js)
 		{
-			$document->addScriptDeclaration('jQuery(document).ready(function(){'
+			$document->addScriptDeclaration('FlexiForm.ready(function(){'
 				.$js.
 			'});');
 		}

@@ -11,8 +11,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('cms.component.helper');
-jimport('cms.plugin.helper');
 
 
 
@@ -25,9 +23,41 @@ $is_fc_component = 1;
 
 $cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 $app     = \Joomla\CMS\Factory::getApplication();
-$document= \Joomla\CMS\Factory::getDocument();
+$document= \Joomla\CMS\Factory::getApplication()->getDocument();
 $jinput  = $app->input;
 $format  = $jinput->get('format', 'html', 'cmd');
+
+// Security: many views and models read 'layout' with the 'string' filter, which keeps quotes, and print it
+// into HTML attributes and JavaScript (e.g. the file manager), which allowed reflected XSS through a crafted link.
+// Real layout names only use [A-Za-z0-9_.-], so strip anything else before any view or controller reads it.
+$fc_layout_raw = $jinput->get('layout', null, 'raw');
+
+if ($fc_layout_raw !== null)
+{
+	$fc_layout_safe = is_string($fc_layout_raw) ? preg_replace('/[^A-Za-z0-9_.\-]/', '', $fc_layout_raw) : '';
+	$fc_layout_safe = $fc_layout_safe !== '' ? $fc_layout_safe : 'default';
+
+	if ($fc_layout_safe !== $fc_layout_raw)
+	{
+		$jinput->set('layout', $fc_layout_safe);
+
+		if (isset($_GET['layout']))
+		{
+			$_GET['layout'] = $fc_layout_safe;
+			$jinput->get->set('layout', $fc_layout_safe);
+		}
+
+		if (isset($_POST['layout']))
+		{
+			$_POST['layout'] = $fc_layout_safe;
+			$jinput->post->set('layout', $fc_layout_safe);
+		}
+	}
+
+	unset($fc_layout_safe);
+}
+
+unset($fc_layout_raw);
 
 // Logging
 global $fc_run_times;
@@ -38,7 +68,7 @@ $force_print = false || JDEBUG;
 
 // Force post-install check for testing purposes
 /*if ( $format == "html" ) {
-	$session = \Joomla\CMS\Factory::getSession();
+	$session = \Joomla\CMS\Factory::getApplication()->getSession();
 	$postinst_integrity_ok = $session->get('flexicontent.postinstall');
 	$recheck_aftersave = $session->get('flexicontent.recheck_aftersave');
 	$force_print = $postinst_integrity_ok===NULL || $postinst_integrity_ok===false || $recheck_aftersave;
@@ -51,7 +81,6 @@ if ($print_logging_info && $format === 'html')
 {
 	$start_microtime = microtime(true);
 	global $fc_jprof;
-	jimport('joomla.profiler.profiler');
 	$fc_jprof = new \Joomla\CMS\Profiler\Profiler();
 	$fc_jprof->mark('START: FLEXIcontent component');
 }
@@ -73,7 +102,6 @@ require_once (JPATH_SITE.'/components/com_flexicontent/helpers/permission.php');
 require_once (JPATH_SITE.'/components/com_flexicontent/helpers/route.php');
 
 // Add component's table directory to the include path
-\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_flexicontent/tables');
 
 // Import the flexicontent_fields plugins and flexicontent plugins
 if (!FLEXI_ONDEMAND)
@@ -89,26 +117,28 @@ if (!FLEXI_ONDEMAND)
  */
 
 // Load language file of 'com_content' component
-\Joomla\CMS\Factory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR);
+\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_content', JPATH_ADMINISTRATOR);
 
-if ( \Joomla\CMS\Factory::getLanguage()->getDefault() != 'en-GB' )
+if ( \Joomla\CMS\Factory::getApplication()->getLanguage()->getDefault() != 'en-GB' )
 {
 	// If site default language is not english then load english language file for 'com_flexicontent' component, and the override (forcing a reload) with current language file
 	// We make sure that 'english' file has been loaded, because we need it as fallback for language strings that do not exist in current language
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
 }
 
 else
 	// No force loading needed, save some time, and do not force language file reload
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
+
+FLEXIUtilities::loadMediaLanguage(JPATH_ADMINISTRATOR);
 
 // Load language overrides, just before executing the component (DONE manually for J1.5)
 /*if (!FLEXI_J16GE)
 {
 	$overrideDir = JPATH_ADMINISTRATOR . '/languages/overrides/';
-	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
-	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
 }*/
 
 
@@ -210,16 +240,17 @@ $jinput->set('task', $controller_task);
 if (
 	$view=='group' || $controller_name=='group'   || $view=='groups' || $controller_name=='groups' ||
 	$view=='user' || $controller_name=='user'   || $view=='users' || $controller_name=='users' ||
-	$view=='debuggroup' || $controller_name=='debuggroup'
+	$view=='debuggroup' || $controller_name=='debuggroup' ||
+	$view=='debuguser' || $controller_name=='debuguser'
 )
 {
 	// Load english language file for 'com_users' component then override with current language file
-	\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);
-	\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);
 	// users helper file
 	require_once (JPATH_ADMINISTRATOR.'/components/com_flexicontent/helpers/users.php');
 }
-if ( $view=='debuggroup' || $controller_name=='debuggroup' ) {
+if ( $view=='debuggroup' || $controller_name=='debuggroup' || $view=='debuguser' || $controller_name=='debuguser' ) {
 	// users helper file
 	require_once (JPATH_ADMINISTRATOR.'/components/com_flexicontent/helpers/debug.php');
 }
@@ -263,6 +294,14 @@ $controller	= \Joomla\CMS\MVC\Controller\BaseController::getInstance('Flexiconte
 
 $controller->execute( $task );
 
+if ($format === 'html' && FLEXI_J40GE)
+{
+	$admin_assets = \Joomla\CMS\Uri\Uri::root(true) . '/administrator/components/com_flexicontent/assets/';
+	$document->addStyleSheet($admin_assets . 'css/native-admin.css', array('version' => FLEXI_VHASH));
+	$document->addScript($admin_assets . 'js/native-admin-layout.js', array('version' => FLEXI_VHASH), array('defer' => true));
+	\Joomla\CMS\Language\Text::script('FLEXI_SCROLL_TABLE');
+}
+
 // Redirect if set by the controller
 $controller->redirect();
 
@@ -278,17 +317,18 @@ $layout = $jinput->getString('layout', '');
 
 if ($format === 'html')
 {
-	// Load jquery Framework, but let some views decide for themselves, so that they can choose not to load some parts of jQuery.ui JS
-	if ($view != 'item' || $view != 'fileselement') flexicontent_html::loadFramework('jQuery');
+	flexicontent_html::loadFramework('form-utils');
+	flexicontent_html::loadFramework('sortable');
+	if (!flexicontent_html::usesNativeAdminAssets()) flexicontent_html::loadFramework('jQuery');
 
 	if ( 1 ) // always load tooltips JS in backend
 	{
-		// J3.0+ tooltips (bootstrap based)
-		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+		// Bootstrap tooltips on .hasTooltip (Joomla 3 attached them by default; Joomla 4+ only for a given selector)
+		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
 	}
 	// Add flexi-lib JS
-	\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Frontend/backend script
-	\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Backend only script
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Frontend/backend script
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Backend only script
 
 	// Validate when Joomla.submitForm() is called, NOTE: for non-FC views this is done before the method is called
 	$js = '
@@ -326,9 +366,9 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	$fields_render_times = FlexicontentFields::getFieldRenderTimes($fields_render_total);
 
 	$fc_jprof->mark('END: FLEXIcontent component: '.$_msg);
-	$msg = '<div style="font-family:tahoma!important; font-size:11px!important;">'. implode('<br/>', $fc_jprof->getbuffer()) .'</div>';
+	$msg = '<div class="fc-perf-summary">'. implode('<br/>', $fc_jprof->getbuffer()) .'</div>';
 
-	$msg .= '<div style="font-family:tahoma!important; font-size:11px!important;">';
+	$msg .= '<div class="fc-perf-details">';
 
 	if (isset($fc_run_times['initialize_component']))
 		$msg .= sprintf('<br/>-- [Initialize component: %.2f s] ', $fc_run_times['initialize_component']/1000000);
@@ -340,17 +380,17 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 
 		$msg .= '<small>';
 		if (isset($fc_run_times['getExistMenuItems']))
-			$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Default menu item for URLs : %.2f s ', $fc_run_times['getExistMenuItems']/1000000);
+			$msg .= sprintf('<br/>- Default menu item for URLs : %.2f s ', $fc_run_times['getExistMenuItems']/1000000);
 		if (isset($fc_run_times['getItemsBadLang']))
-			$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items language and translation associations: %.2f s ', $fc_run_times['getItemsBadLang']/1000000);
+			$msg .= sprintf('<br/>- Items language and translation associations: %.2f s ', $fc_run_times['getItemsBadLang']/1000000);
 		if (isset($fc_run_times['getItemsNoCat']))
-			$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items multi-category relations: %.2f s ', $fc_run_times['getItemsNoCat']/1000000);
+			$msg .= sprintf('<br/>- Items multi-category relations: %.2f s ', $fc_run_times['getItemsNoCat']/1000000);
 		if (isset($fc_run_times['checkCurrentVersionData']))
-			$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items current version data: %.2f s ', $fc_run_times['checkCurrentVersionData']/1000000);
+			$msg .= sprintf('<br/>- Items current version data: %.2f s ', $fc_run_times['checkCurrentVersionData']/1000000);
 		if (isset($fc_run_times['getItemCountingDataOK']))
-			$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items temporary accounting data: %.2f s ', $fc_run_times['getItemCountingDataOK']/1000000);
+			$msg .= sprintf('<br/>- Items temporary accounting data: %.2f s ', $fc_run_times['getItemCountingDataOK']/1000000);
 		if (isset($fc_run_times['checkInitialPermission']))
-			$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - ACL initial permissions: %.2f s ', $fc_run_times['checkInitialPermission']/1000000);
+			$msg .= sprintf('<br/>- ACL initial permissions: %.2f s ', $fc_run_times['checkInitialPermission']/1000000);
 		$msg .= '</small>';
 	}
 	// **** EOF: BACKEND SPECIFIC
@@ -455,17 +495,14 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	if (count($fields_render_times))
 	{
 		$msg .= sprintf('<br/><br/>-- [FC Fields Rendering: %.2f s] ', $fields_render_total/1000000);
-		$msg .= '<br/>';
+		$msg .= '<div class="fc-perf-grid">';
 
 		foreach($fields_render_times as $i => $_time)
 		{
-			$msg .=
-				'<div style="white-space:nowrap; float:left;'.($i%3==0 ? 'clear:both !important;' : '').'">'.
-					$fields_render_times[$i].
-				'</div>';
+			$msg .= '<div class="fc-perf-item">' . $fields_render_times[$i] . '</div>';
 		}
 
-		$msg .= '<br/><div class="fcclear"></div>';
+		$msg .= '</div>';
 	}
 
 	$msg .= '</div>';

@@ -23,10 +23,7 @@ defined('_JEXEC') or die('Restricted access');
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 /**
@@ -95,7 +92,7 @@ class JFormFieldClayoutlist extends JFormFieldList
 		
 		if ($tmpls !== false) {
 			foreach ($tmpls as $tmpl) {
-				$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name);
+				$layouts[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $tmpl->name, $tmpl->name);
 			}
 		}
 		

@@ -5,13 +5,19 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright � 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\Database\DatabaseInterface;
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 class plgFlexicontent_fieldsFcpagenav extends FCField
 {
@@ -294,7 +300,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		}
 		if ($load_css)
 		{
-			\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');
+			\Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->registerAndUseStyle('plg_flexicontent_fields_fcpagenav.style', 'plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');
 		}
 
 		// $html variable , should be set by the layout file
@@ -363,7 +369,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 
 		// Joomla media folder
 		$app = \Joomla\CMS\Factory::getApplication();
-		$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
+		$joomla_image_path = $app->get('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
 		$joomla_image_url  = str_replace (DS, '/', $joomla_image_path);
 		$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 		$joomla_image_url  = $joomla_image_url  ? $joomla_image_url.'/' : '';

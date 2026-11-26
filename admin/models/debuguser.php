@@ -20,10 +20,20 @@ require_once JPATH_COMPONENT.'/helpers/debug.php';
  */
 if (FLEXI_J40GE)
 {
-	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'src'.DS.'Model'.DS.'DebugUserModel.php');
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'src'.DS.'Model'.DS.'DebuguserModel.php');
 
-	class FlexicontentModelDebugUser extends Joomla\Component\Users\Administrator\Model\DebugUserModel
+	class FlexicontentModelDebugUser extends Joomla\Component\Users\Administrator\Model\DebuguserModel
 	{
+		public function __construct($config = array(), $factory = null)
+		{
+			parent::__construct($config, $factory);
+
+			// Joomla's own component injects the user factory that getUser() and getItems() use
+			if ($this instanceof \Joomla\CMS\User\UserFactoryAwareInterface)
+			{
+				$this->setUserFactory(\Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class));
+			}
+		}
 	}
 }
 else

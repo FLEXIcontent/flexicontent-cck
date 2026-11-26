@@ -14,8 +14,13 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
-jimport('joomla.filesystem.file');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecord' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * HTML View class for the Field screen
@@ -35,9 +40,9 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 
 		$app        = \Joomla\CMS\Factory::getApplication();
 		$jinput     = $app->input;
-		$document   = \Joomla\CMS\Factory::getDocument();
-		$user       = \Joomla\CMS\Factory::getUser();
-		$db         = \Joomla\CMS\Factory::getDbo();
+		$document   = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db         = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$perms      = FlexicontentHelperPerm::getPerm();
 
@@ -106,16 +111,16 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 		// Add css to document
 		if ($isAdmin)
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 		else
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 		}
@@ -272,10 +277,13 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 		if (!empty($model->helpURL))
 		{
 			$onclick_js = empty($_SERVER['HTTPS']) && $model->helpModal
-				? 'var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, false, {\'title\': \''.flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_($model->helpTitle), 2).'\'}); return false;'
-				: 'var url = jQuery(this).attr(\'data-href\'); window.open(url); return false;';
+				? 'var url = this.dataset.href; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, false, {\'title\': \''.flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_($model->helpTitle), 2).'\'}); return false;'
+				: 'var url = this.dataset.href; window.open(url); return false;';
 			$js .= "
-				jQuery('#toolbar-help a.toolbar, #toolbar-help button').attr('data-href', '".$model->helpURL."').attr('onclick', \"".$onclick_js."\");
+				document.querySelectorAll('#toolbar-help a.toolbar, #toolbar-help button').forEach(button => {
+					button.dataset.href = " . json_encode($model->helpURL, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT) . ";
+					button.setAttribute('onclick', " . json_encode($onclick_js, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT) . ");
+				});
 			";
 			\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task='', 'help.png', 'help_f2.png', $model->helpTitle, false );
 		}
@@ -323,8 +331,8 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 		// Because 'site-default' language file may not have all needed language strings, or it may be syntactically broken
 		// we load the ENGLISH language file (without forcing it, to avoid overwritting site-default), and then current language file
 		$extension_name = 'plg_flexicontent_fields_'. ($row->iscore ? 'core' : $row->field_type);
-		\Joomla\CMS\Factory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);  // force_reload OFF
-		\Joomla\CMS\Factory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);  // force_reload OFF
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
 
 
 
@@ -350,7 +358,7 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 		if (empty($level_name))
 		{
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $row->access, 'Public'), 'warning');
-			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
+			$document->addScriptDeclaration("FlexiForm.ready(function() { const access = document.getElementById('jform_access'); if (access) { access.value = '1'; access.fc_choices_instance?.refresh(); FlexiForm.change(access); } });");
 		}
 
 
@@ -360,23 +368,46 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 	
 		if (!$row->iscore)
 		{
-			$_field_id = 'jform_field_type';
-			$_row_id = $form->getValue("id");
-			$_ctrl_task = 'task=fields.getfieldspecificproperties';
+			// A type loaded from the raw view may introduce layout and colour controls.
+			$assets = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/';
+			$document->addScript($assets . 'layout-params.js', array('version' => 'auto'));
+			$document->addScript($assets . 'color-input.js', array('version' => 'auto'), array('defer' => true));
+			\Joomla\CMS\Language\Text::script('FLEXI_PLEASE_WAIT');
+			$fieldSettingsUrl = json_encode(
+				'index.php?option=com_flexicontent&task=fields.getfieldspecificproperties&format=raw&cid=' . (int) $form->getValue('id')
+			);
 			$js .= "
-				jQuery('#".$_field_id."').on('change', function() {
-					jQuery('#fieldspecificproperties').html('<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"></p>');
-					jQuery.ajax({
-						type: \"GET\",
-						url: 'index.php?option=com_flexicontent&".$_ctrl_task."&cid=".$_row_id."&field_type='+this.value+'&format=raw',
-						success: function(str)
-						{
-							// Initialize JS and CSS of the layout
-							const container_id  = 'fieldspecificproperties';
-							fc_initDynamicLayoutJsCss(container_id, ['subform-row-add'], str);
-							jQuery('#field_typename').html(jQuery('#".$_field_id."').val());
-						}
-					});
+				const typeSelect = document.getElementById('jform_field_type');
+				const properties = document.getElementById('fieldspecificproperties');
+				const typeName = document.getElementById('field_typename');
+				let fieldSettingsRequest;
+				let appliedType = typeSelect?.value;
+				typeSelect?.addEventListener('change', async function() {
+					const fieldType = typeSelect.value;
+					fieldSettingsRequest?.abort();
+					const request = fieldSettingsRequest = new AbortController();
+					const url = new URL(" . $fieldSettingsUrl . ", document.baseURI);
+					url.searchParams.set('field_type', fieldType);
+					properties.setAttribute('aria-busy', 'true');
+					try {
+						const response = await fetch(url, {
+							headers: {'X-Requested-With': 'XMLHttpRequest'},
+							signal: request.signal
+						});
+						if (!response.ok || response.redirected) throw new Error('HTTP ' + response.status);
+						const html = await response.text();
+						if (request.signal.aborted) return;
+						fc_initDynamicLayoutJsCss('fieldspecificproperties', ['subform-row-add'], html);
+						if (typeName) typeName.textContent = fieldType;
+						appliedType = fieldType;
+					} catch (error) {
+						if (request.signal.aborted) return;
+						typeSelect.value = appliedType;
+						typeSelect.fc_choices_instance?.setChoiceByValue(appliedType);
+						Joomla.renderMessages({error: [FlexiForm.text('JERROR_AN_ERROR_HAS_OCCURRED')]});
+					} finally {
+						if (fieldSettingsRequest === request) properties.removeAttribute('aria-busy');
+					}
 				});
 			";
 		}
@@ -431,7 +462,7 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 
 		if ($js)
 		{
-			$document->addScriptDeclaration('jQuery(document).ready(function(){'
+			$document->addScriptDeclaration('FlexiForm.ready(function(){'
 				.$js.
 			'});');
 		}

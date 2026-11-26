@@ -13,14 +13,13 @@
 // No direct access.
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('cms.plugin.plugin');
 use Joomla\String\StringHelper;
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
-\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_items.php';
 
 /**
  * Page break plugin
@@ -44,6 +43,19 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 	static $rowLinks = array();
 	var $pattern = '#(<hr[^>]*?class=[\"|\']system-pagebreak[\"|\'][^(>|/>)]*?/?>)#iU';
 	var $pluginPath;
+	protected $pages = array();
+	protected $pagescount = 0;
+	protected $texts = array();
+	protected $textscount = 0;
+	protected $limitstart = 0;
+	protected $showall = false;
+	protected $row;
+	protected $prev_link = '';
+	protected $next_link = '';
+	protected $nonsef_link = '';
+	protected $page_links = array();
+	protected $toc_return_link;
+	protected $_text;
 
 	function __construct(&$subject, $params)
 	{
@@ -110,6 +122,9 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 		{
 			return;
 		}
+		$this->_text = null;
+		$this->page_links = array();
+		$this->toc_return_link = null;
 
 		// Get slug and limitstart (current page) and use them to create next / previous links
 		$row->slug = !empty($row->slug) ? $row->slug : $row->id;
@@ -148,8 +163,9 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 
 
 		// Plugin base folder
-		$document = \Joomla\CMS\Factory::getDocument();
-		$plgbase  = \Joomla\CMS\Uri\Uri::root(true).'/plugins/'.$this->_type.'/'.$this->_name.'/'.$this->_name.'/'.$this->_name;
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$wa       = $document->getWebAssetManager();
+		$plgbase  = 'plugins/'.$this->_type.'/'.$this->_name.'/'.$this->_name.'/'.$this->_name;
 
 		// Display configuration
 		$display_method = (int) $this->params->get('display_method', 1);
@@ -161,17 +177,12 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 		// Add JS code for JS based navigation
 		if ($display_method === 1 || $display_method === 0)
 		{
-			if (!class_exists('flexicontent_html'))
-			{
-				require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
-				flexicontent_html::loadFramework('jQuery');
-			}
 
-			$document->addScript($plgbase.'.js');
+			$wa->registerAndUseScript('plg_content_flexibreak.script', $plgbase.'.js');
 		}
 
 		// Add CSS
-		$document->addStyleSheet($plgbase.'.css');
+		$wa->registerAndUseStyle('plg_content_flexibreak.style', $plgbase.'.css');
 
 		// Clear article's text (and toc), so that we re-construct with appropriate containers
 		$row->text = '';
@@ -369,7 +380,7 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 		else
 		{
 			ob_end_clean();
-			JError::raiseError(500, \Joomla\CMS\Language\Text::_('Failed to load template '.$name.'.php'));
+			throw new \Exception(\Joomla\CMS\Language\Text::_('Failed to load template '.$name.'.php'), 500);
 			return '';
 		}
 		return trim(ob_get_clean());
@@ -383,8 +394,7 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 
 		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
 
-		//$table = new flexicontent_items(\Joomla\CMS\Factory::getDbo());
-		$table = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+		$table = new \flexicontent_items(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 
 		// Create ASCII (transliterate) hashtags
 		$force_ascii_hashtags = $this->params->get('force_ascii_hashtags', 1);

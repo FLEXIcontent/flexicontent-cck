@@ -21,12 +21,11 @@ use Joomla\Event\DispatcherAwareTrait;
 use Joomla\Event\DispatcherInterface;
 use \Joomla\CMS\Table\Table;
 
-jimport('joomla.access.rules');
 require_once('flexicontent_basetable.php');
 
 class _flexicontent_items_common extends flexicontent_basetable
 {
-	protected function __getAssetParentId(Table $table = null, $id = null)
+	protected function __getAssetParentId(?Table $table = null, $id = null)
 	{
 		// Initialise variables.
 		$assetId = null;
@@ -68,7 +67,7 @@ if (FLEXI_J30GE)
 {
 	class _flexicontent_items extends _flexicontent_items_common
 	{
-		protected function _getAssetParentId(Table $table = null, $id = null)
+		protected function _getAssetParentId(?Table $table = null, $id = null)
 		{
 			return parent::__getAssetParentId($table, $id);
 		}
@@ -723,15 +722,51 @@ class flexicontent_items extends _flexicontent_items
 		$tk_tmp = $this->_tbl_key_tmp;
 
 		// Split the data to their actual DB table, (#__flexicontent_items_tmp duplicates non-TEXT data of #__content)
-		$record = Table::getInstance($this->_jtbls[$this->_tbl][0]);
+		$__tblType = $this->_jtbls[$this->_tbl][0];
+		$__tblPrefix = 'JTable';
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$record = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$record = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$record = new $__tblClass($__tblDb);
+		}
 		$record->_tbl = $this->_tbl;
 		$record->_tbl_key = $k;
 
-		$record_ext = Table::getInstance($this->_jtbls[$this->_tbl_ext][0], $this->_jtbls[$this->_tbl_ext][1]);
+		$__tblType = $this->_jtbls[$this->_tbl_ext][0];
+		$__tblPrefix = $this->_jtbls[$this->_tbl_ext][1];
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$record_ext = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$record_ext = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$record_ext = new $__tblClass($__tblDb);
+		}
 		$record_ext->_tbl = $this->_tbl_ext;
 		$record_ext->_tbl_key = $fk_ext;
 
-		$record_tmp = Table::getInstance($this->_jtbls[$this->_tbl_tmp][0], $this->_jtbls[$this->_tbl_tmp][1]);
+		$__tblType = $this->_jtbls[$this->_tbl_tmp][0];
+		$__tblPrefix = $this->_jtbls[$this->_tbl_tmp][1];
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$record_tmp = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$record_tmp = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$record_tmp = new $__tblClass($__tblDb);
+		}
 		$record_tmp->_tbl = $this->_tbl_tmp;
 		$record_tmp->_tbl_key = $fk_tmp;
 
@@ -769,6 +804,10 @@ class flexicontent_items extends _flexicontent_items
 			}
 		}
 
+		// The values that the database stores when strict mode is off (a text cut to its column, '' as 0 in a number column,
+		// '' for a NULL in a NOT NULL column), so that it accepts the three records in strict mode too
+		flexicontent_db::fitRecordToColumns($record, $this->getFields(), !$this->$k, $updateNulls);
+
 		if ($this->$k)
 		{
 			$ret = $this->_db->updateObject($this->_tbl, $record, $k, $updateNulls);
@@ -790,14 +829,14 @@ class flexicontent_items extends _flexicontent_items
 
 		if (!empty($record_ext->$fk_ext))
 		{
-			$ext_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_ext . ' WHERE ' . $fk_ext . '=' . (int) $record_ext->$fk_ext)->loadResult();
+			$ext_exists = (bool) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_ext . ' WHERE ' . $fk_ext . '=' . (int) $record_ext->$fk_ext)->loadResult();
 		}
 
 		// Check if record at temporary data DB table exists
 		$tmp_exists = false;
 		if (!empty($record_tmp->$fk_tmp))
 		{
-			$tmp_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_tmp . ' WHERE ' . $fk_tmp . '=' . (int) $record_tmp->$fk_tmp)->loadResult();
+			$tmp_exists = (bool) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_tmp . ' WHERE ' . $fk_tmp . '=' . (int) $record_tmp->$fk_tmp)->loadResult();
 		}
 
 		// Properties that were never loaded/set (e.g. type_id, is_uptodate, when the items_ext
@@ -820,6 +859,7 @@ class flexicontent_items extends _flexicontent_items
 		// Update extended data record
 		if ($ext_exists)
 		{
+			flexicontent_db::fitRecordToColumns($record_ext, $this->_tbl_fields[$this->_tbl_ext], false, $updateNulls);
 			$ret = $this->_db->updateObject($this->_tbl_ext, $record_ext, $fk_ext, $updateNulls);
 		}
 
@@ -828,12 +868,16 @@ class flexicontent_items extends _flexicontent_items
 		{
 			// Insert without using autoincrement
 			$record_ext->$fk_ext = $this->$tk_ext;
+
+			// A new row: the required columns that were dropped above need a value, or strict mode refuses the INSERT
+			flexicontent_db::fitRecordToColumns($record_ext, $this->_tbl_fields[$this->_tbl_ext], true);
 			$ret = $this->_db->insertObject($this->_tbl_ext, $record_ext, $fk_ext);
 		}
 
 		// Update #__flexicontent_items_tmp table
 		if ($tmp_exists)
 		{
+			flexicontent_db::fitRecordToColumns($record_tmp, $this->_tbl_fields[$this->_tbl_tmp], false, $updateNulls);
 			$ret = $this->_db->updateObject($this->_tbl_tmp, $record_tmp, $fk_tmp, $updateNulls);
 		}
 
@@ -842,6 +886,7 @@ class flexicontent_items extends _flexicontent_items
 		{
 			// Insert without using autoincrement
 			$record_tmp->$fk_tmp = $this->$tk_tmp;
+			flexicontent_db::fitRecordToColumns($record_tmp, $this->_tbl_fields[$this->_tbl_tmp], true);
 			$ret = $this->_db->insertObject($this->_tbl_tmp, $record_tmp, $fk_tmp);
 		}
 
@@ -865,7 +910,7 @@ class flexicontent_items extends _flexicontent_items
 		$name  = $this->_getAssetName();
 		$title = $this->_getAssetTitle();
 
-		$asset = Table::getInstance('Asset');
+		$asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$asset->loadByName($name);
 
 		// Check for an error.
@@ -886,6 +931,9 @@ class flexicontent_items extends _flexicontent_items
 		$asset->parent_id = $parentId;
 		$asset->name  = $name;
 		$asset->title = $title;
+
+		// The title column of the assets table is shorter than the item title
+		flexicontent_db::fitRecordToColumns($asset, array_intersect_key($asset->getFields(), array('title' => 1)));
 
 		if ($this->_rules instanceof \Joomla\CMS\Access\Rules)
 		{

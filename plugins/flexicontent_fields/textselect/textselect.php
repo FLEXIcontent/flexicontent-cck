@@ -5,14 +5,20 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
-JLoader::register('plgFlexicontent_fieldsText', JPATH_SITE . '/plugins/flexicontent_fields/text/text.php');
-JLoader::register('plgFlexicontent_fieldsSelect', JPATH_SITE . '/plugins/flexicontent_fields/select/select.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField'                      => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+		'plgFlexicontent_fieldsText'   => JPATH_SITE . '/plugins/flexicontent_fields/text/text.php',
+		'plgFlexicontent_fieldsSelect' => JPATH_SITE . '/plugins/flexicontent_fields/select/select.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 class plgFlexicontent_fieldsTextselect extends FCField
 {
@@ -67,7 +73,7 @@ class plgFlexicontent_fieldsTextselect extends FCField
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		// Call respective method of 'text' field, field_type is not changed since 'text' field can handle current field type
-		FLEXIUtilities::call_FC_Field_Func('text', 'onBeforeSaveField', array(&$field, &$post, &$file, &$item));
+		return FLEXIUtilities::call_FC_Field_Func('text', 'onBeforeSaveField', array(&$field, &$post, &$file, &$item));
 	}
 
 

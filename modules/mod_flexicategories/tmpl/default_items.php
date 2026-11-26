@@ -26,10 +26,11 @@ $cat_image_webp    = (bool) $params->get('cat_image_webp', 0);
 
 // Layout card : top | left | right
 $cat_card_layout = $params->get('cat_image_float', 'left');
+$phpThumbURL = '';
 
 if ($show_cat_image)
 {
-	$joomla_image_path = $app->getCfg('image_path', '');
+	$joomla_image_path = $app->get('image_path', '');
 	$joomla_image_url  = str_replace(DS, '/', $joomla_image_path);
 	$joomla_image_path = $joomla_image_path ? $joomla_image_path . DS : '';
 	$joomla_image_url  = $joomla_image_url  ? $joomla_image_url  . '/' : '';
@@ -275,7 +276,7 @@ foreach ($list as $cat) :
 		<ul class="list-unstyled ps-3 mt-2 d-flex flex-column gap-2">
 		<?php $temp = $list; ?>
 		<?php $list = $cat->getChildren(); ?>
-		<?php require \Joomla\CMS\Helper\ModuleHelper::getLayoutPath('mod_flexicategories', $params->get('layout', 'default') . '_items'); ?>
+		<?php require ModFlexiCategoriesHelper::getItemsLayoutPath($params->get('layout', 'default')); ?>
 		<?php $list = $temp; ?>
 		</ul>
 	<?php endif; ?>

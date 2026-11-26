@@ -55,7 +55,8 @@ class FlexicontentModelReviews extends FCModelAdminList
 	 * Search and ordering columns
 	 */
 	var $search_cols = array(
-		'FLEXI_TITLE' => 'title',
+		'FLEXI_REVIEW_SEARCH_TITLE' => 'title',
+		'FLEXI_REVIEW_SEARCH_TEXT'  => 'text',
 	);
 	var $default_order     = 'a.title';
 	var $default_order_dir = 'ASC';
@@ -107,6 +108,10 @@ class FlexicontentModelReviews extends FCModelAdminList
 		// Call parent after setting ... $this->view_id
 		parent::__construct($config);
 
+		// Language of the voting field (reviews strings live in the field's language file)
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
+
 		$p = $this->ovid;
 
 
@@ -119,6 +124,38 @@ class FlexicontentModelReviews extends FCModelAdminList
 		$filter_approved = $fcform ? $jinput->get('filter_approved', '', 'cmd') : $app->getUserStateFromRequest($p . 'filter_approved', 'filter_approved', '', 'cmd');
 		$this->setState('filter_approved', $filter_approved);
 		$app->setUserState($p . 'filter_approved', $filter_approved);
+
+		// Reviews with text, or only with rating (voting with the stars): 'text' | 'rating'
+		$filter_hastext = $fcform ? $jinput->get('filter_hastext', '', 'cmd') : $app->getUserStateFromRequest($p . 'filter_hastext', 'filter_hastext', '', 'cmd');
+		$filter_hastext = in_array($filter_hastext, array('text', 'rating'), true) ? $filter_hastext : '';
+		$this->setState('filter_hastext', $filter_hastext);
+		$app->setUserState($p . 'filter_hastext', $filter_hastext);
+
+		// Filter by reviewed items and by reviewers (arrays of ids, reviewer id 0 means guests)
+		foreach (array('filter_item', 'filter_user') as $filter_name)
+		{
+			$filter_value = $fcform
+				? $jinput->get($filter_name, array(), 'array')
+				: $app->getUserStateFromRequest($p . $filter_name, $filter_name, array(), 'array');
+
+			$filter_value = array_values(array_unique(array_map('intval', array_filter((array) $filter_value, 'is_numeric'))));
+
+			// Reviewed items must have a valid id
+			if ($filter_name === 'filter_item')
+			{
+				$filter_value = array_values(array_filter($filter_value));
+			}
+
+			$this->setState($filter_name, $filter_value);
+			$app->setUserState($p . $filter_name, $filter_value);
+		}
+
+		// Text search scope: search in all columns (review title and text) by default
+		if (!strlen((string) $this->getState('scope')))
+		{
+			$this->setState('scope', '-1');
+			$app->setUserState($p . 'scope', '-1');
+		}
 
 
 		// Manage view permission
@@ -164,6 +201,35 @@ class FlexicontentModelReviews extends FCModelAdminList
 		if (is_numeric($filter_approved))
 		{
 			$where[] = 'a.approved = ' . (int) $filter_approved;
+		}
+
+		// Filter by review text: reviews with text, or only with rating (no title and no text)
+		$filter_hastext = $this->getState('filter_hastext');
+
+		if ($filter_hastext === 'text')
+		{
+			$where[] = '(CHAR_LENGTH(TRIM(a.text)) > 0 OR CHAR_LENGTH(TRIM(a.title)) > 0)';
+		}
+		elseif ($filter_hastext === 'rating')
+		{
+			$where[] = '(CHAR_LENGTH(TRIM(a.text)) = 0 AND CHAR_LENGTH(TRIM(a.title)) = 0)';
+		}
+
+		// Filter by reviewed items
+		$filter_item = (array) $this->getState('filter_item');
+
+		if ($filter_item)
+		{
+			$where[] = 'a.type = ' . $this->_db->Quote('item');
+			$where[] = 'a.content_id IN (' . implode(',', ArrayHelper::toInteger($filter_item)) . ')';
+		}
+
+		// Filter by reviewers (0 = guests)
+		$filter_user = (array) $this->getState('filter_user');
+
+		if ($filter_user)
+		{
+			$where[] = 'a.user_id IN (' . implode(',', ArrayHelper::toInteger($filter_user)) . ')';
 		}
 
 		if ($q instanceof JDatabaseQuery || (FLEXI_J40GE && $q instanceof \Joomla\Database\DatabaseQuery))
@@ -286,24 +352,112 @@ class FlexicontentModelReviews extends FCModelAdminList
 			return array();
 		}
 
-		$review_ids = array();
+		// The reviewed content items (reviews of other types, e.g. categories, are not supported yet)
+		$content_ids = array();
 
 		foreach ($reviews as $review)
 		{
-			$review_ids[] = $review->id;
+			if ($review->type === 'item' && $review->content_id)
+			{
+				$content_ids[] = (int) $review->content_id;
+			}
 		}
 
-		$review_ids = ArrayHelper::toInteger($review_ids);
-		$review_ids_list = implode(',', $review_ids);
+		if (!$content_ids)
+		{
+			return array();
+		}
+
+		$review_ids_list = implode(',', array_unique(ArrayHelper::toInteger($content_ids)));
 
 		$query = $this->_db->getQuery(true)
 			->select('i.*')
+			->select('ie.type_id')
 			->select('CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug')
 			->from('#__content i')
+			->leftJoin('#__flexicontent_items_ext AS ie ON ie.item_id = i.id')
 			->leftJoin('#__categories AS c ON i.catid = c.id')
 			->where('i.id IN (' . $review_ids_list . ')');
 
 		return $this->_db->setQuery($query)->loadObjectlist('id');
+	}
+
+
+	/**
+	 * Method to get the number of reviews of the given reviews' items, as shown in the list
+	 * (same rule as the default list: trashed and archived reviews are not counted)
+	 *
+	 * @param		array   $reviews  Reviews array
+	 *
+	 * @return	array   Array of content_id => number of reviews
+	 *
+	 * @since   3.3.0
+	 */
+	public function getReviewCounts($reviews)
+	{
+		$content_ids = array();
+
+		foreach ($reviews as $review)
+		{
+			if ($review->type === 'item' && $review->content_id)
+			{
+				$content_ids[] = (int) $review->content_id;
+			}
+		}
+
+		if (!$content_ids)
+		{
+			return array();
+		}
+
+		$query = $this->_db->getQuery(true)
+			->select('r.content_id, COUNT(*) AS total')
+			->from('#__flexicontent_reviews AS r')
+			->where('r.type = ' . $this->_db->Quote('item'))
+			->where('r.content_id IN (' . implode(',', array_unique($content_ids)) . ')')
+			->where('r.state NOT IN (-2, 2)')
+			->group('r.content_id');
+
+		return $this->_db->setQuery($query)->loadAssocList('content_id', 'total');
+	}
+
+
+	/**
+	 * Method to get the options of the item filter: only items that have reviews
+	 *
+	 * @return	array   Array of objects (id, title)
+	 *
+	 * @since   3.3.0
+	 */
+	public function getReviewedItems()
+	{
+		$query = $this->_db->getQuery(true)
+			->select('c.id, c.title')
+			->from('#__content AS c')
+			->where('c.id IN (SELECT r.content_id FROM #__flexicontent_reviews AS r WHERE r.type = ' . $this->_db->Quote('item') . ')')
+			->order('c.title ASC');
+
+		return $this->_db->setQuery($query)->loadObjectList();
+	}
+
+
+	/**
+	 * Method to get the options of the user filter: only users that have reviews
+	 *
+	 * @return	array   Array of objects (id, name), guests have id 0
+	 *
+	 * @since   3.3.0
+	 */
+	public function getReviewers()
+	{
+		$query = $this->_db->getQuery(true)
+			->select('r.user_id AS id, MAX(u.name) AS name')
+			->from('#__flexicontent_reviews AS r')
+			->leftJoin('#__users AS u ON u.id = r.user_id')
+			->group('r.user_id')
+			->order('name ASC');
+
+		return $this->_db->setQuery($query)->loadObjectList();
 	}
 
 

@@ -58,7 +58,7 @@ if ($meta_params && $meta_params->get('robots'))
 }
 
 // This has been deprecated, instead search engines will use the <title> tag
-/*if ($app->getCfg('MetaTitle') == '1')
+/*if ($app->get('MetaTitle') == '1')
 {
 	if ($meta_params && $meta_params->get('page_title'))
 	{
@@ -66,7 +66,7 @@ if ($meta_params && $meta_params->get('robots'))
 	}
 }*/
 
-if ($app->getCfg('MetaAuthor') == '1')
+if ($app->get('MetaAuthor') == '1')
 {
 	if ($meta_params && $meta_params->get('author'))
 	{

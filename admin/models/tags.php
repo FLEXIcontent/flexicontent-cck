@@ -99,6 +99,13 @@ class FlexicontentModelTags extends FCModelAdminList
 	 */
 	var $tagsHelper = null;
 
+	/**
+	 * Flag to also delete the related Joomla tags (and their mappings) when deleting records
+	 *
+	 * @var bool
+	 */
+	public $deleteJoomlaTags = false;
+
 
 	/**
 	 * Constructor
@@ -252,6 +259,90 @@ class FlexicontentModelTags extends FCModelAdminList
 
 
 	/**
+	 * Method to remove records, optionally also the related Joomla tags
+	 *
+	 * @param		array			$cid      array of record ids to delete
+	 *
+	 * @return	boolean	True on success
+	 *
+	 * @since   3.3.0
+	 */
+	public function delete($cid, $model = null)
+	{
+		$jtag_ids = array();
+
+		if ($this->deleteJoomlaTags && count($cid))
+		{
+			$cid_list = implode(',', ArrayHelper::toInteger($cid));
+
+			$jtag_ids = $this->_db->setQuery(
+				$this->_db->getQuery(true)
+					->select('jtag_id')
+					->from('#__flexicontent_tags')
+					->where('id IN (' . $cid_list . ')')
+					->where('jtag_id > 0')
+			)->loadColumn();
+			$jtag_ids = array_unique(ArrayHelper::toInteger($jtag_ids));
+		}
+
+		$result = parent::delete($cid, $model);
+
+		if ($result && count($jtag_ids))
+		{
+			// Keep Joomla tags that are still used by other (not deleted) FLEXIcontent tags
+			$still_used = $this->_db->setQuery(
+				$this->_db->getQuery(true)
+					->select('jtag_id')
+					->from('#__flexicontent_tags')
+					->where('jtag_id IN (' . implode(',', $jtag_ids) . ')')
+			)->loadColumn();
+			$jtag_ids = array_diff($jtag_ids, ArrayHelper::toInteger($still_used));
+
+			$this->_deleteJoomlaTags($jtag_ids);
+		}
+
+		return $result;
+	}
+
+
+	/**
+	 * Method to delete Joomla tags and their content mappings
+	 *
+	 * @param		array			$jtag_ids   array of Joomla tag ids
+	 *
+	 * @return	void
+	 *
+	 * @since   3.3.0
+	 */
+	protected function _deleteJoomlaTags($jtag_ids)
+	{
+		if (!count($jtag_ids))
+		{
+			return;
+		}
+
+
+		foreach ($jtag_ids as $jtag_id)
+		{
+			// Delete mappings of the tag to content
+			$this->_db->setQuery(
+				$this->_db->getQuery(true)
+					->delete('#__contentitem_tag_map')
+					->where('tag_id = ' . (int) $jtag_id)
+			)->execute();
+
+			// Delete via Tag table, to keep nested set (lft / rgt) consistent
+			$table = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable('Tag', 'Administrator');
+
+			if ($table && $table->load($jtag_id))
+			{
+				$table->delete($jtag_id);
+			}
+		}
+	}
+
+
+	/**
 	 * Method to delete records relations like record assignments
 	 *
 	 * @param		array			$cid      array of record ids to delete their related data
@@ -381,43 +472,119 @@ class FlexicontentModelTags extends FCModelAdminList
 	/**
 	 * Method to import a list of tags
 	 *
-	 * @params	string	the list of tags to import
+	 * Names that already exist (ignoring letter case and extra spaces), either in the DB or earlier in the given list,
+	 * are not imported again
 	 *
-	 * @return	array	the import logs
+	 * @param   string  $tags  The list of tags to import, one tag per line
+	 *
+	 * @return  array|null  The import logs: the counters 'success' and 'error', and the lists 'created' and 'existing'
+	 *                      (objects with 'id' and 'name') and 'failed' (names). Null if there is nothing to import
 	 *
 	 * @since	1.5
 	 */
 	public function importList($tags)
 	{
+		// Split on any line ending (textarea submits \r\n), normalize whitespace and skip empty lines
+		$tags = preg_split('/\r\n|\r|\n/', (string) $tags);
+		$tags = array_filter(array_map(array($this, '_cleanTagName'), $tags), 'strlen');
+
 		if (!$tags)
 		{
-			return;
+			return null;
 		}
 
-		// Initialize the logs counters
-		$logs            = array();
-		$logs['error']   = 0;
-		$logs['success'] = 0;
+		// Initialize the logs
+		$logs = array('success' => 0, 'error' => 0, 'created' => array(), 'existing' => array(), 'failed' => array());
 
-		$tags = explode("\n", $tags);
+		$known  = $this->_findTagsByName($tags);
+		$listed = array();
 
 		foreach ($tags as $tag)
 		{
+			$key = StringHelper::strtolower($tag);
+
+			// Repeated line of the given list
+			if (isset($listed[$key]))
+			{
+				continue;
+			}
+
+			$listed[$key] = true;
+
+			if (isset($known[$key]))
+			{
+				$logs['existing'][] = $known[$key];
+				continue;
+			}
+
 			$row            = $this->getTable($this->records_jtable, '');
 			$row->name      = $tag;
 			$row->published = 1;
-			if (!$row->check())
+
+			if ($row->check() && $row->store())
 			{
-				$logs['error'] ++;
+				$logs['success'] ++;
+				$logs['created'][] = (object) array('id' => (int) $row->id, 'name' => $tag);
 			}
 			else
 			{
-				$row->store();
-				$logs['success'] ++;
+				$logs['error'] ++;
+				$logs['failed'][] = $tag;
 			}
 		}
 
 		return $logs;
+	}
+
+
+	/**
+	 * Method to normalize a tag name: collapse whitespace and cut it to the length of the DB column
+	 *
+	 * @param   string  $name  The tag name
+	 *
+	 * @return  string
+	 */
+	protected function _cleanTagName($name)
+	{
+		$clean = preg_replace('/[\s\x{00A0}\x{FEFF}]+/u', ' ', $name);
+
+		// preg_replace() returns null for invalid UTF-8
+		return trim(StringHelper::substr($clean === null ? $name : $clean, 0, 255));
+	}
+
+
+	/**
+	 * Method to find the existing tags having any of the given names
+	 *
+	 * @param   array  $names  The tag names
+	 *
+	 * @return  array  Objects with 'id' and 'name' (the oldest tag of each name), indexed by the lowercase name
+	 */
+	protected function _findTagsByName($names)
+	{
+		$found = array();
+
+		foreach (array_chunk(array_values(array_unique($names)), 500) as $chunk)
+		{
+			$query = 'SELECT id, name'
+				. ' FROM #__flexicontent_tags'
+				. ' WHERE name IN (' . implode(',', array_map(array($this->_db, 'quote'), $chunk)) . ')'
+				. ' ORDER BY id'
+			;
+
+			foreach ($this->_db->setQuery($query)->loadObjectList() as $record)
+			{
+				// Compare in PHP too: the DB collation may also ignore accents, e.g. treat 'й' as 'и'
+				$key = StringHelper::strtolower($this->_cleanTagName($record->name));
+
+				if (!isset($found[$key]))
+				{
+					$found[$key] = (object) array('id' => (int) $record->id, 'name' => $record->name);
+				}
+			}
+		}
+
+		return $found;
 	}
 
 
@@ -430,16 +597,21 @@ class FlexicontentModelTags extends FCModelAdminList
 	 */
 	public function getNotMappedTagIds(&$total = null, $start = 0, $limit = 5000)
 	{
-		$query = 'SELECT SQL_CALC_FOUND_ROWS ft.id '
-			. ' FROM #__flexicontent_tags AS ft'
+		$from_where = ' FROM #__flexicontent_tags AS ft'
 			. ' LEFT JOIN #__tags AS jt ON ft.jtag_id = jt.id'
-			. ' WHERE ft.jtag_id = 0 OR jt.id IS NULL'
+			. ' WHERE ft.jtag_id = 0 OR jt.id IS NULL';
+
+		// The id order makes the pages of the list (start, limit) well defined
+		$query = 'SELECT ft.id '
+			. $from_where
+			. ' ORDER BY ft.id'
 			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 		;
 		$tag_ids = $this->_db->setQuery($query)->loadColumn();
 
 		// Get items total
-		$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+		// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+		$total = $this->_db->setQuery('SELECT COUNT(*) ' . $from_where)->loadResult();
 
 		return $tag_ids;
 	}
@@ -510,7 +682,7 @@ class FlexicontentModelTags extends FCModelAdminList
 			);
 		}
 
-		return (boolean) $this->_db->setQuery($query)->execute();
+		return (bool) $this->_db->setQuery($query)->execute();
 	}
 
 

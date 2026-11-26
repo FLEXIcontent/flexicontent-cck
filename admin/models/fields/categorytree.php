@@ -14,10 +14,7 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 /**
@@ -113,7 +110,7 @@ class JFormFieldCategorytree extends JFormFieldList
 	{
 		global $globalcats;
 		$jinput = \Joomla\CMS\Factory::getApplication()->input;
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cid    = $jinput->getInt('cid', 0);
 
 		$usercats = array();

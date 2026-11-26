@@ -8,7 +8,7 @@ python _tools/tests/remote-size/run.py --php /path/to/php
 
 The runner starts three loopback-only HTTP fixtures on temporary ports, executes PHP with cURL and again with `-n` (without cURL), then stops the fixtures. It makes no external HTTP requests and does not use a Joomla database. Python's standard library is sufficient.
 
-The real remote helper and complete Add URL / Save controller method bodies execute against small Joomla and persistence doubles. The controller's include/bootstrap preamble is replaced; its method bodies are not rewritten. Cache invalidation is stubbed. The tests inspect the data passed to record persistence and the fixture's request log, including rejected redirect destinations. They also load the real frontend dispatch guard for denied tasks.
+The real remote and file editor helpers and complete Add URL / Save controller method bodies execute against small Joomla and persistence doubles. The database double has no File fields, so the custom file properties stay disabled. The controller's include/bootstrap preamble is replaced; its method bodies are not rewritten. Cache invalidation is stubbed. The tests inspect the data passed to record persistence and the fixture's request log, including rejected redirect destinations. They also load the real frontend dispatch guard for denied tasks.
 
 Coverage includes disabled/missing configuration, empty host lists, explicitly listed hosts and ports, site-host exceptions, submitted sizes, frontend internal calls, authorization, redirects, HEAD/Range fallbacks, missing lengths, error responses, bounded request deadlines, and cURL absence. Existing recalculation/proxy helper policies remain covered separately from strict automatic sizing.
 

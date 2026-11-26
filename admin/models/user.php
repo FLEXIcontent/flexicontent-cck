@@ -14,7 +14,6 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\Registry\Registry;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('legacy.model.admin');
 
 if (FLEXI_J40GE)
 {
@@ -83,7 +82,7 @@ class FlexicontentModelUser extends _FlexicontentModelUser
 		}
 
 		// If the user needs to change their password, mark the password fields as required
-		if (\Joomla\CMS\Factory::getUser()->requireReset)
+		if (\Joomla\CMS\Factory::getApplication()->getIdentity()->requireReset)
 		{
 			$form->setFieldAttribute('password', 'required', 'true');
 			$form->setFieldAttribute('password2', 'required', 'true');
@@ -96,7 +95,7 @@ class FlexicontentModelUser extends _FlexicontentModelUser
 		}
 
 		// The user should not be able to set the requireReset value on their own account
-		if ((int) $userId === (int) \Joomla\CMS\Factory::getUser()->id)
+		if ((int) $userId === (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id)
 		{
 			$form->removeField('requireReset');
 		}

@@ -12,8 +12,6 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.legacy');
-jimport('joomla.access.rules');
 use Joomla\String\StringHelper;
 use Joomla\CMS\Factory;
 use Joomla\Filesystem\Path;
@@ -49,7 +47,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$allitems	= $permission->DisplayAllItems;
 
 		$use_tmp = true;
-		$query_select_ids = 'SELECT SQL_CALC_FOUND_ROWS c.id';
+		$query_select_ids = 'SELECT c.id';
 		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier, c.checked_out';
 
 		$query_from_join = ''
@@ -61,16 +59,16 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				. ' WHERE state = -3'
 				. (!FLEXI_J16GE ? ' AND c.sectionid = ' . (int)FLEXI_SECTION : '')
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
-				. ' ORDER BY c.created DESC'
+				. ' ORDER BY c.created DESC, c.id DESC'
 				;
 
 		$query = $query_select_ids . $query_from_join . $query_where_orderby_having;
 		$this->_db->SetQuery($query, 0, 5);
 		$ids = $this->_db->loadColumn();
 
-		// Get total
-		$this->_db->setQuery("SELECT FOUND_ROWS()");
-		$total = $this->_db->loadResult();
+		// Get total: the number of rows of the same query without its LIMIT
+		// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+		$total = $this->_db->setQuery('SELECT COUNT(*) FROM (' . $query . ') AS fc_list')->loadResult();
 
 		$genstats = array();
 
@@ -99,7 +97,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$allitems	= $permission->DisplayAllItems;
 
 		$use_tmp = true;
-		$query_select_ids = 'SELECT SQL_CALC_FOUND_ROWS c.id'.', c.version, MAX(fv.version_id)';
+		$query_select_ids = 'SELECT c.id'.', c.version, MAX(fv.version_id)';
 		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier, c.checked_out'
 			.', c.version, MAX(fv.version_id)';
 
@@ -113,25 +111,25 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				. ' WHERE c.state = -5 OR c.state = 1'
 				. (!FLEXI_J16GE ? ' AND c.sectionid = ' . (int)FLEXI_SECTION : '')
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
-				. ' GROUP BY fv.item_id '
+				. ' GROUP BY c.id '
 				. ' HAVING c.version<>MAX(fv.version_id) '
-				. ' ORDER BY c.modified DESC'
+				. ' ORDER BY c.modified DESC, c.id DESC'
 				;
 
 		$query = $query_select_ids . $query_from_join . $query_where_orderby_having;
 		$this->_db->SetQuery($query, 0, 5);
 		$ids = $this->_db->loadColumn();
 
-		// Get total
-		$this->_db->setQuery("SELECT FOUND_ROWS()");
-		$total = $this->_db->loadResult();
+		// Get total: the number of rows of the same query without its LIMIT
+		// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+		$total = $this->_db->setQuery('SELECT COUNT(*) FROM (' . $query . ') AS fc_list')->loadResult();
 
 		$genstats = array();
 
 		if (!empty($ids))
 		{
 			$query = $query_select_data . str_replace('#__flexicontent_items_tmp', '#__content', $query_from_join) . ' WHERE c.id IN ('.implode(',',$ids).')'
-				.' GROUP BY fv.item_id ';
+				.' GROUP BY c.id ';
 			$this->_db->SetQuery($query, 0, 5);
 			$_data = $this->_db->loadObjectList('id');
 
@@ -155,7 +153,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$requestApproval = @ $permission->RequestApproval;
 
 		$use_tmp = true;
-		$query_select_ids = 'SELECT SQL_CALC_FOUND_ROWS c.id';
+		$query_select_ids = 'SELECT c.id';
 		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier, c.checked_out';
 
 		$query_from_join = ''
@@ -167,16 +165,16 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				. ' WHERE state = -4'
 				. (!FLEXI_J16GE ? ' AND c.sectionid = ' . (int)FLEXI_SECTION : '')
 				. (($allitems || $requestApproval) ? '' : ' AND c.created_by = '.$user->id)
-				. ' ORDER BY c.created DESC'
+				. ' ORDER BY c.created DESC, c.id DESC'
 				;
 
 		$query = $query_select_ids . $query_from_join . $query_where_orderby_having;
 		$this->_db->SetQuery($query, 0, 5);
 		$ids = $this->_db->loadColumn();
 
-		// Get total
-		$this->_db->setQuery("SELECT FOUND_ROWS()");
-		$total = $this->_db->loadResult();
+		// Get total: the number of rows of the same query without its LIMIT
+		// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+		$total = $this->_db->setQuery('SELECT COUNT(*) FROM (' . $query . ') AS fc_list')->loadResult();
 
 		$genstats = array();
 
@@ -205,7 +203,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$allitems	= $permission->DisplayAllItems;
 
 		$use_tmp = true;
-		$query_select_ids = 'SELECT SQL_CALC_FOUND_ROWS c.id';
+		$query_select_ids = 'SELECT c.id';
 		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier, c.checked_out';
 
 		$query_from_join = ''
@@ -217,16 +215,16 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				. ' WHERE c.state = -5'
 				. (!FLEXI_J16GE ? ' AND c.sectionid = ' . (int)FLEXI_SECTION : '')
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
-				. ' ORDER BY c.created DESC'
+				. ' ORDER BY c.created DESC, c.id DESC'
 				;
 
 		$query = $query_select_ids . $query_from_join . $query_where_orderby_having;
 		$this->_db->SetQuery($query, 0, 5);
 		$ids = $this->_db->loadColumn();
 
-		// Get total
-		$this->_db->setQuery("SELECT FOUND_ROWS()");
-		$total = $this->_db->loadResult();
+		// Get total: the number of rows of the same query without its LIMIT
+		// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+		$total = $this->_db->setQuery('SELECT COUNT(*) FROM (' . $query . ') AS fc_list')->loadResult();
 
 		$genstats = array();
 
@@ -650,9 +648,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	// Check and if needed install 3rd party plugins that do not use Joomla plugin system
 	function install_3rdParty_plugins()
 	{
-		jimport('joomla.filesystem.path' );
-		jimport('joomla.filesystem.folder');
-		jimport('joomla.filesystem.file');
 
 		// ****************************
 		// Handle jcomments integration
@@ -786,8 +781,8 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$session = Factory::getApplication()->getSession();
 		$app = Factory::getApplication();
 
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbname   = $app->getCfg('db');
+		$dbprefix = $app->get('dbprefix');
+		$dbname   = $app->get('db');
 
 		$jversion = new \Joomla\CMS\Version;
 
@@ -826,6 +821,10 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				$db->setQuery($query);
 				$col_data = $db->loadAssocList('COLUMN_NAME');
 				foreach($col_data as $col => $data) {
+					// An older Joomla language column must not downgrade existing four-byte text.
+					if ($data['CHARACTER_SET_NAME'] === 'utf8mb4' && $jchset !== 'utf8mb4') {
+						continue;
+					}
 					if ($data['CHARACTER_SET_NAME'] <> $jchset || $data['COLLATION_NAME'] <> $jcname) {
 						$query = "ALTER TABLE ".$full_tbl_name." MODIFY `".$col."` ". $tbl_cols[$col];
 						$db->setQuery($query);
@@ -867,7 +866,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		}
 
 		// Check for emtpy language in flexicontent EXT table
-		$query = "SELECT COUNT(*)"
+		$query = "SELECT 1"
 			." FROM #__flexicontent_items_ext as ie"
 			." WHERE ie.language='' "
 			." LIMIT 1";
@@ -875,7 +874,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$cnt = $this->_db->loadResult();
 		if ($cnt) return $return = true;
 
-		$query = "SELECT COUNT(*)"  // Check for emtpy language in Joomla content EXT table
+		$query = "SELECT 1"  // Check for emtpy language in Joomla content EXT table
 			." FROM #__content as i"
 			." WHERE i.language=''"
 			." LIMIT 1";
@@ -883,7 +882,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$cnt = $this->_db->loadResult();
 		if ($cnt) return $return = true;
 
-		$query = "SELECT COUNT(*)"
+		$query = "SELECT 1"
 			." FROM #__content as i"
 			." JOIN #__flexicontent_items_ext as ie ON i.id=ie.item_id "
 			." WHERE i.language<>ie.language"
@@ -893,7 +892,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		if ($cnt) return $return = true;
 
 		// Check for not yet transfered language associations
-		$query = "SELECT COUNT(*)"
+		$query = "SELECT 1"
 			." FROM #__flexicontent_items_ext as ie"
 			." WHERE ie.lang_parent_id <> 0"
 			." LIMIT 1";
@@ -902,6 +901,25 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		if ($cnt) return $return = true;
 
 		return $return;
+	}
+
+
+	/**
+	 * Method to get the FLEXIcontent DB tables that still use the 3-byte utf8 character set
+	 *
+	 * @return	array   The tables to convert to utf8mb4, indexed by name. Empty when all are converted
+	 */
+	function getDBCharsetPending()
+	{
+		static $pending;
+
+		if ($pending === null)
+		{
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbcharset.php';
+			$pending = FlexicontentDbCharset::getPendingTables($this->_db);
+		}
+
+		return $pending;
 	}
 
 
@@ -1017,14 +1035,13 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		static $missing;
 		if ($missing !== NULL) return $check_only ? empty($missing) : $missing;
 
-		jimport('joomla.filesystem.file');
 		$app = Factory::getApplication();
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbname   = $app->getCfg('db');
+		$dbprefix = $app->get('dbprefix');
+		$dbname   = $app->get('db');
 
 		$tblname_indexnames = array(
-			'flexicontent_tags'=>array('name'=>0, 'alias'=>0, 'published'=>0, 'jtag_id'=>0),
-			'flexicontent_types'=>array('name'=>0, 'alias'=>0, 'published'=>0, 'access'=>0),
+			'flexicontent_tags'=>array('name'=>191, 'alias'=>191, 'published'=>0, 'jtag_id'=>0),
+			'flexicontent_types'=>array('name'=>191, 'alias'=>191, 'published'=>0, 'access'=>0),
 			'flexicontent_items_ext'=>array('type_id'=>0, 'is_uptodate'=>0, 'lang_parent_id'=>0),
 			'flexicontent_items_tmp'=>array(
 				'title'=>array(
@@ -1073,7 +1090,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				)
 			),
 			'flexicontent_download_history'=>array('user_id'=>0, 'file_id'=>0),
-			'flexicontent_download_coupons'=>array('user_id'=>0, 'file_id'=>0, 'token'=>0, 'expire_on'=>0),
+			'flexicontent_download_coupons'=>array('user_id'=>0, 'file_id'=>0, 'token'=>191, 'expire_on'=>0),
 			'flexicontent_templates'=>array(
 				'configuration'=>array(
 					'cols'=>array('template'=>0, 'cfgname'=>0, 'layout'=>0, 'position'=>0)
@@ -1161,7 +1178,9 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 			if (count($_update_clauses))
 			{
-				$update_queries[$tblname] = 'UPDATE #__' . $tblname . ' SET ' . implode(' , ', $_update_clauses);
+				// IGNORE, as the same statement has after an item is saved: the clauses cast a text value to a number or a date,
+				// and without it strict mode refuses the whole UPDATE at the first value that is not a number
+				$update_queries[$tblname] = 'UPDATE IGNORE #__' . $tblname . ' SET ' . implode(' , ', $_update_clauses);
 			}
 		}
 
@@ -1186,17 +1205,18 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	function getExistVersionsPopulated() {
 		static $return;
 		if ($return === NULL) {
-			$query 	= 'SELECT COUNT( version )'
+			// Only "is there any row" is asked: do not count the rows, InnoDB has to read them all for that
+			$query 	= 'SELECT 1'
 					. ' FROM #__flexicontent_items_versions'
 					;
-			$this->_db->setQuery( $query );
+			$this->_db->setQuery( $query, 0, 1 );
 			if(!$this->_db->loadResult()) {
 				$return = true;
 			} else {
-				$query 	= 'SELECT COUNT( id )'
+				$query 	= 'SELECT 1'
 						. ' FROM #__flexicontent_versions'
 						;
-				$this->_db->setQuery( $query );
+				$this->_db->setQuery( $query, 0, 1 );
 				$return = $this->_db->loadResult() ? true : false;
 			}
 		}
@@ -1214,9 +1234,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		static $return;
 		if ($return!==null) return $return;
 
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.folder');
-		jimport('joomla.filesystem.path');
 
 		$conf_override_file = Path::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpThumb.config_OVERRIDE.php');
 
@@ -1257,7 +1274,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// CHECK phpThumb cache exists and create the folder
 		if ( !is_dir($phpthumbcache) && !mkdir($phpthumbcache) )
 		{
-			JError::raiseWarning(100, 'Error: Unable to create phpThumb folder: '. $phpthumbcache .' image thumbnail will not work properly' );
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage('Error: Unable to create phpThumb folder: '. $phpthumbcache .' image thumbnail will not work properly', 'warning');
 			$return = true;  // Cancel task !! to allow user to continue
 			return;
 		}
@@ -1273,7 +1290,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// If permissions not good check if we can change them
 		if ( !$return && !Path::canChmod($phpthumbcache) )
 		{
-			JError::raiseWarning(100, 'Error: Unable to change phpThumb folder permissions: '. $phpthumbcache .' there maybe a wrong owner of the folder. Correct permissions are important for proper thumbnails and for -security-' );
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage('Error: Unable to change phpThumb folder permissions: '. $phpthumbcache .' there maybe a wrong owner of the folder. Correct permissions are important for proper thumbnails and for -security-', 'warning');
 			$return = true;  // Cancel task !! to allow user to continue
 			return;
 		}
@@ -1311,8 +1328,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		$finished = false;
 
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.folder');
 
 		$deprecated['files'] = array();
 		$deprecated['folders'] = array();
@@ -1399,7 +1414,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				  `view` varchar(30) NOT NULL default '',
 				  `folder` varchar(100) NOT NULL default '',
 				  `position` varchar(255) NOT NULL default ''
-				) ENGINE=MyISAM DEFAULT CHARSET=utf8
+				) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 				";
 		$this->_db->setQuery( $query );
 		$this->_db->execute();
@@ -1482,7 +1497,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	{
 		static $return;
 		if ($return === NULL) {
-			$query 	= 'SELECT COUNT( item_id )'
+			$query 	= 'SELECT 1'
 					. ' FROM #__flexicontent_fields_item_relations'
 					. ' WHERE field_id < 15'
 					. ' LIMIT 1';
@@ -1823,7 +1838,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 	function createLanguagePack($code = 'en-GB', $method = '', $params = array())
 	{
-		jimport('joomla.filesystem.file');
 
 		$prefix 	= $code . '.';
 		$suffix 	= '.ini';
@@ -1896,9 +1910,9 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		if ($method == 'zip') {
 			if (count($adminfiles))
-				mkdir($targetfolder.DS.'admin', 0755);
+				mkdir($targetfolder.DS.'admin', 0755, true);
 			if (count($sitefiles))
-				mkdir($targetfolder.DS.'site', 0755);
+				mkdir($targetfolder.DS.'site', 0755, true);
 		}
 
 		foreach ($adminfiles as $file) {
@@ -1978,8 +1992,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				$files[$i]['time'] = time();
 			}
 
-			jimport('joomla.archive.archive');
-			$packager = JArchive::getAdapter('zip');
+			$packager = new \Joomla\Archive\Zip();
 			if (!$packager->create($archivename, $files)) {
 				echo \Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED');
 				return false;
@@ -2035,7 +2048,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		try { $db->execute(); } catch (Exception $e) { echo $e->getMessage(); }
 
 		// CHECK that we have the same Component Actions in assets DB table with the Actions as in component's access.xml file
-		$asset	= \Joomla\CMS\Table\Table::getInstance('asset');
+		$asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		if ($comp_section = $asset->loadByName($component_name))    // Try to load component asset, if missing it returns false
 		{
 			$this->verifyExtraRules();  // Verify that com_content component asset has the extra FC specific rules
@@ -2076,7 +2089,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// Get a list com_content TOP-LEVEL categories that have wrong asset names (do not point to 'com_content' asset)
 		// (NOTE: we do not longer force category asset creation if asset is not set, so we will not check them here)
 		// !!! WARNING this query must be same like the one USED in function initialPermission()
-		$com_content_asset	= \Joomla\CMS\Table\Table::getInstance('asset');
+		$com_content_asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$com_content_asset->loadByName('com_content');
 		$query = $db->getQuery(true)
 			->select('c.id')
@@ -2128,7 +2141,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$app = Factory::getApplication();
 		$component_name	= $app->input->get('option', '', 'CMD');
 		$db = $this->_db;
-		$asset	= \Joomla\CMS\Table\Table::getInstance('asset');   // Create an asset object
+		$asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));   // Create an asset object
 
 		/*** Component assets ***/
 		$asset_exists = $asset->loadByName($component_name);
@@ -2142,7 +2155,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			// Component asset entry does not exist or is empty: We will create initial rules for all component's actions
 
 			// Get root asset
-			$root = \Joomla\CMS\Table\Table::getInstance('asset');
+			$root = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 			$root->loadByName('root.1');
 
 			// Initialize component asset
@@ -2221,11 +2234,11 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		}
 
 		// Load component asset
-		$component_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$component_asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$component_asset->loadByName($component_name);
 
 		// Load com_content asset
-		$com_content_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$com_content_asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$com_content_asset->loadByName('com_content');
 		$com_content_name = 'com_content';
 
@@ -2484,7 +2497,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				\Joomla\CMS\Language\Text::sprintf('FLEXI_ALERT_UPDATE_SINDEX_BASIC',
 					$dirty_basic,
 					' href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic" '.
-					' class="btn" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 420, function(){window.location.reload(false)}); return false;" '
+					' class="btn" onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 420, function(){window.location.reload(false)}); return false;" '
 				) . '
 			</div>';
 		}
@@ -2496,7 +2509,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				\Joomla\CMS\Language\Text::sprintf('FLEXI_ALERT_UPDATE_SINDEX_ADVANCED',
 					$dirty_advanced,
 					' href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced" ' .
-					' class="btn" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 420, function(){window.location.reload(false)}); return false;" '
+					' class="btn" onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 420, function(){window.location.reload(false)}); return false;" '
 				) . '
 			</div>';
 		}
@@ -2515,7 +2528,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// *** Get com_flexicontent asset
 		// ***
 
-		$comp_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$comp_asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$existing_rules = $comp_asset->loadByName('com_flexicontent') && !empty($comp_asset->rules)
 			? json_decode($comp_asset->rules, true)
 			: array();
@@ -2556,7 +2569,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// *** Get com_content asset and its rule names
 		// ***
 
-		$com_content_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$com_content_asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$com_content_asset->loadByName('com_content');
 		$com_content_rules = json_decode($com_content_asset->rules, true);
 
@@ -2729,12 +2742,12 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	{
 		$debug_initial_perms = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('debug_initial_perms');
 
-		$fc_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$fc_asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$fc_asset->loadByName('com_flexicontent');
 		$fc_asset_rules = json_decode($fc_asset->rules, true);
 		if ( !count($fc_asset_rules) )  return; // The asset is empty do not try anything
 
-		$com_content_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$com_content_asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$com_content_asset->loadByName('com_content');
 		$com_content_rules = json_decode($com_content_asset->rules, true);
 

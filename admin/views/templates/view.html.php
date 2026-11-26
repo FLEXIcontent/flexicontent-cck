@@ -14,13 +14,28 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecords' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * View class for the FLEXIcontent templates screen
  */
 class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 {
+	/**
+	 * Columns of this manager are shown / hidden / moved in the browser (see fc-table-tools.js),
+	 * so the old position based hiding (cookie of the old column chooser) must not apply
+	 */
+	public function hideCol($colposition)
+	{
+		return '';
+	}
+
 	var $proxy_option   = null;
 	var $title_propname = null;
 	var $state_propname = null;
@@ -35,11 +50,11 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 		global $globalcats;
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getSession();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
@@ -55,8 +70,8 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
 		{
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get model
@@ -79,16 +94,16 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 			// Add css to document
 			if ($isAdmin)
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 			}
 			else
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
@@ -116,7 +131,7 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 		// Create document/toolbar titles
 		$doc_title = \Joomla\CMS\Language\Text::_('FLEXI_TEMPLATES');
 		$site_title = $document->getTitle();
-		\Joomla\CMS\Toolbar\ToolbarHelper::title( $doc_title, 'eye' );
+		\Joomla\CMS\Toolbar\ToolbarHelper::title( $doc_title, 'paint-brush thememanager' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
@@ -148,6 +163,14 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 
 		$tmpldirectory = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
 		$source = $jinput->get('source', '', 'STRING');
+
+		// Security: 'source' is printed into the duplicate dialog, so only accept an existing template folder name
+		// (same name rule as the templates.duplicate task)
+		if ($source !== '' && (!preg_match('/^[A-Za-z0-9][A-Za-z0-9_\-\.]*$/', $source) || strpos($source, '..') !== false || !is_dir($tmpldirectory . $source)))
+		{
+			$source = '';
+		}
+
 		$dest   = $source ? flexicontent_upload::sanitizedir($tmpldirectory, $source) : '';
 
 		$this->lists       = $lists;
@@ -158,7 +181,6 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 
 		$this->sidebar = null;
 
-		if(FLEXI_J30GE && !FLEXI_J40GE) $this->sidebar = JHtmlSidebar::render();
 		if(FLEXI_J40GE) $this->sidebar = \Joomla\CMS\HTML\Helpers\Sidebar::render();
 
 
@@ -183,11 +205,11 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 	 */
 	function setToolbar()
 	{
-		$user     = \Joomla\CMS\Factory::getUser();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		$js = '';
 
@@ -199,7 +221,7 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 			$btn_icon = 'icon-download';
 			$btn_name = 'download';
 			$btn_task = 'appsman.exportxml';
-			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}).appendTo(jQuery(f));";
+			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; var input = Object.assign(document.createElement('input'), {type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}); f.append(input);";
 			flexicontent_html::addToolBarButton(
 				'Export now',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=\Joomla\CMS\Language\Text::_('FLEXI_EXPORT_NOW_AS_XML'),
@@ -208,7 +230,7 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 			$btn_icon = 'icon-box-add';
 			$btn_name = 'box-add';
 			$btn_task = 'appsman.addtoexport';
-			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}).appendTo(jQuery(f));";
+			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; var input = Object.assign(document.createElement('input'), {type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}); f.append(input);";
 			flexicontent_html::addToolBarButton(
 				'Add to export',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=\Joomla\CMS\Language\Text::_('FLEXI_ADD_TO_EXPORT_LIST'),
@@ -227,7 +249,7 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');

@@ -53,7 +53,7 @@ else
 
 		if ($anyAsFirstLastValues)
 		{
-			$step_values[] = "''";
+			$step_values[] = '';
 			$step_labels[] = \Joomla\CMS\Language\Text::_('FLEXI_ANY');
 			$i++;
 		}
@@ -65,7 +65,7 @@ else
 				continue;
 			}
 
-			$step_values[] = "'" . addcslashes($result->value, "'") . "'";
+			$step_values[] = (string) $result->value;
 			$step_labels[] = $result->text;
 
 			if ($result->value==$value1)
@@ -86,7 +86,7 @@ else
 
 		if ($display_filter_as == 8 && $anyAsFirstLastValues)
 		{
-			$step_values[] = "''";
+			$step_values[] = '';
 			$step_labels[] = \Joomla\CMS\Language\Text::_('FLEXI_ANY');
 		}
 
@@ -127,13 +127,13 @@ else
 
 		foreach ($custom_vals as $i => $v)
 		{
-			$step_values[$i] = "'" . addcslashes($v, "'") . "'";
+			$step_values[$i] = (string) $v;
 		}
 
 		$step_labels = & $custom_labels;
 		$i = 0;
-		$set_start = strlen($value1) > 0;
-		$set_end   = strlen($value2) > 0;
+		$set_start = strlen((string) $value1) > 0;
+		$set_end   = strlen((string) $value2) > 0;
 
 		foreach ($custom_vals as $n => $custom_val)
 		{
@@ -154,7 +154,7 @@ else
 	$rght_no = '2';  // sometimes unused
 
 	$js = "
-		jQuery(document).ready(function()
+		FlexiForm.ready(function()
 		{
 			var slider = document.getElementById('".$filter_ffid."_nouislider');
 
@@ -162,8 +162,12 @@ else
 			var input2 = document.getElementById('".$filter_ffid.$rght_no."');
 			var isSingle = ".($display_filter_as==7 ? '1' : '0').";
 
-			var step_values = [".implode(', ', $step_values)."];
-			var step_labels = [\"".implode('", "', array_map('addslashes', $step_labels))."\"];
+			// Labels of found values are stored data: show them as text. Only the custom labels of the field configuration may hold markup
+			var labelsAreHtml = ".($slider_display_config==2 ? '1' : '0').";
+			var setLabel = function(el, text) { if (labelsAreHtml) { el.innerHTML = text; } else { el.textContent = text; } };
+
+			var step_values = ".json_encode(array_values($step_values), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT).";
+			var step_labels = ".json_encode(array_values($step_labels), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT).";
 
 			noUiSlider.create(slider, {".
 				($display_filter_as==7 ? "
@@ -179,7 +183,7 @@ else
 			var showAsTooltips = " . ($showAsTooltips ? 1 : 0) . ";
 			var nodeHandles = slider.getElementsByClassName('noUi-handle'),
 				tooltips = [];
-			var mssgHandle = jQuery(slider).parent().find('.fcfilter_nouislider_txtbox').get(0),
+			var mssgHandle = slider.parentElement.querySelector('.fcfilter_nouislider_txtbox'),
 				txtBoxes = [];
 
 			// Add divs to the slider handles.
@@ -240,43 +244,20 @@ else
 				if (showAsTooltips)
 				{
 					var max_len = 36;
-					tooltips[handle].innerHTML = tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text;
+					setLabel(tooltips[handle], tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text);
 
-					var left  = jQuery(tooltips[handle]).closest('.noUi-origin').position().left;
-					var width = jQuery(tooltips[handle]).closest('.noUi-base').width();
-					
-					//window.console.log ('handle: ' + handle + ', left : ' + left + ', width : ' + width);
-					if (isSingle)
-					{
-						left<(50/100)*width ?
-							jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right') :
-							jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left');
-					}
-
-					else if (handle)
-					{
-						left<=(76/100)*width ?
-							jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right') :
-							jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left');
-						left<=(49/100)*width ?
-							jQuery(tooltips[handle]).parent().addClass('fc-bottom') :
-							jQuery(tooltips[handle]).parent().removeClass('fc-bottom');
-					}
-
-					else
-					{
-						left>=(24/100)*width ?
-							jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left') :
-							jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right');
-						left>=(51/100)*width ?
-							jQuery(tooltips[handle]).parent().addClass('fc-bottom') :
-							jQuery(tooltips[handle]).parent().removeClass('fc-bottom');
-					}
+                    const base = tooltips[handle].closest('.noUi-base').getBoundingClientRect();
+                    const left = tooltips[handle].closest('.noUi-origin').getBoundingClientRect().left - base.left;
+                    const width = base.width;
+                    const right = isSingle ? left < .5 * width : handle ? left <= .76 * width : left < .24 * width;
+                    tooltips[handle].parentElement.classList.toggle('fc-right', right);
+                    tooltips[handle].parentElement.classList.toggle('fc-left', !right);
+                    tooltips[handle].parentElement.classList.toggle('fc-bottom', !isSingle && (handle ? left <= .49 * width : left >= .51 * width));
 				}
 				else
 				{
 					var max_len = 56;
-					txtBoxes[handle].innerHTML = tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text;
+					setLabel(txtBoxes[handle], tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text);
 				}
 
 			});
@@ -284,10 +265,8 @@ else
 			// Handle form autosubmit
 			slider.noUiSlider.on('change', function()
 			{
-				var slider = jQuery('#".$filter_ffid."_nouislider');
-				var jform  = slider.closest('form');
-				var form   = jform.get(0);
-				adminFormPrepare(form, parseInt(jform.attr('data-fc-autosubmit')));
+                const form = slider.closest('form');
+                if (form) adminFormPrepare(form, parseInt(form.dataset.fcAutosubmit) || 0);
 			});
 			
 			input1.addEventListener('change', function()
@@ -312,7 +291,7 @@ else
 		});
 	";
 
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 	//\Joomla\CMS\Factory::getDocument()->addStyleDeclaration("");
 }
 
@@ -332,7 +311,7 @@ if ($display_filter_as==1 || $display_filter_as==7)
 			<div class="fc_filter_element">
 				<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value, ENT_COMPAT, 'UTF-8').'" />
 			</div>
-		'.($isSlider ? '</div><div class="fcfilter_nouislider_txtbox">' . ($label_filter==2 ? '<span class="fc_slider_inner_label">' . $filter->label . ': </span>' : '') . '</div>' : '');
+		'.($isSlider ? '</div><div class="fcfilter_nouislider_txtbox">' . ($label_filter==2 ? '<span class="fc_slider_inner_label">' . htmlspecialchars((string) $filter->label, ENT_QUOTES, 'UTF-8') . ': </span>' : '') . '</div>' : '');
 	}
 }
 
@@ -361,6 +340,6 @@ else
 			<div class="fc_filter_element">
 				<input name="'.$filter_ffname.'[2]" '.$attribs_str.' id="'.$filter_ffid.'2" type="text" size="'.$size.'" value="'.htmlspecialchars($value[2] ?? '', ENT_COMPAT, 'UTF-8').'" />
 			</div>
-		'.($isSlider ? '</div><div class="fcfilter_nouislider_txtbox">' . ($label_filter==2 ? '<span class="fc_slider_inner_label">' . $filter->label . ': </span>' : '') . '</div>' : '');
+		'.($isSlider ? '</div><div class="fcfilter_nouislider_txtbox">' . ($label_filter==2 ? '<span class="fc_slider_inner_label">' . htmlspecialchars((string) $filter->label, ENT_QUOTES, 'UTF-8') . ': </span>' : '') . '</div>' : '');
 	}
 }

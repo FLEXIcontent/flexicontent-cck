@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -18,34 +18,12 @@
 
 defined('_JEXEC') or die('Restricted access');
 ?>
+<?php
+flexicontent_html::loadFramework('flexi-lib');
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/admin-actions.js', array('version' => FLEXI_VHASH));
+?>
 <script>
-(function ($) {
-
-	$(document).ready(function() {
-
-		var ajaxloader = '<span class="ajax-loader"><\/span>';
-		var adminForm = $('#adminForm');
-		var log_bind = $('#log-bind');
-
-		adminForm.on('submit', function(e, data)
-		{
-			e.preventDefault();
-			log_bind.html(ajaxloader);
-
-			$.ajax({
-				type: 'POST',
-				data: adminForm.serialize(),
-				url:  adminForm.prop('action'),
-				success: function(str) {
-					log_bind.html(str);
-				}
-			});
-
-		});
-
-	});
-
-})(jQuery);
+FlexiForm.ready(() => FlexiAdmin.bindResultForm(document.getElementById('adminForm'), document.getElementById('log-bind')));
 </script>
 
 <form action="index.php?option=com_flexicontent&task=categories.params&layout=params&format=raw" method="post" name="adminForm" id="adminForm">
@@ -63,7 +41,7 @@ defined('_JEXEC') or die('Restricted access');
 			<input id="copy" type="submit" class="fc_button" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_COPY_PARAMETERS_BUTTON' ); ?>" />
 			</td>
 			<td width="50%" align="left">
-			<input type="button" class="fc_button" onclick="window.parent.SqueezeBox.close();;" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CANCEL' ); ?>" />			
+			<input type="button" class="fc_button" onclick="window.parent.fc_closeDialog('fc_modal_popup_container');" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CANCEL' ); ?>" />
 			</td>
 		</tr>
 	</table>

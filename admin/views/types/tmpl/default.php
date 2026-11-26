@@ -13,15 +13,16 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use \Joomla\CMS\Language\Text;
-\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/fc_service_registry.php';
+flexicontent_register_html_helpers(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 
 global $globalcats;
 $app      = \Joomla\CMS\Factory::getApplication();
 $jinput   = $app->input;
-$config   = \Joomla\CMS\Factory::getConfig();
-$user     = \Joomla\CMS\Factory::getUser();
-$session  = \Joomla\CMS\Factory::getSession();
-$document = \Joomla\CMS\Factory::getDocument();
+$config   = \Joomla\CMS\Factory::getApplication()->getConfig();
+$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 $cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'types.';
 $hlpname  = 'fctypes';
@@ -46,15 +47,17 @@ $view_items  = Text::_('FLEXI_VIEW', true); //Text::_('FLEXI_VIEW_ITEMS', true);
 
 
 /**
- * JS for Columns chooser box and Filters box
+ * Resizable / movable / hideable columns (replaces the old column chooser), settings are stored in the browser
  */
 
-flexicontent_html::jscode_to_showhide_table(
-	'mainChooseColBox',
-	'adminListTableFC' . $this->view,
-	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
-);
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_table_tools.css', array('version' => FLEXI_VHASH));
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_type_tabs.css', array('version' => FLEXI_VHASH));
+$document->addScript(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/js/fc-table-tools.js', array('version' => FLEXI_VHASH));
+
+foreach (array('FLEXI_TBL_MOVE_COL', 'FLEXI_TBL_HIDE_COL', 'FLEXI_TBL_SHOW_COL', 'FLEXI_TBL_FIT_COL', 'FLEXI_TBL_RESET_WIDTHS', 'FLEXI_TBL_RESET_COLS') as $fc_txt)
+{
+	\Joomla\CMS\Language\Text::script($fc_txt);
+}
 
 
 
@@ -108,28 +111,12 @@ $js .= "
 // Delete a specific list filter
 function delFilter(name)
 {
-	//if(window.console) window.console.log('Clearing filter:'+name);
-	var myForm = jQuery('#adminForm');
-	var filter = jQuery('#'+name);
-
-	if (!filter.length)
-	{
-		return;
-	}
-	else if (filter.attr('type') == 'checkbox')
-	{
-		filter.checked = '';
-	}
-	else
-	{
-		filter.val('');
-
-		// Case that input has Calendar JS attached
-		if (filter.attr('data-alt-value'))
-		{
-			filter.attr('data-alt-value', '');
-		}
-	}
+    const field = document.getElementById(name);
+    if (!field) return;
+    if (field.type === 'checkbox') field.checked = false;
+    else if (field.tagName === 'SELECT') FlexiForm.clearSelect(field);
+    else field.value = '';
+    if (field.hasAttribute('data-alt-value')) field.setAttribute('data-alt-value', '');
 }
 
 function delAllFilters()
@@ -175,7 +162,7 @@ if ($js)
 <?php endif;?>
 
 
-	<div id="fc-managers-header">
+	<div id="fc-managers-header" class="fc-mh-items fc-mh-solo">
 
 		<?php if (!empty($this->lists['scope_tip'])) : ?>
 		<div class="fc-filter-head-box filter-search nowrap_box" style="margin: 0;">
@@ -191,19 +178,57 @@ if ($js)
 				<input type="text" name="search" id="search" placeholder="<?php echo !empty($this->scope_title) ? $this->scope_title : Text::_('FLEXI_SEARCH'); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="fcfield_textval" />
 				<button title="" data-original-title="<?php echo Text::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : Text::_('FLEXI_GO'); ?></button>
 
-				<div id="fc_filters_box_btn" data-original-title="<?php echo Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
+				<button type="button" id="fc_filters_box_btn" aria-label="<?php echo htmlspecialchars(Text::_('FLEXI_FILTERS'), ENT_QUOTES, 'UTF-8'); ?>" data-original-title="<?php echo Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
 					<?php echo FLEXI_J30GE ? '<i class="icon-filter"></i>' : Text::_('FLEXI_FILTERS'); ?>
 					<?php echo ($this->count_filters  ? ' <sup>' . $this->count_filters . '</sup>' : ''); ?>
-				</div>
+				</button>
 
-				<div id="fc-filters-box" <?php if (!$this->count_filters || empty($tools_state->filters_box)) echo 'style="display:none;"'; ?> class="fcman-abs" onclick="var event = arguments[0] || window.event; event.stopPropagation();">
+				<?php
+				$filters_modern = (int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('backend_filters_style', 1) === 1;
+				$filters_apply_btn = $filters_modern && (int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('backend_filters_apply', 1) === 1;
+				?>
+				<div id="fc-filters-box" <?php if (!$this->count_filters || empty($tools_state->filters_box)) echo 'style="display:none;"'; ?> class="fcman-abs<?php echo $filters_modern ? ' fc-filters-modern fc-filters-modern-sm' : ''; ?>">
 					<?php
 					echo $this->lists['filter_state'];
 					echo $this->lists['filter_access'];
 					?>
 
-					<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
+					<?php if ($filters_apply_btn) : ?>
+					<div class="fc-filters-actions">
+						<button type="button" class="btn btn-primary fc-filters-apply" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();">
+							<span class="icon-filter"></span> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_APPLY'); ?>
+						</button>
+					</div>
+					<?php endif; ?>
+
+					<button type="button" id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></button>
 				</div>
+
+				<?php if ($filters_apply_btn) : ?>
+				<script>
+					/* Apply-button mode: changing a filter inside the box does not reload the list immediately.
+					   The filters are applied by the Apply button or by clicking outside of the box. */
+					(function() {
+						var box = document.getElementById('fc-filters-box');
+						if (!box) return;
+						var dirty = false;
+						var els = box.querySelectorAll('[onchange*="submitform"]');
+						for (var i = 0; i < els.length; i++) {
+							els[i].removeAttribute('onchange');
+							els[i].onchange = null;
+						}
+						var markDirty = function() { dirty = true; };
+						box.addEventListener('change', markDirty, true);
+						if (window.jQuery) jQuery(box).on('change', markDirty);
+						document.addEventListener('mousedown', function(e) {
+							if (!dirty || box.contains(e.target)) return;
+							dirty = false;
+							if (!!document.adminForm.limitstart) document.adminForm.limitstart.value = 0;
+							Joomla.submitform();
+						}, true);
+					})();
+				</script>
+				<?php endif; ?>
 
 				<button title="" data-original-title="<?php echo Text::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-cancel"></i>' : Text::_('FLEXI_CLEAR'); ?></button>
 			</div>
@@ -214,15 +239,15 @@ if ($js)
 		<div class="fc-filter-head-box nowrap_box">
 
 			<div class="btn-group">
-				<div id="fc_mainChooseColBox_btn" class="<?php echo $this->tooltip_class . ' ' . $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
+				<button type="button" id="fc_mainChooseColBox_btn" aria-label="<?php echo htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_COLUMNS'), ENT_QUOTES, 'UTF-8'); ?>" class="<?php echo $this->tooltip_class . ' ' . $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
 					<span class="icon-contract"></span><sup id="columnchoose_totals"></sup>
-				</div>
+				</button>
 
 				<?php if (!empty($this->minihelp) && FlexicontentHelperPerm::getPerm()->CanConfig): ?>
-				<div id="fc-mini-help_btn" class="<?php echo $out_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
+				<button type="button" id="fc-mini-help_btn" class="<?php echo $out_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
 					<span class="icon-help"></span>
 					<?php echo $this->minihelp; ?>
-				</div>
+				</button>
 				<?php endif; ?>
 			</div>
 			<div id="mainChooseColBox" class="group-fcset fcman-abs" style="display:none;"></div>
@@ -257,58 +282,58 @@ if ($js)
 	<thead>
 		<tr>
 
-			<th class="col_num hidden-phone">
+			<th class="col_num hidden-phone" data-col="num">
 				<?php echo Text::_( 'FLEXI_NUM' ); ?>
 			</th>
 
-			<th class="col_cb left">
+			<th class="col_cb left" data-col="cb">
 				<div class="group-fcset">
 					<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo Text::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					<label for="checkall-toggle" class="green single"></label>
 				</div>
 			</th>
 
-			<th class="col_status hideOnDemandClass left">
+			<th class="col_status hideOnDemandClass left" data-col="status">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_title hideOnDemandClass title">
+			<th class="col_title hideOnDemandClass title" data-col="title">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_TYPE_NAME', 'a.name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_redirect hideOnDemandClass hidden-phone hidden-tablet">
+			<th class="col_redirect hideOnDemandClass hidden-phone hidden-tablet" data-col="redirect" data-col-label="<?php echo htmlspecialchars(Text::_('FLEXI_JOOMLA_ARTICLE_VIEW'), ENT_QUOTES, 'UTF-8'); ?>">
 				<?php echo $article_viewing_tip . Text::_( 'FLEXI_JOOMLA_ARTICLE_VIEW' )."<br/><small>(" . Text::_( 'FLEXI_ALLOWED') .' / '. Text::_( 'FLEXI_REROUTED' ) .' / '. Text::_( 'FLEXI_REDIRECTED' ) . ")</small>"; ?>
 			</th>
 
-			<th class="col_template left hideOnDemandClass hidden-phone hidden-tablet" colspan="2">
+			<th class="col_template left hideOnDemandClass hidden-phone hidden-tablet" colspan="2" data-col="template" data-col-label="<?php echo htmlspecialchars(Text::_('FLEXI_TEMPLATE'), ENT_QUOTES, 'UTF-8'); ?>">
 				<?php echo $default_template_tip.Text::_( 'FLEXI_TEMPLATE' )."<br/><small>(".Text::_( 'FLEXI_PROPERTY_DEFAULT' )." ".Text::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?>
 			</th>
 
-			<th class="col_template left hideOnDemandClass hidden-phone hidden-tablet" >
+			<th class="col_template left hideOnDemandClass hidden-phone hidden-tablet"  data-col="maincat" data-col-label="<?php echo htmlspecialchars(Text::_('FLEXI_MAIN_CATEGORY'), ENT_QUOTES, 'UTF-8'); ?>">
 				<?php echo $limit_maincat_tip.Text::_( 'FLEXI_MAIN_CATEGORY' ) . '<br/><small>(' . Text::_( 'FLEXI_SUBTREE_LIMITATION' ) . ')</small>'; ?>
 			</th>
 
-			<th class="col_iflayout center hideOnDemandClass hidden-phone hidden-tablet" colspan="2" >
+			<th class="col_iflayout center hideOnDemandClass hidden-phone hidden-tablet" colspan="2"  data-col="iflayout" data-col-label="<?php echo htmlspecialchars(Text::_('Form') . ' ' . Text::_('FLEXI_LAYOUT'), ENT_QUOTES, 'UTF-8'); ?>">
 				<?php echo Text::_( 'Form'). ' ' . Text::_( 'FLEXI_LAYOUT' ) . '<br/><small>(' . Text::_( 'FLEXI_FRONTEND' ) . ' ' . Text::_( 'FLEXI_BACKEND' ) . ')</small>'; ?>
 			</th>
 
-			<th class="col_alias hideOnDemandClass hidden-phone hidden-tablet">
+			<th class="col_alias hideOnDemandClass hidden-phone hidden-tablet" data-col="alias">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_ALIAS', 'a.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_fassigned hideOnDemandClass center">
+			<th class="col_fassigned hideOnDemandClass center" data-col="fassigned">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_iassigned hideOnDemandClass center">
+			<th class="col_iassigned hideOnDemandClass center" data-col="iassigned">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_access hideOnDemandClass hidden-phone">
+			<th class="col_access hideOnDemandClass hidden-phone" data-col="access">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_id hideOnDemandClass center hidden-phone hidden-tablet">
+			<th class="col_id hideOnDemandClass center hidden-phone hidden-tablet" data-col="id">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 			</th>
 
@@ -345,20 +370,20 @@ if ($js)
 			$row_ilayout          = $row->config->get('ilayout');
 			$row_form_ilayout_fe  = $row->config->get('form_ilayout_fe', 'tabs');
 			$row_form_ilayout_be  = $row->config->get('form_ilayout_be', 'tabs');
-			$catid_allowed_parent = $row->config->get('catid_allowed_parent');
+			$catid_allowed_parent = (int) $row->config->get('catid_allowed_parent');  // (int): used as an array key below, null is deprecated as a key in PHP 8.5
 			?>
 		<tr class="<?php echo 'row' . ($i % 2); ?>">
 
-			<td class="col_num hidden-phone">
+			<td class="col_num hidden-phone" data-col="num">
 				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td>
 
-			<td class="col_cb">
+			<td class="col_cb" data-col="cb">
 				<!--div class="adminlist-table-row"></div-->
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
 
-			<td class="col_status" style="padding-right: 8px;">
+			<td class="col_status" style="padding-right: 8px;" data-col="status">
 				<div class="btn-group fc-group fc-types">
 					<?php
 					//echo \Joomla\CMS\HTML\HTMLHelper::_('jgrid.published', $row->state, $i, $ctrl, $stateIsChangeable);
@@ -369,7 +394,7 @@ if ($js)
 				</div>
 			</td>
 
-			<td class="col_title ">
+			<td class="col_title " data-col="title">
 				<?php
 				/**
 				 * Display an edit pencil or a check-in button if: either (a) current user has Global
@@ -385,7 +410,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_redirect hidden-phone hidden-tablet">
+			<td class="col_redirect hidden-phone hidden-tablet" data-col="redirect">
 				<?php
 					$jarticle_url_handling_txts = array(0 => 'FLEXI_ROUTE_TO_ITEM_VIEW', 1 => 'FLEXI_ALLOWED', '2' => 'FLEXI_REDIRECT_TO_ITEM_VIEW');
 					$allow_jview = $row->config->get("allow_jview");
@@ -395,57 +420,57 @@ if ($js)
 					$jview_ops[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '0', 'FLEXI_ROUTE_TO_ITEM_VIEW');
 					$jview_ops[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '2', 'FLEXI_REDIRECT_TO_ITEM_VIEW');
 
-					echo \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $jview_ops, 'allow_jview['.$row->id.']', 'class="fcfield_selectval" size="1" onchange="Joomla.listItemTask(\'cb'.$i.'\',\'types.toggle_jview\'); Joomla.submitform()"', 'value', 'text', $allow_jview, 'allow_jview'.$row->id, $translate=true);
+					echo \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $jview_ops, 'allow_jview['.$row->id.']', 'class="fcfield_selectval" size="1" onchange="return Joomla.listItemTask(\'cb'.$i.'\',\'types.toggle_jview\')"', 'value', 'text', $allow_jview, 'allow_jview'.$row->id, $translate=true);
 				?>
 			</td>
 
-			<td class="col_edit_layout hidden-phone hidden-tablet">
+			<td class="col_edit_layout hidden-phone hidden-tablet" data-col="template">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.edit_layout', $row, '__modal__', $i, $this->perms->CanTemplates, $row_ilayout); ?>
 			</td>
 
-			<td class="col_template  hidden-phone hidden-tablet">
+			<td class="col_template  hidden-phone hidden-tablet" data-col="template">
 				<?php echo $row_ilayout; ?>
 			</td>
 
-			<td class="col_allowed_subtree  hidden-phone hidden-tablet">
+			<td class="col_allowed_subtree  hidden-phone hidden-tablet" data-col="maincat">
 				<?php echo isset($globalcats[$catid_allowed_parent]) ? $globalcats[$catid_allowed_parent]->title : '-'; ?>
 			</td>
 
-			<td class="col_iflayout_fe  center hidden-phone hidden-tablet">
+			<td class="col_iflayout_fe  center hidden-phone hidden-tablet" data-col="iflayout">
 				<?php echo $row_form_ilayout_fe; ?>
 			</td>
 
-			<td class="col_iflayout_be  center hidden-phone hidden-tablet">
+			<td class="col_iflayout_be  center hidden-phone hidden-tablet" data-col="iflayout">
 				<?php echo $row_form_ilayout_be; ?>
 			</td>
 
-			<td class="col_alias  hidden-phone hidden-tablet">
+			<td class="col_alias  hidden-phone hidden-tablet" data-col="alias">
 				<?php echo StringHelper::strlen($row->alias) > 25
 					? StringHelper::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25) . '...'
 					: htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8');
 				?>
 			</td>
 
-			<td class="col_fassigned center">
+			<td class="col_fassigned center" data-col="fassigned">
 				<a class="badge fc-assignments-btn" href="<?php echo $fields_link; ?>">
 					<?php echo $row->fassigned; ?>
 				</a>
 			</td>
 
-			<td class="col_iassigned center">
+			<td class="col_iassigned center" data-col="iassigned">
 				<a class="badge bg-info badge-info fc-assignments-btn" href="<?php echo $items_link; ?>">
 					<?php echo $row->iassigned; ?>
 				</a>
 			</td>
 
-			<td class="col_access hidden-phone">
+			<td class="col_access hidden-phone" data-col="access">
 				<?php echo $row->canEdit
 					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'class="fcfield_selectval" onchange="return Joomla.listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
 					: $this->escape($row->access_level);
 				?>
 			</td>
 
-			<td class="col_id center hidden-phone hidden-tablet">
+			<td class="col_id center hidden-phone hidden-tablet" data-col="id">
 				<?php echo $row->id; ?>
 			</td>
 
@@ -456,6 +481,7 @@ if ($js)
 	</tbody>
 
 	</table>
+	<script>window.fcTableTools && fcTableTools.init('adminListTableFC<?php echo $this->view; ?>');</script>
 
 
 	<div>

@@ -20,7 +20,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
 
-jimport('legacy.controller.legacy');
 
 /**
  * FLEXIcontent Component Controller
@@ -31,6 +30,46 @@ jimport('legacy.controller.legacy');
  */
 class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 {
+	/**
+	 * The error messages that this controller recorded
+	 *
+	 * @var array
+	 */
+	protected $_fc_errors = array();
+
+
+	/**
+	 * Record the reason of a refused or failed step, to show it as a message.
+	 *
+	 * Joomla's controllers no longer have setError() and getError() (Joomla 5 and later), but FLEXIcontent's
+	 * controllers use them. Without these two methods a refused save ended in a PHP fatal error.
+	 *
+	 * @param   string|\Exception  $error  The message
+	 *
+	 * @return  void
+	 */
+	public function setError($error)
+	{
+		$this->_fc_errors[] = $error;
+	}
+
+
+	/**
+	 * The most recent error message (or the one with the given index), false when there is none.
+	 *
+	 * @param   int|null  $i         Index of the message, null for the most recent one
+	 * @param   bool      $toString  Return the message of an exception object
+	 *
+	 * @return  string|\Exception|false
+	 */
+	public function getError($i = null, $toString = true)
+	{
+		$error = $i === null ? end($this->_fc_errors) : ($this->_fc_errors[$i] ?? false);
+
+		return $toString && $error instanceof \Throwable ? $error->getMessage() : $error;
+	}
+
+
 	public function __construct($config = array())
 	{
 		parent::__construct($config);
@@ -51,7 +90,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link);   // we do not message since this will be displayed by template of the view ...
 		}
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		// GET POSTINSTALL tasks from session variable AND IF NEEDED re-evaluate it
 		// NOTE, POSTINSTALL WILL NOT LET USER USE ANYTHING UNTIL ALL TASKS ARE COMPLETED
@@ -139,7 +178,6 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$model  = $this->getModel('flexicontent');
 		$model->checkCollations();
-		$model->install_template_overrides();
 		$model->install_3rdParty_plugins();
 
 		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
@@ -234,6 +272,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$itemcountingdok  = $model->getItemCountingDataOK();
+		$dbcharsetok      = !$model->getDBCharsetPending();
 		if ( $print_logging_info ) @$fc_run_times['getItemCountingDataOK'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		//printf('<br/>-- [getItemCountingDataOK: %.2f s] ', $fc_run_times['getItemCountingDataOK']/1000000);
 
@@ -258,7 +297,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 			//!$existfplg || !$existseplg || existsyplg ||
 			!$existcats || !$langsynced || !$existversions || !$existversionsdata || !$existauthors ||
 			!$deprecatedfiles || !$nooldfieldsdata || !$missingversion || !$cachethumb ||
-			!$existdbindexes || !$itemcountingdok || !$initialpermission
+			!$existdbindexes || !$itemcountingdok || !$initialpermission || !$dbcharsetok
 		) {
 			$postinst_integrity_ok = false;
 		}

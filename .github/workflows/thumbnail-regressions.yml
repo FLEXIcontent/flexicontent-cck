@@ -20,3 +20,4 @@ jobs:
       - run: |
           php -d error_reporting=-1 tests/thumbnail-html-boundaries.php
           php -d error_reporting=-1 tests/thumbnail-signatures.php
+          php -d error_reporting=-1 tests/thumbnail-callers.php

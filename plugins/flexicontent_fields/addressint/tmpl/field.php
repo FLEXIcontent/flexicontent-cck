@@ -76,17 +76,17 @@ foreach ($values as $value)
 	<div class="fcfield_field_data_box fcfield_addressint_data">
 
 		<div>
-			<div id="'.$elementid_n.'_messages" class="alert alert-warning fc-iblock addrint_messages" style="display:none;"></div>
+			<div id="'.$elementid_n.'_messages" class="alert alert-warning fc-iblock addrint_messages" data-map-engine="'.($mapapi_edit === 'googlemap' ? 'googlemap' : 'nominatim').'" style="display:none;"></div>
 		</div>
 
 		<table class="fc-form-tbl fcfullwidth fcinner fc-addressint-field-tbl"><tbody>
 			<tr>
 				<td colspan="2" class="">
 					' . $message_error . '
-					<div class="'.$input_grp_class . ' fc-xpended-row" style="width:100%;">
+					<div class="'.$input_grp_class . ' fc-xpended-row addrint_autocomplete_row" style="width:100%;">
 						<label class="' . $add_on_class . ' fc-lbl-short addrint_autocomplete-lbl" for="'.$elementid_n.'_autocomplete" style="float: none;min-width: 114px;text-align: right;"><span class="icon-search"></span></label>
 						<input id="'.$elementid_n.'_autocomplete" class="addrint_autocomplete" style="border: 1px solid var(--template-bg-dark-20) !important;" name="'.$fieldname_n.'[autocomplete]" type="text" autocomplete="off" spellcheck="false" />
-						<select id="'.$elementid_n.'_ac_type" class="addrint_ac_type use_select2_lib" name="'.$fieldname_n.'[ac_type]" onchange="fcfield_addrint.changeAutoCompleteType(this.id.replace(\'_ac_type\', \'\'), \''.$field_name_js.'\');"' . ($mapapi_edit === 'nominatim' ? ' style="display:none;"' : '') . '>
+						<select id="'.$elementid_n.'_ac_type" class="addrint_ac_type' . ($mapapi_edit === 'nominatim' ? '' : ' use_select2_lib') . '" name="'.$fieldname_n.'[ac_type]" onchange="fcfield_addrint.changeAutoCompleteType(this.id.replace(\'_ac_type\', \'\'), \''.$field_name_js.'\');"' . ($mapapi_edit === 'nominatim' ? ' style="display:none;"' : '') . '>
 							'.$ac_type_options.'
 						</select>
 					</div>
@@ -176,13 +176,19 @@ foreach ($values as $value)
 			</tr>
 		' : '') . '
 
-			<tr '.($edit_latlon ? '' : 'style="display:none;"').' class="fc_gm_latitude_row">
-				<td class="key"><label class="fc-prop-lbl addrint_lat-lbl">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LATITUDE').'</label></td>
-				<td><input type="text" class="fcfield_textval addrint_lat ' . (in_array('latitude', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr . ' id="'.$elementid_n.'_lat" name="'.$fieldname_n.'[lat]" value="'.htmlspecialchars($value['lat'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="10" ' . (!$edit_latlon || $edit_latlon == 2 ? ' readonly="readonly" ' : '') . '/></td>
-			</tr>
-			<tr class="fc_gm_longitude_row">
-				<td class="key"><label class="fc-prop-lbl addrint_lon-lbl">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LONGITUDE').'</label></td>
-				<td><input type="text" class="fcfield_textval addrint_lon ' . (in_array('longitude', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr . ' id="'.$elementid_n.'_lon" name="'.$fieldname_n.'[lon]" value="'.htmlspecialchars($value['lon'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="10" ' . (!$edit_latlon || $edit_latlon == 2 ? ' readonly="readonly" ' : '') . '/></td>
+			<tr '.($edit_latlon ? '' : 'style="display:none;"').' class="fc_gm_latlon_row">
+				<td colspan="2">
+					<div class="fc-addressint-latlon">
+						<div class="fc_gm_latitude_row">
+							<label class="fc-prop-lbl addrint_lat-lbl">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LATITUDE').'</label>
+							<input type="text" class="fcfield_textval addrint_lat ' . (in_array('latitude', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr . ' id="'.$elementid_n.'_lat" name="'.$fieldname_n.'[lat]" value="'.htmlspecialchars($value['lat'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="10" ' . (!$edit_latlon || $edit_latlon == 2 ? ' readonly="readonly" ' : '') . '/>
+						</div>
+						<div class="fc_gm_longitude_row">
+							<label class="fc-prop-lbl addrint_lon-lbl">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LONGITUDE').'</label>
+							<input type="text" class="fcfield_textval addrint_lon ' . (in_array('longitude', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr . ' id="'.$elementid_n.'_lon" name="'.$fieldname_n.'[lon]" value="'.htmlspecialchars($value['lon'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="10" ' . (!$edit_latlon || $edit_latlon == 2 ? ' readonly="readonly" ' : '') . '/>
+						</div>
+					</div>
+				</td>
 			</tr>' .
 
 
@@ -197,13 +203,15 @@ foreach ($values as $value)
 						'value', 'text', $value['custom_marker'], $elementid_n.'_custom_marker') . '
 				</td>
 			</tr>
+
+		' : '') . '
+		' . ($use_custom_marker && $show_marker_anchor ? '
 			<tr class="fc_gm_marker_anchor_row">
 			<td class="key"><label class="fc-prop-lbl fc_gm_marker_anchor-lbl" for="'.$elementid_n.'_marker_anchor">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ANCHOR').'</label></td>
 				<td style="position: relative;">' .
 					\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $marker_anchors, $fieldname_n.'[marker_anchor]',
 						' class="fc_gm_marker_anchor use_select2_lib" onchange="fcfield_addrint.updateMarkerIcon(this.id.replace(\'_marker_anchor\', \'\'), \''.$field_name_js.'\');" ',
 						'value', 'text', $value['marker_anchor'], $elementid_n.'_marker_anchor') . '
-						<button type="button" class="btn btn-small btn-sm hasPopover" data-toggle="popover" title="' .  \Joomla\CMS\Language\Text::_('FLEXI_EXAMPLES', true) . '" data-content="' .  \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ANCHOR_INFO', true) . '"><span class="icon-info"></span>' .  \Joomla\CMS\Language\Text::_('FLEXI_ABOUT', true) . '</button>
 				</td>
 			</tr>
 
@@ -215,20 +223,19 @@ foreach ($values as $value)
 
 
 	<div id="'.$elementid_n.'_addressint_map" class="fcfield_field_preview_box fcfield_addressint_map" style="display: none;">
-		<div>
-			<div class="'.$input_grp_class.' fc-xpended" class="addrint_marker_tolerance_box">
+		<div class="fcfield_addressint_canvas_outer">
+			<div id="map_canvas_'.$elementid_n.'" class="addrint_map_canvas" '.($map_width || $map_height  ?  'style="width:'.$map_width.'px; height:'.$map_height.'px;"' : '').'></div>
+		</div>
+
+		<div class="fc-addressint-map-opts">
+			<div class="'.$input_grp_class.' fc-xpended addrint_marker_tolerance_box">
 				<label class="' . $add_on_class . ' fc-lbl-short addrint_marker_tolerance-lbl" for="'.$elementid_n.'_marker_tolerance">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_TOLERANCE').'</label>
 				<input type="text" class="fcfield_textval inlineval addrint_marker_tolerance" id="'.$elementid_n.'_marker_tolerance" name="'.$fieldname_n.'[marker_tolerance]" value="50" size="7" maxlength="7" />
 			</div>
-			&nbsp;
-			<div class="'.$input_grp_class.' fc-xpended" class="addrint_zoom_box">
+			<div class="'.$input_grp_class.' fc-xpended addrint_zoom_box">
 				<label class="' . $add_on_class . ' fc-lbl-short addrint_zoom-lbl" for="'.$elementid_n.'_zoom" >'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZOOM_LEVEL').'</label>
 				<input type="text" class="fcfield_textval inlineval addrint_zoom" id="'.$elementid_n.'_zoom" name="'.$fieldname_n.'[zoom]" value="'.htmlspecialchars($value['zoom'], ENT_COMPAT, 'UTF-8').'" readonly="readonly" size="2" />
 			</div>
-		</div>
-
-		<div class="fcfield_addressint_canvas_outer">
-			<div id="map_canvas_'.$elementid_n.'" class="addrint_map_canvas" '.($map_width || $map_height  ?  'style="width:'.$map_width.'px; height:'.$map_height.'px;"' : '').'></div>
 		</div>
 	</div>
 
@@ -270,11 +277,6 @@ foreach ($values as $value)
 	 * Initialize Custom Marker Selector
 	 */
 
-	$dom_ready_js .= (!$use_custom_marker ? '' : '
-		fcfield_addrint.initMarkerSelector("'.$elementid_n.'", "'.$field_name_js.'");
-	');
-
-
 	/**
 	 * Initialize autocomplete search box and MAP display
 	 * Same JS function names for both engines (googlemap & nominatim)
@@ -286,13 +288,13 @@ foreach ($values as $value)
 	';
 
 	$dom_ready_js .= '
-		fcfield_addrint.initAutoComplete("'.$elementid_n.'", "'.$field_name_js.'");'
-		. (!$coords_are_empty ? '
-		fcfield_addrint.initMap("'.$elementid_n.'", "'.$field_name_js.'");'
-		: '')
-	;
+		if (' . ($mapapi_edit !== 'googlemap' ? 'true' : 'window.google?.maps') . ') {
+			fcfield_address.start("'.$elementid_n.'", "'.$field_name_js.'", '.($coords_are_empty ? 'false' : 'true').');
+		}
+	';
 
 	$field->html[$n] = '
+		'.($use_ingroup ? '<input type="hidden" id="'.$elementid_n.'_present" name="'.$fieldname_n.'[present]" value="1">' : '').'
 		<div class="fc-field-value-properties-box ' . ($value_is_disabled ? ' fc-field-value-disabled' : '') . '">
 			' . $field_html . '
 		</div>
@@ -305,10 +307,12 @@ if ($dom_ready_js)
 {
 	$js .= '
 	// load autocomplete on page ready
-	jQuery(document).ready(function() {
+	FlexiForm.ready(function() {
 		' . $dom_ready_js . '
 	});
 	';
 }
 
-$document->addScriptDeclaration($js);
+if ($js !== "") {
+	$document->getWebAssetManager()->addInlineScript($js);
+}

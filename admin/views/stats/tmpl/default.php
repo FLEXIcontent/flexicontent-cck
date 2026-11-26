@@ -48,48 +48,6 @@ $ctrl_users = "task=users.";
 <?php endif;?>
 
 
-<?php
-	// BOF: Load echart libraries
-	$error_msg = '';
-
-	if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'echarts'))
-	{
-		$error_msg .= '<div class="alert alert-error">echarts library not installed in ' . JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'echarts' . '</div>';
-	}
-
-	if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'zrender'))
-	{
-		$error_msg .= '<div class="alert alert-error">zrender library not installed in ' . JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'zrender' . '</div>';
-	}
-	
-	if (!$error_msg) : ?>
-
-	<script>
-    require.config({
-        packages: [
-            {
-                name: 'echarts',
-                location: '../components/com_flexicontent/librairies/echarts',
-                main: 'echarts'
-            },
-            {
-                name: 'zrender',
-                location: '../components/com_flexicontent/librairies/zrender',
-                main: 'zrender'
-            }
-        ]
-    });
-	</script>
-
-<?php else : ?>
-
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/echarts.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/line.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/bar.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/pie.js"></script>
-	<script src="	https://cdnjs.cloudflare.com/ajax/libs/zrender/2.0.7/zrender.js"></script>
-
-<?php endif; ?>
 
 
 	<table class="fc-table-list fc-tbl-short" style="margin:20px 0 20px 0; width:100%; box-sizing: border-box;">
@@ -208,9 +166,9 @@ $ctrl_users = "task=users.";
 <?php
 	$stasts          = $this->itemsgraph[0];
 	$months          = array();
-	$monthslist      = '';
+	$monthslist      = '[]';
 	$totalitems       = array();
-	$totalitemslist   = '';
+	$totalitemslist   = '[]';
 
 
 	foreach ($stasts as $s) {
@@ -233,6 +191,7 @@ $ctrl_users = "task=users.";
 	</div>
 
 	<script>
+		document.addEventListener('flexicontent:stats-ready', function () {
 		var option = {
 	            tooltip : {
 	                trigger: 'axis'
@@ -289,6 +248,7 @@ $ctrl_users = "task=users.";
 	            }
 	        )
 
+		}, { once: true });
 	</script>
 
 
@@ -313,14 +273,16 @@ $ctrl_users = "task=users.";
 			$typeslabel        = explode('|',$workflow['labels']);
 			$typeslabellist    = json_encode($typeslabel);
 			$valuesitems       = explode(',',$workflow['values']);
-			$datalist          = '';
+			$data              = array();
 
 			foreach ($typeslabel  as $key=>$label) {
-					$datalist.= '{value:'.$valuesitems[$key].', name:"'.$label.'"},';
+					$data[] = array('value' => (float) ($valuesitems[$key] ?? 0), 'name' => $label);
 			}
+			$datalist = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 		 ?>
 
 	    <script>
+		document.addEventListener('flexicontent:stats-ready', function () {
 
 			var optionpie = {
 			      tooltip : {
@@ -354,9 +316,7 @@ $ctrl_users = "task=users.";
 			          type:'pie',
 			          radius : '75%',
 			          center: ['60%', '60%'],
-			          data:[
-			               <?php echo $datalist; ?>
-			           ]
+			          data:<?php echo $datalist; ?>
 			        }
 			      ]
 			    };
@@ -371,7 +331,8 @@ $ctrl_users = "task=users.";
 		            }
 		        )
 
-	        </script>
+		}, { once: true });
+	</script>
 		</div>
 	</div>
 
@@ -630,14 +591,16 @@ $ctrl_users = "task=users.";
 				$voteslabel        = explode('|',$votesitems['labels']);
 				$voteslabellist    = json_encode($voteslabel);
 				$valuesvotes       = explode(',',$votesitems['values']);
-				$datalist          = '';
+				$data              = array();
 
 				foreach ($voteslabel  as $key=>$label) {
-						$datalist.= '{value:'.$valuesvotes[$key].', name:"'.$label.'"},';
+						$data[] = array('value' => (float) ($valuesvotes[$key] ?? 0), 'name' => $label);
 				}
+				$datalist = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 			 ?>
 
 		    <script>
+		document.addEventListener('flexicontent:stats-ready', function () {
 
 				var optionpie2 = {
 				      tooltip : {
@@ -671,9 +634,7 @@ $ctrl_users = "task=users.";
 				          type:'pie',
 				          radius : '75%',
 				          center: ['50%', '60%'],
-				          data:[
-				               <?php echo $datalist; ?>
-				           ]
+				          data:<?php echo $datalist; ?>
 				        }
 				      ]
 				    };
@@ -688,7 +649,8 @@ $ctrl_users = "task=users.";
 			            }
 			        )
 
-		        </script>
+		}, { once: true });
+	</script>
 			</div>
 		</div>
 	</div>

@@ -5,7 +5,7 @@
  * 
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright � 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -23,13 +23,11 @@ require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'category.php');
 
 //require_once (JPATH_SITE.DS.'modules'.DS.'mod_flexicontent'.DS.'classes'.DS.'datetime.php');
-//\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-JLoader::register('\Joomla\CMS\Form\FormFieldFclayoutbuilder', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'elements' . DS . 'fclayoutbuilder.php');
 
 
 // Decide whether to show module contents
 $app     = \Joomla\CMS\Factory::getApplication();
-$config  = \Joomla\CMS\Factory::getConfig();
+$config  = \Joomla\CMS\Factory::getApplication()->getConfig();
 $jinput  = $app->input;
 $option  = $jinput->get('option', '', 'cmd');
 $view    = $jinput->get('view', '', 'cmd');
@@ -87,7 +85,6 @@ if ( !$show_mod )  return;
 
 
 global $modfc_jprof;
-jimport('joomla.profiler.profiler');
 $modfc_jprof = new \Joomla\CMS\Profiler\Profiler();
 $modfc_jprof->mark('START: FLEXIcontent Filter-Search Module');
 
@@ -103,7 +100,8 @@ if ($mod_initialized === null)
 }
 
 // Initialize various variables
-$document = \Joomla\CMS\Factory::getDocument();
+$document = $app->getDocument();
+$wa = $app->getDocument()->getWebAssetManager();
 $flexiparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 // Include the helper only once
@@ -391,6 +389,7 @@ $jinput->set('view', $saved_view);
 
 // Load needed JS libs & CSS styles
 flexicontent_html::loadFramework('jQuery');
+flexicontent_html::loadFramework('select2');
 flexicontent_html::loadFramework('flexi_tmpl_common');
 
 // Add tooltips
@@ -435,24 +434,24 @@ if ($add_ccs && $layout)
 		// Active module layout css (optional)
 		if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css'))
 		{
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version' => FLEXI_VHASH));
+			$wa->registerAndUseStyle($modulename.'.layout.'.$layout, 'modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Module 's core CSS
 		if (file_exists(dirname(__FILE__).DS.'tmpl_common'.DS.'module.css'))
 		{
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', array('version' => FLEXI_VHASH));
+			$wa->registerAndUseStyle($modulename.'.module', 'modules/'.$modulename.'/tmpl_common/module.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Component CSS with optional override
-		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		$wa->registerAndUseStyle('flexicontent.core', 'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			$wa->registerAndUseStyle('flexicontent.template.'.$app->getTemplate(), 'media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
 		elseif (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+			$wa->registerAndUseStyle('flexicontent.template.'.$app->getTemplate(), 'templates/'.$app->getTemplate().'/css/flexicontent.css');
 		}
 	}
 }
@@ -471,7 +470,7 @@ if ( ($display_cat_list && $mcats_selection) || !$catid)
 // !! target (single) category view when selecting single category a category is currently selected
 else if ($catid)
 {
-	$db = \Joomla\CMS\Factory::getDbo();
+	$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 	$query 	= 'SELECT CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 		.' FROM #__categories AS c WHERE c.id = '.$catid;
 	$db->setQuery( $query );
@@ -534,11 +533,9 @@ if ($display_cat_list && !$mcats_selection)
 
 			if (cid_val.length == 0)
 			{
-				var fcform = jQuery(form);
-				var default_action = fcform.attr("data-fcform_default_action"); 
-
-				fcform.attr("action", default_action);
-				fcform.attr("data-fcform_action", default_action); 
+				var default_action = form.getAttribute("data-fcform_default_action");
+				form.setAttribute("action", default_action);
+				form.setAttribute("data-fcform_action", default_action);
 
 				adminFormPrepare(form, 1);
 				return;
@@ -552,7 +549,7 @@ if ($display_cat_list && !$mcats_selection)
 
 if ($js)
 {
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	$wa->addInlineScript($js);
 }
 
 // append performance stats to global variable

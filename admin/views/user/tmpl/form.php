@@ -26,10 +26,11 @@ $cparams = \Joomla\CMS\Component\ComponentHelper::getParams ('com_media');
 $date_format = FLEXI_J16GE ? 'Y-m-d H:i:s' : '%Y-%m-%d %H:%M:%S';
 
 
-if ($this->row->get('lastvisitDate') == "0000-00-00 00:00:00") {
+$lastVisit = $this->row->lastvisitDate ?? '';
+if (!$lastVisit || $lastVisit == "0000-00-00 00:00:00") {
 	$lvisit = \Joomla\CMS\Language\Text::_( 'Never' );
 } else {
-	$lvisit	= \Joomla\CMS\HTML\HTMLHelper::_('date', $this->row->get('lastvisitDate'), $date_format);
+	$lvisit	= \Joomla\CMS\HTML\HTMLHelper::_('date', $lastVisit, $date_format);
 }
 
 // Load JS tabber lib
@@ -37,7 +38,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flex
 $this->document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 $js = "
-	jQuery(document).ready(function(){
+	FlexiForm.ready(function(){
 		fc_bindFormDependencies('#flexicontent', 2, '.control-group');
 	});
 ";
@@ -85,7 +86,7 @@ $this->document->addScriptDeclaration($js);
 
 				// DB Query to get -mulitple- user group ids for all authors,
 				// Get user-To-usergoup mapping for users in current page
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 				
 				$query = 'SELECT group_id FROM #__user_usergroup_map WHERE user_id = '.(int) $this->form->getValue('id');
 				$user_grpids = $db->setQuery($query)->loadColumn();
@@ -285,7 +286,8 @@ $this->document->addScriptDeclaration($js);
 				<h3 class="tabberheading hasTooltip"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ASSIGNED_GROUPS' ); ?> </h3>
 				
 				<fieldset id="user-groups_set">
-					<?php \Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_users/helpers/html'); ?>
+					<?php require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/fc_service_registry.php';
+					flexicontent_register_html_helpers(JPATH_ADMINISTRATOR.'/components/com_users/helpers/html');  ?>
 					<?php echo \Joomla\CMS\HTML\HTMLHelper::_('access.usergroups', 'jform[groups]', $this->usergroups, true); ?>
 				</fieldset>
 				
@@ -444,7 +446,7 @@ $this->document->addScriptDeclaration($js);
 					<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_LAYOUT'); ?> </h3>
 
 					<span class="btn-group input-append" style="margin: 2px 0px 6px;">
-						<span id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo \Joomla\CMS\Language\Text::_('JHELP'); ?></span>
+						<button type="button" id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo \Joomla\CMS\Language\Text::_('JHELP'); ?></button>
 					</span>
 					<div class="fcclear"></div>
 
@@ -677,13 +679,13 @@ $this->document->addScriptDeclaration($js);
 	<div class="fcclear"></div>
 
 	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="id" value="<?php echo $this->row->get('id'); ?>" />
-	<input type="hidden" name="cid[]" value="<?php echo $this->row->get('id'); ?>" />
+	<input type="hidden" name="id" value="<?php echo (int) ($this->row->id ?? 0); ?>" />
+	<input type="hidden" name="cid[]" value="<?php echo (int) ($this->row->id ?? 0); ?>" />
 	<input type="hidden" name="controller" value="users" />
 	<input type="hidden" name="view" value="user" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="contact_id" value="" />
-	<?php if (!\Joomla\CMS\Factory::getUser()->authorise('com_users', 'email_events')) : ?>
+	<?php if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('com_users', 'email_events')) : ?>
 		<input type="hidden" name="sendEmail" value="0" />
 	<?php endif; ?>
 	<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>

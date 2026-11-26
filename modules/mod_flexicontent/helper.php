@@ -15,6 +15,7 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 
 class modFlexicontentHelper
 {
@@ -101,11 +102,9 @@ class modFlexicontentHelper
 		// Construire les srcsets en exploitant small/medium/large si disponibles et existants
 		// On ne construit le srcset que pour les tailles <= à la taille demandée
 		$size_order  = ['small', 'medium', 'large'];
-		$size_widths = ['small' => 480, 'medium' => 768, 'large' => 1200];
 
 		$srcset_img  = [];
 		$srcset_webp = [];
-		$sizes_parts = [];
 		$fallback_url = $main_url;
 
 		// Pour original : on affiche juste l'image originale, pas de srcset multi-tailles
@@ -115,10 +114,12 @@ class modFlexicontentHelper
 				$webp_fs  = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_fs);
 				$webp_url = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_url);
 				if (file_exists($webp_fs)) {
-					$srcset_webp[] = $_srcset_url($webp_url) . ' ' . ($display_w ?: 1200) . 'w';
+					$webp_dimensions = @getimagesize($webp_fs);
+					if ($webp_dimensions && $webp_dimensions[0]) {
+						$srcset_webp[(int) $webp_dimensions[0]] = $_srcset_url($webp_url) . ' ' . (int) $webp_dimensions[0] . 'w';
+					}
 				}
 			}
-			$sizes_parts[] = ($display_w ?: 1200) . 'px';
 		} else {
 			// Trouver les tailles inférieures ou égales à la taille demandée
 			$target_idx = array_search($size, $size_order);
@@ -134,30 +135,35 @@ class modFlexicontentHelper
 				if (!file_exists($s_fs)) {
 					continue;
 				}
-				$w = $size_widths[$s];
+				$dimensions = @getimagesize($s_fs);
+				if (!$dimensions || !$dimensions[0]) continue;
+				$w = (int) $dimensions[0];
 
 				if ($idx < $target_idx) {
 					// Taille inférieure : breakpoint responsive
-					$srcset_img[]  = $_srcset_url($s_url) . ' ' . $w . 'w';
-					$sizes_parts[] = '(max-width:' . $w . 'px) ' . $w . 'px';
+					$srcset_img[$w] = $_srcset_url($s_url) . ' ' . $w . 'w';
 					if ($use_webp && !$_src_is_webp) {
 						$webp_fs  = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $s_fs);
 						$webp_url = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $s_url);
 						if (file_exists($webp_fs)) {
-							$srcset_webp[] = $_srcset_url($webp_url) . ' ' . $w . 'w';
+							$webp_dimensions = @getimagesize($webp_fs);
+							if ($webp_dimensions && $webp_dimensions[0]) {
+								$srcset_webp[(int) $webp_dimensions[0]] = $_srcset_url($webp_url) . ' ' . (int) $webp_dimensions[0] . 'w';
+							}
 						}
 					}
 				} else {
 					// Taille demandée : desktop / taille de base
-					$desktop_w    = $display_w ?: $w;
-					$srcset_img[] = $_srcset_url($main_url) . ' ' . $desktop_w . 'w';
-					$sizes_parts[] = $desktop_w . 'px';
+					$srcset_img[$w] = $_srcset_url($main_url) . ' ' . $w . 'w';
 					$fallback_url  = $main_url;
 					if ($use_webp && !$_src_is_webp) {
 						$webp_fs  = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_fs);
 						$webp_url = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_url);
 						if (file_exists($webp_fs)) {
-							$srcset_webp[] = $_srcset_url($webp_url) . ' ' . $desktop_w . 'w';
+							$webp_dimensions = @getimagesize($webp_fs);
+							if ($webp_dimensions && $webp_dimensions[0]) {
+								$srcset_webp[(int) $webp_dimensions[0]] = $_srcset_url($webp_url) . ' ' . (int) $webp_dimensions[0] . 'w';
+							}
 						}
 					}
 				}
@@ -168,7 +174,8 @@ class modFlexicontentHelper
 			return '';
 		}
 
-		$sizes_str = implode(', ', $sizes_parts);
+		// These lazy images fill their CSS container, which may override the width attribute.
+		$sizes_str = 'auto, 100vw';
 		$_style = 'width:100%;height:auto;display:block!important;border:0!important;';
 
 		$img_tag = '<img'
@@ -203,6 +210,13 @@ class modFlexicontentHelper
 	public static function thumbUrlToFilesystemPath($thumb_url)
 	{
 		if (!$thumb_url) {
+			return '';
+		}
+
+		// A remote URL cannot be verified using a same-named file on this server.
+		$host = parse_url($thumb_url, PHP_URL_HOST);
+		if ($host && strcasecmp($host, (string) parse_url(\Joomla\CMS\Uri\Uri::root(), PHP_URL_HOST)) !== 0)
+		{
 			return '';
 		}
 
@@ -681,7 +695,9 @@ return $html;
 			}
 			elseif (($use_fields && count($fields)) || ($use_fields_feat && count($fields_feat)))
 			{
-				$rows = FlexicontentFields::getFields($filtered_rows, 'module', $params);
+				// The 'skip on empty fields' filter above has already loaded the field values of these rows,
+				// do not query them a second time ($reuse_loaded), only render the fields
+				$rows = FlexicontentFields::getFields($filtered_rows, 'module', $params, false, true, count($skiponempty_fields) > 0);
 			}
 			else
 			{
@@ -690,7 +706,8 @@ return $html;
 				// Batch-load field values (no rendering) so that the per-row
 				// getFieldDisplay() calls further below do not each trigger a
 				// separate single-item getFields() (~11 queries per item).
-				FlexicontentFields::getFields($rows, 'module');
+				// ... unless the 'skip on empty fields' filter above has already loaded them
+				FlexicontentFields::getFields($rows, 'module', null, false, true, count($skiponempty_fields) > 0);
 			}
 
 			$lists = array();
@@ -1133,6 +1150,9 @@ return $html;
 			? (int) $params->get('maxskipcount', 50)
 			: (int) $params->get('count', 5);
 
+		$offset_items = (int) $params->get('offset_items', 0);
+		if ($offset_items < 0) $offset_items = 0;
+
 		// Now check if no items need to be retrieved
 		if ( $count === 0 && $totals === null )
 		{
@@ -1147,7 +1167,8 @@ return $html;
 			if (FLEXI_CACHE)
 			{
 				// add the category tree to categories cache
-				$catscache 	= \Joomla\CMS\Factory::getCache('com_flexicontent_cats');
+				$catscache 	= \Joomla\CMS\Factory::getContainer()->get(CacheControllerFactoryInterface::class)
+					->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_cats']);
 				$catscache->setCaching(1); 		//force cache
 				$catscache->setLifeTime(84600); //set expiry to one day
 				$globalcats = $catscache->get(
@@ -1261,7 +1282,7 @@ return $html;
 		$nullDate	= $db->getNullDate();
 		if ($use_local_time)
 		{
-			$nowDate = \Joomla\CMS\HTML\HTMLHelper::_('date', $nowDate, 'Y-m-d H:i:s', $app->getCfg('offset') );
+			$nowDate = \Joomla\CMS\HTML\HTMLHelper::_('date', $nowDate, 'Y-m-d H:i:s', $app->get('offset') );
 		}
 
 		// Server date
@@ -2614,10 +2635,13 @@ return $html;
 		 * Create query to get item ids
 		 */
 
-		$items_query 	= 'SELECT ' . ($totals !== null ? 'SQL_CALC_FOUND_ROWS' : '')
+		// With "show found items" the total of the list is a column of the list: COUNT(*) OVER(), counted after GROUP BY.
+		// One statement instead of SQL_CALC_FOUND_ROWS + FOUND_ROWS(), which MySQL 8.0.17+ deprecates
+		$items_query 	= 'SELECT '
 			. ' i.id '
 			. (in_array('commented', $ordering) ? $select_comments : '')
 			. (in_array('rated', $ordering) ? $select_rated : '')
+			. ($totals !== null ? ', COUNT(*) OVER() AS fc_list_total' : '')
 			. ' FROM #__flexicontent_items_tmp AS i'
 			. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
 			. ' JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
@@ -2634,7 +2658,11 @@ return $html;
 			. $where .' '. ($apply_config_per_category ? '__CID_WHERE__' : '')
 			. $where_field_filters
 			. ' GROUP BY i.id'
-			. (!$behaviour_items && $method_items == 3 && $items_use_order ? ' ORDER BY FIELD(i.id, '. $items .')' : $orderby)
+			. (!$behaviour_items && $method_items == 3 && $items_use_order ? ' ORDER BY FIELD(i.id, '. $items .')' : $orderby
+				// A unique last sort key. Without SQL_CALC_FOUND_ROWS the database may stop sorting at the LIMIT,
+				// and rows with equal sort values could then repeat or go missing across pages
+				. ($totals !== null && trim((string) $orderby) !== '' && strpos($orderby, 'i.id') === false ? ', i.id' : '')
+			)
 			;
 
 
@@ -2650,7 +2678,13 @@ return $html;
 			. $select_rated
 			. ', mc.title AS maincat_title, mc.alias AS maincat_alias'   // Main category data
 			. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
-			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', '.$_cl.'.id, '.$_cl.'.alias) ELSE '.$_cl.'.id END as categoryslug'
+			// The category of the item link: the main category, or (category scope, when the option says not to link via the
+			// main category) one of the item's categories. The query has one row per item, so "one of" needs a definite
+			// choice: the category with the lowest id
+			. ($_cl === 'mc'
+				? ', CASE WHEN CHAR_LENGTH(mc.alias) THEN CONCAT_WS(\':\', mc.id, mc.alias) ELSE mc.id END as categoryslug'
+				: ', SUBSTRING(MIN(CONCAT(LPAD(c.id, 10, \'0\'), CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END)), 11) as categoryslug'
+			)
 			. ', GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats'
 			. ' FROM #__content AS i'
 			. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
@@ -2686,22 +2720,23 @@ return $html;
 			$per_cat_query = str_replace('__CID_WHERE__', $cat_where, $items_query);
 			//require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'SqlFormatter'.DS.'SqlFormatter.php');
 			//echo str_replace('PPP_', '#__', SqlFormatter::format(str_replace('#__', 'PPP_', $query)))."<br/>";
-			$db->setQuery($per_cat_query, 0, $count ? $count : 1);
+			$db->setQuery($per_cat_query, $offset_items, $count ? $count : 1);
+
+			$rows    = $db->loadObjectList();
+			$content = array();
 
 			if ($count)
 			{
-				$content = $db->loadColumn(0);
-			}
-			else
-			{
-				$db->execute();
-				$content = array();
+				foreach ($rows as $row) $content[] = $row->id;
 			}
 
+			// Total of found items: every row of the list carries it
 			if ($totals !== null)
 			{
-				$db->setQuery("SELECT FOUND_ROWS()");
-				$totals[$catid] = $db->loadResult();
+				$totals[$catid] = $rows
+					? $rows[0]->fc_list_total
+					// No row to read it from: only an offset after the last item still needs the total
+					: ($offset_items ? $db->setQuery('SELECT COUNT(*) FROM (' . $per_cat_query . ') AS fc_list')->loadResult() : 0);
 			}
 
 			@ $mod_fc_run_times['query_items'] += microtime(1) - $_microtime;
@@ -2855,7 +2890,7 @@ return $html;
 			return false;
 		}
 
-		$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
+		$joomla_image_path = $app->get('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
 		foreach ($catdata_arr as $i => $catdata)
 		{
 			$catdata->params = new \Joomla\Registry\Registry($catdata->params);
@@ -3038,8 +3073,8 @@ return $html;
 		$location   = '/modules/mod_flexicontent/builder/';
 		$css_file   = 'css/' . $layout_name . '_' . $module->id . '.css';
 
-		\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-		\Joomla\CMS\HTML\HTMLHelper::_('fclayoutbuilder.createCss',
+		require_once JPATH_SITE . '/components/com_flexicontent/helpers/html/fclayoutbuilder.php';
+		\JHtmlFclayoutbuilder::createCss(
 			$module,
 			$params,
 			$config = (object) array(
@@ -3054,8 +3089,10 @@ return $html;
 		 */
 		flexicontent_html::loadframework('grapesjs_view');
 
-		\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleSheet(
-			\Joomla\CMS\Uri\Uri::base(true) . $location . $css_file,
+		$wa = \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager();
+		$wa->registerAndUseStyle(
+			'mod_flexicontent.builder.' . $module->id,
+			ltrim($location . $css_file, '/'),
 			array('version' => $params->get($layout_name . '_hash'))
 		);
 	}

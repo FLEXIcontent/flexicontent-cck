@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright � 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -13,7 +13,13 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\CMS\Mail\MailerFactoryInterface;
 require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/security.php';
 require_once __DIR__ . '/security.php';
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 class plgFlexicontent_fieldsEmail extends FCField
 {
@@ -164,9 +170,6 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
 
-		// JS safe Field name
-		$field_name_js = str_replace('-', '_', $field->name);
-
 		// JS & CSS of current field
 		$js = '';
 		$css = '';
@@ -174,155 +177,22 @@ class plgFlexicontent_fieldsEmail extends FCField
 		// Handle multiple records
 		if ($multiple)
 		{
-			// Add the drag and drop sorting feature
-			if ($add_ctrl_btns) $js .= "
-			jQuery(document).ready(function(){
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					cancel: false,
-					/*containment: 'parent',*/
-					tolerance: 'pointer'
-					".($fields_box_placing ? "
-					,start: function(e) {
-						//jQuery(e.target).children().css('float', 'left');
-						//fc_setEqualHeights(jQuery(e.target), 0);
-					}
-					,stop: function(e) {
-						//jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
-					}
-					" : '')."
-				});
-			});
-			";
-
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
-			$js .= "
-			function addField".$field->id."(el, groupval_box, fieldval_box, params)
+			$controls = array(
+				array('selector' => 'input.emailaddr', 'key' => 'addr', 'value' => $default_addr),
+			);
+			if ($usetitle)
 			{
-				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
-				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
-				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
-				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-
-				if(!remove_previous && (rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
-					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
-					return 'cancel';
-				}
-
-				// Find last container of fields and clone it to create a new container of fields
-				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
-				var newField  = lastField.clone();
-				newField.find('.fc-has-value').removeClass('fc-has-value');
-
-				// New element's field name and id
-				var uniqueRowN = uniqueRowNum" . $field->id . ";
-				var element_id = '" . $elementid . "_' + uniqueRowN;
-				var fname_pfx  = '" . $fieldname . "[' + uniqueRowN + ']';
-				";
-
-			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			$js .= "
-				// Update the new email address
-				theInput = newField.find('input.emailaddr').first();
-				theInput.attr('value', ".json_encode($default_addr).");
-				theInput.attr('name', fname_pfx + '[addr]');
-				theInput.attr('id', element_id + '_addr');
-				newField.find('.emailaddr-lbl').first().attr('for', element_id + '_addr');
-
-				// Update inputmask
-				var has_inputmask = newField.find('input.has_inputmask').length != 0;
-				if (has_inputmask)  newField.find('input.has_inputmask').inputmask();
-				";
-
-			// Update the new email linking text
-			if ($usetitle) $js .= "
-				theInput = newField.find('input.emailtext').first();
-				theInput.val(".json_encode($default_title).");
-				theInput.attr('name', fname_pfx + '[text]');
-				theInput.attr('id', element_id + '_text');
-				newField.find('.emailtext-lbl').first().attr('for', element_id + '_text');
-
-				// Destroy any select2 elements
-				var sel2_elements = newField.find('div.select2-container');
-				if (sel2_elements.length)
-				{
-					sel2_elements.remove();
-					newField.find('select.use_select2_lib').select2('destroy').show();
-				}
-				";
-
-			// Add new field to DOM
-			$js .= "
-				lastField ?
-					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
-					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
-				if (remove_previous) lastField.remove();
-
-				// Attach form validation on new element
-				fc_validationAttach(newField);
-
-				// Re-init any select2 elements
-				fc_attachSelect2(newField);
-				";
-
-			// Add new element to sortable objects (if field not in group)
-			if ($add_ctrl_btns) $js .= "
-				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
-				";
-
-			// Show new field, increment counters
-			$js .="
-				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
-				if (scroll_visible) fc_scrollIntoView(newField, 1);
-				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
-
-				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({html: true, container: newField});
-				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
-
-				// Attach bootstrap event on new element
-				fc_bootstrapAttach(newField);
-
-				rowCount".$field->id."++;       // incremented / decremented
-				uniqueRowNum".$field->id."++;   // incremented only
+				$controls[] = array('selector' => 'input.emailtext', 'key' => 'text', 'value' => $default_title);
 			}
 
+			$config = array('controls' => $controls);
+			$js .= $this->buildValueRepeater($field, $elementid, $fieldname, $max_values, $add_ctrl_btns, $config);
 
-			function deleteField".$field->id."(el, groupval_box, fieldval_box)
-			{
-				// Disable clicks on remove button, so that it is not reclicked, while we do the field value hide effect (before DOM removal of field value)
-				var btn = fieldval_box ? false : jQuery(el);
-				if (btn && rowCount".$field->id." > 1) btn.css('pointer-events', 'none').off('click');
-
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-
-				// Add empty container if last element, instantly removing the given field value container
-				if(rowCount".$field->id." == 1)
-					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
-
-				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
-				if (rowCount".$field->id." > 1)
-				{
-					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the field value hide effect (before DOM removal of field value)
-					row.find('.fcfield-delvalue').remove();
-					row.find('.fcfield-expand-view').remove();
-					row.find('.fcfield-insertvalue').remove();
-					row.find('.fcfield-drag-handle').remove();
-					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){ jQuery(this).remove(); });
-					rowCount".$field->id."--;
-				}
-			}
-			";
-
-			$css .= '';
-
-			$remove_button = '<span class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$remove_button = '<button type="button" class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></button>';
 			$move2         = '<span class="' . $btn_item_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<button type="button" class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></button> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<button type="button" class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></button> ' : '';
 		}
 
 		// Field not multi-value
@@ -384,7 +254,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		if ($per_val_js)
 		{
 			$js .= "
-			jQuery(document).ready(function()
+			FlexiForm.ready(function()
 			{
 				" . $per_val_js . "
 			});
@@ -392,13 +262,8 @@ class plgFlexicontent_fieldsEmail extends FCField
 		}
 
 		// Add field's CSS / JS
-		if ($multiple) $js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
+		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
 
 		// Do not convert the array to string if field is in a group
@@ -414,9 +279,9 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="'.$btn_group_class.' fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+					<button type="button" class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(this.closest(\'.fc-xpended-btns\'));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
 						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
-					</span>
+					</button>
 				</div>';
 		}
 
@@ -447,7 +312,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		{
 			$field->html = '
 			<button type="button" class="fcfield-expand-view-btn btn btn-small" data-expandedFieldState="0" aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_EXPAND') . '"
-				onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\'));"
+				onclick="fc_toggleCompactValuesView(this, this.closest(\'.container_fcfield\'));"
 			>
 				<span class="fcfield-expand-view ' . $font_icon_class . '" aria-hidden="true"></span>&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_EXPAND', true) . '
 			</button>
@@ -680,7 +545,12 @@ class plgFlexicontent_fieldsEmail extends FCField
 			// *** Validate data, skipping values that are empty after validation
 			// ***
 
-			$addr = flexicontent_html::dataFilter($v['addr'], $maxlength, 'EMAIL', 0);  // Clean bad text/html
+			$rawAddress = trim((string) ($v['addr'] ?? ''));
+			$addr = flexicontent_html::dataFilter($rawAddress, $maxlength, 'EMAIL', 0);
+			if (!$is_importcsv && $rawAddress !== '' && $addr === '')
+			{
+				return false;
+			}
 
 			// Skip empty value, but if in group increment the value position
 			if (!strlen($addr))
@@ -812,7 +682,7 @@ class plgFlexicontent_fieldsEmail extends FCField
         if ($params->get('viewlayout', '') !== 'form') throw new \RuntimeException('Contact form is disabled', 403);
         $formid = $input->get('formid', '', 'raw');
         if (!is_string($formid) || !preg_match('/^fcemail_[a-f0-9]{16}$/D', $formid)) throw new \RuntimeException('Invalid contact form', 400);
-        $db = \Joomla\CMS\Factory::getDbo();
+        $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
         $values = $db->setQuery('SELECT value FROM #__flexicontent_fields_item_relations WHERE item_id = ' . (int) $item->id
             . ' AND field_id = ' . (int) $field->id . ' ORDER BY valueorder')->loadColumn();
         $recipient = flexicontent_email_security::recipient($item->id, $field, $values, $input->get('recipient_key', '', 'raw'), $app->get('secret'));
@@ -859,7 +729,7 @@ class plgFlexicontent_fieldsEmail extends FCField
         if ($pluginParams->get('email_admin_copy', 0) && filter_var($pluginParams->get('email_admin', ''), FILTER_VALIDATE_EMAIL))
             $mailer->addBCC($pluginParams->get('email_admin'));
         // An anonymous copy address would reintroduce an arbitrary-recipient relay.
-        $user = \Joomla\CMS\Factory::getUser();
+        $user = \Joomla\CMS\Factory::getApplication()->getIdentity();
         if ($pluginParams->get('email_user_copy', 0) && !$user->guest && !$user->block && strcasecmp($user->email, $fromemail) === 0)
             $mailer->addBCC($user->email);
         $sent = $mailer->Send();

@@ -4,6 +4,76 @@ use Joomla\CMS\Language\LanguageFactoryInterface;
 
 class flexicontent_upload
 {
+	public static function getAllowedExtensions($uconf)
+	{
+		return array_values(array_unique(array_filter(preg_split('/\s*,\s*/', strtolower(
+			$uconf->get('upload_extensions', 'bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics')
+			. ',' . $uconf->get('ignore_extensions', '')
+		)))));
+	}
+
+	/** Resolve the same upload restrictions for the field UI and the endpoint. */
+	public static function getUploadParams($field = null)
+	{
+		$params = clone \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$componentMax = $params->get('upload_maxsize', 10000000);
+		if ($field && isset($field->parameters))
+		{
+			$params->merge($field->parameters);
+		}
+		if ($field && $field->field_type === 'image')
+		{
+			$images = array('bmp', 'wbmp', 'gif', 'jpg', 'jpeg', 'png', 'webp', 'ico');
+			$allowed = preg_split('/\s*,\s*/', strtolower($params->get('upload_extensions', implode(',', $images)) ?? ''));
+			$params->set('upload_extensions', implode(',', array_intersect($images, $allowed)));
+			$params->set('ignore_extensions', '');
+			$params->set('image_extensions', implode(',', $images));
+			$params->set('restrict_uploads', 1);
+		}
+		if ($field && $field->field_type === 'mediafile')
+		{
+			// Both the inline uploader and My Files use these rules at the upload endpoint.
+			$defaults = 'mp3,m4a,wav,ogg,oga,webm,mp4,m4v,mov';
+			$media = explode(',', $defaults . ',aac,flac,opus,ogv,mpeg,mp4a,mp4v');
+			$configured = $field->parameters->get('upload_extensions') ?: $field->parameters->get('iam_upload_extensions');
+			$requested = preg_split('/[\s,]+/', strtolower(trim($configured ?: $defaults)));
+			$allowed = array_intersect($media, array_map(static fn($ext) => ltrim($ext, '.'), $requested));
+			$params->set('upload_extensions', $allowed ? implode(',', $allowed) : $defaults);
+			$params->set('ignore_extensions', '');
+			$params->set('restrict_uploads', 1);
+			$legacyMax = (int) $field->parameters->get('iam_upload_maxsize', 0) * 1000000;
+			$params->set('upload_maxsize', $field->parameters->get('upload_maxsize', $legacyMax ?: $componentMax));
+		}
+		return $params;
+	}
+
+	/** Existing thumbnail files owned by a DB-mode image, never arbitrary directory contents. */
+	public static function getImageThumbnails($file, $fields, $includeWebp = true)
+	{
+		$name = (string) $file->filename;
+		if (!$name || $name !== basename($name) || preg_match('#[/\\\\\x00]#', $name) || strpos($name, '..') !== false) return array();
+		$root = realpath(JPATH_SITE);
+		$paths = array();
+		foreach ($fields as $field)
+		{
+			$params = new \Joomla\Registry\Registry($field->attribs);
+			if ((int) $params->get('image_source', 0) !== 0 || (int) $params->get('target_dir', 1) !== (int) $file->secure) continue;
+			$folder = realpath(JPATH_SITE . '/' . $params->get('dir', 'images/stories/flexicontent'));
+			if (!$folder || !$root || strpos($folder . DIRECTORY_SEPARATOR, $root . DIRECTORY_SEPARATOR) !== 0 || $folder === $root) continue;
+			foreach (array('b', 'l', 'm', 's') as $size) foreach (array('', 'fld' . (int) $field->id . '_') as $prefix)
+			{
+				$names = array($size . '_' . $prefix . $name);
+				if ($includeWebp) $names[] = $size . '_' . $prefix . pathinfo($name, PATHINFO_FILENAME) . '.webp';
+				foreach ($names as $thumb)
+				{
+					$path = $folder . DIRECTORY_SEPARATOR . $thumb;
+					if (is_file($path) && !is_link($path)) $paths[$path] = $path;
+				}
+			}
+		}
+		return array_values($paths);
+	}
+
 	static function makeSafe($file, $language = null)
 	{
 		// Replace [] with () and multiple spaces with a single hyphen.
@@ -167,7 +237,6 @@ class flexicontent_upload
 			return false;
 		}
 
-		jimport('joomla.filesystem.file');
 
 
 		// ***************************************************************
@@ -243,7 +312,6 @@ class flexicontent_upload
 						$err = 'FLEXI_WARNINVALIDMIME';
 						return false;
 					}
-					finfo_close($finfo);
 
 				}
 				else if(function_exists('mime_content_type') /*&& $params->get('check_mime',1)*/)
@@ -301,7 +369,6 @@ class flexicontent_upload
 	*/
 	static function sanitize($base_Dir, $filename)
 	{
-		jimport('joomla.filesystem.file');
 
 		// Check for any trailing dots and remove them (trailing shouldn't be possible cause of the getExt check)
 		$filename = rtrim($filename, '.');
@@ -345,7 +412,6 @@ class flexicontent_upload
 	*/
 	static function sanitizedir($base_Dir, $folder)
 	{
-		jimport('joomla.filesystem.folder');
 
 		// Replace invalid characters with dash, if makeSafe has been called then this has already been done
 		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\.\_\- ]#', '#^\.#');

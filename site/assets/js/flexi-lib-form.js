@@ -1,489 +1,195 @@
-
-	function fcfield_add2list(list_tagid, selector)
-	{
-		var list = jQuery('#'+list_tagid);
-		var sep = list.val().trim() ? ', ' : '';
-		val = list.val() +  sep + jQuery(selector).val();
-		list.val(val);
-	}
-	
-	
-	function fcfield_del_sortable_element(obj)
-	{
-		var element = jQuery(obj).parent();
-		var parent_element = jQuery(element.parent());
-		element.slideUp(300, function(){
-			jQuery(this).remove();
-			fcfield_store_ordering( parent_element );
-		});
-	}
-	
-	
-	function fcfield_add_sortable_element(selector)
-	{
-		var selobj = jQuery(selector);
-		var tagid  = selobj.attr('id').replace('_selector','');
-		var container = 'sortable-' + tagid;
-		
-		var val = selobj.val();
-		if (!val) return true;
-		var lbl = selobj.find('option:selected').text();
-		jQuery('#'+container).append(
-			'<li data-value="field_'+val+'" class="fcrecord">'+
-				'<span class="fcprop_box">'+lbl+'</span>'+
-				'<span class="delfield_handle" title="Remove" onclick="fcfield_del_sortable_element(this);"></span>'+
-			'</li>'
-		);
-		
-		var field_list = jQuery('#'+tagid).val();
-		field_list += field_list ? ','+val : val;
-		jQuery('#'+tagid).val(field_list);
-
-		setTimeout(function(){
-			jQuery(selobj).val('').trigger('change');
-		}, 50);
-		return true;
-	}
-	
-	
-	function fcfield_store_ordering(parent_element)
-	{
-		hidden_id = '#'+jQuery.trim(parent_element.attr('id').replace('sortable-',''));
-		fields = new Array();
-		i = 0;
-		parent_element.children('li').each(function(){
-			fields[i++] = jQuery(this).attr('data-value').replace('field_', '');
-		});
-		jQuery(hidden_id).val(fields.join(','))
-	}
-	
-	
-	function fcfield_attach_sortable(sel)
-	{
-		sel = typeof sel !== 'undefined' ? sel : 'body';
-
-		var sortable_fcfield_lists = sel + ' ul.fcfields_list';
-
-		jQuery( sortable_fcfield_lists ).each(function(index, value)
-		{
-			fcfield_store_ordering(jQuery(this));
-		});
-		
-		jQuery( sortable_fcfield_lists ).sortable(
-		{
-			//connectWith: sortable_fcfield_lists,
-			update: function(event, ui) {
-				ui.sender ?
-					fcfield_store_ordering(jQuery(ui.sender)) :
-					fcfield_store_ordering(jQuery(ui.item).parent()) ;
-			}
-		});
-	}
-
-
-
-
-	var fc_field_dialog_handle_fcrecord_list;
-
-
-	function fcrecord_del_sortable_element(obj)
-	{
-		var list_el = jQuery(obj).closest('li');
-		var list = list_el.closest('ul');
-
-		list_el.slideUp(300, function(){
-			jQuery(this).remove();
-			fcrecord_store_values( list );
-		});
-	}
-
-
-	function fcrecord_toggle_textarea_edit(container)
-	{
-		var value_area = container.find('textarea');
-		if (value_area.attr('readonly'))
-			value_area.removeAttr('readonly');
-		else
-			value_area.attr('readonly', 'readonly');
-	}
-	
-	function fcrecord_direct_edit(list, in_modal)
-	{
-		var value_element_id = list.data('value_element_id');
-		var value_area = jQuery('#'+value_element_id);
-		value_area.removeAttr('readonly');
-		
-		in_modal = typeof in_modal !== 'undefined' ? in_modal : 0;
-		if (in_modal)
-		{
-			fc_field_dialog_handle_fcrecord_list = fc_showAsDialog(value_area.parent(), null, null, fcrecord_toggle_textarea_edit, {'visibleOnClose': 1, 'title': Joomla.JText._('FLEXI_EDIT')});
-			list.parent().hide();
-		}
-		else
-		{
-			value_area.css({'height': '', 'width': ''});
-			value_area.parent().css({'height': '', 'width': ''}).slideDown();
-			list.parent().slideUp();
-		}
-	}
-
-
-	function fcrecord_toggle_details_btns(btn, current_visibility)
-	{
-		if (typeof btn === 'undefined' || !btn) return;
-
-		if (current_visibility)
-		{
-			btn.parent().find('.fcrecords_show_btn').hide();
-			btn.parent().find('.fcrecords_hide_btn').show();
-		}
-		else
-		{
-			btn.parent().find('.fcrecords_show_btn').show();
-			btn.parent().find('.fcrecords_hide_btn').hide();
-		}
-	}
-
-
-	function fcrecord_ui_edit(list, in_modal, btn_show, btn_hide)
-	{
-		// Make sure list is empty and hidden, till we have repopulated it
-		list.hide();
-		list.empty();
-
-		// Display message about unused columns
-		list.parent().find('.fcrec_general_msg').html('').hide();
-		var unused_labels = list.parent().find('.fcrecord_label.fcrec_unused:not(.fcrec_cascaded_col)');
-		unused_labels.each(function() {
-			var label = jQuery(this).html();
-			list.parent().find('.fcrec_general_msg').append(label + ' ' + Joomla.JText._('FLEXI_INDEXED_FIELD_UNUSED_COL_DISABLED').replace(/\\/g, '') + '<br/>').show();
-		});
-
-		var value_element_id = list.data('value_element_id');
-		jQuery('#'+value_element_id).attr('readonly', 'readonly').css('height', '64px');
-
-		in_modal = typeof in_modal !== 'undefined' ? in_modal : 0;
-		if (in_modal)
-		{
-			fc_field_dialog_handle_fcrecord_list = fc_showAsDialog(list.parent(), null, null, null, {'title': Joomla.JText._('FLEXI_EDIT')});
-			fcrecord_toggle_details_btns(btn_show, 0);
-		}
-		else
-		{
-			if (list.parent().is(':visible'))
-			{
-				fcrecord_toggle_details_btns(btn_show, 0);
-				list.parent().slideUp();
-				return;
-			}
-			fcrecord_toggle_details_btns(btn_show, 1);
-			list.parent().css('height', '').show();
-		}
-
-		var state_fieldname = list.data('state_fieldname');
-		state_fieldname = state_fieldname ? jQuery('#jform_attribs_'+state_fieldname+' input:checked') : jQuery();
-		var use_elements_state = state_fieldname.length ? parseInt(state_fieldname.val()) : 0;
-
-		if (!use_elements_state)
-		{
-			list.parent().find('.fcrec_state_msg').html(Joomla.JText._('FLEXI_INDEXED_FIELD_STATE_COL_DISABLED').replace(/\\/g, '')).show();
-			list.parent().find('.fcrec_state_col').addClass('fcrec_unused');
-			list.data('use_elements_state', null);
-		}
-		else
-		{
-			list.parent().find('.fcrec_state_msg').html('').hide();
-			list.parent().find('.fcrec_state_col').removeClass('fcrec_unused');
-			list.data('use_elements_state', '1');
-		}
-
-		var master_fieldname = list.data('master_fieldname');
-		master_fieldname = master_fieldname ? jQuery('#jform_attribs_'+master_fieldname) : jQuery();
-		var master_field_id = master_fieldname.length && parseInt(master_fieldname.val()) ? parseInt(master_fieldname.val()) : 0;
-		
-		if (!master_field_id)
-		{
-			list.parent().find('.fcrec_cascaded_msg').html(Joomla.JText._('FLEXI_INDEXED_FIELD_VALGRP_COL_DISABLED').replace(/\\/g, '')).show();
-			list.parent().find('.fcrec_cascaded_col').addClass('fcrec_unused');
-			list.data('master_elements', null);
-		}
-		else
-		{
-			list.parent().find('.fcrec_cascaded_msg').html('').hide();
-			list.parent().find('.fcrec_cascaded_col').removeClass('fcrec_unused');
-
-			// Joomla Base URL
-			var base_url = !!jbase_url_fc ? jbase_url_fc : '';
-
-			list.after( jQuery('<img src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif">') );
-			jQuery.ajax({
-				async: false,
-				type: 'GET',
-				url: base_url + 'index.php?option=com_flexicontent&task=fields.getIndexedFieldJSON&format=raw',
-				data: {
-					field_id: master_field_id
-				},
-				success: function(str) {
-					var master_elements = (str ? JSON.parse(str) : false);
-					list.data('master_elements', master_elements);
-					list.next().remove();
-				},
-				error: function(str) {
-					list.next().remove();
-				}
-			});
-		}
-
-		list.show();
-		fcrecord_populate_list_elements(list);
-	}
-
-
-	function fcrecord_populate_list_elements(list)
-	{
-		var record_sep = list.data('record_sep');
-		var value_element_id = list.data('value_element_id');
-
-		var values = jQuery('#'+value_element_id).val().split( new RegExp('\\s*'+record_sep+'\\s*') );
-
-		// Make sure list is empty and re-add the values
-		list.empty();
-		jQuery(values).each(function(key, value)
-		{
-			if (value.length) fcrecord_add_sortable_element_ext(list, 1, value, 0);
-		});
-		list.children('li').slideDown();
-	}
-
-
-	function fcrecord_add_sortable_element_ext(addAt, placement, record_value, shown)
-	{
-		if (addAt.prop('tagName') == 'UL')
-		{
-			var list = addAt;
-			list_el = null;
-		}
-		else {
-			var list = addAt.closest('ul');
-			var list_el = addAt;
-		}
-
-		var cascaded_prop = list.data('cascaded_prop');
-		var state_prop    = list.data('state_prop');
-		cascaded_prop = cascaded_prop ? parseInt(cascaded_prop) : -1;
-		state_prop    = state_prop    ? parseInt(state_prop)    : -1;
-
-		var master_elements = list.data('master_elements');
-		var master_select = '';
-		var master_values = {};
-		if (master_elements)
-		{
-			master_select = '<select class="fcrecord_prop master_prop" style="__width__" onchange="fcrecord_store_values(jQuery(this).closest(\'ul\'));" >';
-			master_select += '<option value="">-</option>';
-			master_select += '__current_value__';
-			for (var i = 0; i < master_elements.length; i++)
-			{
-				master_select += '<option value="'+master_elements[i].value+'">'+master_elements[i].text+'</option>';
-				master_values[master_elements[i].value] = master_elements;
-			}
-			master_select += '</select>';
-		}
-
-		var use_elements_state = list.data('use_elements_state');
-		var state_select = '';
-		if (use_elements_state)
-		{
-			state_select = '<select class="fcrecord_prop state_prop" style="__width__" onchange="fcrecord_store_values(jQuery(this).closest(\'ul\'));" >';
-			state_select += '<option value="">-</option>';
-			state_select += '<option value="1">' + Joomla.JText._('FLEXI_PUBLISHED') + '</option>';
-			state_select += '<option value="0">' + Joomla.JText._('FLEXI_UNPUBLISHED') + '</option>';
-			state_select += '<option value="9">' + Joomla.JText._('FLEXI_EXPIRED') + '</option>';
-			state_select += '<option value="2">' + Joomla.JText._('FLEXI_ARCHIVED') + '</option>';
-			state_select += '<option value="-2">' + Joomla.JText._('FLEXI_TRASHED') + '</option>';
-			state_select += '</select>';
-		}
-
-		record_value = typeof record_value !== 'undefined' ? record_value : '';
-		shown = typeof shown !== 'undefined' ? shown : 1;
-
-		var record_sep  = list.data('record_sep');
-		var props_sep   = list.data('props_sep');
-
-		var prop_widths = list.data('prop_widths');
-		prop_widths = prop_widths.split( new RegExp('\\s*,\\s*') );
-		
-		var props_used = list.data('props_used');
-		props_used = props_used.split( new RegExp('\\s*,\\s*') );
-		var _unused_col = ' readonly="readonly" placeholder="' + Joomla.JText._('FLEXI_NA') + '" ';
-
-		var add_after  = list.data('add_after');
-		var add_before = list.data('add_before');
-		var is_elements = list.data('is_elements');
-
-		var props = record_value.split( new RegExp('\\s*'+props_sep+'\\s*') );
-		var props_html = '';
-		jQuery(props_used).each(function(key, in_use)
-		{
-			if (key > props_used - 1) return;
-			value = key > props.length - 1 ? '' :  props[key];
-			var _unused = !parseInt(props_used[key]) || (key==cascaded_prop && !master_elements) || (key==state_prop && !use_elements_state);
-			var _width = 'width:'+prop_widths[key]+'!important';
-			
-			if (key==cascaded_prop && master_select)
-			{
-				var select = master_select.replace('__width__', _width);
-				select = value.length && !master_values.hasOwnProperty(value) ?
-					select.replace('__current_value__', '<option value="'+value+'">'+value+' [CURRENT]</option>') :
-					select = select.replace('__current_value__', '') ;
-				props_html += select;
-			}
-			else if (key==state_prop && state_select)
-			{
-				var select = state_select.replace('__width__', _width);
-				if (value.length) select = select.replace('value="'+value+'"', 'value="'+value+'" selected="selected"');
-				props_html += select;
-			}
-			else
-				props_html += '<input type="text" value="'+value+'" class="fcrecord_prop '+(_unused ? ' fcrec_unused' : '')+'" onblur="fcrecord_store_values(jQuery(this).closest(\'ul\'));" style="'+_width+'" '+(_unused ? _unused_col : '')+'/>';
-		});
-
-		var lbl = 'empty';
-		var newrec = jQuery(
-			'<li class="fcrecord">'+
-				(is_elements ?
-					props_html :
-					'<span class="fcprop_box">'+lbl+'</span>'
-				)+
-				'<span class="delfield_handle" title="' + Joomla.JText._('FLEXI_REMOVE') + '" onclick="fcrecord_del_sortable_element(this);"></span>'+
-				(add_after ?  '<span class="addfield_handle fc_after"  title="' + Joomla.JText._('FLEXI_ADD') + '" onclick="fcrecord_add_sortable_element_ext(jQuery(this).parent(), 1);"></span>' : '')+
-				(add_before ? '<span class="addfield_handle fc_before" title="' + Joomla.JText._('FLEXI_ADD') + '" onclick="fcrecord_add_sortable_element_ext(jQuery(this).parent(), 0);"></span>' : '')+
-				(is_elements ? '<span class="ordfield_handle" title="' + Joomla.JText._('FLEXI_ORDER') + '"></span>' : '')+
-			'</li>'
-		).hide();
-		
-		if (master_select && props.length > cascaded_prop)
-		{
-			if ( props[cascaded_prop] ) newrec.find('select.master_prop').val(props[cascaded_prop]);
-		}
-
-		if (list_el)
-			placement ?
-				list_el.after(newrec) :
-				list_el.before(newrec) ;
-		else
-			list.append(newrec);
-
-		if (shown)
-			newrec.slideDown();
-	}
-
-
-	function fcrecord_add_sortable_element(selector)
-	{
-		var selobj = jQuery(selector);
-		var tagid  = selobj.attr('id').replace('_selector','');
-		var list = jQuery('#sortable-' + tagid);
-
-		var val = selobj.val();
-		if (!val) return;
-		var lbl = selobj.find('option:selected').text();
-		list.append(
-			'<li class="fcrecord" data-value="'+val+'">'+
-				'<span class="fcprop_box">'+lbl+'</span>'+
-				'<span title="' + Joomla.JText._('FLEXI_REMOVE') + '" onclick="fcrecord_del_sortable_element(this);" class="delfield_handle"></span>'+
-			'</li>'
-		);
-
-		var field_list = jQuery('#'+tagid).val();
-		field_list += field_list ? ','+val : val;
-		jQuery('#'+tagid).val(field_list);
-		if (selobj.hasClass('use_select2_lib')) {
-			selobj.select2('val', '');
-			selobj.prev().find('.select2-choice').removeClass('fc_highlight');
-		} else
-			selobj.prop('selectedIndex',0);
-	}
-
-
-	function fcrecord_store_values(list)
-	{
-		var values = [];
-		if (list.data('is_elements'))
-		{
-			var props_sep = list.data('props_sep');
-
-			list.children('li').each(function()
-			{
-				var v;
-				var empty_cnt = 0;
-				var props = [];
-				jQuery(this).find('.fcrecord_prop').each(function()
-				{
-					v = jQuery(this).val().trim();
-					if (v.length && v != '_NA_')
-					{
-						props.push(v);
-						empty_cnt = 0;
-					}
-					else {
-						props.push('_NA_');
-						empty_cnt++;
-					}
-				});
-				// Trim empty values at the ends
-				for (var i=0; i < empty_cnt; i++) props.pop();
-
-				if (props.length) values.push(props.join(props_sep));
-			});
-		}
-		else
-		{
-			list.children('li').each(function()
-			{
-				values.push( jQuery(this).data('value') );
-			});
-		}
-
-		var record_sep = list.data('record_sep');
-		var value_element_id = list.data('value_element_id');
-
-		list.data('is_elements') ?
-			jQuery('#'+value_element_id).val( values.join(record_sep+'\n') ) :
-			jQuery('#'+value_element_id).val( values.join(record_sep) ) ;
-	}
-
-
-	function fcrecord_attach_sortable(sel)
-	{
-		sel = typeof sel !== 'undefined' ? sel : 'body';
-
-		jQuery(sel + ' ul.fcrecords_list').each(function(index, value)
-		{
-			var list = jQuery(this);
-
-			if (!list.data('is_elements'))
-			{
-				fcrecord_store_values(jQuery(this));
-			}
-
-			if( !list.hasClass('ui-sortable') )
-			{
-				list.sortable({
-					update: function(event, ui) {
-						if (ui.sender)
-							fcrecord_store_values(jQuery(ui.sender));
-						else
-							fcrecord_store_values(jQuery(ui.item).parent());
-					}
-				});
-			}
-		});
-	}
-
-
-	// Trigger value storing function and attach sortable to fcrecord lists
-	jQuery(document).ready(function()
-	{
-		fcrecord_attach_sortable('body');
-		fcfield_attach_sortable('body');
-	});
+/** Repeatable administrator field records and ordered field selectors. */
+var fc_field_dialog_handle_fcrecord_list;
+const fc_recordLoads = new WeakMap();
+function fcfield_add2list(id, selector) {
+  const input = document.getElementById(id), select = FlexiForm.element(selector);
+  input.value += (input.value.trim() ? ', ' : '') + select.value;
+  FlexiForm.change(input);
+}
+function fcfield_store_ordering(value) {
+  const list = FlexiForm.element(value), input = document.getElementById(list.id.replace('sortable-', '').trim());
+  input.value = Array.from(list.children, item => item.dataset.value.replace('field_', '')).join(',');
+  fcfield_sync_selector(input.id);
+  FlexiForm.change(input);
+}
+/** Is the value already in the sortable list (values may have a ":suffix", e.g. "fieldname:displaymethod:title") */
+function fcfield_sortable_has(list, val) {
+  return Array.from(list.children).some(item => {
+    const v = (item.dataset.value || '').replace('field_', '');
+    return v === val || v.split(':')[0] === val;
+  });
+}
+/** Disable, in the selector of a sortable list, the options that are already in the list */
+function fcfield_sync_selector(id) {
+  const select = document.getElementById(id + '_selector'), list = document.getElementById('sortable-' + id);
+  if (!select || !list) return;
+  const used = new Set(Array.from(list.children, item => (item.dataset.value || '').replace('field_', '').split(':')[0]));
+  select.querySelectorAll('option').forEach(option => { option.disabled = !!(option.value && used.has(option.value)); });
+}
+function fcfield_del_sortable_element(value) {
+  const item = FlexiForm.element(value).closest('li'), list = item.parentElement;
+  item.remove(); fcfield_store_ordering(list);
+}
+function fc_recordButton(item, className, title, callback) {
+  const button = document.createElement('button'); button.type = 'button';
+  button.className = className; button.title = title; button.setAttribute('aria-label', title);
+  button.style.cssText = 'border:0;padding:0;background-color:transparent;';
+  button.addEventListener('click', callback); item.append(button); return button;
+}
+function fc_recordSelectReset(select) {
+  const instance = window.fc_choices_instances?.[select.id || select.name];
+  if (instance) instance.removeActiveItems();
+  select.value = '';
+  // Select2 remains optional for existing layouts which request it.
+  if (!window.fc_use_choicesjs && window.jQuery?.fn.select2 && select.classList.contains('use_select2_lib')) window.jQuery(select).select2('val', '');
+  FlexiForm.change(select);
+}
+function fcfield_add_sortable_element(value) {
+  const select = FlexiForm.element(value), id = select.id.replace('_selector', '');
+  if (!select.value) return true;
+  const list = document.getElementById('sortable-' + id), item = document.createElement('li');
+  // Do not add an element that is already in the list (also protects against the change event firing twice for one selection)
+  if (fcfield_sortable_has(list, select.value)) { setTimeout(() => fc_recordSelectReset(select), 50); return true; }
+  item.className = 'fcrecord'; item.dataset.value = 'field_' + select.value;
+  const label = document.createElement('span'); label.className = 'fcprop_box'; label.textContent = select.selectedOptions[0].textContent;
+  item.append(label); fc_recordButton(item, 'delfield_handle', FlexiForm.text('FLEXI_REMOVE'), () => fcfield_del_sortable_element(item.firstChild));
+  list.append(item); fcfield_store_ordering(list); fc_recordSelectReset(select); return true;
+}
+function fcfield_attach_sortable(selector = 'body') {
+  FlexiForm.element(selector).querySelectorAll('ul.fcfields_list').forEach(list => {
+    fcfield_store_ordering(list);
+    if (!Sortable.get(list)) Sortable.create(list, {draggable: 'li', onEnd: () => fcfield_store_ordering(list)});
+  });
+}
+function fcrecord_del_sortable_element(value) {
+  const item = FlexiForm.element(value).closest('li'), list = item.parentElement;
+  item.remove(); fcrecord_store_values(list);
+}
+function fcrecord_toggle_textarea_edit(value) {
+  const area = FlexiForm.element(value).querySelector('textarea'); area.readOnly = !area.readOnly;
+}
+function fcrecord_direct_edit(value, in_modal = 0) {
+  const list = FlexiForm.element(value), area = document.getElementById(FlexiForm.data(list, 'value_element_id'));
+  area.readOnly = false;
+  if (in_modal) {
+    fc_field_dialog_handle_fcrecord_list = fc_showAsDialog(area.parentElement, null, null, fcrecord_toggle_textarea_edit, {visibleOnClose: 1, title: FlexiForm.text('FLEXI_EDIT')});
+  } else {
+    area.style.height = ''; area.style.width = ''; area.parentElement.style.height = ''; area.parentElement.style.width = '';
+    FlexiForm.show(area.parentElement);
+  }
+  FlexiForm.show(list.parentElement, false);
+}
+function fcrecord_toggle_details_btns(value, visible) {
+  const button = FlexiForm.element(value); if (!button) return;
+  button.parentElement.querySelectorAll('.fcrecords_show_btn').forEach(el => FlexiForm.show(el, !visible));
+  button.parentElement.querySelectorAll('.fcrecords_hide_btn').forEach(el => FlexiForm.show(el, !!visible));
+}
+async function fcrecord_ui_edit(value, in_modal = 0, btn_show) {
+  const list = FlexiForm.element(value), box = list.parentElement, F = FlexiForm;
+  if (!in_modal && F.visible(box)) { fcrecord_toggle_details_btns(btn_show, 0); F.show(box, false); return; }
+  fc_recordLoads.get(list)?.abort();
+  const controller = new AbortController(); fc_recordLoads.set(list, controller);
+  list.replaceChildren(); F.show(list, false);
+  const area = document.getElementById(F.data(list, 'value_element_id'));
+  area.readOnly = true; area.style.height = '64px';
+  const message = (selector, text) => { const el = box.querySelector(selector); if (el) { el.textContent = text; F.show(el, !!text); } };
+  message('.fcrec_general_msg', Array.from(box.querySelectorAll('.fcrecord_label.fcrec_unused:not(.fcrec_cascaded_col)'), el => el.textContent + ' ' + F.text('FLEXI_INDEXED_FIELD_UNUSED_COL_DISABLED').replace(/\\/g, '')).join('\n'));
+  if (in_modal) fc_field_dialog_handle_fcrecord_list = fc_showAsDialog(box, null, null, null, {title: F.text('FLEXI_EDIT')});
+  else { box.style.height = ''; F.show(box); }
+  fcrecord_toggle_details_btns(btn_show, !in_modal);
+  const stateName = F.data(list, 'state_fieldname');
+  const state = stateName && document.getElementById('jform_attribs_' + stateName)?.querySelector('input:checked');
+  const enabled = !!Number(state?.value);
+  F.data(list, 'use_elements_state', enabled ? '1' : null);
+  message('.fcrec_state_msg', enabled ? '' : F.text('FLEXI_INDEXED_FIELD_STATE_COL_DISABLED').replace(/\\/g, ''));
+  box.querySelectorAll('.fcrec_state_col').forEach(el => el.classList.toggle('fcrec_unused', !enabled));
+  const masterName = F.data(list, 'master_fieldname');
+  const masterId = Number(masterName && document.getElementById('jform_attribs_' + masterName)?.value) || 0;
+  F.data(list, 'master_elements', null);
+  message('.fcrec_cascaded_msg', masterId ? '' : F.text('FLEXI_INDEXED_FIELD_VALGRP_COL_DISABLED').replace(/\\/g, ''));
+  box.querySelectorAll('.fcrec_cascaded_col').forEach(el => el.classList.toggle('fcrec_unused', !masterId));
+  if (masterId) {
+    const loading = document.createElement('span'); loading.className = 'fc_loading_msg'; loading.textContent = 'Loading...'; list.after(loading);
+    try {
+      const url = new URL((window.jbase_url_fc || '') + 'index.php', document.baseURI);
+      url.search = new URLSearchParams({option:'com_flexicontent',task:'fields.getIndexedFieldJSON',format:'raw',field_id:masterId});
+      const response = await fetch(url, {credentials:'same-origin',signal:controller.signal});
+      if (!response.ok) throw Error('Could not load field values');
+      const values = await response.json(); F.data(list, 'master_elements', values);
+    } catch(error) {
+      if (error.name === 'AbortError') return;
+      message('.fcrec_cascaded_msg', error.message);
+    } finally { loading.remove(); }
+  }
+  if (controller.signal.aborted) return;
+  fcrecord_populate_list_elements(list); F.show(list);
+}
+function fcrecord_populate_list_elements(value) {
+  const list = FlexiForm.element(value), data = key => FlexiForm.data(list,key);
+  const values = document.getElementById(data('value_element_id')).value.split(new RegExp('\\s*'+data('record_sep')+'\\s*'));
+  list.replaceChildren(); values.filter(Boolean).forEach(value => fcrecord_add_sortable_element_ext(list, 1, value, 1));
+}
+function fcrecord_add_sortable_element_ext(value, placement, record_value = '', shown = 1) {
+  const target = FlexiForm.element(value), list = target.tagName === 'UL' ? target : target.closest('ul');
+  const data = key => FlexiForm.data(list,key), text = FlexiForm.text;
+  const cascade = data('cascaded_prop') === undefined || data('cascaded_prop') === '' ? -1 : Number(data('cascaded_prop'));
+  const state = data('state_prop') === undefined || data('state_prop') === '' ? -1 : Number(data('state_prop'));
+  const masters = data('master_elements'), useState = data('use_elements_state');
+  const props = record_value.split(new RegExp('\\s*'+data('props_sep')+'\\s*'));
+  const used = String(data('props_used')).split(/\s*,\s*/), widths = String(data('prop_widths')).split(/\s*,\s*/);
+  const item = document.createElement('li'); item.className = 'fcrecord';
+  if (data('is_elements')) used.forEach((inUse,index) => {
+    const value = props[index] || '';
+    const unused = !Number(inUse) || (index === cascade && !masters) || (index === state && !useState);
+    let input;
+    if ((index === cascade && masters) || (index === state && useState)) {
+      input = document.createElement('select'); input.append(new Option('-', ''));
+      if (index === cascade) {
+        if (value && !masters.some(row => String(row.value) === value)) input.append(new Option(value+' [CURRENT]',value));
+        masters.forEach(row => input.append(new Option(row.text, row.value))); input.classList.add('master_prop');
+      } else {
+        [['1','FLEXI_PUBLISHED'],['0','FLEXI_UNPUBLISHED'],['9','FLEXI_EXPIRED'],['2','FLEXI_ARCHIVED'],['-2','FLEXI_TRASHED']].forEach(([value,key]) => input.append(new Option(text(key),value)));
+        input.classList.add('state_prop');
+      }
+    } else { input = document.createElement('input'); input.type = 'text'; input.readOnly = unused; if (unused) input.placeholder = text('FLEXI_NA'); }
+    input.value = value; input.classList.add('fcrecord_prop'); if (unused) input.classList.add('fcrec_unused');
+    if (widths[index]) input.style.setProperty('width', widths[index], 'important');
+    input.addEventListener('change', () => fcrecord_store_values(list)); input.addEventListener('blur', () => fcrecord_store_values(list));
+    item.append(input);
+  });
+  else { const label = document.createElement('span'); label.className='fcprop_box'; label.textContent='empty'; item.append(label); }
+  fc_recordButton(item,'delfield_handle',text('FLEXI_REMOVE'),() => fcrecord_del_sortable_element(item.firstChild));
+  if(data('add_after')) fc_recordButton(item,'addfield_handle fc_after',text('FLEXI_ADD'),() => fcrecord_add_sortable_element_ext(item,1));
+  if(data('add_before')) fc_recordButton(item,'addfield_handle fc_before',text('FLEXI_ADD'),() => fcrecord_add_sortable_element_ext(item,0));
+  if(data('is_elements')) { const handle=document.createElement('span'); handle.className='ordfield_handle'; handle.title=text('FLEXI_ORDER'); item.append(handle); }
+  target === list ? list.append(item) : target[placement ? 'after' : 'before'](item);
+  FlexiForm.show(item,!!shown);
+  return item;
+}
+function fcrecord_add_sortable_element(value) {
+  const select=FlexiForm.element(value), list=document.getElementById('sortable-'+select.id.replace('_selector',''));
+  if(!select.value) return;
+  const item=document.createElement('li'); item.className='fcrecord'; item.dataset.value=select.value;
+  const label=document.createElement('span'); label.className='fcprop_box'; label.textContent=select.selectedOptions[0].textContent; item.append(label);
+  fc_recordButton(item,'delfield_handle',FlexiForm.text('FLEXI_REMOVE'),() => fcrecord_del_sortable_element(label));
+  list.append(item); fcrecord_store_values(list); fc_recordSelectReset(select);
+}
+function fcrecord_store_values(value) {
+  const list=FlexiForm.element(value), data=key=>FlexiForm.data(list,key), values=[];
+  for(const item of list.children) {
+    if(data('is_elements')) {
+      const props=Array.from(item.querySelectorAll('.fcrecord_prop'),el=>el.value.trim() || '_NA_');
+      while(props.at(-1)==='_NA_') props.pop();
+      if(props.length) values.push(props.join(data('props_sep')));
+    } else values.push(item.dataset.value);
+  }
+  const input=document.getElementById(data('value_element_id'));
+  input.value=values.join(data('record_sep')+(data('is_elements')?'\n':'')); FlexiForm.change(input);
+}
+function fcrecord_attach_sortable(selector='body') {
+  FlexiForm.element(selector).querySelectorAll('ul.fcrecords_list').forEach(list => {
+    if(!FlexiForm.data(list,'is_elements')) fcrecord_store_values(list);
+    if(!Sortable.get(list)) Sortable.create(list,{draggable:'li',filter:'input,select,textarea,button',preventOnFilter:false,onEnd:()=>fcrecord_store_values(list)});
+  });
+}
+FlexiForm.ready(() => { fcrecord_attach_sortable(); fcfield_attach_sortable(); });

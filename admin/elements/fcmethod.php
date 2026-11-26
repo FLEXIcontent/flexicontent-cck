@@ -19,10 +19,7 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('radio');   // \Joomla\CMS\Form\Field\RadioField
 
 /**
@@ -44,7 +41,7 @@ class JFormFieldFcmethod extends JFormFieldRadio
 
 	function getInput()
 	{
-		$doc = \Joomla\CMS\Factory::getDocument();
+		$doc = \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -63,22 +60,17 @@ class JFormFieldFcmethod extends JFormFieldRadio
 			$js 	= "
 				function filterCategories_".$disabled_ff."(method)
 				{
-					var cats = jQuery('#".$dff_idtag."');
-					var options = cats.find('option');
-					if (method == 1) {
-						cats.setAttribute('disabled', 'disabled');
-						/*options.each(function(el){
-								el.setAttribute('selected', 'selected');
-						});*/
-					} else {
-						cats.setAttribute('disabled', '');
-					}
+					var cats = document.getElementById('".$dff_idtag."');
+					if (!cats) return;
+					cats.disabled = String(method) === '1';
+					if (cats.fc_choices_instance) cats.fc_choices_instance[cats.disabled ? 'disable' : 'enable']();
 				}
 
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					filterCategories_".$disabled_ff."('".$value."');			
 				});
 			";
+			flexicontent_html::loadFramework('form-utils');
 			$doc->addScriptDeclaration($js);
 			
 			$class = 'class="inputbox" onchange="filterCategories_'.$disabled_ff.'(this.value);"';

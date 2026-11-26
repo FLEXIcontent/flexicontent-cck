@@ -14,7 +14,13 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentControllerBaseAdmin' => JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * FLEXIcontent Items Controller
@@ -49,6 +55,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		'download', 'download_file', 'download_files', 'download_tree', 'weblink',
 		'save2new', 'save2copy', 'save_a_preview',
 		'field_set_value',
+		'getversionlist',
+		'setversionkeep',
 	);
 
 	/**
@@ -72,8 +80,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			}
 
 			// Since we are in frontend we need to manually load the backend language files, (english and then  override with current language)
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
 		/**
@@ -127,7 +135,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$cid = $this->input->get('cid', array(), 'array');
 		$cid = ArrayHelper::toInteger($cid);
@@ -189,10 +197,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$db      = \Joomla\CMS\Factory::getDbo();
-		$user    = \Joomla\CMS\Factory::getUser();
-		$config  = \Joomla\CMS\Factory::getConfig();
-		$session = \Joomla\CMS\Factory::getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$config  = \Joomla\CMS\Factory::getApplication()->getConfig();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$perms   = FlexicontentHelperPerm::getPerm();
 		$isSite  = $app->isClient('site');
 
@@ -374,8 +382,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 			// We use some strings from administrator part, load english language file
 			// for 'com_flexicontent' component then override with current language file
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get some flags this will also trigger item loading if not already loaded
@@ -555,7 +563,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			$display_captcha = $display_captcha && ( $is_submitop || $captcha_formop);  // for submit operation we do not need to check 'captcha_formop' ...
 			if ($display_captcha)
 			{
-				$c_plugin = $params->get('captcha', $app->getCfg('captcha')); // TODO add param to override default
+				$c_plugin = $params->get('captcha', $app->get('captcha')); // TODO add param to override default
 				if ($c_plugin)
 				{
 					$c_name = 'captcha_response_field';
@@ -881,22 +889,6 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 
 		/**
-		 * Use session to detect multiple item saves to avoid sending notification EMAIL multiple times
-		 */
-		$is_first_save = true;
-
-		if ($session->has('saved_fcitems', 'flexicontent'))
-		{
-			$saved_fcitems = $session->get('saved_fcitems', array(), 'flexicontent');
-			$is_first_save = $isnew ? true : !isset($saved_fcitems[$model->get('id')]);
-		}
-
-		// Add item to saved items of the corresponding session array
-		$saved_fcitems[$model->get('id')] = $timestamp = time();  // Current time as seconds since Unix epoc;
-		$session->set('saved_fcitems', $saved_fcitems, 'flexicontent');
-
-
-		/**
 		 * Get categories added / removed from the item
 		 */
 		$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
@@ -941,109 +933,109 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		/**
 		 * We need to get emails to notify, from Global/item's Content Type parameters -AND- from item's categories parameters
+		 *
+		 * Notifications are evaluated on every save. The "Debug notifications" option only displays
+		 * debugging information after saving, it does not control whether emails are sent.
 		 */
 		$notify_emails = array();
 
-		if ($is_first_save || $cats_altered || $params->get('nf_enable_debug', 0))
+		// Get needed flags regarding the saved items
+		$approve_version = 2;
+		$pending_approval_state = -3;
+		$draft_state = -4;
+
+		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true); // Get current item version
+		$last_version    = FLEXIUtilities::getLastVersions($item->id, true);    // Get last version (=latest one saved, highest version id),
+
+		// $validated_data variables vstate & state may have been (a) tampered in the form, and/or (b) altered by save procedure so better not use them
+		$needs_version_reviewal     = !$isnew && ($last_version > $current_version) && !$canPublish && !$AutoApproveChanges;
+		$needs_publication_approval = $isnew && ($item->state == $pending_approval_state) && !$canPublish;
+
+		$draft_from_non_publisher = $item->state == $draft_state && !$canPublish;
+
+		if ($draft_from_non_publisher)
 		{
-			// Get needed flags regarding the saved items
-			$approve_version = 2;
-			$pending_approval_state = -3;
-			$draft_state = -4;
+			// Suppress notifications for draft-state items (new or existing ones), for these each author will publication approval manually via a button
+			$nConf = false;
+		}
+		else
+		{
+			// Get notifications configuration and select appropriate emails for current saving case
+			$nConf = $model->getNotificationsConf($params);  // echo "<pre>"; print_r($nConf); "</pre>";
+		}
 
-			$current_version = FLEXIUtilities::getCurrentVersions($item->id, true); // Get current item version
-			$last_version    = FLEXIUtilities::getLastVersions($item->id, true);    // Get last version (=latest one saved, highest version id),
+		if ($nConf)
+		{
+			$states_notify_new = $params->get('states_notify_new', array(1, 0, 2, -3, -4, -5));
 
-			// $validated_data variables vstate & state may have been (a) tampered in the form, and/or (b) altered by save procedure so better not use them
-			$needs_version_reviewal     = !$isnew && ($last_version > $current_version) && !$canPublish && !$AutoApproveChanges;
-			$needs_publication_approval = $isnew && ($item->state == $pending_approval_state) && !$canPublish;
-
-			$draft_from_non_publisher = $item->state == $draft_state && !$canPublish;
-
-			if ($draft_from_non_publisher)
+			if (empty($states_notify_new))
 			{
-				// Suppress notifications for draft-state items (new or existing ones), for these each author will publication approval manually via a button
-				$nConf = false;
-			}
-			else
-			{
-				// Get notifications configuration and select appropriate emails for current saving case
-				$nConf = $model->getNotificationsConf($params);  // echo "<pre>"; print_r($nConf); "</pre>";
+				$states_notify_new = array();
 			}
 
-			if ($nConf)
+			elseif (! is_array($states_notify_new))
 			{
-				$states_notify_new = $params->get('states_notify_new', array(1, 0, 2, -3, -4, -5));
-
-				if (empty($states_notify_new))
-				{
-					$states_notify_new = array();
-				}
-
-				elseif (! is_array($states_notify_new))
-				{
-					$states_notify_new = !FLEXI_J16GE ? array($states_notify_new) : explode("|", $states_notify_new);
-				}
-
-				$states_notify_existing = $params->get('states_notify_existing', array(1, 0, 2, -3, -4, -5));
-
-				if (empty($states_notify_existing))
-				{
-					$states_notify_existing = array();
-				}
-
-				elseif (! is_array($states_notify_existing))
-				{
-					$states_notify_existing = !FLEXI_J16GE ? array($states_notify_existing) : explode("|", $states_notify_existing);
-				}
-
-				$n_state_ok = in_array($item->state, $states_notify_new);
-				$e_state_ok = in_array($item->state, $states_notify_existing);
-
-				if ($needs_publication_approval)
-				{
-					$notify_emails = $nConf->emails->notify_new_pending;
-				}
-				elseif ($isnew && $n_state_ok)
-				{
-					$notify_emails = $nConf->emails->notify_new;
-				}
-				elseif ($isnew)
-				{
-					$notify_emails = array();
-				}
-				elseif ($needs_version_reviewal)
-				{
-					$notify_emails = $nConf->emails->notify_existing_reviewal;
-				}
-				elseif (!$isnew && $e_state_ok)
-				{
-					$notify_emails = $nConf->emails->notify_existing;
-				}
-				elseif (!$isnew)
-				{
-					$notify_emails = array();
-				}
-
-				if ($needs_publication_approval)
-				{
-					$notify_text = $params->get('text_notify_new_pending');
-				}
-				elseif ($isnew)
-				{
-					$notify_text = $params->get('text_notify_new');
-				}
-				elseif ($needs_version_reviewal)
-				{
-					$notify_text = $params->get('text_notify_existing_reviewal');
-				}
-				elseif (!$isnew)
-				{
-					$notify_text = $params->get('text_notify_existing');
-				}
-
-				// print_r($notify_emails); jexit();
+				$states_notify_new = !FLEXI_J16GE ? array($states_notify_new) : explode("|", $states_notify_new);
 			}
+
+			$states_notify_existing = $params->get('states_notify_existing', array(1, 0, 2, -3, -4, -5));
+
+			if (empty($states_notify_existing))
+			{
+				$states_notify_existing = array();
+			}
+
+			elseif (! is_array($states_notify_existing))
+			{
+				$states_notify_existing = !FLEXI_J16GE ? array($states_notify_existing) : explode("|", $states_notify_existing);
+			}
+
+			$n_state_ok = in_array($item->state, $states_notify_new);
+			$e_state_ok = in_array($item->state, $states_notify_existing);
+
+			if ($needs_publication_approval)
+			{
+				$notify_emails = $nConf->emails->notify_new_pending;
+			}
+			elseif ($isnew && $n_state_ok)
+			{
+				$notify_emails = $nConf->emails->notify_new;
+			}
+			elseif ($isnew)
+			{
+				$notify_emails = array();
+			}
+			elseif ($needs_version_reviewal)
+			{
+				$notify_emails = $nConf->emails->notify_existing_reviewal;
+			}
+			elseif (!$isnew && $e_state_ok)
+			{
+				$notify_emails = $nConf->emails->notify_existing;
+			}
+			elseif (!$isnew)
+			{
+				$notify_emails = array();
+			}
+
+			if ($needs_publication_approval)
+			{
+				$notify_text = $params->get('text_notify_new_pending');
+			}
+			elseif ($isnew)
+			{
+				$notify_text = $params->get('text_notify_new');
+			}
+			elseif ($needs_version_reviewal)
+			{
+				$notify_text = $params->get('text_notify_existing_reviewal');
+			}
+			elseif (!$isnew)
+			{
+				$notify_text = $params->get('text_notify_existing');
+			}
+
+			// print_r($notify_emails); jexit();
 		}
 
 
@@ -1308,9 +1300,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	public function edit()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$isAdmin  = $app->isClient('administrator');
 
 		$this->input->set('view', $this->record_name);
@@ -1409,7 +1401,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				}
 
 				// Get User Group / Author parameters
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 				$authorparams = flexicontent_db::getUserConfig($user->id);
 				$max_auth_limit = intval($authorparams->get('max_auth_limit', 0));  // Maximum number of content items the user can create
 
@@ -1595,7 +1587,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$model = $this->getModel($this->record_name_pl);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Calculate ACL access
 		$is_authorised = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
@@ -1670,7 +1662,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$model = $this->getModel($this->record_name_pl);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Calculate ACL access
 		$is_authorised = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
@@ -1717,9 +1709,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getDbo();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$model = $this->getModel($this->record_name_pl);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$cid = $this->input->get('cid', array(), 'array');
 		$cid = ArrayHelper::toInteger($cid);
@@ -1778,6 +1770,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$copynr   = $this->input->get('copynr', 1, 'int');
 		$maincat  = $this->input->get('maincat', '', 'int');
 		$seccats  = $this->input->get('seccats', array(), 'array');
+		$seccats  = array_values(array_filter(ArrayHelper::toInteger($seccats), static function ($id) { return $id > 0; }));
 		$tags     = $this->input->get('tags', array(), 'array');
 		$keepseccats = $this->input->get('keepseccats', 0, 'int');
 
@@ -1846,8 +1839,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			}
 		}
 
-		// Set only authenticated item ids for the copyitems() method
-		$auth_cid = $cid;
+		// Keep the authorised subset. Replacing it with the original selection
+		// would reintroduce rows that the edit-permission check just rejected.
 		$clean_cache_flag = false;
 
 
@@ -1918,6 +1911,59 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				break;
 		}
 
+		// Set custom field values (updated items, or the new items created by copying)
+		if (in_array($method, array(1, 2, 3)))
+		{
+			$batch_cid = $method == 2 ? $auth_cid : $model->copiedIds;
+			$field_msg = $this->_batchSetFields(
+				$batch_cid,
+				$this->input->get('batch_fields', array(), 'array'),
+				$this->input->get('custom', array(), 'array')
+			);
+
+			if ($field_msg)
+			{
+				$msg = trim($msg . ' ' . $field_msg);
+				$clean_cache_flag = true;
+			}
+		}
+
+		// AJAX step of the batch progress UI (one item, one language per request): reply with JSON, instead of HTML / redirect
+		if ($this->input->getInt('fc_ajax', 0))
+		{
+			$errors = array();
+
+			foreach ($app->getMessageQueue(true) as $queued)
+			{
+				if (in_array($queued['type'], array('error', 'warning'), true))
+				{
+					$errors[] = trim(strip_tags($queued['message']));
+				}
+			}
+
+			if (isset($total_cnt) && $total_cnt)
+			{
+				$created = (int) $total_cnt;
+			}
+			else
+			{
+				$created = $method == 99 || $method == 3 ? 0 : count($auth_cid);
+			}
+
+			if ($clean_cache_flag)
+			{
+				$this->_cleanCache();
+			}
+
+			header('Content-Type: application/json; charset=utf-8');
+			jexit(json_encode(array(
+				'ok'      => !$errors && $created > 0,
+				'created' => $created,
+				'message' => trim(strip_tags($msg)),
+				'errors'  => $errors,
+			)));
+		}
+
 		// CHECK CASE OF TRANSLATING SINGLE ITEM TO MULTIPLE LANGUAGES and terminate with success message, because this is inside a modal window
 		if ($lang_arr)
 		{
@@ -1934,6 +1980,442 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		$this->setRedirect($link, $msg);
+	}
+
+
+	/**
+	 * Set custom field values of the given items, as requested by the batch tool
+	 *
+	 * Modes (per field):
+	 *   add      Add the given values to the existing values (skipping duplicates)
+	 *   replace  Replace the existing values with the given values
+	 *   fill     Set the given values only if the field has no value
+	 *   clear    Remove all values of the field
+	 *
+	 * Values are saved via the item model, so field plugins validate / filter them as in the item form
+	 *
+	 * @param   int[]   $cid           Ids of the items to update
+	 * @param   array   $batch_fields  Field ids => array('mode' => ...)
+	 * @param   array   $custom        Posted values: field name => values
+	 *
+	 * @return  string  Result message, empty if no fields were requested
+	 *
+	 * @since   3.3
+	 */
+	protected function _batchSetFields(array $cid, array $batch_fields, array $custom)
+	{
+		$cid = array_values(array_filter(ArrayHelper::toInteger($cid)));
+
+		if (!$cid || !$batch_fields)
+		{
+			return '';
+		}
+
+		$app = \Joomla\CMS\Factory::getApplication();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		$items_model  = $this->getModel($this->record_name_pl);
+		$record_model = $this->getModel($this->record_name);
+
+		/**
+		 * Build the operations, keeping only the fields that can be batch-edited
+		 */
+		$types_list = flexicontent_html::getTypesList();
+		$allowed    = $items_model->getBatchFields(array_keys($types_list));
+		$modes      = array('add', 'replace', 'fill', 'clear');
+		$ops        = array();
+
+		foreach ($batch_fields as $field_id => $conf)
+		{
+			$field_id = (int) $field_id;
+
+			if (!isset($allowed[$field_id]))
+			{
+				continue;
+			}
+
+			$mode   = isset($conf['mode']) && in_array($conf['mode'], $modes) ? $conf['mode'] : 'add';
+			$name   = $allowed[$field_id]->name;
+			$is_arr = (bool) $allowed[$field_id]->value_is_arr;
+			$values = $this->_batchCleanValues(isset($custom[$name]) ? (array) $custom[$name] : array());
+
+			// Fields whose value is a set of options: work with the flat list of options
+			if ($is_arr)
+			{
+				$flat   = $this->_batchFlatten($values);
+				$values = $flat ? array($flat) : array();
+			}
+
+			// Single value fields: there is nothing to add to, so only set the value if the field is empty
+			if (!$allowed[$field_id]->multiple && $mode === 'add')
+			{
+				$mode = 'fill';
+			}
+
+			// Respect the maximum number of values of the field
+			$max_values = (int) $allowed[$field_id]->max_values;
+			if ($max_values > 0 && !$is_arr)
+			{
+				$values = array_slice($values, 0, $max_values);
+			}
+
+			// Nothing to set, avoid wiping values by accident
+			if ($mode !== 'clear' && !$values)
+			{
+				continue;
+			}
+
+			$ops[$field_id] = (object) array('name' => $name, 'label' => $allowed[$field_id]->label, 'mode' => $mode, 'values' => $values, 'max_values' => $max_values, 'is_arr' => $is_arr, 'multiple' => (bool) $allowed[$field_id]->multiple, 'groups' => (bool) $allowed[$field_id]->allow_multiple, 'type_ids' => $allowed[$field_id]->type_ids);
+		}
+
+		if (!$ops)
+		{
+			return '';
+		}
+
+		/**
+		 * Apply the operations on every item
+		 */
+		$updated = array();
+		$skipped = array();
+		$failed  = array();    // item id => reason
+		$noperm  = array();
+		$locked  = array();    // item id => name of the user that has the item checked out
+		$nochange  = array();
+		$propagated = array();  // associated items (outside the selection) that got values of non-translatable fields
+
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$can_checkin_others = $user->authorise('core.manage', 'com_checkin');
+
+		/**
+		 * Non-translatable fields are shared among the items of a language association, the item of the site's default language is the source of their values
+		 */
+		$useAssocs     = flexicontent_db::useAssociations();
+		$site_default  = substr(flexicontent_html::getSiteDefaultLang(), 0, 2);
+		$untranslatable_names = $useAssocs
+			? $db->setQuery('SELECT name FROM #__flexicontent_fields WHERE untranslatable = 1 AND iscore = 0 AND published = 1')->loadColumn()
+			: array();
+
+		foreach ($cid as $item_id)
+		{
+			$record = $record_model->getRecord($item_id);
+
+			if (!$record || !$record->id)
+			{
+				$failed[$item_id] = 'not found';
+				continue;
+			}
+
+			if (!$record_model->canEdit($record))
+			{
+				$noperm[] = $item_id;
+				continue;
+			}
+
+			// Do not change items that are checked out by another user (unless user can check them in)
+			if (!empty($record->checked_out) && $record->checked_out != $user->id && !$can_checkin_others)
+			{
+				$locked[$item_id] = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $record->checked_out)->name;
+				continue;
+			}
+
+			// Language associations of the item, and the item of the default language (the source of values of non-translatable fields)
+			$assoc_ids = array();
+			$orig_id   = 0;
+
+			if ($useAssocs && $record->language !== '*')
+			{
+				$associations = \Joomla\CMS\Language\Associations::getAssociations('com_content', '#__content', 'com_content.item', $item_id);
+
+				foreach ($associations as $tag => $association)
+				{
+					if ((int) $association->id === (int) $item_id)
+					{
+						continue;
+					}
+
+					$assoc_ids[] = (int) $association->id;
+
+					if (substr($tag, 0, 2) === $site_default && substr($record->language, 0, 2) !== $site_default)
+					{
+						$orig_id = (int) $association->id;
+					}
+				}
+			}
+
+			// Values of the original item
+			$orig_values = null;
+
+			if ($orig_id && $untranslatable_names)
+			{
+				if ($orig_item = $record_model->getItem($orig_id, $check_view_access = false, $no_cache = true, $force_version = 0))
+				{
+					$orig_items  = array($orig_item);
+					$orig_all    = FlexicontentFields::getCustomFieldValues($orig_items, 'item');
+					$orig_values = (array) reset($orig_all);
+				}
+			}
+
+			$item = $record_model->getItem($item_id, $check_view_access = false, $no_cache = true, $force_version = 0);
+
+			if (!$item)
+			{
+				$failed[$item_id] = 'not found';
+				continue;
+			}
+
+			// Existing values of the custom fields
+			$items               = array($item);
+			$items_custom_values = FlexicontentFields::getCustomFieldValues($items, 'item');
+			$current             = (array) reset($items_custom_values);
+
+			// Like the item form does, use values of the original item for non-translatable fields, so that saving does not overwrite them with stale copies
+			if ($orig_values !== null)
+			{
+				foreach ($untranslatable_names as $n)
+				{
+					$current[$n] = isset($orig_values[$n]) ? $orig_values[$n] : array();
+				}
+			}
+
+			$data = array('id' => $item_id, 'vstate' => 2, 'custom' => $current);
+			$changed = false;
+
+			foreach ($ops as $field_id => $op)
+			{
+				// Field is not assigned to the type of the item
+				if (!in_array((int) $item->type_id, $op->type_ids))
+				{
+					$skipped[$field_id] = isset($skipped[$field_id]) ? $skipped[$field_id] + 1 : 1;
+					continue;
+				}
+
+				$existing = $this->_batchCleanValues(isset($current[$op->name]) ? (array) $current[$op->name] : array());
+
+				// Fields whose value is a set of options
+				if ($op->is_arr)
+				{
+					// Existing options, as groups (one group per value)
+					$groups = array();
+					foreach ($existing as $e)
+					{
+						if ($g = $this->_batchFlatten(array($e)))
+						{
+							$groups[] = $g;
+						}
+					}
+					$existing_flat = $this->_batchFlatten($groups);
+					$op_flat       = $op->values ? reset($op->values) : array();
+
+					switch ($op->mode)
+					{
+						case 'replace':
+							$new = $op->values;
+							break;
+
+						case 'fill':
+							$new = $groups ?: $op->values;
+							break;
+
+						case 'clear':
+							$new = array();
+							break;
+
+						default:  // add
+							$added = array_values(array_diff($op_flat, $existing_flat));
+							// Separate groups of options only if the field allows several values, otherwise the plugin keeps only the first group
+							$new   = !$added ? $groups : ($op->groups ? array_merge($groups, array($added)) : array(array_merge($existing_flat, $added)));
+					}
+
+					if (json_encode($new) === json_encode($groups))
+					{
+						continue;
+					}
+
+					$data['custom'][$op->name] = $new;
+					$changed = true;
+					continue;
+				}
+
+				switch ($op->mode)
+				{
+					case 'replace':
+						$new = $op->values;
+						break;
+
+					case 'fill':
+						$new = $existing ?: $op->values;
+						break;
+
+					case 'clear':
+						$new = array();
+						break;
+
+					default:  // add
+						$known = array_map('json_encode', $existing);
+						$new   = $existing;
+
+						foreach ($op->values as $v)
+						{
+							if ($op->max_values > 0 && count($new) >= $op->max_values)
+							{
+								break;
+							}
+
+							if (!in_array(json_encode($v), $known))
+							{
+								$new[]   = $v;
+								$known[] = json_encode($v);
+							}
+						}
+				}
+
+				if ($new === $existing)
+				{
+					continue;
+				}
+
+				$data['custom'][$op->name] = $new;
+				$changed = true;
+			}
+
+			if (!$changed)
+			{
+				$nochange[] = $item_id;
+				continue;
+			}
+
+			$app->input->set('unique_tmp_itemid', $item_id);
+			$result = $record_model->store($data);
+			$app->input->set('unique_tmp_itemid', null);
+
+			if ($result)
+			{
+				$updated[] = $item_id;
+
+				// Saving an item, also sets the values of its non-translatable fields to the items it is associated with
+				foreach ($ops as $op)
+				{
+					if (in_array($op->name, $untranslatable_names) && isset($data['custom'][$op->name]))
+					{
+						foreach ($assoc_ids as $assoc_id)
+						{
+							if (!in_array($assoc_id, $cid))
+							{
+								$propagated[$assoc_id] = $assoc_id;
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				$failed[$item_id] = $record_model->getError() ?: 'unknown error';
+				\Joomla\CMS\Log\Log::add('Batch set fields, failed to store item ' . $item_id . ': ' . $failed[$item_id], \Joomla\CMS\Log\Log::WARNING);
+			}
+		}
+
+		foreach ($skipped as $field_id => $count)
+		{
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_BATCH_FIELD_SKIPPED_N_ITEMS', $ops[$field_id]->label, $count), 'warning');
+		}
+
+		if ($noperm)
+		{
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_BATCH_FIELDS_NO_PERMISSION') . ': ' . implode(',', $noperm), 'warning');
+		}
+
+		if ($locked)
+		{
+			$list = array();
+			foreach ($locked as $id => $name)
+			{
+				$list[] = $id . ' (' . $name . ')';
+			}
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_BATCH_FIELDS_CHECKED_OUT') . ': ' . implode(', ', $list), 'warning');
+		}
+
+		foreach ($failed as $id => $reason)
+		{
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_BATCH_FIELDS_FAILED_ITEM') . ' ' . $id . ': ' . $reason, 'warning');
+		}
+
+		if ($nochange)
+		{
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_BATCH_FIELDS_NO_CHANGE', count($nochange), implode(',', $nochange)), 'notice');
+		}
+
+		if ($propagated)
+		{
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_BATCH_FIELDS_TRANSLATIONS_ALSO', count($propagated), implode(',', $propagated)), 'notice');
+		}
+
+		return \Joomla\CMS\Language\Text::sprintf('FLEXI_BATCH_FIELDS_UPDATED', count($ops), count($updated));
+	}
+
+
+	/**
+	 * Flatten (nested / serialized) field values into a list of unique non-empty strings
+	 *
+	 * @param   array  $values  Field values
+	 *
+	 * @return  string[]
+	 */
+	protected function _batchFlatten(array $values)
+	{
+		$flat = array();
+
+		foreach ($values as $v)
+		{
+			$v = flexicontent_db::unserialize_array($v, $force_array = false, $force_value = true);
+
+			if (is_array($v))
+			{
+				$flat = array_merge($flat, $this->_batchFlatten($v));
+			}
+			elseif (strlen(trim((string) $v)))
+			{
+				$flat[] = (string) $v;
+			}
+		}
+
+		return array_values(array_unique($flat));
+	}
+
+
+	/**
+	 * Normalize field values: unserialize them, and remove empty ones
+	 *
+	 * @param   array  $values  Field values
+	 *
+	 * @return  array  Re-indexed, non-empty values
+	 */
+	protected function _batchCleanValues(array $values)
+	{
+		$clean = array();
+
+		foreach ($values as $v)
+		{
+			$v = flexicontent_db::unserialize_array($v, $force_array = false, $force_value = true);
+
+			if (is_array($v))
+			{
+				$v = array_map(function ($x) { return is_string($x) ? trim($x) : $x; }, $v);
+
+				if (!array_filter($v, function ($x) { return is_array($x) ? !empty($x) : strlen((string) $x); }))
+				{
+					continue;
+				}
+			}
+			elseif (!strlen(trim((string) $v)))
+			{
+				continue;
+			}
+
+			$clean[] = $v;
+		}
+
+		return $clean;
 	}
 
 
@@ -2000,7 +2482,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken() or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$cid    = $this->input->get('cid', array(), 'array');
 		$values = array('featured' => 1, 'unfeatured' => 0);
@@ -2160,7 +2642,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$id			= $this->input->getInt('id', 0);
 		$version	= $this->input->getInt('version', 0);
@@ -2178,7 +2660,19 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		// First checkin the open item, but do not force check-in of items locked by other users
-		$item = \Joomla\CMS\Table\Table::getInstance($this->records_jtable, '');
+		$__tblType = $this->records_jtable;
+		$__tblPrefix = '';
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$item = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$item = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$item = new $__tblClass($__tblDb);
+		}
 		$item->load($id);
 
 		if ($item->checked_out && $item->checked_out != $user->id && !$user->authorise('core.manage', 'com_checkin'))
@@ -2202,6 +2696,56 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$ctrlTask = 'task=items.edit';
 		$this->setRedirect('index.php?option=com_flexicontent&' . $ctrlTask . '&cid[]=' . $id, $msg);
+	}
+
+
+	/**
+	 * Mark (or unmark) one version as a permanent backup for an item.
+	 * Only one version per item can be permanent; it is excluded from version rotation.
+	 *
+	 * @return void
+	 */
+	function setversionkeep()
+	{
+		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		$app     = \Joomla\CMS\Factory::getApplication();
+		$cid     = $this->input->get('cid', array(), 'array');
+		$id      = $this->input->getInt('id', !empty($cid[0]) ? (int) $cid[0] : 0);
+		$version = $this->input->getInt('version', 0);
+
+		$record_model = $this->getModel($this->record_name);
+		$record = $id ? \FLEXIUtilities::getVersionRecord($id) : null;
+
+		if (!$record || empty($record->id) || !$record_model->canEdit($record))
+		{
+			$app->setHeader('status', '403 Forbidden', true);
+			$this->setRedirect($this->returnURL, \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+
+			return;
+		}
+
+		$result = \FLEXIUtilities::setVersionKeep($id, $version);
+		if (!$result['success'])
+		{
+			$app->setHeader('status', '404', true);
+			$this->setRedirect($this->returnURL, $result['error'], 'error');
+
+			return;
+		}
+
+		$msg = \Joomla\CMS\Language\Text::sprintf(
+			$result['keep'] ? 'FLEXI_VERSION_KEPT' : 'FLEXI_VERSION_UNKEPT',
+			$version
+		);
+
+		if ($app->input->getCmd('format') === 'raw')
+		{
+			echo json_encode(array('success' => 1, 'version' => $version, 'keep' => $result['keep'], 'message' => $msg));
+			jexit();
+		}
+
+		$this->setRedirect('index.php?option=com_flexicontent&task=items.edit&cid[]=' . (int) $id, $msg);
 	}
 
 
@@ -2237,7 +2781,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$isAdmin  = $app->isClient('administrator');
 
 		// Get model
@@ -2291,15 +2835,19 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 * Find and excluded records that user cannot edit
 		 */
 		$record_model = $this->getModel($this->record_name);
+		$errors = [];
+		$modified = 0;
 
 		if ($checkACL)
 		{
 			$cid_noauth = [];
 			foreach ($cid as $i => $_id)
 			{
-				$record = $record_model->getRecord($_id);
+				// The item model keeps the first loaded record: getRecord() of another id returns it again,
+				// so load each item explicitly, otherwise every id is checked against the first item's permissions
+				$record = $record_model->getItem($_id, $check_view_access = false, $no_cache = true);
 
-				if (!$record_model->canEdit($record))
+				if (!$record || !$record_model->canEdit($record))
 				{
 					$cid_noauth[] = $_id;
 					unset($cid[$i]);
@@ -2327,7 +2875,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			}
 			elseif (count($cid_noauth))
 			{
-				$app->enqueueMessage($msg_noauth, 'warning');
+				$errors[] = $msg_noauth;
 			}
 		}
 
@@ -2337,12 +2885,16 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			// EITHER Load existing item into the ITEM model
 			$item = $record_model->getItem($item_ID, $check_view_access = false, $no_cache = true, $force_version = 0);
 			// You can use $item to get existing values
-			if (!$item) die('item ' . $item_ID . ' not found');
+			if (!$item)
+			{
+				$errors[] = 'item ' . $item_ID . ' not found';
+				continue;
+			}
 
 			// IMPORTANT: Get existing field values for the item
 			$items               = array($item);
 			$items_custom_values = FlexicontentFields::getCustomFieldValues($items, 'item');
-			$data['custom']      = reset($items_custom_values); // Get data of first item
+			$data['custom']      = reset($items_custom_values) ?: array(); // Get data of first item (none if the item has no field values yet)
 
 			// Indicate which item to update
 			$data['id'] = $item_ID;
@@ -2363,26 +2915,38 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			$app->input->set('unique_tmp_itemid', null);
 			if (!$result)
 			{
-				$msg = 'Failed to store item: ' . $record_model->getError();
+				$msg = 'Failed to store item ' . $item_ID . ': ' . $record_model->getError();
 				\Joomla\CMS\Log\Log::add($msg);
-				echo $msg . "<br/>";
+				$errors[] = $msg;
+			}
+			else
+			{
+				$modified++;
 			}
 		}
 
 		// Clear dependent cache data
 		$this->_cleanCache();
 
-		$msg = count($cid) . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_RECORDS_MODIFIED');
+		$msg = $modified . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_RECORDS_MODIFIED');
 
-		/*echo '<pre>';
-		print_r($cid); echo "\n";
-		print_r($fieldname); echo "\n";
-		print_r($values); echo "\n";
-		print_r($data);
-		exit;*/
+		if ($this->input->get('is_ajax') && $errors)
+		{
+			$app->setHeader('status', '400 Bad Request', true);
+			$app->setHeader('Content-Type', 'text/plain; charset=utf-8', true);
+			$app->sendHeaders();
+			echo $msg . "\n" . implode("\n", $errors);
+			$app->close();
+		}
 
 		if ($this->input->get('is_ajax')) die('OK');
-		$this->setRedirect($this->returnURL, $msg, 'message');
+
+		foreach ($errors as $error)
+		{
+			$app->enqueueMessage(htmlspecialchars($error, ENT_QUOTES, 'UTF-8'), 'error');
+		}
+
+		$this->setRedirect($this->returnURL, $msg, $errors ? ($modified ? 'warning' : 'error') : 'message');
 	}
 
 
@@ -2399,7 +2963,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$id    = $this->input->get('id', 0, 'int');
 		$record_model = $this->getModel($this->record_name);
 		$tags  = $record_model->gettags();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Get tag ids if non-new item
 		$used = $id ? $record_model->getUsedtagsIds($id) : null;
@@ -2434,7 +2998,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 					<li class="tagitem">
 						<span>' . $tag->name . '</span>
 						<input type="hidden" name="jform[tag][]" value="' . $tag->tid . '" />
-						<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="' . \Joomla\CMS\Language\Text::_('FLEXI_DELETE_TAG') . '"></a>
+						<a href="#" class="deletetag" title="' . \Joomla\CMS\Language\Text::_('FLEXI_DELETE_TAG') . '"></a>
 					</li>';
 				}
 				else
@@ -2480,8 +3044,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getDbo();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$cid = $this->input->get('cid', array(), 'array');
 		$cid = ArrayHelper::toInteger($cid);

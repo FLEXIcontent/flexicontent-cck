@@ -31,7 +31,11 @@ if ($filter_vals_display)
 $scroll_min = 10;  // Minimum number of filter values, after which a content scrollbar is added, TODO: add parameter for this
 $add_scrollbar = count($results) >= $scroll_min;
 
-if ($add_scrollbar)
+// mCustomScrollbar (mCSB) is a jQuery plugin: only load it in legacy (select2js) mode.
+// In choices.js mode the scrollbar is provided by native CSS (overflow) — see flexi_choices.css.
+$useChoicesJs = $cparams->get('select_lib_type', 0) == 1;
+
+if ($add_scrollbar && !$useChoicesJs)
 {
 	flexicontent_html::loadFramework('mCSB');
 }
@@ -52,7 +56,7 @@ $filter->html .= '
 	<div class="fc_checkradio_group_wrapper fc_add_scroller'.($add_scrollbar ? ' fc_list_filter_wrapper':'').'">
 		<ul class="fc_field_filter fc_checkradio_group'.($add_scrollbar ? ' fc_list_filter':'').'">
 			<li class="fc_checkradio_option fc_checkradio_special'.$checked_class_li.'" style="'.$value_style.'">
-			' . ($label_filter==2  ? ' <span class="fc_filter_label_inline">'.$filter->label.'</span> ' : '');
+			' . ($label_filter==2  ? ' <span class="fc_filter_label_inline">'.htmlspecialchars((string) $filter->label, ENT_QUOTES, 'UTF-8').'</span> ' : '');
 
 if ($display_filter_as == 4)
 {
@@ -103,6 +107,7 @@ foreach ($results as $result)
 		? ' fc_checkradio_checked' : '';
 
 	$result_text_encoded = htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8');
+	$result_value_encoded = htmlspecialchars((string) $result->value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
 	$filter->html .= '<li class="fc_checkradio_option'.$checked_class_li.'" style="'.$value_style.'">';
 	
@@ -110,21 +115,21 @@ foreach ($results as $result)
 	if ($filter_vals_display == 2)
 	{
 		$filter->html .= isset( $result->image_url ) ?
-			'<span class="fc_filter_val_img"><img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.$result_text_encoded.'" title="'.$result_text_encoded.'" /></span>' :
-			'<span class="fc_filter_val_img"><span onclick="jQuery(this).closest(\'li\').find(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="'.$result_text_encoded.'"></span></span>' ;
+			'<span class="fc_filter_val_img"><img onclick="this.closest(\'li\').querySelector(\'input\').click();" src="'.$result->image_url.'" alt="'.$result_text_encoded.'" title="'.$result_text_encoded.'" /></span>' :
+			'<span class="fc_filter_val_img"><span onclick="this.closest(\'li\').querySelector(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="'.$result_text_encoded.'"></span></span>' ;
 	}
 	
 	if ($display_filter_as==4)
 	{
 		$filter->html .= ' <input onchange="fc_toggleClassGrp(this, \'fc_highlight\');" ';
 		$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
-		$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
+		$filter->html .= '  value="'.$result_value_encoded.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
 	}
 	else
 	{
 		$filter->html .= ' <input onchange="fc_toggleClass(this, \'fc_highlight\');" ';
 		$filter->html .= '  id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'[]" ';
-		$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
+		$filter->html .= '  value="'.$result_value_encoded.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
 	}
 	
 	$filter->html .= '<label class="fc_filter_val fc_cleared '.$checked_class.'" for="'.$filter_ffid.$i.'">';
@@ -139,10 +144,10 @@ foreach ($results as $result)
 	{
 		$filter->html .= isset( $result->image_url ) ?
 			'<span class="fc_filter_val_img">
-				<img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="' . $result_text_encoded . '" title="' . $result_text_encoded . '" />
+				<img onclick="this.closest(\'li\').querySelector(\'input\').click();" src="'.$result->image_url.'" alt="' . $result_text_encoded . '" title="' . $result_text_encoded . '" />
 			</span>' :
 			'<span class="fc_filter_val_img">
-				<span onclick="jQuery(this).closest(\'li\').find(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="' . $result_text_encoded . '"></span>
+				<span onclick="this.closest(\'li\').querySelector(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="' . $result_text_encoded . '"></span>
 			</span>' ;
 	}
 	

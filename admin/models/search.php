@@ -198,9 +198,9 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
-		// 2, get current items total for pagination
-		$this->_db->setQuery("SELECT FOUND_ROWS()");
-		$this->_total = $this->_db->loadResult();
+		// 2, get current items total for pagination: the number of rows of the same query without its LIMIT
+		// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+		$this->_total = $this->_db->setQuery('SELECT COUNT(*) FROM (' . $query . ') AS fc_list')->loadResult();
 
 		$filter_indextype = $this->getState('filter_indextype');
 		$isADV = $filter_indextype=='advanced';
@@ -281,7 +281,7 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 		$isADV = $filter_indextype=='advanced';
 
 		$query = !$query_ids
-			? 'SELECT SQL_CALC_FOUND_ROWS ' . ($isADV ? 'ai.sid' : 'ext.item_id')
+			? 'SELECT ' . ($isADV ? 'ai.sid' : 'ext.item_id')
 			: ($isADV
 				? 'SELECT f.label, f.name, f.field_type, ai.*, a.title, a.id, a.language, 0 AS checked_out '
 				: 'SELECT ext.*, a.title, a.id, a.language, 0 AS checked_out '
@@ -343,6 +343,8 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 		$filter_order_Dir = $this->getState('filter_order_Dir');
 
 		$orderby = $filter_order.' '.$filter_order_Dir;
+		// Several index entries can share an item's title. Keep tied rows on the same page.
+		$orderby .= $this->getState('filter_indextype') === 'advanced' ? ', ai.sid' : ', ext.item_id';
 		$orderby = ' ORDER BY '.$orderby;
 
 		return $orderby;
@@ -471,8 +473,8 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 	public function purge($del_fieldids = null)
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbname   = $app->getCfg('db');
+		$dbprefix = $app->get('dbprefix');
+		$dbname   = $app->get('db');
 
 		/**
 		 * Empty Common text-search index
@@ -544,10 +546,14 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 			  KEY `field_id` (`field_id`),
 			  KEY `item_id` (`item_id`),
 			  FULLTEXT `search_index` (`search_index`),
-			  KEY `value_id` (`value_id`)
-			) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`
+			  KEY `value_id` (`value_id`(191))
+			) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`
 			';
 			$this->_db->setQuery($query)->execute();
+
+			// A new table must not come back as MyISAM on a site that was moved to InnoDB
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+			FlexicontentDbEngine::followSiteEngine($this->_db, $tbl_name);
 		}
 	}
 }

@@ -21,6 +21,37 @@ if ($app->isClient('site'))
 {
 	$task_parts = explode('.', $app->input->get('task', '', 'cmd'));
 	$task_method = strtolower((string) end($task_parts));
+	$controller = strtolower($app->input->get('controller', '', 'cmd'));
+	$view = strtolower($app->input->get('view', '', 'cmd'));
+	$is_filemanager_request = $controller === 'filemanager' || $view === 'filemanager'
+		|| (count($task_parts) > 1 && strtolower($task_parts[0]) === 'filemanager');
+
+	// Public/Registered inherit upload and own-file actions from the installer.
+	// Those alone must not expose a standalone file-management endpoint. Internal
+	// field operations keep their item/file checks and do not enter this guard.
+	if ($is_filemanager_request)
+	{
+		$user = $app->getIdentity();
+		$can_manage_files = $user && !$user->guest
+			&& $user->authorise('flexicontent.managefiles', 'com_flexicontent');
+		if ($user && !$user->guest && !$can_manage_files)
+		{
+			foreach (array('core.create', 'core.edit', 'core.edit.own') as $action)
+			{
+				if ($user->authorise($action, 'com_flexicontent')
+					|| $user->getAuthorisedCategories('com_content', $action))
+				{
+					$can_manage_files = true;
+					break;
+				}
+			}
+		}
+		if (!$can_manage_files)
+		{
+			throw new \RuntimeException('File-management or content-author permission is required to manage files.', 403);
+		}
+	}
+
 
 	if (in_array($task_method, array('addurl', 'addlocal'), true))
 	{

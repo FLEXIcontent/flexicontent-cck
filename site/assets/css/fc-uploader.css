@@ -1,0 +1,364 @@
+.fc-native-upload {
+  border: 1px solid var(--border-color, #ced4da);
+  border-radius: .375rem;
+  max-inline-size: 36rem;
+  padding: .5rem;
+}
+
+/* The legacy plupload container reserves 530px even inside a smaller column. */
+#flexicontent .fc_file_uploader .fc-native-upload.plupload_container {
+  min-width: 0;
+  max-width: 100%;
+  margin-inline: 0;
+}
+
+.fc_auto_uploader > .fc-native-upload {
+  border: 0;
+  padding: 0;
+}
+
+/* Existing file layouts give this column an inline flex-basis. Reserve a full
+   row while it contains the queue so the picker cannot overlap the metadata. */
+.fc_uploader_n_props_box > .inlinefile-prv-box:has(.fc-native-upload) {
+  flex-basis: 100% !important;
+  min-width: 0;
+}
+
+#flexicontent .fc_file_uploader:has(> .fc-native-upload),
+.fc_file_uploader:has(> .fc-native-upload) {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.fc-native-upload-controls,
+.fc-native-upload-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .375rem;
+}
+
+.fc-native-upload .fc-upload-drop {
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: .375rem;
+  width: 100%;
+  min-block-size: 8rem;
+  margin: 0;
+  padding: .75rem .5rem;
+  border: 2px dashed var(--border-color, #aeb7c2);
+  border-radius: .375rem;
+  font-size: .875rem;
+  line-height: 1.35;
+  text-align: center;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.fc-native-upload .fc-upload-drop,
+.fc-upload-dialog .uppy-Dashboard-inner,
+.fc-upload-dialog .uppy-Dashboard-AddFilesPanel {
+  background: var(--tertiary-bg, #f3f5f8);
+  color: var(--body-color, #253248);
+}
+.fc-upload-dialog .uppy-Dashboard-AddFiles { border-color: var(--border-color, #aeb7c2); }
+.fc-upload-dialog .uppy-Dashboard-AddFiles-title { color: var(--body-color, #253248); }
+.fc-upload-dialog .uppy-Dashboard-browse { color: var(--link-color, #3459bc); }
+
+.fc-image-card .fc-upload-drop {
+  aspect-ratio: 1;
+}
+
+/* The image field uses a transparent pixel until a thumbnail is assigned. */
+#flexicontent .fc-image-card:has(.fc_auto_uploader) .fcfield_preview_box:has(img[src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="]) {
+  display: none;
+}
+
+/* A selected image occupies the drop area and accepts the next drop on the picture. */
+.fc-image-card:has(.fc-image-preview-button img[src]:not([src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="])) div:has(> .fc_auto_uploader):not(:has(.fc-native-upload-row, .fc-native-upload-message:not(:empty), .fc-field-invalid)) {
+  display: none !important; /* The uploader helper sets display inline. */
+}
+.fc-has-assigned-file .fc_auto_uploader :is(.fc-upload-drop, .fc-upload-formats),
+.fc_auto_uploader:has(~ .fc-upload-result) :is(.fc-upload-drop, .fc-upload-formats) {
+  display: none;
+}
+#flexicontent .fc-image-card .fc-image-preview-button,
+#flexicontent .fc_auto_uploader ~ .fc-upload-result:has(img) {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: zoom-in;
+}
+#flexicontent .fc_auto_uploader ~ .fc-upload-result:has(img) {
+  display: block;
+  width: 100%;
+  font-size: 0;
+}
+#flexicontent .fc_auto_uploader ~ .fc-upload-result img {
+  width: 100%;
+  height: 8rem;
+  margin: 0;
+  object-fit: contain;
+}
+.fc-image-card:has(.fc-upload-dragover) .fc-image-preview-button,
+.fc-upload-dragover ~ .fc-upload-result:has(img) {
+  outline: 2px solid var(--link-color, #3459bc);
+  outline-offset: -2px;
+}
+
+.fc-upload-drop .fc-upload-cloud {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--body-bg, white);
+  color: var(--link-color, #3459bc);
+  font-size: 1.1rem;
+}
+
+.fc-native-upload .fc-upload-drop .fc-upload-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.fc-upload-drop:focus-within,
+.fc-upload-dragover .fc-upload-drop {
+  outline: 2px solid var(--link-color, #3459bc);
+  outline-offset: -2px;
+  border-style: solid;
+}
+
+.fc-upload-dragover .fc-upload-drop {
+  background: var(--primary-bg-subtle, #e3ebff);
+}
+
+.fc-upload-types, .fc-upload-formats {
+  font-size: .75rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.fc-upload-dialog {
+  box-sizing: border-box;
+  width: min(56rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  padding: .75rem;
+  border: 1px solid var(--border-color, #aeb7c2);
+  border-radius: .5rem;
+  color: var(--body-color, #253248);
+  background: var(--body-bg, white);
+}
+.fc-upload-dialog::backdrop { background: rgba(15, 24, 34, .55); }
+.fc-upload-media-preview {
+  display: block;
+  width: 100%;
+  max-height: 65vh;
+  border: 0;
+}
+iframe.fc-upload-media-preview { height: 60vh; }
+.fc-upload-pdf-viewer .gcontainer {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: #202124;
+}
+.fc-upload-pdf-title {
+  align-content: center;
+  min-height: 44px;
+  padding-inline: 1rem 3.5rem;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.glightbox-container.fc-upload-pdf-viewer .gclose {
+  inset: 0 auto auto;
+  inset-inline-end: 0;
+  width: 44px;
+  height: 44px;
+  opacity: 1;
+}
+.glightbox-container.fc-upload-pdf-viewer :is(.gprev, .gnext) { display: none; }
+.fc-upload-pdf-viewer :is(.gslide, .gslide-inner-content, .ginner-container, .ginlined-content, iframe.fc-upload-media-preview) {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+}
+.glightbox-container.fc-upload-pdf-viewer :is(.gslide-inline, .ginlined-content) {
+  padding: 0;
+  max-height: none;
+  overflow: hidden;
+  box-shadow: none;
+}
+.fc-upload-dashboard-preview { align-self: center; width: 100%; }
+.fc-upload-dialog .fc-upload-media-preview { max-height: min(350px, 50vh); }
+.fc-upload-dialog > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  padding-block-end: .75rem;
+}
+.fc-upload-dialog > header > div { flex: 1 1 14rem; }
+.fc-upload-dialog > header strong, .fc-upload-dialog > header small { display: block; }
+.fc-upload-dialog > header label { font-size: .875rem; }
+.fc-upload-dialog > header select { max-width: 12rem; }
+.fc-upload-dialog .uppy-Dashboard-inner { max-height: calc(100dvh - 7rem); }
+
+.fc-upload-formats { margin-block: .375rem; }
+.fc-upload-formats summary { cursor: pointer; }
+.fc-native-upload-controls:has(> :not([hidden])) { margin-block: .375rem; }
+.fc-upload-preview img {
+  display: block;
+  max-width: 100%;
+  max-height: 8rem;
+  margin: 0 auto .25rem;
+  object-fit: contain;
+}
+
+.fc-native-upload-controls .fc-native-upload-size {
+  width: auto;
+}
+
+.fc-native-upload .fc-native-upload-list {
+  display: grid;
+  gap: .5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+}
+
+.fc-native-upload .fc-native-upload-row {
+  display: grid;
+  gap: .375rem;
+  min-width: 0;
+  padding: .5rem 0;
+  overflow-wrap: anywhere;
+}
+
+.fc-native-upload .plupload_img_preview img {
+  display: block;
+  max-width: min(100%, var(--fc-upload-thumb-size, 150px));
+  max-height: var(--fc-upload-thumb-size, 150px);
+  object-fit: contain;
+}
+
+.fc-native-upload-message:not(:empty) {
+  margin-top: .5rem;
+}
+
+.fc-native-upload progress {
+  width: 100%;
+}
+
+/* Keep media row controls consistent across the editor's field layouts. */
+#flexicontent .fcfieldval_container:has(.fc_file_uploader[data-tagid-prefix]) > .fc-xpended-btns {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .25rem;
+  max-inline-size: 100%;
+}
+
+#flexicontent .fcfieldval_container:has(.fc_file_uploader[data-tagid-prefix]) > .fc-xpended-btns > .btn {
+  align-items: center;
+  background-color: transparent;
+  border-color: var(--border-color, #adb5bd);
+  border-radius: .375rem;
+  color: var(--body-color, #253248);
+  display: inline-flex;
+  font-size: .875rem;
+  justify-content: center;
+  line-height: 1.2;
+  margin: 0;
+  min-block-size: 2rem;
+  min-inline-size: 2rem;
+  padding: .25rem .45rem;
+}
+
+#flexicontent .fcfieldval_container:has(.fc_file_uploader[data-tagid-prefix]) > .fc-xpended-btns > .btn:is(:hover, :focus-within, [aria-expanded="true"]) {
+  background-color: var(--tertiary-bg, #f3f5f8);
+}
+
+#flexicontent .fcfieldval_container:has(.fc_file_uploader[data-tagid-prefix]) .fc-xpended-btns .fcfield-addvalue.dropdown-toggle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  display: inline-flex;
+  gap: .25rem;
+  line-height: 1.2;
+  padding: .25rem .45rem;
+}
+
+#flexicontent .fcfieldval_container:has(.fc_file_uploader[data-tagid-prefix]) .fc-xpended-btns .dropdown-menu {
+  background: var(--body-bg, #fff);
+  border: 1px solid var(--border-color, #adb5bd);
+  border-radius: .375rem;
+  min-inline-size: 9.5rem;
+  padding: .25rem;
+}
+
+#flexicontent .fcfieldval_container:has(.fc_file_uploader[data-tagid-prefix]) .fc-xpended-btns .dropdown-menu li:empty {
+  display: none;
+}
+
+#flexicontent .fcfieldval_container:has(.fc_file_uploader[data-tagid-prefix]) .fc-xpended-btns .dropdown-menu li > :is(.btn, .dropdown-item) {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: .25rem;
+  color: var(--body-color, #253248);
+  display: flex;
+  font-size: .875rem;
+  gap: .45rem;
+  justify-content: flex-start;
+  margin: 0;
+  padding: .375rem .5rem;
+  text-align: start;
+  width: 100%;
+}
+
+#flexicontent .fcfieldval_container:has(.fc_file_uploader[data-tagid-prefix]) .fc-xpended-btns .dropdown-menu li > :is(.btn, .dropdown-item):is(:hover, :focus-visible, .active) {
+  background: var(--tertiary-bg, #f3f5f8);
+}
+
+#flexicontent .fcfieldval_container:has(.fc_file_uploader[data-tagid-prefix]) .fc-xpended-btns .dropdown-menu .fcfont-icon-inline {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 1.125rem;
+  height: 1.125rem !important;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  width: 1.125rem !important;
+}
+
+#flexicontent .fcfieldval_container:has(.fc_file_uploader[data-tagid-prefix]) .fc-xpended-btns .dropdown-menu .fcfont-icon-inline::before {
+  color: inherit;
+  height: auto !important;
+  line-height: 1;
+  position: static !important;
+  width: auto !important;
+}
+
+.fc_uploader_status_box > :is(.fc_uploader_mssg_box, .fc-field-invalid):empty {
+  display: none;
+}
+
+[data-bs-theme="dark"] #flexicontent .fcfieldval_container:has(.fc_file_uploader[data-tagid-prefix]) :is(.fc_filedata_txt, .fcimg_value_props textarea) {
+  background: var(--body-bg, #171c24);
+  border-color: var(--border-color, #495057);
+  color: var(--body-color, #e0e5ed);
+}

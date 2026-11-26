@@ -10,7 +10,13 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 class plgFlexicontent_fieldsColor extends FCField
 {
@@ -60,7 +66,7 @@ class plgFlexicontent_fieldsColor extends FCField
 		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';
@@ -105,7 +111,7 @@ class plgFlexicontent_fieldsColor extends FCField
 
 		$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
 		$colors_by          = (int) $field->parameters->get('colors_by', 1);
-		$color_control      = $colors_by ? 'simple' : 'advanced';
+		flexicontent_html::loadFramework('native-field-controls');
 
 		if ($colors_by === 1)
 		{
@@ -166,160 +172,14 @@ class plgFlexicontent_fieldsColor extends FCField
 		// Handle multiple records
 		if ($multiple)
 		{
-			// Add the drag and drop sorting feature
-			if ($add_ctrl_btns) $js .= "
-			jQuery(document).ready(function(){
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					cancel: false,
-					/*containment: 'parent',*/
-					tolerance: 'pointer'
-					".($fields_box_placing ? "
-					,start: function(e) {
-						//jQuery(e.target).children().css('float', 'left');
-						//fc_setEqualHeights(jQuery(e.target), 0);
-					}
-					,stop: function(e) {
-						//jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
-					}
-					" : '')."
-				});
-			});
-			";
+			$config = array('defaultValue' => (string) $default_value);
+			$js .= $this->buildValueRepeater($field, $elementid, $fieldname, $max_values, $add_ctrl_btns, $config, 'fcfield_color');
 
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
-			$js .= "
-			function addField".$field->id."(el, groupval_box, fieldval_box, params)
-			{
-				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
-				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
-				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
-				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-
-				if(!remove_previous && (rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
-					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
-					return 'cancel';
-				}
-
-				// Find last container of fields and clone it to create a new container of fields
-				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
-				var newField  = lastField.clone();
-				newField.find('.fc-has-value').removeClass('fc-has-value');
-
-				// New element's field name and id
-				var uniqueRowN = uniqueRowNum" . $field->id . ";
-				var element_id = '" . $elementid . "_' + uniqueRowN;
-				var fname_pfx  = '" . $fieldname . "[' + uniqueRowN + ']';
-				";
-
-			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			$js .= "
-			// Update the new color field
-				var theInput = newField.find('input, select').first();
-				var theInput_dv = theInput.attr('data-defvals');
-				(theInput_dv && theInput_dv.length) ?
-					theInput.attr('value', theInput.attr('data-defvals')) :
-					theInput.attr('value', ".json_encode($default_value).") ;
-				theInput.attr('name', fname_pfx);
-				theInput.attr('id', element_id);
-
-				// Destroy any select2 elements
-				var sel2_elements = newField.find('div.select2-container');
-				if (sel2_elements.length)
-				{
-					sel2_elements.remove();
-					newField.find('select.use_select2_lib').select2('destroy').show();
-				}
-				";
-
-			// Update select for textselect if it exists
-			if ($field->field_type=='textselect')
-				$js .= "
-				newField.parent().find('select.fcfield_textselval').val('');
-				";
-
-			// Add new field to DOM
-			$js .= "
-				lastField ?
-					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
-					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
-				if (remove_previous) lastField.remove();
-
-				// Attach form validation on new element
-				fc_validationAttach(newField);
-
-				// Re-init any simple color elements
-				var sel = jQuery(newField).find('select.simplecolors');
-				if (sel.length)
-				{
-					sel.removeClass('chzn-done').removeAttr('data-data-chosen').next().remove();
-					sel.simplecolors();
-				}
-
-				// Re-init any advanced color elements
-				var inp = jQuery(newField).find('input');
-				if (inp)
-				{
-					inp.minicolors('destroy');
-					fc_initMinicolors(null, newField.get(0), []);
-				}
-				";
-
-			// Add new element to sortable objects (if field not in group)
-			if ($add_ctrl_btns) $js .= "
-				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
-				";
-
-			// Show new field, increment counters
-			$js .="
-				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
-				if (scroll_visible) fc_scrollIntoView(newField, 1);
-				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
-
-				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({html: true, container: newField});
-				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
-
-				rowCount".$field->id."++;       // incremented / decremented
-				uniqueRowNum".$field->id."++;   // incremented only
-			}
-
-
-			function deleteField".$field->id."(el, groupval_box, fieldval_box)
-			{
-				// Disable clicks on remove button, so that it is not reclicked, while we do the field value hide effect (before DOM removal of field value)
-				var btn = fieldval_box ? false : jQuery(el);
-				if (btn && rowCount".$field->id." > 1) btn.css('pointer-events', 'none').off('click');
-
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-
-				// Add empty container if last element, instantly removing the given field value container
-				if(rowCount".$field->id." == 1)
-					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
-
-				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
-				if (rowCount".$field->id." > 1)
-				{
-					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the field value hide effect (before DOM removal of field value)
-					row.find('.fcfield-delvalue').remove();
-					row.find('.fcfield-expand-view').remove();
-					row.find('.fcfield-insertvalue').remove();
-					row.find('.fcfield-drag-handle').remove();
-					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){ jQuery(this).remove(); });
-					rowCount".$field->id."--;
-				}
-			}
-			";
-
-			$css .= '';
-
-			$remove_button = '<span class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$remove_button = '<button type="button" class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></button>';
 			$move2         = '<span class="' . $btn_item_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<button type="button" class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></button> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<button type="button" class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></button> ' : '';
 		}
 
 		// Field not multi-value
@@ -334,13 +194,8 @@ class plgFlexicontent_fieldsColor extends FCField
 
 
 		// Add field's CSS / JS
-		if ($multiple) $js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
+		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
 		$classes  = ' fcfield_textval' . $required_class;
 
@@ -350,11 +205,6 @@ class plgFlexicontent_fieldsColor extends FCField
 			$classes = ' fcfield_auto_value ';
 		}
 
-		if (!FLEXI_J40GE)
-		{
-			jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-			\Joomla\CMS\Form\FormHelper::loadFieldClass('color');   // \Joomla\CMS\Form\Field\ColorField
-		}
 
 		/**
 		 * Create field's HTML display for item form
@@ -366,25 +216,37 @@ class plgFlexicontent_fieldsColor extends FCField
 		foreach ($field->value as $value)
 		{
 			$value = $value ?? ''; // value maybe null
-		if (!strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not inside a field group
+			if (!strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not inside a field group
 
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 
-			$elementid_jf_n = $elementid.'__'.$n.'_';
+			$value = (string) $value;
+			$escaped = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+			if ($colors_by && !$auto_value)
+			{
+				$colors = array_unique(array_filter(array_map('trim', explode(',', $specific_colors))));
+				if ($value !== '' && !in_array($value, $colors, true)) array_unshift($colors, $value);
 
-			$xml_field = '<field name="'.$fieldname_n.'" type="color" control="' . $color_control . '" colors="' . $specific_colors . '"/>';
-			$xml_form = '<form><fields name="attribs"><fieldset name="attribs">'.$xml_field.'</fieldset></fields></form>';
-
-			$jform = new \Joomla\CMS\Form\Form('flexicontent_field.color', array('control' => '', 'load_data' => true));
-			$jform->load($xml_form);
-			$jfield = FLEXI_J40GE
-				? new \Joomla\CMS\Form\Field\ColorField($jform)
-				: new JFormFieldColor($jform);
-
-			$jfield->setup(new SimpleXMLElement($xml_field), $value, '');
-
-			$jfield_html = str_replace($elementid_jf_n . '"', $elementid_n . '"', $jfield->input);
+				$options = array(\Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_('FLEXI_SELECT')));
+				foreach ($colors as $color)
+				{
+					$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $color, htmlspecialchars($color, ENT_QUOTES, 'UTF-8'));
+				}
+				$jfield_html = \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $fieldname_n, 'class="form-select fc-color-value" ' . $attribs, 'value', 'text', $value, $elementid_n);
+			}
+			else
+			{
+				$jfield_html = '<div class="input-group" data-fc-color><input type="text" class="form-control fc-color-value" id="' . $elementid_n
+					. '" name="' . $fieldname_n . '" value="' . $escaped . '" placeholder="#rrggbb" ' . $attribs . '>';
+				if (!$auto_value)
+				{
+					$swatch = preg_match('/^#[0-9a-f]{6}$/iD', $value) ? $escaped : '#000000';
+					$jfield_html .= '<input type="color" class="form-control form-control-color fc-color-picker" style="flex: 0 0 3rem;" aria-label="'
+						. htmlspecialchars(strip_tags($field->label), ENT_QUOTES, 'UTF-8') . '" value="' . $swatch . '">';
+				}
+				$jfield_html .= '</div>';
+			}
 
 			$field->html[] = $pretext . '
 				' . $jfield_html . '
@@ -414,9 +276,9 @@ class plgFlexicontent_fieldsColor extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="'.$btn_group_class.' fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+					<button type="button" class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(this.closest(\'.fc-xpended-btns\'));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
 						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
-					</span>
+					</button>
 				</div>';
 		}
 
@@ -454,7 +316,7 @@ class plgFlexicontent_fieldsColor extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');

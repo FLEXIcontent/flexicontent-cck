@@ -1,6 +1,7 @@
 <?php
 //No direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
+flexicontent_html::loadFramework('form-utils');
 
 
 // Get Map Engine
@@ -175,8 +176,15 @@ foreach ($this->values as $n => $value)
 
 	if ($marker_path || $marker_url)
 	{
-		// Marker Size
-		list($wS, $hS) = getimagesize($marker_path ?: $marker_url);
+		// Marker Size. Do not call getimagesize() on a remote URL: it can block the
+		// whole request when the host is unreachable (e.g. comparing versions of an
+		// item using an OpenStreetMap address field). Use the default marker size.
+		$marker_source = $marker_path ?: $marker_url;
+		$marker_size = (!preg_match('#^https?://#i', $marker_source) && is_readable($marker_source))
+			? @getimagesize($marker_source)
+			: false;
+		$wS = $marker_size ? $marker_size[0] : 25;
+		$hS = $marker_size ? $marker_size[1] : 41;
 
 		// Marker Anchor
 		switch($value['marker_anchor'])
@@ -252,7 +260,8 @@ foreach ($this->values as $n => $value)
 	}
 
 	// generate link to google maps directions
-	$map_link = empty($value['url'])  ?  false  :  $value['url'];
+	// Validate old stored values too; URL text filtering is not a scheme policy.
+	$map_link = empty($value['url']) ? '' : flexicontent_security::safeUrl($value['url']);
 
 	// if no url, compatibility with old values
 	if (empty($map_link))
@@ -272,7 +281,7 @@ foreach ($this->values as $n => $value)
 	}
 
 	// generate map directions link html
-	$map_directions = '<div class="directions"><a href="'.$map_link.'" target="_blank">'.$directions_link_label.'</a></div>';
+	$map_directions = '<div class="directions"><a href="'.htmlspecialchars($map_link, ENT_QUOTES, 'UTF-8').'" target="_blank" rel="noopener noreferrer">'.$directions_link_label.'</a></div>';
 
 	// generate map (only if lat and lon available)
 	$map = '';
@@ -402,7 +411,7 @@ foreach ($this->values as $n => $value)
 
 static $addressint_view_js_added = array();
 
-if (!isset($addressint_view_js_added[$field->id]) && $map_api === 'googlemap' && $map_embed_type === 'int')
+if ($show_map && !isset($addressint_view_js_added[$field->id]) && $map_api === 'googlemap' && $map_embed_type === 'int')
 {
 	$addressint_view_js_added[$field->id] = true;
 
@@ -419,17 +428,17 @@ if (!isset($addressint_view_js_added[$field->id]) && $map_api === 'googlemap' &&
 	$js = '
 	function fc_addressint_initMap_' . $field->id . '(mapBox)
 	{
-		var mapLatLon  = eval("(" + mapBox.attr("data-maplatlon") + ")");
-		var mapZoom    = parseInt(mapBox.attr("data-mapzoom"));
-		var mapAddr    = eval("(" + mapBox.attr("data-mapaddr") + ")");
-		var mapType    = eval("(" + mapBox.attr("data-maptype") + ")");
-		var mapContent = eval("(" + mapBox.attr("data-mapcontent") + ")");
-		var mapIcon    = eval("(" + mapBox.attr("data-mapicon") + ")");
+		var mapLatLon  = eval("(" + mapBox.getAttribute("data-maplatlon") + ")");
+		var mapZoom    = parseInt(mapBox.getAttribute("data-mapzoom"));
+		var mapAddr    = eval("(" + mapBox.getAttribute("data-mapaddr") + ")");
+		var mapType    = eval("(" + mapBox.getAttribute("data-maptype") + ")");
+		var mapContent = eval("(" + mapBox.getAttribute("data-mapcontent") + ")");
+		var mapIcon    = eval("(" + mapBox.getAttribute("data-mapicon") + ")");
 
-		var wS = mapBox.attr("data-mapicon_ws"), hS = mapBox.attr("data-mapicon_hs"),
-				wA = mapBox.attr("data-mapicon_wa"), hA = mapBox.attr("data-mapicon_ha");
+		var wS = mapBox.getAttribute("data-mapicon_ws"), hS = mapBox.getAttribute("data-mapicon_hs"),
+				wA = mapBox.getAttribute("data-mapicon_wa"), hA = mapBox.getAttribute("data-mapicon_ha");
 
-		var theMap = new google.maps.Map(document.getElementById(mapBox.attr("id")), {
+		var theMap = new google.maps.Map(document.getElementById(mapBox.getAttribute("id")), {
 			center: mapLatLon,
 			scrollwheel: false,
 			zoom: mapZoom,
@@ -442,8 +451,9 @@ if (!isset($addressint_view_js_added[$field->id]) && $map_api === 'googlemap' &&
 			styles: ' . $map_style . '
 		});
 
-		mapBox.addClass("has_fc_google_maps_map");
-		mapBox.data("google_maps_ref", theMap);
+		mapBox.classList.add("has_fc_google_maps_map");
+		mapBox.google_maps_ref = theMap;
+		FlexiForm.data(mapBox, "google_maps_ref", theMap);
 
 		var myInfoWindow = new google.maps.InfoWindow({
 			content: mapContent
@@ -473,22 +483,24 @@ if (!isset($addressint_view_js_added[$field->id]) && $map_api === 'googlemap' &&
 		});
 	}
 
-	jQuery(document).ready(function(){
-		jQuery(".fc_addressint_container_' . $field->id . ' .fc_addressint_map_canvas").each( function() {
-			fc_addressint_initMap_' . $field->id . '(jQuery(this));
+	FlexiForm.ready(function(){
+		document.querySelectorAll(".fc_addressint_container_' . $field->id . ' .fc_addressint_map_canvas").forEach(function(mapBox) {
+			fc_addressint_initMap_' . $field->id . '(mapBox);
   	});
 	});
 	';
 
 	// Load google-maps library
 	flexicontent_html::loadFramework('google-maps', '', $field->parameters);
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	if ($js !== "") {
+		\Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript($js);
+	}
 }
 
 // Code is WIP (work-in-progress) only for testing 1 address inside item view
 static $addressint_view_js_added_OS = null;
 
-if ($addressint_view_js_added_OS === null && $map_api === 'openstreetmap')
+if ($show_map && $addressint_view_js_added_OS === null && $map_api === 'openstreetmap')
 {
 	$addressint_view_js_added_OS = true;
 
@@ -504,10 +516,12 @@ if ($addressint_view_js_added_OS === null && $map_api === 'openstreetmap')
 if (!empty($js_perValue))
 {
 	$js = '
-	jQuery(document).ready(function()
+	FlexiForm.ready(function()
 	{
 		' . implode("\n", $js_perValue) . '
 	});
 	';
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	if ($js !== "") {
+		\Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript($js);
+	}
 }

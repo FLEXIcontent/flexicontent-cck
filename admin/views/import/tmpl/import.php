@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 $params = $this->cparams;
-$document	= \Joomla\CMS\Factory::getDocument();
+$document	= \Joomla\CMS\Factory::getApplication()->getDocument();
 $cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
@@ -376,6 +376,7 @@ $tabCnt[$tabSetCnt] = 0;
 						$checked0 = $dv==0 ? 'checked="checked"' : '';
 						$checked1 = $dv==1 ? 'checked="checked"' : '';
 						$checked2 = $dv==2 ? 'checked="checked"' : '';
+						$checked3 = $dv==3 ? 'checked="checked"' : '';
 					?>
 					<div class="group-fcset fc_input_set fc-cleared">
 						<input type="radio" id="tags_col0" name="tags_col" value="0" <?php echo $checked0; ?> />
@@ -386,6 +387,32 @@ $tabCnt[$tabSetCnt] = 0;
 						<div class="fcclear"></div>
 						<input type="radio" id="tags_col2" name="tags_col" value="2" <?php echo $checked2; ?> />
 						<label for="tags_col2">c. <?php echo \Joomla\CMS\Language\Text::_("FLEXI_IMPORT_USE_TAG_IDS_COL");?></label>
+						<div class="fcclear"></div>
+						<input type="radio" id="tags_col3" name="tags_col" value="3" <?php echo $checked3; ?> />
+						<label for="tags_col3">d. <?php echo \Joomla\CMS\Language\Text::_("FLEXI_IMPORT_ASSIGN_SELECTED_TAGS");?></label>
+					</div>
+
+					<div id="fc_import_tags_box" class="container_fcfield container_fcfield_name_tags" style="margin-top: 12px; <?php echo $dv ? '' : 'display: none;'; ?>">
+						<div class="fc-mssg-inline fc-info fc_import_tags_hint fc_import_tags_hint_col" style="<?php echo $dv == 1 || $dv == 2 ? '' : 'display: none;'; ?>"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_IMPORT_SELECTED_TAGS_ADDED_TO_COL'); ?></div>
+						<div class="fc-mssg-inline fc-info fc_import_tags_hint fc_import_tags_hint_only" style="<?php echo $dv == 3 ? '' : 'display: none;'; ?>"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_IMPORT_SELECTED_TAGS_ONLY'); ?></div>
+						<div class="fcclear"></div>
+						<div id="tags">
+							<input type="text" id="input-tags" name="tagname" autocomplete="off"
+								placeholder="<?php echo \Joomla\CMS\Language\Text::_($this->perms->CanCreateTags ? 'FLEXI_TAG_SEARCH_EXISTING_CREATE_NEW' : 'FLEXI_TAG_SEARCH_EXISTING'); ?>"
+							/>
+						</div>
+						<div class="fc_tagbox" id="fc_tagbox">
+							<ul id="ultagbox">
+							<?php foreach ($this->import_tags as $tag) : ?>
+								<li class="tagitem">
+									<span><?php echo htmlspecialchars($tag->name, ENT_COMPAT, 'UTF-8'); ?></span>
+									<input type="hidden" name="tags_ids[]" value="<?php echo (int) $tag->id; ?>" />
+									<a href="#" class="deletetag" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_DELETE_TAG'); ?>"></a>
+								</li>
+							<?php endforeach; ?>
+							</ul>
+							<div class="fcclear"></div>
+						</div>
 					</div>
 				</td>
 			</tr>
@@ -444,7 +471,8 @@ $tabCnt[$tabSetCnt] = 0;
 				<td class="data" style="max-width:40%; white-space: unset;">
 					<div class="group-fcset fc_input_set fc-cleared">
 						<?php foreach ($this->file_fields as $i=> $file_fieid) : ?>
-							<input type="checkbox" id="skip_file_field_<?php echo $i; ?>" name="skip_file_field[]" value="<?php echo $file_fieid->name; ?>" />
+							<input type="checkbox" id="skip_file_field_<?php echo $i; ?>" name="skip_file_field[]" value="<?php echo $file_fieid->name; ?>"
+								<?php echo in_array($file_fieid->name, (array) $this->model->getState('skip_file_field')) ? 'checked="checked"' : ''; ?> />
 							<label for="skip_file_field_<?php echo $i; ?>" class=""><?php echo $file_fieid->label." <small>[".$file_fieid->name."]</small>"; ?></label>
 						<?php endforeach; ?>
 					</div>
@@ -468,7 +496,17 @@ $tabCnt[$tabSetCnt] = 0;
 					<label class="label" for="csvfile"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CSVFILE' ); ?></label>
 				</td>
 				<td class="data">
-					<input type="file" name="csvfile" id="csvfile" class="required" />
+					<?php
+						// A CSV file uploaded by a previous (failed / test) submit is kept on the server, so that it does not need to be selected again
+						$_prev_csv = \Joomla\CMS\Factory::getApplication()->getUserState('com_flexicontent.import.csvfile', null);
+						$_prev_csv = ($_prev_csv && !empty($_prev_csv['path']) && is_file($_prev_csv['path'])) ? $_prev_csv : null;
+					?>
+					<input type="file" name="csvfile" id="csvfile" class="<?php echo $_prev_csv ? '' : 'required'; ?>" />
+					<?php if ($_prev_csv) : ?>
+						<div class="fc-mssg fc-info fc-nobgimage" style="margin-top:6px;">
+							<?php echo \Joomla\CMS\Language\Text::sprintf('FLEXI_IMPORT_PREVIOUS_CSV_FILE', htmlspecialchars($_prev_csv['name'], ENT_QUOTES, 'UTF-8')); ?>
+						</div>
+					<?php endif; ?>
 				</td>
 				<td class="data">
 				</td>

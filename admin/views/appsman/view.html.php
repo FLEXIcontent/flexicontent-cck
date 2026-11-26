@@ -18,7 +18,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.view.legacy');
 use Joomla\String\StringHelper;
 
 /**
@@ -39,10 +38,10 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		$task    = $jinput->get('task', '', 'cmd');
 
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
-		$user     = \Joomla\CMS\Factory::getUser();
-		$db       = \Joomla\CMS\Factory::getDbo();
-		$document = \Joomla\CMS\Factory::getDocument();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		
 		// Get model
 		$model = $this->getModel();
@@ -62,10 +61,10 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		// *** Add css and js to document
 		// ***
 		
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
@@ -117,7 +116,6 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 
 		$this->sidebar = null;
 
-		if(FLEXI_J30GE && !FLEXI_J40GE) $this->sidebar = JHtmlSidebar::render();
 		if(FLEXI_J40GE) $this->sidebar = \Joomla\CMS\HTML\Helpers\Sidebar::render();
 		
 		
@@ -223,7 +221,7 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		// We will not use the default getInput() function of J1.6+ since we want to create a radio selection field with flags
 		// we could also create a new class and override getInput() method but maybe this is an overkill, we may do it in the future
 		$lists['languages'] = flexicontent_html::buildlanguageslist('language'
-			, ' style="vertical-align:top;" onchange="var m=jQuery(\'#fc_import_about_langcol\'); this.value ? m.hide(600) : m.show(600);"'
+			, ' style="vertical-align:top;" onchange="FlexiForm.show(document.getElementById(\'fc_import_about_langcol\'), !this.value);"'
 			, $formvals['language'], 6/*'- '.\Joomla\CMS\Language\Text::_('FLEXI_USE_LANGUAGE_COLUMN').' -'*/, $allowed_langs, $published_only=true
 			, $disable_langs=null, $add_all=true, $conf=array('required'=>true)
 		).'
@@ -231,7 +229,7 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 				'.\Joomla\CMS\Language\Text::_('FLEXI_USE_LANGUAGE_COLUMN_TIP').'
 			</span>';
 
-		$lists['states'] = flexicontent_html::buildstateslist('state', ' style="vertical-align:top;" onchange="var m=jQuery(\'#fc_import_about_statecol\'); this.value ? m.hide(600) : m.show(600);"'
+		$lists['states'] = flexicontent_html::buildstateslist('state', ' style="vertical-align:top;" onchange="FlexiForm.show(document.getElementById(\'fc_import_about_statecol\'), !this.value);"'
 			, $formvals['state'], 2/*'- '.\Joomla\CMS\Language\Text::_('FLEXI_USE_STATE_COLUMN').' -'*/).
 			'<span class="fc-mssg-inline fc-note fc-nobgimage" id="fc_import_about_statecol" style="display:none;">
 				'.\Joomla\CMS\Language\Text::_('FLEXI_USE_STATE_COLUMN_TIP').'
@@ -269,18 +267,18 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 	 */
 	function setToolbar($conf, $task)
 	{
-		$user     = \Joomla\CMS\Factory::getUser();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		$js = '';
 
 		$contrl = "appsman.";
 		$contrl_s = null;
 
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_LOADING') .' ... '. \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_WAIT'), 2);
 
@@ -353,7 +351,7 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');

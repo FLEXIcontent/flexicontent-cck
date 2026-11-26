@@ -14,7 +14,10 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+// Lazy class loading (was JLoader::register): loaded only if/when used.
+spl_autoload_register(static function ($class) {
+	if ($class === 'FlexicontentControllerBaseAdmin' && is_file($f = JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php')) require_once $f;
+}, true, true);
 
 // Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
 require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'tag.php';
@@ -95,13 +98,10 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		{
 			if ($logs['success'])
 			{
-				echo '<div class="copyok">' . \Joomla\CMS\Language\Text::sprintf('FLEXI_TAG_IMPORT_SUCCESS', $logs['success']) . '</div>';
+				$this->_cleanCache();
 			}
 
-			if ($logs['error'])
-			{
-				echo '<div class="copywarn>' . \Joomla\CMS\Language\Text::sprintf('FLEXI_TAG_IMPORT_FAILED', $logs['error']) . '</div>';
-			}
+			include JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/tags/tmpl/import_report.php';
 		}
 		else
 		{
@@ -125,7 +125,10 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		$cid  = (int) $cid[0];
 
 		// Check if tag exists (id exists or name exists)
-		JLoader::register("FlexicontentModelTag", JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'tag.php');
+		// Lazy class loading (was JLoader::register): loaded only if/when used.
+		spl_autoload_register(static function ($class) {
+			if ($class === 'FlexicontentModelTag' && is_file($f = JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'tag.php')) require_once $f;
+		}, true, true);
 		$model = new FlexicontentModelTag;
 		$model->setId($cid);
 		$tag = $model->getTag($name);
@@ -202,8 +205,8 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		$indexer     = $this->input->getCmd('indexer', 'tag_mappings');
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		// Check indexer type
@@ -213,8 +216,8 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		}
 
 		// Clear previous log file
-		$log_filename = 'tag_mappings_checker_' . \Joomla\CMS\Factory::getUser()->id . '.php';
-		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
+		$log_filename = 'tag_mappings_checker_' . \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.php';
+		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename);
 
 		if (file_exists($log_filename_full))
 		{
@@ -274,8 +277,8 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 
 		$start_microtime = microtime(true);
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		$has_zlib      = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
@@ -287,7 +290,6 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		$records_cnt      = $this->input->getInt('records_cnt', 0);        // Counter of items indexed so far, this is given via HTTP request
 
 		$log_filename = $session->get($indexer . '_log_filename', null, 'flexicontent');
-		jimport('joomla.log.log');
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file

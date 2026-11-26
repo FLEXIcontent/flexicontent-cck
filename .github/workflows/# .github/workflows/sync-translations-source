@@ -1,0 +1,65 @@
+# .github/workflows/sync-translations-source.yml
+name: Sync en-GB sources to flexicontent-translations
+
+on:
+  push:
+    branches: [master]            # adapter au nom réel de la branche
+    paths:
+      - '**/en-GB/**'
+      - '**/en-GB.*.ini'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Simulation (aucun commit)'
+        type: boolean
+        default: true
+
+concurrency:
+  group: sync-translations-source
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: cck
+
+      - uses: actions/checkout@v4
+        with:
+          repository: FLEXIcontent/flexicontent-translations
+          token: ${{ secrets.TRANSLATIONS_PAT }}   # fine-grained, contents:write sur ce seul dépôt
+          path: tr
+
+      - name: Sync sources into resources/
+        env:
+          DRY: ${{ github.event.inputs.dry_run == 'true' && '-n' || '' }}
+        run: |
+          mkdir -p tr/resources
+          # --delete ne supprime que les fichiers qui correspondent aux include
+          # (tout le reste est protégé par --exclude='*')
+          rsync -a $DRY -v --prune-empty-dirs --delete \
+            --include='*/' \
+            --include='admin/language/en-GB/*.ini' \
+            --include='site/language/en-GB/*.ini' \
+            --include='site/templates/*/language/en-GB/*.ini' \
+            --include='modules/**/language/*.ini' \
+            --include='modules/**/language/en-GB/*.ini' \
+            --include='plugins/**/en-GB.*.ini' \
+            --include='plugins/**/en-GB/*.ini' \
+            --exclude='*' \
+            cck/ tr/resources/
+
+      - name: Commit and push
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          cd tr
+          git config user.name  "flexicontent-bot"
+          git config user.email "flexicontent-bot@users.noreply.github.com"
+          git add -A resources
+          git status --short
+          git diff --cached --quiet || {
+            git commit -m "Sync en-GB sources from flexicontent-cck@${GITHUB_SHA::7}"
+            git push
+          }

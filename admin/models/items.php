@@ -52,6 +52,23 @@ class FlexicontentModelItems extends FCModelAdminList
 	protected $copyRelations = false;
 
 	/**
+	 * IDs of the records created by the last copyitems() call
+	 *
+	 * @var int[]
+	 */
+	public $copiedIds = array();
+
+	/**
+	 * Field types that can be set via the batch tool, as these store plain values (no uploads / nested structures / virtual output)
+	 *
+	 * @var string[]
+	 */
+	protected static $batchFieldTypes = array(
+		'text', 'textarea', 'select', 'selectmultiple', 'radio', 'checkbox', 'radioimage', 'checkboximage',
+		'textselect', 'termlist', 'date', 'color', 'email', 'weblink', 'phonenumbers',
+	);
+
+	/**
 	 * Events
 	 *
 	 * @var string
@@ -220,6 +237,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$csv_header     = $fcform ? $jinput->get('csv_header',     '',    'int')    :  $app->getUserStateFromRequest( $p.'csv_header',     'csv_header',     '',    'int');
 		$csv_raw_export = $fcform ? $jinput->get('csv_raw_export', '',    'int')    :  $app->getUserStateFromRequest( $p.'csv_raw_export', 'csv_raw_export', '',    'int');
 		$csv_all_fields = $fcform ? $jinput->get('csv_all_fields', '1',    'int')    :  $app->getUserStateFromRequest( $p.'csv_all_fields', 'csv_all_fields', '1',    'int');
+		$csv_zip_media  = $fcform ? $jinput->get('csv_zip_media',  0,      'int')    :  $app->getUserStateFromRequest( $p.'csv_zip_media',  'csv_zip_media',  0,      'int');
 
 
 		if (!is_array($filter_tag))    $filter_tag    = strlen($filter_tag)    ? array($filter_tag)    : array();
@@ -240,6 +258,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->setState('csv_header', $csv_header);
 		$this->setState('csv_raw_export', $csv_raw_export);
 		$this->setState('csv_all_fields', $csv_all_fields);
+		$this->setState('csv_zip_media', $csv_zip_media);
 
 		$app->setUserState($p . 'filter_tag', $filter_tag);
 		$app->setUserState($p . 'filter_lang', $filter_lang);
@@ -251,6 +270,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$app->setUserState($p . 'csv_header', $csv_header);
 		$app->setUserState($p . 'csv_raw_export', $csv_raw_export);
 		$app->setUserState($p . 'csv_all_fields', $csv_all_fields);
+		$app->setUserState($p . 'csv_zip_media', $csv_zip_media);
 
 
 		// Date filters
@@ -362,9 +382,10 @@ class FlexicontentModelItems extends FCModelAdminList
 				$rows = $this->_db->loadObjectList();
 				if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
-				// 2, get current items total for pagination
-				$this->_db->setQuery("SELECT FOUND_ROWS()");
-				$this->_total = $this->_db->loadResult();
+				// 2, get current items total for pagination: count the rows of the same query (without ordering).
+				// Not SQL_CALC_FOUND_ROWS: it stops the database from ending the list query after the rows of the
+				// current page, and MySQL 8.0.17+ deprecates it
+				$this->_total = (int) $this->_db->setQuery('SELECT COUNT(*) FROM (' . $this->_buildQuery(false, true) . ') AS fc_list')->loadResult();
 
 				// 3, get item ids
 				$query_ids = array();
@@ -450,7 +471,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function getExtraCols()
 	{
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Check if extra columns already calculated
 		if ( $this->_extra_cols !== null) return $this->_extra_cols;
@@ -527,7 +548,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	function getCustomFilts()
 	{
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$jinput  = $app->input;
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
@@ -763,7 +784,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	{
 		if (!$checkNoExtData && !$checkInvalidCat) return $count_only ? 0 : array();
 
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$configured = FLEXI_J16GE ? FLEXI_CAT_EXTENSION : FLEXI_SECTION;
 		if ( !$configured ) return null;
 
@@ -847,7 +868,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$default_lang = flexicontent_html::getSiteDefaultLang();
 
 		// Get invalid cats, to avoid using them during binding, this is only done once
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$badcats_fixed = $session->get('badcats', null, 'flexicontent');
 		if ( $badcats_fixed === null ) {
 			// Correct non-existent main category in content table
@@ -934,6 +955,16 @@ class FlexicontentModelItems extends FCModelAdminList
 			}
 		}
 
+		// Add the same title and text to the field-attributed basic index (word suggestions)
+		$core_ids = $this->_db->setQuery('SELECT name, id FROM #__flexicontent_fields WHERE iscore = 1 AND name IN (' . $this->_db->Quote('title') . ', ' . $this->_db->Quote('text') . ')')->loadAssocList('name', 'id');
+		$basic_index = array();
+		foreach ($rows as $row)
+		{
+			if (!empty($core_ids['title'])) $basic_index[(int) $row->id][(int) $core_ids['title']] = $row->title;
+			if (!empty($core_ids['text']))  $basic_index[(int) $row->id][(int) $core_ids['text']] = $row->text_stripped;
+		}
+		flexicontent_db::replaceBasicSearchIndex(array_keys($basic_index), $basic_index);
+
 		// Update temporary item data
 		$this->updateItemCountingData($rows);
 	}
@@ -1019,7 +1050,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 *
 	 * @since   3.3.0
 	 */
-	protected function _buildQuery($query_ids = false)
+	protected function _buildQuery($query_ids = false, $for_count = false)
 	{
 		$use_versioning = $this->cparams->get('use_versioning', 1);
 		$lang  = 'ie.language AS lang, ie.lang_parent_id, ';
@@ -1062,7 +1093,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		if ( !$query_ids )
 		{
-			$query = 'SELECT SQL_CALC_FOUND_ROWS a.id '
+			$query = 'SELECT a.id '
 				. ( in_array($filter_order, array('rating_count','rating')) ?
 					', cr.rating_count AS rating_count' . $ratings_col : ''
 				)
@@ -1082,7 +1113,8 @@ class FlexicontentModelItems extends FCModelAdminList
 			$query =
 				'SELECT a.*, ie.item_id as item_id, ie.search_index AS search_index, ie.type_id, '. $lang .' cousr.name AS editor'
 				. ($filter_cats || $filter_catsinstate != 99 ?
-					', rel.catid as rel_catid' : ''
+					// One row per item: its main category when that is among the joined categories, else the lowest category id
+					', COALESCE(MAX(CASE WHEN rel.catid = a.catid THEN rel.catid END), MIN(rel.catid)) as rel_catid' : ''
 				)
 				. ', cr.rating_count AS rating_count' . $ratings_col
 				. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
@@ -1139,7 +1171,11 @@ class FlexicontentModelItems extends FCModelAdminList
 				? ' JOIN #__flexicontent_fields_item_relations as fi ON a.id=fi.item_id'
 				: '')
 
-			. ' LEFT JOIN #__flexicontent_tags_item_relations AS tg ON a.id=tg.itemid'
+			// Tags: needed by the item data query (taglist column) and by the tag filter of the list query only.
+			// Joined without a tag filter, every tag of an item multiplies the rows the list query must group.
+			. ($query_ids || !empty($filter_tag)
+				? ' LEFT JOIN #__flexicontent_tags_item_relations AS tg ON a.id=tg.itemid'
+				: '')
 
 			. ($query_ids || in_array($filter_order, array('rating_count', 'rating'))
 				? ' LEFT JOIN ' . $rating_join
@@ -1175,8 +1211,8 @@ class FlexicontentModelItems extends FCModelAdminList
 				? ' LEFT JOIN #__viewlevels AS level ON level.id = a.access'
 				: '')
 
-			// Workflows
-			. (FLEXI_J40GE
+			// Workflows: only the item data query selects their columns, the list query never filters or orders by them
+			. (FLEXI_J40GE && $query_ids
 				? ' LEFT JOIN #__workflow_associations AS wa ON wa.item_id = a.id AND wa.extension = "com_content.article"' .
 				' LEFT JOIN #__workflow_stages AS ws ON ws.id = wa.stage_id' .
 				' LEFT JOIN #__workflows AS w ON w.id = ws.workflow_id'
@@ -1205,7 +1241,7 @@ class FlexicontentModelItems extends FCModelAdminList
 				. $where
 				. ' GROUP BY a.id'
 				. (count($having) ? ' HAVING ' . implode(' AND ', $having) : '')
-				. $orderby
+				. ($for_count ? '' : $orderby)
 			;
 		}
 		else
@@ -1261,6 +1297,13 @@ class FlexicontentModelItems extends FCModelAdminList
 				break;
 		}
 
+		// LIMIT may use a different sort plan from the old SQL_CALC_FOUND_ROWS query.
+		// Keep tied values on stable pages instead of repeating items across offsets.
+		if ($orderby && strpos($orderby, 'a.id') === false)
+		{
+			$orderby .= ', a.id ASC';
+		}
+
 		return $orderby;
 	}
 
@@ -1274,8 +1317,8 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function _buildContentJoinsWhere(& $extra_joins = '', $tmp_only = false)
 	{
-		$session = \Joomla\CMS\Factory::getSession();
-		$user    = \Joomla\CMS\Factory::getUser();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$perms   = FlexicontentHelperPerm::getPerm();
 
 
@@ -1299,12 +1342,21 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		if ($filter_fileid)
 		{
-			$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
-			$itemids =  $fileid_to_itemids[$filter_fileid];
+			// Items using the file via file-id storing fields (File, MediaFile), found directly in the DB,
+			// so it does not depend on data that the file manager may (or may not) have stored in the session.
+			// Field ids are looked up first, so that only the (few) rows of these fields are searched for the value
+			$file_field_ids = $this->_db->setQuery(
+				'SELECT id FROM #__flexicontent_fields WHERE field_type IN (' . $this->_db->Quote('file') . ', ' . $this->_db->Quote('mediafile') . ')'
+			)->loadColumn();
+			$file_field_ids = ArrayHelper::toInteger($file_field_ids);
 
-			return empty($itemids)
+			return empty($file_field_ids)
 				? ' WHERE 0 '
-				: ' WHERE a.id IN ('. implode(',', $itemids) .') ';
+				: ' WHERE a.id IN ('
+					. 'SELECT rel.item_id FROM #__flexicontent_fields_item_relations AS rel'
+					. ' WHERE rel.field_id IN (' . implode(',', $file_field_ids) . ')'
+					. ' AND rel.value = ' . $this->_db->Quote((string) (int) $filter_fileid)
+				. ') ';
 		}
 
 
@@ -1502,7 +1554,8 @@ class FlexicontentModelItems extends FCModelAdminList
 			{
 				$filter_state = array('ALL');
 				$FS = array('ALL'=>0);
-				$filter_state = $this->setState('filter_state', $filter_state);
+				// Keep the model state unchanged: the count rebuild must see the same
+				// review/version flags as the first list query.
 			}
 			elseif (isset($FS['ORPHAN']))
 			{
@@ -1538,7 +1591,16 @@ class FlexicontentModelItems extends FCModelAdminList
 		if (!empty($filter_tag))
 		{
 			$filter_tag = ArrayHelper::toInteger($filter_tag);
-			$where[] = 'tg.tid IN (' . implode( ',', $filter_tag) .')';
+
+			// Special value -1: items without tags (no row in the tags relations table), can be combined with tags
+			$no_tags = in_array(-1, $filter_tag, true);
+			$filter_tag = array_filter($filter_tag, function ($tid) { return $tid > 0; });
+
+			$tag_where = array();
+			if ($no_tags) $tag_where[] = 'tg.tid IS NULL';
+			if (count($filter_tag)) $tag_where[] = 'tg.tid IN (' . implode( ',', $filter_tag) .')';
+
+			if (count($tag_where)) $where[] = '(' . implode(' OR ', $tag_where) . ')';
 		}
 
 		if (!empty($filter_type))
@@ -1556,6 +1618,15 @@ class FlexicontentModelItems extends FCModelAdminList
 		if ($filter_id)
 		{
 			$where[] = 'a.id = ' . $filter_id;
+		}
+
+		// Limit to given item ids (e.g. CSV export of selected items), set only by code, not via request
+		$filter_ids = ArrayHelper::toInteger((array) $this->getState('filter_ids'));
+		$filter_ids = array_filter($filter_ids);
+
+		if ($filter_ids)
+		{
+			$where[] = 'a.id IN (' . implode(',', $filter_ids) . ')';
 		}
 
 		if (!empty($filter_lang))
@@ -1697,6 +1768,14 @@ class FlexicontentModelItems extends FCModelAdminList
 	}
 
 
+	/** Normalize scalar batch requests and the omitted-language marker. */
+	protected function normaliseBatchLanguages($languages): array
+	{
+		if (is_array($languages)) return array_values($languages);
+		return $languages === null || $languages === '' || $languages === '_not_posted_'
+			? [] : [(string) $languages];
+	}
+
 	/**
 	 * Method to copy items 
 	 *
@@ -1710,8 +1789,9 @@ class FlexicontentModelItems extends FCModelAdminList
 		$jinput = $app->input;
 
 		$tags = array_values(array_filter(ArrayHelper::toInteger((array) $tags)));
+		$lang_arr = $this->normaliseBatchLanguages($lang_arr);
 
-		$dbprefix = $app->getCfg('dbprefix');
+		$dbprefix = $app->get('dbprefix');
 
 		$use_versioning = $this->cparams->get('use_versioning', 1);
 
@@ -1722,11 +1802,11 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		$_FALANG = false;
 		$this->_db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'falang_content"');
-		$_FALANG = (boolean) count($this->_db->loadObjectList());
+		$_FALANG = (bool) count($this->_db->loadObjectList());
 
 		// Try to find old joomfish tables (with current DB prefix)
 		$this->_db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'jf_content"');
-		$_FISH = (boolean) count($this->_db->loadObjectList());
+		$_FISH = (bool) count($this->_db->loadObjectList());
 
 		// Try to find old joomfish tables (with J1.5 jos prefix)
 		if (!$_FISH)
@@ -1745,7 +1825,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		if ($_FISH)
 		{
 			$this->_db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'jf_languages_ext"');
-			$_FISH22GE = (boolean) count($this->_db->loadObjectList());
+			$_FISH22GE = (bool) count($this->_db->loadObjectList());
 		}
 
 		$_NEW_LANG_TBL = FLEXI_J16GE || $_FISH22GE;
@@ -1767,7 +1847,9 @@ class FlexicontentModelItems extends FCModelAdminList
 		{
 			$this->_db->setQuery('SELECT id FROM #__flexicontent_fields WHERE name = "text" ');
 			$desc_field_id = $this->_db->loadResult();
-			$desc_field = \Joomla\CMS\Table\Table::getInstance('flexicontent_fields', '');
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_fields.php';
+			$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$desc_field = new flexicontent_fields($__fcTableDb);
 			$desc_field->load($desc_field_id);
 		}
 
@@ -1777,6 +1859,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		 */
 		$cid_reverse = array_reverse($cid);
 		$total_cnt = 0;
+		$this->copiedIds = array();
 		global $globalcats;
 
 		$items = array();
@@ -1785,7 +1868,8 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		foreach ($cid_reverse as $itemid)
 		{
-			$item = \Joomla\CMS\Table\Table::getInstance('flexicontent_items', '');
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_items.php';
+			$item = new flexicontent_items(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 			$item->load($itemid);
 
 			$items[$itemid] = $item;
@@ -1859,7 +1943,7 @@ class FlexicontentModelItems extends FCModelAdminList
 					$lang_from			= substr($row->language,0,2);
 					$row->language	= $lang ? $lang : $row->language;
 					$lang_to				= substr($row->language,0,2);
-					$row->state			= strlen($state) ? $state : $row->state;  // keep original if: null, ''
+					$row->state			= strlen((string) $state) ? $state : $row->state;  // keep original if: null, ''
 					$row->type_id		= $type_id ? $type_id : $row->type_id;    // keep original if: null, zero, ''
 					$row->access		= $access ? $access : $row->access;       // keep original if: null, zero, ''
 
@@ -2013,6 +2097,13 @@ class FlexicontentModelItems extends FCModelAdminList
 							flexicontent_db::setValues_commonDataTypes($field);
 						}
 					}
+
+					// The merged basic index was copied with the item row, copy the field-attributed rows too (word suggestions)
+					$this->_db->setQuery('INSERT IGNORE INTO #__flexicontent_basicsearch_index (item_id, field_id, search_index)'
+						. ' SELECT ' . (int) $row->id . ', field_id, search_index'
+						. ' FROM #__flexicontent_basicsearch_index'
+						. ' WHERE item_id = ' . (int) $sourceid
+					)->execute();
 
 					if ($use_versioning)
 					{
@@ -2175,6 +2266,7 @@ class FlexicontentModelItems extends FCModelAdminList
 						$assoc_data['associations'][$row->language]  = $row->id;  // Add new item itself
 						$assoc_data['associations'][$item->language] = $item->id; // Add current item (needed if association group is empty)
 					}
+				$this->copiedIds[] = (int) $row->id;
 				$total_cnt++;
 			}
 		}
@@ -2323,6 +2415,11 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function moveitem($itemid, $maincat, $seccats = null, $lang = null, $state = null, $type_id = 0, $access = null, $tags = array(), $keeptags = 2)
 	{
+		$itemid = (int) $itemid;
+		if ($seccats !== null)
+		{
+			$seccats = array_values(array_unique(array_filter(ArrayHelper::toInteger((array) $seccats), static function ($id) { return $id > 0; })));
+		}
 		$tags = array_values(array_filter(ArrayHelper::toInteger((array) $tags)));
 
 		$item = $this->getTable($this->records_jtable, '');
@@ -2330,12 +2427,12 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		// Keep original if: null, zero, ''
 		$item->catid    = $maincat ?: $item->catid;
-		$item->language = $lang ?: $item->language;
+		$item->language = $lang && $lang !== '_not_posted_' ? $lang : $item->language;
 		$item->type_id  = $type_id ?: $item->type_id;
 		$item->access   = $access ?: $item->access;
 
 		// keep original if: null, ''
-		$item->state = strlen($state) ? $state : $item->state;
+		$item->state = strlen((string) $state) ? $state : $item->state;
 
 		$item->store();
 
@@ -2373,7 +2470,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		foreach($seccats as $cat)
 		{
 			$query 	= 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`)'
-				.' VALUES(' . $cat . ',' . $itemid . ')'
+				.' VALUES(' . (int) $cat . ',' . $itemid . ')'
 			;
 			$this->_db->setQuery($query);
 			$this->_db->execute();
@@ -2452,7 +2549,84 @@ class FlexicontentModelItems extends FCModelAdminList
 			}
 		}
 
+		// Categories field is configured as "Non-translatable": apply the categories to the associated items too
+		if (flexicontent_db::isCategoriesFieldUntranslatable())
+		{
+			flexicontent_db::propagateCategoriesToAssocs((int) $itemid);
+		}
+
 		return true;
+	}
+
+
+	/**
+	 * Get the custom fields that can be set via the batch tool, for the given item types
+	 *
+	 * @param   int[]  $type_ids  Item types to get the fields for
+	 *
+	 * @return  array  Field objects (id, name, label, field_type, type_ids), ordered by label
+	 */
+	public function getBatchFields(array $type_ids)
+	{
+		$type_ids = array_values(array_filter(ArrayHelper::toInteger($type_ids)));
+
+		if (!$type_ids)
+		{
+			return array();
+		}
+
+		$db = $this->_db;
+		$query = $db->getQuery(true)
+			->select('f.id, f.name, f.label, f.field_type, f.attribs, f.valueseditable, ftr.type_id')
+			->from('#__flexicontent_fields AS f')
+			->join('INNER', '#__flexicontent_fields_type_relations AS ftr ON ftr.field_id = f.id')
+			->where('f.published = 1')
+			->where('f.iscore = 0')
+			->where('f.field_type IN (' . implode(',', array_map(array($db, 'quote'), static::$batchFieldTypes)) . ')')
+			->where('ftr.type_id IN (' . implode(',', $type_ids) . ')')
+			->order('f.label, f.id');
+
+		$fields = array();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
+
+		foreach ($db->setQuery($query)->loadObjectList() as $row)
+		{
+			if (!isset($fields[$row->id]))
+			{
+				// Fields that are part of a field group are edited via the group
+				$params = new \Joomla\Registry\Registry($row->attribs);
+
+				if ($params->get('use_ingroup', 0))
+				{
+					continue;
+				}
+
+				// Fields whose values the user is not allowed to edit
+				if ($row->valueseditable && !$user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $row->id))
+				{
+					continue;
+				}
+
+				// Whether the field can hold several values (some types always can), and the maximum number of them (0 = unlimited)
+				$row->multiple   = (int) (in_array($row->field_type, array('selectmultiple', 'checkbox', 'checkboximage')) || $params->get('allow_multiple', 0));
+				$row->max_values = $row->multiple ? (int) $params->get('max_values', 0) : 1;
+
+				// The 'Allow multiple values' setting itself (several values, e.g. several groups of options, instead of a single one)
+				$row->allow_multiple = (int) $params->get('allow_multiple', 0);
+
+				// Types whose single value is a set of options (array), e.g. a multi-select
+				$row->value_is_arr = (int) in_array($row->field_type, array('selectmultiple', 'checkbox', 'checkboximage'));
+
+				$row->label    = \Joomla\CMS\Language\Text::_($row->label);
+				$row->type_ids = array();
+				unset($row->attribs, $row->valueseditable);
+				$fields[$row->id] = $row;
+			}
+
+			$fields[$row->id]->type_ids[] = (int) $row->type_id;
+		}
+
+		return $fields;
 	}
 
 
@@ -2467,13 +2641,13 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function sendNotification($users, $item)
 	{
-		$sender = \Joomla\CMS\Factory::getUser();
+		$sender = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// messaging for new items
 		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_messages'.DS.'tables'.DS.'message.php');
 
 		// load language for messaging
-		$lang = \Joomla\CMS\Factory::getLanguage();
+		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
 		$lang->load('com_messages');
 
 		$ctrl_task = FLEXI_J16GE ? '&task=items.edit' : '&controller=items&task=edit';
@@ -2546,7 +2720,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		}
 
 		$filter_order_type = $this->getState('filter_order_type');
-		$multi_assigns_ordering = (boolean) $filter_order_type;
+		$multi_assigns_ordering = (bool) $filter_order_type;
 
 		// Correct direction according to current value of the 'direction' filter
 		$direction = strtolower($this->getState('filter_order_Dir')) == 'desc' ? - $direction : $direction;
@@ -3009,26 +3183,18 @@ class FlexicontentModelItems extends FCModelAdminList
 		}
 
 
-		// ***
-		// *** Retrieve asset before deleting the items
-		// ***
-		$query = $this->_db->getQuery(true)
-			->select('asset_id')
-			->from('#__content')
-			->where('id IN (' . $cid_list . ')');
+		// Delete content through Joomla's table API, including its nested ACL asset.
+		foreach ($cid as $id)
+		{
+			$table = new \Joomla\CMS\Table\Content(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
+			if (!$table->load($id) || !$table->delete($id))
+			{
+				$this->setError($table->getError() ?: 'The item could not be deleted.');
+				return false;
+			}
+		}
 
-		$assetids = $this->_db->setQuery($query)->loadColumn();
-		$assetidslist = implode(',', $assetids );
-
-
-		// ***
-		// *** Remove basic item data
-		// ***
-		$query = 'DELETE FROM #__content'
-			. ' WHERE id IN ('. $cid_list .')'
-		;
-		$this->_db->setQuery($query)->execute();
-
+		$this->_db->setQuery('DELETE FROM #__flexicontent_basicsearch_index WHERE item_id IN (' . $cid_list . ')')->execute();
 
 		// ***
 		// *** Remove extended item data
@@ -3064,6 +3230,26 @@ class FlexicontentModelItems extends FCModelAdminList
 			. ' WHERE content_item_id IN ('. $cid_list .')'
 			. '	  AND type_alias = ' . $this->_db->Quote('com_content.article')
 		;
+		$this->_db->setQuery($query)->execute();
+
+
+		// ***
+		// *** Remove Joomla workflow associations (Joomla's article model does this, its Content table does not)
+		// ***
+		if (FLEXI_J40GE)
+		{
+			$query = 'DELETE FROM #__workflow_associations'
+				. ' WHERE item_id IN ('. $cid_list .')'
+				. '   AND extension = ' . $this->_db->Quote('com_content.article')
+			;
+			$this->_db->setQuery($query)->execute();
+		}
+
+
+		// ***
+		// *** Remove featured (front page) entries (Joomla's article model does this, its Content table does not)
+		// ***
+		$query = 'DELETE FROM #__content_frontpage WHERE content_id IN ('. $cid_list .')';
 		$this->_db->setQuery($query)->execute();
 
 
@@ -3112,13 +3298,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->_db->setQuery($query)->execute();
 
 
-		// ***
-		// *** Delete item asset/ACL records
-		// ***
-		$query 	= 'DELETE FROM #__assets'
-			. ' WHERE id in ('.$assetidslist.')'
-		;
-		//$this->_db->setQuery($query)->execute();
+
 
 
 		/**
@@ -3150,7 +3330,9 @@ class FlexicontentModelItems extends FCModelAdminList
 		if (empty($catids)) $catids = $this->_catids;
 		if (empty($catids)) return array();
 
+		// items_count: number of items assigned to the category (main or secondary), used by the pill in the categories column
 		$query = 'SELECT DISTINCT c.id, c.title'
+			. ', (SELECT COUNT(DISTINCT r.itemid) FROM #__flexicontent_cats_item_relations AS r WHERE r.catid = c.id) AS items_count'
 			. ' FROM #__categories AS c'
 			. ' WHERE c.id IN ('. implode(',', $catids) .') '
 			. (FLEXI_J16GE ? ' AND c.extension="'.FLEXI_CAT_EXTENSION.'"' : '')
@@ -3177,7 +3359,9 @@ class FlexicontentModelItems extends FCModelAdminList
 		if (empty($tagids)) $tagids = $this->_tagids;
 		if (empty($tagids)) return array();
 
+		// items_count: number of items assigned to the tag, used by the pill in the tags column
 		$query = 'SELECT DISTINCT t.*'
+			. ', (SELECT COUNT(DISTINCT r.itemid) FROM #__flexicontent_tags_item_relations AS r WHERE r.tid = t.id) AS items_count'
 			. ' FROM #__flexicontent_tags AS t'
 			. ' WHERE t.id IN ('. implode(',', $tagids) .') '
 		;
@@ -3198,15 +3382,20 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function getItemsWithTags(&$total=null, $start=0, $limit=100000)
 	{
-		$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT a.id '
-			. ' FROM #__content AS a'
-			. ' JOIN #__flexicontent_tags_item_relations AS tg ON a.id = tg.itemid'
+		$from = ' FROM #__content AS a'
+			. ' JOIN #__flexicontent_tags_item_relations AS tg ON a.id = tg.itemid';
+
+		// The id order makes the pages of the list (start, limit) well defined
+		$query = 'SELECT DISTINCT a.id '
+			. $from
+			. ' ORDER BY a.id'
 			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 		;
 		$item_ids = $this->_db->setQuery($query)->loadColumn();
 
 		// Get items total
-		$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+		// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+		$total = $this->_db->setQuery('SELECT COUNT(DISTINCT a.id) ' . $from)->loadResult();
 
 		return $item_ids;
 	}
@@ -3222,14 +3411,15 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function getAllItems(&$total=null, $start=0, $limit=100000)
 	{
-		$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT a.id '
+		$query = 'SELECT a.id '
 			. ' FROM #__content AS a'
+			. ' ORDER BY a.id'
 			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 		;
 		$item_ids = $this->_db->setQuery($query)->loadColumn();
 
 		// Get items total
-		$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+		$total = $this->_db->setQuery('SELECT COUNT(*) FROM #__content')->loadResult();
 
 		return $item_ids;
 	}
@@ -3325,7 +3515,6 @@ class FlexicontentModelItems extends FCModelAdminList
 
 	function import()
 	{
-		jimport('joomla.utilities.simplexml');  // Deprecated J2.5, removed J3.x
 		// Get the site default language
 		$lang = flexicontent_html::getSiteDefaultLang();
 
@@ -3343,7 +3532,8 @@ class FlexicontentModelItems extends FCModelAdminList
 		//$logs->err = new stdClass();
 
 		// Create the new category for the flexicontent items
-		$topcat = \Joomla\CMS\Table\Table::getInstance('flexicontent_categories','');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_categories.php';
+		$topcat = new flexicontent_categories(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$topcat->parent_id	= 1;
 		$topcat->level			= 0;
 		$topcat->extension	= "com_content";
@@ -3398,7 +3588,8 @@ class FlexicontentModelItems extends FCModelAdminList
 			// Loop throught the categories of the created section
 			foreach ($categories as $category)
 			{
-				$subcat = \Joomla\CMS\Table\Table::getInstance('flexicontent_categories','');
+				require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_categories.php';
+				$subcat = new flexicontent_categories(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 				$subcat->load($category->id);
 				$subcat->id			= 0;
 				$subcat->lft		= null;
@@ -3427,7 +3618,7 @@ class FlexicontentModelItems extends FCModelAdminList
 				// Loop throught the articles of the created category
 				foreach ($articles as $article)
 				{
-					$item = \Joomla\CMS\Table\Table::getInstance('content');
+					$item = new \Joomla\CMS\Table\Content(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 					$item->load($article->id);
 					$item->id					= 0;
 					$item->catid			= $subcat->id;
@@ -3445,7 +3636,8 @@ class FlexicontentModelItems extends FCModelAdminList
 		} // end if
 
 		foreach ($categories as $category) {
-			$subcat = \Joomla\CMS\Table\Table::getInstance('flexicontent_categories','');
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_categories.php';
+			$subcat = new flexicontent_categories(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 			$subcat->load($map_old_new[$category->id]);
 			$subcat->lft			= null;
 			$subcat->rgt			= null;
@@ -3533,14 +3725,15 @@ class FlexicontentModelItems extends FCModelAdminList
 		// Return all items, since we included a core field other than tag
 		if ($use_all_items == true)
 		{
-			$query = 'SELECT SQL_CALC_FOUND_ROWS id'
+			$query = 'SELECT id'
 				. ' FROM #__content'
+				. ' ORDER BY id'
 				. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 			;
 			$item_list = $this->_db->setQuery($query)->loadColumn();
 
 			// Get items total
-			$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+			$total = $this->_db->setQuery('SELECT COUNT(*) FROM #__content')->loadResult();
 
 			return $item_list;
 		}
@@ -3568,14 +3761,17 @@ class FlexicontentModelItems extends FCModelAdminList
 			;
 		}
 
-		$query = 'SELECT SQL_CALC_FOUND_ROWS a.*'
-			. ' FROM (('. implode(') UNION ( ', $queries) . ')) AS a'
+		$from = ' FROM (('. implode(') UNION ( ', $queries) . ')) AS a';
+
+		$query = 'SELECT a.*'
+			. $from
+			. ' ORDER BY 1'
 			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 		;
 		$item_list = $this->_db->setQuery($query)->loadColumn();
 
 		// Get items total
-		$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+		$total = $this->_db->setQuery('SELECT COUNT(*) ' . $from)->loadResult();
 
 		/**
 		 * NOTE: array_unique() creates gaps in the index of the array,
@@ -3755,7 +3951,9 @@ class FlexicontentModelItems extends FCModelAdminList
 					break;
 
 				case 'ie.search_index':
-					$textwhere[] = ' MATCH (ie.search_index) AGAINST (' . $this->_db->Quote($search_prefix . $escaped_search . '*', false ).' IN BOOLEAN MODE)';
+					$ft_input = str_replace(' ', '%', trim($search));
+					$ft_search = implode('%', flexicontent_db::getBooleanSearchWords(explode('%', $search_prefix . $ft_input)));
+					$textwhere[] = $ft_search === '' ? '0=1' : ' MATCH (ie.search_index) AGAINST (' . $this->_db->Quote($ft_search . '*').' IN BOOLEAN MODE)';
 					break;
 			}
 		}

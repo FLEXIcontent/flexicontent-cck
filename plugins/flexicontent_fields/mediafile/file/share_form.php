@@ -1,6 +1,7 @@
 <?php
 // no direct access
 defined('_JEXEC') or die;
+flexicontent_html::loadFramework('flexi-lib');
 \Joomla\CMS\HTML\HTMLHelper::_('behavior.keepalive');
 ?>
 
@@ -10,7 +11,7 @@ defined('_JEXEC') or die;
 
 		// do field validation
 		if (form.mailto.value == "" || form.from.value == "") {
-			alert('<?php echo \Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_EMAIL_ERR_NOINFO'); ?>');
+			FlexiForm.alert('<?php echo \Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_EMAIL_ERR_NOINFO'); ?>');
 			return false;
 		}
 		form.submit();

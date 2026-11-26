@@ -38,6 +38,7 @@
 	height: 100%;
 	border: 0;
 	position: relative;
+	width: 100%;
 }
 .map_contents_box > .col8 {
 	width: 60%;

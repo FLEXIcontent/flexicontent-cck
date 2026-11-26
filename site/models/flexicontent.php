@@ -19,7 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Model
@@ -189,8 +188,8 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$params = $this->_params;
 		$use_tmp = true;
 		
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$orderby = $this->_buildCatOrderBy('cat_');
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
@@ -215,7 +214,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		{
 			$lta = $use_tmp ? 'i': 'ie';
 			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
-			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 		
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
@@ -286,7 +285,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	{
 		$params = $this->_params;
 
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
@@ -360,8 +359,8 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$params = $this->_params;
 		$use_tmp = true;
 		
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$cat_orderby = $this->_buildCatOrderBy('subcat_');
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
@@ -386,7 +385,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		{
 			$lta = $use_tmp ? 'i': 'ie';
 			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
-			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 		
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).

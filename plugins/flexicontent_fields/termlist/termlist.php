@@ -5,12 +5,18 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright � 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 class plgFlexicontent_fieldsTermlist extends FCField
 {
@@ -49,10 +55,10 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		if ($use_ingroup && empty($field->ingroup)) return;
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -66,7 +72,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 
 		// Create the editor object of editor prefered by the user,
 		// this will also add the needed JS to the HTML head
-		$editor_name = $field->parameters->get( 'editor',  $user->getParam('editor', $app->getCfg('editor'))  );
+		$editor_name = $field->parameters->get( 'editor',  $user->getParam('editor', $app->get('editor'))  );
 		$editor  = \Joomla\CMS\Editor\Editor::getInstance($editor_name);
 		$editor_plg_params = array();  // Override parameters of the editor plugin, ignored by most editors !!
 
@@ -153,7 +159,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			if ( !in_array('pagebreak', $skip_buttons) ) $skip_buttons[] = 'pagebreak';
 			if ( !in_array('readmore',  $skip_buttons) )  $skip_buttons[] = 'readmore';
 		}
-		$skip_buttons_arr = ($show_buttons && ($editor_name=='jce' || $editor_name=='tinymce') && count($skip_buttons)) ? $skip_buttons : (boolean) $show_buttons;   // JCE supports skipping buttons
+		$skip_buttons_arr = ($show_buttons && ($editor_name=='jce' || $editor_name=='tinymce') && count($skip_buttons)) ? $skip_buttons : (bool) $show_buttons;   // JCE supports skipping buttons
 
 		// Initialise property with default value
 		if (!$field->value || (count($field->value) === 1 && reset($field->value) === null))
@@ -185,267 +191,15 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		// Handle multiple records
 		if ($multiple)
 		{
-			// Add the drag and drop sorting feature
-			if ($add_ctrl_btns) $js .= "
-			jQuery(document).ready(function(){
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					cancel: false,
-					/*containment: 'parent',*/
-					tolerance: 'pointer'
-					".($fields_box_placing ? "
-					,start: function(e) {
-						//jQuery(e.target).children().css('float', 'left');
-						//fc_setEqualHeights(jQuery(e.target), 0);
-					}
-					,stop: function(e) {
-						//jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
-					}
-					" : '')."
-				});
-			});
-			";
+			flexicontent_html::loadFramework('native-field-controls');
+			$config = array('editor' => $use_html ? $mce_fieldname . '_text' : '', 'term' => true);
+			$js .= $this->buildValueRepeater($field, $elementid, $fieldname, $max_values, $add_ctrl_btns, $config, 'fcfield_textarea');
 
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
-			$js .= "
-			function addField".$field->id."(el, groupval_box, fieldval_box, params)
-			{
-				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
-				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
-				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
-				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-
-				if(!remove_previous && (rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
-					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
-					return 'cancel';
-				}
-
-				// Find last container of fields and clone it to create a new container of fields
-				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
-				var newField  = lastField.clone();
-				newField.find('.fc-has-value').removeClass('fc-has-value');
-
-				// New element's field name and id
-				var uniqueRowN = uniqueRowNum" . $field->id . ";
-				var element_id = '" . $elementid . "_' + uniqueRowN;
-				var fname_pfx  = '" . $fieldname . "[' + uniqueRowN + ']';
-				";
-
-			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			$js .= "
-				// Update the new term title
-				var termtitle = newField.find('input.termtitle');
-				var termtitle_dv = termtitle.attr('data-defvals');
-				termtitle_dv && termtitle_dv.length ?
-					termtitle.val(termtitle_dv) :
-					termtitle.val('') ;
-				termtitle.attr('name', fname_pfx + '[title]');
-				termtitle.attr('id', element_id + '_title');
-
-				// Update the new term description
-				var boxClass = 'termtext';
-				var container = newField.find('.fc_'+boxClass);
-				var container_inner = newField.find('.fcfield_box');
-
-				var txtArea   = container.find('textarea').first();
-				var oldAreaID = txtArea.attr('id');
-				var newAreaID = element_id;
-				var regex_oldAreaID = new RegExp(oldAreaID, 'g');
-
-				// ID of originally cloned textarea 
-				var srcAreaID = txtArea.attr('data-original-id') ? txtArea.attr('data-original-id') : txtArea.attr('id');
-
-				var hasTinyMCE = txtArea.hasClass('mce_editable');  //typeof tinyMCE === 'undefined' ? false : !!tinyMCE.get( srcAreaID );
-				var hasCodeMirror = typeof CodeMirror === 'undefined' ? false : txtArea.next().hasClass('CodeMirror');
-
-				".( !$use_html ? "" : "
-				if (hasCodeMirror)  // CodeMirror case
-				{
-					// Get options not from copy but from the original DOM element
-					var CMoptions = document.getElementById(srcAreaID).nextSibling.CodeMirror.options;
-
-					// Cleanup the cloned HTML elements of the editor
-					container.find('.CodeMirror').remove();
-				}
-				else   // tinyMCE / other editors
-				{
-					// Get options not from copy but from the original DOM element
-					var MCEoptions = null;
-					if (hasTinyMCE)
-					{
-						MCEoptions = tinyMCE.majorVersion >= 4 ?
-							tinymce.get(srcAreaID).settings :
-							tinymce.EditorManager.get(srcAreaID).settings;
-
-						// Clear some options
-						MCEoptions.id = null;
-						MCEoptions.url_converter_scope = null;
-
-						// tinyMCE of J3.7.0+
-						if (typeof MCEoptions.setupCallbackString != 'undefined')
-						{
-							MCEoptions.target = null;
-							MCEoptions.setup = null;
-							MCEoptions.setupCallbackString = MCEoptions.setupCallbackString.replace(regex_oldAreaID, newAreaID);
-						}
-					}
-					//window.console.log(MCEoptions);
-
-					// Append a new container after the current textarea container
-					container.after('<div class=\"'+ container.get(0).className +'\"></div>');
-
-					// Copy label
-					container.find('label.labeltext').appendTo(container.next());
-
-					// Add inner container and copy only the textarea into the new container and make it visible
-					var newBox = jQuery('<div class=\"'+ container_inner.get(0).className +'\"></div>')
-					newBox.appendTo(container.next());
-
-					var target;
-					if (hasTinyMCE && tinyMCE.majorVersion >= 4)
-					{
-						jQuery('<div class=\"js-editor-tinymce\"></div>').appendTo(newBox);
-						target = container.next().find('.js-editor-tinymce');
-					}
-					else
-					{
-						target = container.next();
-					}
-					container.find('textarea').appendTo(target).css('display', '').css('visibility', '');
-
-					// Legacy (external) editor XTD-buttons, e.g. JCE, tinyMCE of < J3.7.0
-					var editor_xtd_buttons = false;
-					if (hasTinyMCE)
-					{
-						editor_xtd_buttons = container.find('#editor-xtd-buttons');
-						if (editor_xtd_buttons.length)
-						{
-							editor_xtd_buttons.removeClass(function (index, className) {
-								return (className.match(/(^|\s)fc_xtd_btns_-\S+/g) || []).join(' ');
-							});
-							editor_xtd_buttons.html(editor_xtd_buttons.html().replace(regex_oldAreaID, newAreaID));
-							editor_xtd_buttons.addClass('fc_xtd_btns_' + element_id);
-							editor_xtd_buttons.appendTo(target.parent());
-						}
-					}
-
-					// Remove old (cloned) container box along with all the contents
-					container.remove();
-				}
-				")."
-
-				// Prepare the new textarea for attaching the HTML editor
-				var mce_fieldname_text = '" . $mce_fieldname . "_text';
-				var mce_fieldname_text_sfx = mce_fieldname_text ? '[' + mce_fieldname_text + ']' : '';
-				var theArea = newField.find('.fc_'+boxClass).find('textarea');
-				theArea.val('');
-				theArea.attr('name', fname_pfx + '[text]' + mce_fieldname_text_sfx);
-				theArea.attr('id', element_id + '_text');
-
-				// Update the labels
-				newField.find('label.labeltitle').attr('for', element_id + '_title');
-				newField.find('label.labeltitle').attr('id', element_id + '_title-lbl');
-				newField.find('label.labeltext').attr('for', element_id + '_text');
-				newField.find('label.labeltext').attr('id', element_id + '_text-lbl');
-				";
-
-			// Add new field to DOM
-			$js .= "
-				lastField ?
-					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
-					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
-
-				// 2: means no DATA clean-up
-				if (remove_previous && remove_previous!=2)
-				{
-					fc_removeAreaEditors(lastField.find('textarea'), 0);
-				}
-				if (remove_previous) lastField.remove();
-
-				// Attach form validation on new element
-				fc_validationAttach(newField);
-				";
-
-			// Attach a new JS HTML editor object
-			if ($use_html) $js .= "
-
-				if (hasCodeMirror)
-				{
-					var jsEditor = fc_attachCodeMirror(theArea, CMoptions);
-				}
-				else if (hasTinyMCE)
-				{
-					var jsEditor = fc_attachTinyMCE(theArea, MCEoptions, mce_fieldname_text);
-
-					// Add click event to Legacy (external) editor XTD-buttons, e.g. JCE, tinyMCE of < J3.7.0
-					if (!(tinyMCE.majorVersion >= 4) && editor_xtd_buttons && editor_xtd_buttons.length)
-					{
-						SqueezeBox.assign(jQuery('#editor-xtd-buttons.fc_xtd_btns_' + element_id + ' a.modal-button').get(), { parse: 'rel' });
-					}
-				}
-				";
-
-			// Add new element to sortable objects (if field not in group)
-			if ($add_ctrl_btns) $js .= "
-				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
-				";
-
-			// Show new field, increment counters
-			$js .="
-				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
-				if (scroll_visible) fc_scrollIntoView(newField, 1);
-				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
-
-				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({html: true, container: newField});
-				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
-
-				rowCount".$field->id."++;       // incremented / decremented
-				uniqueRowNum".$field->id."++;   // incremented only
-			}
-
-
-			function deleteField".$field->id."(el, groupval_box, fieldval_box)
-			{
-				// Disable clicks on remove button, so that it is not reclicked, while we do the field value hide effect (before DOM removal of field value)
-				var btn = fieldval_box ? false : jQuery(el);
-				if (btn && rowCount".$field->id." > 1) btn.css('pointer-events', 'none').off('click');
-
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-
-				// Add empty container if last element, instantly removing the given field value container
-				if(rowCount".$field->id." == 1)
-					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
-
-				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
-				if (rowCount".$field->id." > 1)
-				{
-					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the field value hide effect (before DOM removal of field value)
-					row.find('.fcfield-delvalue').remove();
-					row.find('.fcfield-expand-view').remove();
-					row.find('.fcfield-insertvalue').remove();
-					row.find('.fcfield-drag-handle').remove();
-
-					// Remove known JS editors
-					fc_removeAreaEditors( row.find('textarea'), 0 );
-
-					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){ jQuery(this).remove(); });
-					rowCount".$field->id."--;
-				}
-
-				//if (typeof tinyMCE != 'undefined' && tinyMCE) window.console.log('Field \"".$field->label."\" # values: ' + rowCount".$field->id." + ' tinyMCE editor count: ' + tinyMCE.editors.length);
-			}
-			";
-
-			$css .= '';
-
-			$remove_button = '<span class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$remove_button = '<button type="button" class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></button>';
 			$move2         = '<span class="' . $btn_item_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<button type="button" class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></button> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<button type="button" class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></button> ' : '';
 		}
 
 		// Field not multi-value
@@ -540,7 +294,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		if ($per_val_js)
 		{
 			$js .= "
-			jQuery(document).ready(function()
+			FlexiForm.ready(function()
 			{
 				" . $per_val_js . "
 			});
@@ -548,13 +302,8 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		}
 
 		// Add field's CSS / JS
-		if ($multiple) $js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
+		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
 
 		// Do not convert the array to string if field is in a group
@@ -570,9 +319,9 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="'.$btn_group_class.' fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+					<button type="button" class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(this.closest(\'.fc-xpended-btns\'));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
 						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
-					</span>
+					</button>
 				</div>';
 		}
 
@@ -623,7 +372,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');

@@ -16,17 +16,15 @@
  *   fcfield_addrint.map_zoom[field]            — niveau de zoom par défaut
  *   fcfield_addrint.configure[field]           — ignoré (compatibilité)
  */
-;(function ($) {
+;(function () {
 	'use strict';
 
 	/* ------------------------------------------------------------------ *
 	 * Constants
 	 * ------------------------------------------------------------------ */
-	var NOMINATIM_SEARCH  = 'https://nominatim.openstreetmap.org/search';
-	var NOMINATIM_REVERSE = 'https://nominatim.openstreetmap.org/reverse';
+	var NOMINATIM_BASE    = 'https://nominatim.openstreetmap.org/';
 	var TILE_URL          = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 	var TILE_ATTR         = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors';
-	var DEBOUNCE_MS       = 400;
 	var MIN_CHARS         = 3;
 	var MAX_RESULTS       = 7;
 	var DEFAULT_ZOOM      = 16;
@@ -38,22 +36,27 @@
 	 * ------------------------------------------------------------------ */
 	var _maps      = {};   // Leaflet map instances  keyed by elementid
 	var _markers   = {};   // Leaflet marker instances
-	var _timers    = {};   // debounce handles
+	var requests = new Map();
+	var requestQueue = Promise.resolve();
+	var lastRequest = 0;
 	var _dropdowns = {};   // suggestion <ul> DOM nodes
 
 	/* ------------------------------------------------------------------ *
 	 * Public object — merge with existing fcfield_addrint if already set
 	 * ------------------------------------------------------------------ */
 	window.fcfield_addrint = window.fcfield_addrint || {};
-	var FC = window.fcfield_addrint;
+	var shared = window.fcfield_addrint;
+	var FC = Object.create(shared);
+	(shared.engines ||= {}).nominatim = FC;
 
-	FC.allowed_countries = FC.allowed_countries || {};
-	FC.single_country    = FC.single_country    || {};
-	FC.map_zoom          = FC.map_zoom          || {};
-	FC.map_type          = FC.map_type          || {};
-	FC.configure         = FC.configure         || {};   // ignoré (compatibilité Google Maps)
-	FC.tile_url          = FC.tile_url          || {};   // tile server URL par champ (optionnel)
-	FC.LatLon            = FC.LatLon            || {};
+	shared.allowed_countries = shared.allowed_countries || {};
+	shared.single_country    = shared.single_country    || {};
+	shared.map_zoom          = shared.map_zoom          || {};
+	shared.map_type          = shared.map_type          || {};
+	shared.configure         = shared.configure         || {};   // ignoré (compatibilité Google Maps)
+	shared.tile_url      = shared.tile_url      || {};   // tile server URL par champ (optionnel)
+	shared.nominatim_url = shared.nominatim_url || {};
+	shared.LatLon            = shared.LatLon            || {};
 
 	/* ------------------------------------------------------------------ *
 	 * DOM helpers
@@ -80,12 +83,31 @@
 	function fireChange(id) {
 		var e = el(id);
 		if (!e) return;
-		$(e).trigger('change');
+		e.fc_choices_instance?.refresh();
+		e.dispatchEvent(new Event('change', { bubbles: true }));
 	}
 
-	function debounce(fn, delay, key) {
-		if (_timers[key]) clearTimeout(_timers[key]);
-		_timers[key] = setTimeout(fn, delay);
+	// Serialize lookups across fields and reuse results for this form session.
+	function lookup(field, action, params) {
+		var base = shared.nominatim_url[field] || NOMINATIM_BASE;
+		var url = new URL(action, base.replace(/\/?$/, '/'));
+		if (!/^https?:$/.test(url.protocol)) return Promise.reject(new Error('Invalid geocoding endpoint'));
+		url.search = new URLSearchParams(params);
+		var key = url.href;
+		if (requests.has(key)) return requests.get(key);
+		var pending = requestQueue.catch(function () {}).then(async function () {
+			await new Promise(resolve => setTimeout(resolve, Math.max(0, 1100 - (Date.now() - lastRequest))));
+			lastRequest = Date.now();
+			var response = await fetch(url, {headers: {'Accept': 'application/json'}, signal:AbortSignal.timeout(15000)});
+			if (!response.ok) throw new Error('Geocoding HTTP ' + response.status);
+			var data = await response.json();
+			if (data.error) throw new Error(data.error);
+			return data;
+		});
+		requestQueue = pending;
+		requests.set(key, pending);
+		pending.catch(function () { requests.delete(key); });
+		return pending;
 	}
 
 	/* ------------------------------------------------------------------ *
@@ -157,7 +179,7 @@
 		if (!results.length) {
 			var li = document.createElement('li');
 			li.style.cssText = 'padding:8px 12px;color:#999;cursor:default';
-			li.textContent   = Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_NOT_FOUND_AT_MARKER') || 'Aucun résultat';
+			li.textContent   = Joomla.Text._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_NOT_FOUND_AT_MARKER');
 			dd.appendChild(li);
 			return;
 		}
@@ -195,7 +217,7 @@
 	/* ------------------------------------------------------------------ *
 	 * Nominatim query
 	 * ------------------------------------------------------------------ */
-	function nominatimSearch(query, countryCodes, callback) {
+	function nominatimSearch(query, countryCodes, field) {
 		var params = {
 			q:              query,
 			format:         'json',
@@ -205,24 +227,12 @@
 		};
 		if (countryCodes) params.countrycodes = countryCodes;
 
-		var qs = Object.keys(params).map(function (k) {
-			return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
-		}).join('&');
-
-		fetch(NOMINATIM_SEARCH + '?' + qs, {
-			headers: { 'Accept-Language': document.documentElement.lang || 'fr' }
-		})
-		.then(function (r) { return r.json(); })
-		.then(callback)
-		.catch(function (err) { console.warn('Nominatim error:', err); callback([]); });
+		return lookup(field, 'search', params);
 	}
 
-	function nominatimReverse(lat, lng, callback) {
-		var url = NOMINATIM_REVERSE + '?format=json&addressdetails=1'
-			+ '&lat=' + lat + '&lon=' + lng
-			+ '&accept-language=' + (document.documentElement.lang || 'fr');
-		fetch(url)
-			.then(function (r) { return r.json(); })
+	function nominatimReverse(lat, lng, field, callback) {
+		lookup(field, 'reverse', {format:'json', addressdetails:1, lat:lat, lon:lng,
+			'accept-language':document.documentElement.lang || 'en'})
 			.then(callback)
 			.catch(function () { callback(null); });
 	}
@@ -234,6 +244,8 @@
 		var addr = result.address || {};
 		var lat  = parseFloat(result.lat) || 0;
 		var lng  = parseFloat(result.lon) || 0;
+		var skip = el(elementid + '_autocomplete')?.closest('.fcfieldval_container')?.querySelector('.fcfield-skipvalue');
+		if (skip) window.fcfield_address?.setEnabled(skip, true);
 
 		/* Coordonnées */
 		val(elementid + '_lat', lat || '');
@@ -319,16 +331,34 @@
 		inputEl.setAttribute('autocomplete', 'off');
 		inputEl.setAttribute('spellcheck',   'false');
 
-		inputEl.addEventListener('input', function () {
-			var q = inputEl.value.trim();
-			if (q.length < MIN_CHARS) { dropdownRemove(inputEl.id); return; }
-
-			debounce(function () {
-				nominatimSearch(q, countryCodes, function (results) {
-					dropdownPopulate(inputEl, results, elementid, field_name_js);
-				});
-			}, DEBOUNCE_MS, inputEl.id);
-		});
+		var button = inputEl.parentElement.querySelector('.fc-osm-search');
+		if (!button) {
+			button = document.createElement('button');
+			button.type = 'button';
+			button.className = 'btn btn-secondary fc-osm-search';
+			button.textContent = Joomla.Text._('JSEARCH_FILTER_SUBMIT', 'Search');
+			inputEl.after(button);
+		}
+		button.disabled = false;
+		var generation = 0;
+		async function search() {
+			var q = inputEl.value.trim(), current = ++generation;
+			dropdownRemove(inputEl.id);
+			if (q.length < MIN_CHARS) return;
+			var message = el(elementid + '_messages');
+			if (message) { message.textContent = ''; message.style.display = 'none'; }
+			button.disabled = true;
+			try {
+				var results = await nominatimSearch(q, countryCodes, field_name_js);
+				if (current === generation && inputEl.isConnected) dropdownPopulate(inputEl, results, elementid, field_name_js);
+			} catch (error) {
+				if (current === generation) {
+					if (message) { message.textContent = error.message; message.style.display = ''; }
+				}
+			} finally { button.disabled = false; }
+		}
+		button.addEventListener('click', search);
+		inputEl.addEventListener('input', function () { generation++; dropdownRemove(inputEl.id); });
 
 		inputEl.addEventListener('blur', function () {
 			// Petit délai pour laisser mousedown du li se déclencher
@@ -337,6 +367,7 @@
 
 		inputEl.addEventListener('keydown', function (e) {
 			var dd = _dropdowns[inputEl.id];
+			if (e.key === 'Enter' && !dd?.querySelector('.fc-osm-active')) { e.preventDefault(); search(); return; }
 			if (!dd) return;
 			var items = dd.querySelectorAll('li');
 			var active = dd.querySelector('li.fc-osm-active');
@@ -418,7 +449,7 @@
 				val(elementid + '_lon', pos.lng.toFixed(7));
 				FC.LatLon[elementid] = { lat: pos.lat, lng: pos.lng };
 				/* Reverse geocode pour mettre à jour l'adresse */
-				nominatimReverse(pos.lat, pos.lng, function (result) {
+				nominatimReverse(pos.lat, pos.lng, field_name_js, function (result) {
 					if (!result) return;
 					var inputEl = el(elementid + '_autocomplete');
 					if (inputEl) inputEl.value = result.display_name || '';
@@ -432,7 +463,7 @@
 				val(elementid + '_lat', e.latlng.lat.toFixed(7));
 				val(elementid + '_lon', e.latlng.lng.toFixed(7));
 				FC.LatLon[elementid] = { lat: e.latlng.lat, lng: e.latlng.lng };
-				nominatimReverse(e.latlng.lat, e.latlng.lng, function (result) {
+				nominatimReverse(e.latlng.lat, e.latlng.lng, field_name_js, function (result) {
 					if (!result) return;
 					var inputEl = el(elementid + '_autocomplete');
 					if (inputEl) inputEl.value = result.display_name || '';
@@ -500,8 +531,8 @@
 		if (!selectEl) return;
 		var id       = selectEl.id || '';
 		var prefix   = id.replace(/_country$/, '');
-		var stateRow = el(prefix + '_state') ? $(el(prefix + '_state')).closest('tr')[0] : null;
-		var provRow  = el(prefix + '_province') ? $(el(prefix + '_province')).closest('tr')[0] : null;
+		var stateRow = el(prefix + '_state')?.closest('tr');
+		var provRow  = el(prefix + '_province')?.closest('tr');
 
 		if (!stateRow && !provRow) return;
 
@@ -568,4 +599,4 @@
 		}
 	}
 
-}(jQuery));
+}());

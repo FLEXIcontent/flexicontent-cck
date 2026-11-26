@@ -10,6 +10,7 @@ namespace Joomla\CMS {
     class Factory {
         public static $app, $db;
         public static function getApplication() { return self::$app; }
+        public static function getDbo() { return self::$db; }
         public static function getContainer() { return new class { public function get($name) { return Factory::$db; } }; }
         public static function getDate($value) { return new class { public function toSql() { return '2026-01-01 00:00:00'; } }; }
     }
@@ -30,12 +31,16 @@ namespace {
         public function __construct($values = array()) { $this->values = $values; }
         public function get($key, $default = null, $filter = null) { return $this->values[$key] ?? $default; }
         public function getCmd($key, $default = '') { return $this->get($key, $default); }
+        public function getInt($key, $default = 0) { return (int) $this->get($key, $default); }
+        public function set($key, $value) { $this->values[$key] = $value; }
         public function getArray() { return $this->values; }
     }
     class TestUser {
-        public $id = 7;
+        public $id = 7, $guest = 0;
+        public static $rights = array();
         public function get($name) { return $this->$name; }
-        public function authorise($action, $asset = null) { return false; }
+        public function authorise($action, $asset = null) { return in_array($action, self::$rights, true); }
+        public function getAuthorisedCategories($component, $action) { return array(); }
     }
     class TestApp {
         public $input, $client = 'administrator', $messages = array();
@@ -46,10 +51,17 @@ namespace {
         public function enqueueMessage($message, $type) { $this->messages[] = $message; }
         public function setHeader(...$args) {}
     }
+    // No File fields exist, so the file editor's custom properties stay disabled.
+    class TestQuery { public function __call($name, $args) { return $this; } }
     class TestDb {
         public $stored;
         public function insertObject($table, $row) { $this->stored = clone $row; }
         public function insertid() { return 101; }
+        public function getQuery($new = false) { return new TestQuery(); }
+        public function setQuery($query) { return $this; }
+        public function quote($value) { return "'" . $value . "'"; }
+        public function loadColumn() { return array(); }
+        public function loadResult() { return null; }
     }
     class TestModel {
         public $stored, $editable = true, $id = 0;
@@ -69,6 +81,8 @@ namespace {
     }
     class flexicontent_html { public static function dataFilter($value, ...$args) { return $value; } }
     class flexicontent_upload { public static function getExt($path) { return pathinfo($path, PATHINFO_EXTENSION); } }
+    // The controller fits a new file record to its table's columns before the INSERT; there is no table here.
+    class flexicontent_db { public static function fitRecordToTable($record, $table, $isNew = false) {} }
     function jimport($name) {}
     function sourcePath($relative) {
         $installed = getenv('FLEXI_INSTALLED_ROOT');
@@ -78,9 +92,27 @@ namespace {
         return dirname(__DIR__, 3) . '/' . $relative;
     }
     require sourcePath('site/classes/helpers/remote.php');
+    require sourcePath('site/classes/helpers/fileeditor.php');
+    // save() includes the file editor helper from JPATH_SITE. A checkout has no components/ folder,
+    // so point JPATH_SITE at a temporary folder whose copy of that path loads the real helper.
+    if (getenv('FLEXI_INSTALLED_ROOT')) {
+        define('JPATH_SITE', getenv('FLEXI_INSTALLED_ROOT'));
+    } else {
+        define('JPATH_SITE', sys_get_temp_dir() . '/fc-remote-size-' . bin2hex(random_bytes(6)));
+        $shim = JPATH_SITE . '/components/com_flexicontent/classes/helpers/fileeditor.php';
+        mkdir(dirname($shim), 0700, true);
+        file_put_contents($shim, '<?php require_once ' . var_export(sourcePath('site/classes/helpers/fileeditor.php'), true) . ';');
+        register_shutdown_function(function () use ($shim) {
+            unlink($shim);
+            for ($dir = dirname($shim); $dir !== dirname(JPATH_SITE); $dir = dirname($dir)) { rmdir($dir); }
+        });
+    }
     // Keep imports and the complete controller class. Only Joomla's include/bootstrap preamble is replaced.
     $source = file_get_contents(sourcePath('admin/controllers/filemanager.php'));
-    $imports = substr($source, strpos($source, 'use Joomla\\CMS\\Factory;'), strpos($source, 'JLoader::register') - strpos($source, 'use Joomla\\CMS\\Factory;'));
+    $usePos = strpos($source, 'use Joomla\\CMS\\Factory;');
+    $classPos = strpos($source, 'class FlexicontentControllerFilemanager ');
+    preg_match_all('/^use\s+[^;]+;\s*$/m', substr($source, $usePos, $classPos - $usePos), $importMatches);
+    $imports = implode("\n", $importMatches[0]) . "\n";
     eval($imports . substr($source, strpos($source, 'class FlexicontentControllerFilemanager ')));
     class TestController extends FlexicontentControllerFilemanager {
         public function __construct($input) { $this->input = $input; $this->model = new TestModel(); }
@@ -194,13 +226,16 @@ namespace {
     $denied = controller('save', $url . '/size.txt');
     $denied->model->editable = false;
     check('save ACL still denies before probing', $denied->save() === false && $denied->model->stored === null && count(requests()) === $before);
+    // A file manager passes the frontend file-management gate, so these tasks reach the addurl/addlocal block.
+    TestUser::$rights = array('flexicontent.managefiles');
     foreach (array('filemanager.addurl', 'ADDURL', 'filemanager.x.AddLocal') as $task) {
         \Joomla\CMS\Factory::$app->client = 'site';
         \Joomla\CMS\Factory::$app->input->values['task'] = $task;
         $denied = false;
-        try { include sourcePath('site/controllers/filemanager.php'); } catch (\RuntimeException $e) { $denied = $e->getCode() === 403; }
+        try { include sourcePath('site/controllers/filemanager.php'); } catch (\RuntimeException $e) { $denied = $e->getCode() === 403 && strpos($e->getMessage(), 'Direct frontend access') === 0; }
         check('frontend dispatch remains blocked: ' . $task, $denied);
     }
+    TestUser::$rights = array();
     configure(1, array($host));
     $start = microtime(true);
     check('redirects share the supplied HTTP deadline', flexicontent_remote::headSize($url . '/delayed-redirect.txt', $error, true, $start + 0.45) < 0 && microtime(true) - $start < 0.8);
@@ -209,6 +244,9 @@ namespace {
     check('slow server yields zero', flexicontent_remote::getSizeOnSave($url . '/slow.txt') === 0);
     $elapsed = microtime(true) - $start;
     check('shared HTTP budget enforced', $elapsed >= 4 && $elapsed < 6);
+    // cURL times out on its own clock and can return a few ms before the microtime() deadline: wait for the deadline
+    $deadline = (new \ReflectionProperty('flexicontent_remote', 'size_probe_deadline'))->getValue();
+    while (microtime(true) <= $deadline) { usleep(1000); }
     $before = count(requests());
     check('exhausted budget prevents later probes in same save', flexicontent_remote::getSizeOnSave($url . '/size.txt') === 0 && count(requests()) === $before);
     echo $checks . ' checks passed (real local HTTP)' . PHP_EOL;

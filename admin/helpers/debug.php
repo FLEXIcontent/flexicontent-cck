@@ -30,7 +30,7 @@ class UsersHelperDebug
 	static function getComponents()
 	{
 		// Initialise variable.
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$db		= \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query	= $db->getQuery(true);
 
 		$query->select('name AS text, element AS value')
@@ -41,7 +41,7 @@ class UsersHelperDebug
 		$items = $db->setQuery($query)->loadObjectList();
 
 		if (count($items)) {
-			$lang = \Joomla\CMS\Factory::getLanguage();
+			$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
 
 			foreach ($items as &$item)
 			{
@@ -86,7 +86,6 @@ class UsersHelperDebug
 			if (!empty($component_actions)) {
 				foreach($component_actions as &$action)
 				{
-					echo $action->name . " -- ";
 					if ( StringHelper::substr( $action->name , 0 , 5) != 'core.' ) continue;
 					$action_title = str_replace('core.', '', $action->name); //$action->title;
 					$actions[$action_title] = array($action->name, $action->description);
@@ -97,7 +96,9 @@ class UsersHelperDebug
 
 		// Use default actions from configuration if no component selected or component doesn't have actions
 		if (empty($actions)) {
-			$filename = JPATH_ADMINISTRATOR.'/components/com_config/models/forms/application.xml';
+			$filename = JPATH_ADMINISTRATOR . (FLEXI_J40GE
+				? '/components/com_config/forms/application.xml'
+				: '/components/com_config/models/forms/application.xml');
 
 			if (is_file($filename)) {
 				$xml = simplexml_load_file($filename);
@@ -124,7 +125,7 @@ class UsersHelperDebug
 				}
 
 				// Load language
-				$lang 		= \Joomla\CMS\Factory::getLanguage();
+				$lang 		= \Joomla\CMS\Factory::getApplication()->getLanguage();
 				$extension 	= 'com_config';
 				$source 	= JPATH_ADMINISTRATOR . '/components/' . $extension;
 

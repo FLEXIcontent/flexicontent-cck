@@ -25,11 +25,7 @@ use Joomla\String\StringHelper;
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('groupedlist');   // \Joomla\CMS\Form\Field\GroupedlistField
 
 /**
@@ -83,8 +79,6 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 		// ***
 		// *** HTML Tag parameters
 		// ***
-
-		$popover_class = 'hasPopover';
 
 		if ($this->element['multiple']=='multiple' || $this->element['multiple']=='true' )
 		{
@@ -197,14 +191,14 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 			if ( \Joomla\CMS\Factory::getApplication()->input->get('option', '', 'cmd') != 'com_flexicontent' )
 			{
 				$js = "
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					".(FLEXI_J30GE ?
 						"fc_bindFormDependencies('body', 2, '.control-group');" :
 						"fc_bindFormDependencies('body', 1, 'li');"
 					)."
 				});
 				";
-				\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+				\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 			}
 		}
 
@@ -307,16 +301,7 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 
 		if ($inline_tip = $this->element['inline_tip'])
 		{
-			$tip_img = $this->element['tip_img'] ? $this->element['tip_img'] : 'comments.png';
-			$preview_img = $this->element['preview_img'] ? $this->element['preview_img'] : '';
-			$tip_class = $this->element['tip_class'] . ' ' . $popover_class;
-
-			$hintmage = \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
-			$previewimage = $preview_img ? \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
-			$tip_text .= '
-				<span class="'.$tip_class.'" style="display: inline-block;" data-content="' . htmlspecialchars(\Joomla\CMS\Language\Text::_($inline_tip), ENT_COMPAT, 'UTF-8') . '">
-					' . $hintmage . $previewimage . '
-				</span>';
+			$tip_text .= flexicontent_html::getInlineTip($inline_tip, $this->element['tip_img'], $this->element['tip_class'], $this->element['preview_img'], 'display: inline-block;');
 		}
 
 		if ($inline_text = $this->element['inline_text'])
@@ -331,16 +316,7 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 
 		if ($inline_tip = $this->element['inline_tip2'])
 		{
-			$tip_img = $this->element['tip_img2'] ? $this->element['tip_img2'] : 'comments.png';
-			$preview_img = $this->element['preview_img2'] ? $this->element['preview_img2'] : '';
-			$tip_class = $this->element['tip_class2'] . ' ' . $popover_class;
-
-			$hintmage = \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
-			$previewimage = $preview_img ? \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
-			$tip_text2 .= '
-				<span class="'.$tip_class.'" style="display: inline-block;" data-content="' . htmlspecialchars(\Joomla\CMS\Language\Text::_($inline_tip), ENT_COMPAT, 'UTF-8') . '">
-					' . $hintmage . $previewimage . '
-				</span>';
+			$tip_text2 .= flexicontent_html::getInlineTip($inline_tip, $this->element['tip_img2'], $this->element['tip_class2'], $this->element['preview_img2'], 'display: inline-block;');
 		}
 
 

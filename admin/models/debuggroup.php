@@ -20,9 +20,9 @@ require_once JPATH_COMPONENT.'/helpers/debug.php';
  */
 if (FLEXI_J40GE)
 {
-	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'Model'.DS.'DebugGroupModel.php');
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'src'.DS.'Model'.DS.'DebuggroupModel.php');
 
-	class FlexicontentModelDebugGroup extends Joomla\Component\Users\Administrator\Model\DebugGroupModel
+	class FlexicontentModelDebugGroup extends Joomla\Component\Users\Administrator\Model\DebuggroupModel
 	{
 		public function getDebugActions()
 		{

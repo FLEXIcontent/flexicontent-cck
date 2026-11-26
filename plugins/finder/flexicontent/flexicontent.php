@@ -56,14 +56,7 @@ if (version_compare(JVERSION, '4.0', 'ge'))
         public function __construct(DispatcherInterface $dispatcher, array $config)
         {
             // Call the parent constructor.
-            if ($config instanceof DispatcherInterface) {
-                $dispatcher = $config;
-                $config     = \func_num_args() > 1 ? func_get_arg(1) : [];
-
-                parent::__construct($dispatcher, $config);
-            } else {
-                parent::__construct($config);
-            }
+            parent::__construct($dispatcher, $config);
 
             $this->setDatabase(Factory::getContainer()->get(DatabaseInterface::class));
         }
@@ -71,10 +64,10 @@ if (version_compare(JVERSION, '4.0', 'ge'))
 }
 else
 {
-    \JLoader::register('FinderIndexerAdapter', JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php');
-    \JLoader::register('FinderIndexerHelper', JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/helper.php');
-    \JLoader::register('FinderIndexer', JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/indexer.php');
-    \JLoader::register('FinderIndexerResult', JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/result.php');
+    require_once JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php';
+    require_once JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/helper.php';
+    require_once JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/indexer.php';
+    require_once JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/result.php';
 
     class_alias(\FinderIndexerAdapter::class, Adapter::class);
     class_alias(\FinderIndexerResult::class, Result::class);
@@ -226,6 +219,8 @@ class Flexicontent extends _Flexicontent
 
         if ($context === 'com_content.article' || $context === 'com_content.form' || $context === 'com_flexicontent.form') {
             $id = $table->id;
+
+            $this->removeLegacyLinks($id);
         } elseif ($context === 'com_finder.index') {
             $id = $table->link_id;
         } else {
@@ -346,7 +341,7 @@ class Flexicontent extends _Flexicontent
     public function onFinderChangeState($context, $pks = null, $value = null)
     {
         $event = null;
-        if ($context instanceof FinderEvent\AfterSaveEvent)
+        if ($context instanceof FinderEvent\AfterChangeStateEvent)
         {
             $event   = $context;
             $context = $event->getContext();
@@ -356,6 +351,11 @@ class Flexicontent extends _Flexicontent
 
         // We only want to handle articles here.
         if ($context === 'com_content.article' || $context === 'com_content.form' || $context === 'com_flexicontent.form') {
+            foreach ($pks as $pk) {
+                if ($this->removeLegacyLinks($pk, false)) {
+                    $this->reindex($pk);
+                }
+            }
             $this->itemStateChange($pks, $value);
         }
 
@@ -384,7 +384,7 @@ class Flexicontent extends _Flexicontent
         if (!isset($item->category) || !isset($item->cat_state) || !isset($item->cat_access))
         {
             /** @var DatabaseDriver $db */
-            $db = version_compare(JVERSION, '4', 'ge') ? Factory::getContainer()->get('DatabaseDriver') : Factory::getDbo();
+            $db = version_compare(JVERSION, '4', 'ge') ? Factory::getContainer()->get('DatabaseDriver') : Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
             $category = self::$isJ4GE
                 ? $this->getApplication()->bootComponent('com_content')->getCategory(['published' => false, 'access' => false])->get($item->catid)
                 : $db->setQuery($db->getQuery(true)
@@ -400,7 +400,7 @@ class Flexicontent extends _Flexicontent
         /**
          * Check if type is allowed to be indexed
          */
-        $typesToIndex = $this->params->get('types_to_index', []);
+        $typesToIndex = $this->getListParameter('types_to_index');
         if (!isset($item->fc_type_id))
         {
             $fc_type_id= $this->db->setQuery($this->db->getQuery(true)
@@ -464,6 +464,9 @@ class Flexicontent extends _Flexicontent
 
         // Get the menu title if it exists.
         $title = $this->getItemMenuTitle($item->url);
+        if (empty($title)) {
+            $title = $this->getItemMenuTitle($item->url . '&cid=' . (int) $item->catid);
+        }
 
         // Adjust the title if necessary.
         if (!empty($title) && $this->params->get('use_menu_title', true)) {
@@ -486,7 +489,7 @@ class Flexicontent extends _Flexicontent
         //if (!$item->state) return;
 
         // Get taxonomies to display
-        $taxonomies = $this->params->get('taxonomies', ['type', 'author', 'category', 'language']);
+        $taxonomies = $this->getListParameter('taxonomies', ['type', 'author', 'category', 'language']);
 
         // Add the type taxonomy data.
         if (\in_array('type', $taxonomies)) {
@@ -520,6 +523,7 @@ class Flexicontent extends _Flexicontent
         if (static::$isJ4GE) Helper::addCustomFields($item, 'com_content.article');
 
         // Index the item.
+        $this->removeLegacyLinks($item->id, false);
         $this->indexer->index($item);
     }
 
@@ -553,9 +557,7 @@ class Flexicontent extends _Flexicontent
         $case_when_item_alias = ' CASE WHEN ';
         $case_when_item_alias .= $query->charLength('a.alias', '!=', '0');
         $case_when_item_alias .= ' THEN ';
-        $a_id = static::$isJ4GE
-            ? $query->castAs('CHAR', 'a.id')
-            : $query->castAsChar('a.id');
+        $a_id = $query->castAs('CHAR', 'a.id');
         $case_when_item_alias .= $query->concatenate([$a_id, 'a.alias'], ':');
         $case_when_item_alias .= ' ELSE ';
         $case_when_item_alias .= $a_id . ' END as slug';
@@ -564,9 +566,7 @@ class Flexicontent extends _Flexicontent
         $case_when_category_alias = ' CASE WHEN ';
         $case_when_category_alias .= $query->charLength('c.alias', '!=', '0');
         $case_when_category_alias .= ' THEN ';
-        $c_id = static::$isJ4GE
-            ? $query->castAs('CHAR', 'c.id')
-            : $query->castAsChar('c.id');
+        $c_id = $query->castAs('CHAR', 'c.id');
         $case_when_category_alias .= $query->concatenate([$c_id, 'c.alias'], ':');
         $case_when_category_alias .= ' ELSE ';
         $case_when_category_alias .= $c_id . ' END as catslug';
@@ -583,10 +583,41 @@ class Flexicontent extends _Flexicontent
     }
 
 
+    /** Read both saved multi-select arrays and comma-separated manifest defaults. */
+    private function getListParameter(string $name, array $default = []): array
+    {
+        $value = $this->params->get($name, $default);
+
+        return is_array($value)
+            ? $value
+            : preg_split('/\s*,\s*/', (string) $value, -1, PREG_SPLIT_NO_EMPTY);
+    }
+
     // override ...
     protected function getUrl($id, $extension, $view, $cid=0)
     {
-        return 'index.php?option=' . $extension . '&view=' . $view . '&id=' . $id . ($cid ? '&cid=' . $cid : '');
+        // Finder's change/remove callbacks use this key without a category argument.
+        // Category and menu information belongs in the separate display route.
+        return 'index.php?option=' . $extension . '&view=' . $view . '&id=' . $id;
+    }
+
+    /** Remove the old category-dependent keys through Finder's cleanup API. */
+    private function removeLegacyLinks($id, bool $removeTaxonomies = true): bool
+    {
+        $db = $this->getDatabase();
+        $pattern = $db->escape($this->getUrl((int) $id, $this->extension, $this->layout) . '&cid=', true) . '%';
+        $query = $db->getQuery(true)
+            ->select('link_id')
+            ->from('#__finder_links')
+            ->where($db->quoteName('url') . ' LIKE :legacyPrefix')
+            ->bind(':legacyPrefix', $pattern);
+        $ids = $db->setQuery($query)->loadColumn();
+
+        foreach ($ids as $linkId) {
+            $this->indexer->remove((int) $linkId, $removeTaxonomies);
+        }
+
+        return (bool) $ids;
     }
 
 

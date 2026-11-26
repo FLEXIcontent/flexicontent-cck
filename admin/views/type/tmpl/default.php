@@ -21,7 +21,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flex
 $this->document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 $js = "
-	jQuery(document).ready(function(){
+	FlexiForm.ready(function(){
 		fc_bindFormDependencies('#flexicontent', 0, '');
 	});
 ";
@@ -188,7 +188,7 @@ $this->document->addScriptDeclaration($js);
 		<div class="fc_tabset_inner">
 
 			<span class="btn-group input-append" style="margin: 2px 0px 6px;">
-				<span id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo Text::_('JHELP'); ?></span>
+				<button type="button" id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo Text::_('JHELP'); ?></button>
 			</span>
 			<div class="fcclear"></div>
 
@@ -278,6 +278,12 @@ $this->document->addScriptDeclaration($js);
 							if ($cssprep && FLEXI_J37GE)
 							{
 								$_value = $form_layout->getValue($fieldname, $groupname, $layoutParams->get($fieldname));
+
+								// Layout configuration never saved: use the default of the field, a NULL value makes the core fields log PHP 8.1+ deprecations
+								if ($_value === null)
+								{
+									$_value = (string) $field->getAttribute('default', '');
+								}
 
 								// Not only set the disabled attribute but also clear the required attribute to avoid issues with some fields (like 'color' field)
 								$form_layout->setFieldAttribute($fieldname, 'disabled', 'true', $field->group);

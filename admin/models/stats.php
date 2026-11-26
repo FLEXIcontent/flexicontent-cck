@@ -11,7 +11,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component stats Model
@@ -116,9 +115,9 @@ class FlexicontentModelStats extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		$query = 'SELECT
 				  COUNT(*) AS item_count,
 				  DATE_FORMAT(i.created, "%Y-%m") as year_month_num,
-				  DATE_FORMAT(i.created, "%Y-%b") as year_month_text,
-				  DATE_FORMAT(i.created, "%m") as month_num,
-				  DATE_FORMAT(i.created, "%b") as month_txt
+				  MIN(DATE_FORMAT(i.created, "%Y-%b")) as year_month_text,
+				  MIN(DATE_FORMAT(i.created, "%m")) as month_num,
+				  MIN(DATE_FORMAT(i.created, "%b")) as month_txt
 
 				FROM #__content AS i
 				WHERE i.created > DATE_SUB(NOW(), INTERVAL 120 MONTH)
@@ -236,7 +235,8 @@ class FlexicontentModelStats extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	 */
 	function getCreators()
 	{
-		$query = 'SELECT COUNT(*) AS counter, i.created_by AS id, ua.name, ua.username'
+		// One row per user name: MIN() names the user of the row, where the choice was left to the database before
+		$query = 'SELECT COUNT(*) AS counter, MIN(i.created_by) AS id, ua.name, MIN(ua.username) AS username'
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid=c.id'
 			. ' LEFT JOIN #__users AS ua ON ua.id = i.created_by'
@@ -260,7 +260,7 @@ class FlexicontentModelStats extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	 */
 	function getEditors()
 	{
-		$query = 'SELECT COUNT(*) AS counter, i.modified_by AS id, ua.name, ua.username'
+		$query = 'SELECT COUNT(*) AS counter, MIN(i.modified_by) AS id, ua.name, MIN(ua.username) AS username'
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid=c.id'
 			. ' LEFT JOIN #__users AS ua ON ua.id = i.modified_by'
@@ -435,7 +435,7 @@ class FlexicontentModelStats extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		//count
 		foreach ($votes as $vote) {
 
-			if(!$vote->rating_sum) {
+			if(!$vote->rating_sum || !(int) $vote->rating_count) {
 				$collect['novotes']++;
 				continue;
 			}
@@ -509,7 +509,19 @@ class FlexicontentModelStats extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 
 		$this->_db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
 		$field = $this->_db->loadObject();
-		$item = \Joomla\CMS\Table\Table::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
+		$__tblType = $type = 'flexicontent_items';
+		$__tblPrefix = $prefix = '';
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$item = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$item = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$item = new $__tblClass($__tblDb);
+		}
 		//$item->load( $id );
 		FlexicontentFields::loadFieldConfig($field, $item);
 

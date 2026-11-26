@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -13,7 +13,13 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
 
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 class plgFlexicontent_fieldsAuthoritems extends FCField
 {
@@ -27,6 +33,7 @@ class plgFlexicontent_fieldsAuthoritems extends FCField
 	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
+		\Joomla\CMS\Plugin\CMSPlugin::loadLanguage('plg_flexicontent_fields_authoritems', JPATH_ADMINISTRATOR);
 	}
 
 
@@ -39,6 +46,7 @@ class plgFlexicontent_fieldsAuthoritems extends FCField
 	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
+		$field->html = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_AI_AUTOMATIC');
 	}
 
 
@@ -67,7 +75,7 @@ class plgFlexicontent_fieldsAuthoritems extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -90,7 +98,7 @@ class plgFlexicontent_fieldsAuthoritems extends FCField
 			try
 			{
 				// Get user
-				$author = \Joomla\CMS\Factory::getUser($item->created_by);
+				$author = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $item->created_by);
 
 				// Make sure unicode username can be used in the URL
 				$created_by_username = \Joomla\CMS\Filter\OutputFilter::stringURLUnicodeSlug($author->username);

@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright � 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -14,7 +14,13 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 class plgFlexicontent_fieldsCore extends FCField
 {
@@ -79,7 +85,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -309,9 +315,6 @@ class plgFlexicontent_fieldsCore extends FCField
 
 					if ($allow_reviews)
 					{
-						// Get item's reviews. Pass items to avoid multiple queries ...
-						$reviews = $this->_getReviews($items, $item);
-
 						// Placement of reviews
 						$reviews_placement = (int) $field->parameters->get('reviews_placement', 0);
 					}
@@ -546,7 +549,7 @@ class plgFlexicontent_fieldsCore extends FCField
             $auto_title_code = '';
             if ($auto_title === 2)
             {
-                $db = \Joomla\CMS\Factory::getDbo();
+                $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
                 $typeParams = new \Joomla\Registry\Registry($db->setQuery('SELECT attribs FROM #__flexicontent_types WHERE id = ' . (int) $item->type_id)->loadResult());
                 $auto_title_code = (int) $typeParams->get('auto_title', 0) === 2 ? $typeParams->get('auto_title_code', '') : '';
             }
@@ -638,7 +641,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			? in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'))
 			: false;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$formfieldname = 'filter_'.$filter->id;
 
 		$_s = $isSearchView ? '_s' : '';
@@ -878,21 +881,21 @@ class plgFlexicontent_fieldsCore extends FCField
 				if($disable_keyboardinput)
 				{
 					$filter_ffid   = $formName.'_'.$filter->id.'_val';
-					$document =  \Joomla\CMS\Factory::getDocument();
+					$document =  \Joomla\CMS\Factory::getApplication()->getDocument();
 					switch ($display_filter_as)
 					{
 						case 1:
-							$document->addScriptDeclaration("
-										jQuery(document).ready(function(){
-											jQuery('#".$filter_ffid."').on('keydown keypress keyup', false);
+							$document->getWebAssetManager()->addInlineScript("
+										FlexiForm.ready(function(){
+											document.getElementById('".$filter_ffid."')?.setAttribute('readonly', 'readonly');
 										});
 									");
 						break;
 						case 3:
-							$document->addScriptDeclaration("
-										jQuery(document).ready(function(){
-											jQuery('#".$filter_ffid."1').on('keydown keypress keyup', false);
-											jQuery('#".$filter_ffid."2').on('keydown keypress keyup', false);
+							$document->getWebAssetManager()->addInlineScript("
+										FlexiForm.ready(function(){
+											document.getElementById('".$filter_ffid."1')?.setAttribute('readonly', 'readonly');
+											document.getElementById('".$filter_ffid."2')?.setAttribute('readonly', 'readonly');
 										});
 									");
 						break;
@@ -1166,7 +1169,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			return array();
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$_s = $for_advsearch ? '_s' : '';
 
 		$values = array();
@@ -1308,56 +1311,5 @@ class plgFlexicontent_fieldsCore extends FCField
 				$this->_catTreeRecurse($cat->id, $cats, $display_filter_as, 0, $start_depth, $filter_depth);
 			}
 		}
-	}
-
-
-	/**
-	 * Function to get review records of and item
-	 *
-	 * @param	  array	   $property	 Current set of items. To get reviews via single query
-	 * @param	  object   $item		   The item for which to return its reviews
-	 *
-	 * @return	array    The reviews of $item
-	 * 
-	 */
-	private function _getReviews($items, $item)
-	{
-		static $item_reviews = null;
-
-		if (!isset($item_reviews[$item->id]))
-		{
-			$db = \Joomla\CMS\Factory::getDbo();
-
-			$item_ids = array();
-
-			foreach($items as $item)
-			{
-				$item_ids[] = (int) $item->id;
-			}
-
-			$query = $db->getQuery(true)
-				->select('*')
-				->from('#__flexicontent_reviews')
-				->where('content_id IN (' . implode(',', $item_ids) . ')')
-				->where('type = ' . $db->Quote('item'));
-
-			$rvdata = $db->setQuery($query)->loadObjectList();
-
-			foreach($rvdata as $r)
-			{
-				$item_reviews[$r->content_id][] = $r;
-			}
-
-			// This is need for future isset checks
-			foreach($items as $item)
-			{
-				if (!isset($item_reviews[$item->id]))
-				{
-					$item_reviews[$item->id] = array();
-				}
-			}
-		}
-
-		return $item_reviews[$item->id];
 	}
 }

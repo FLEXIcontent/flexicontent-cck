@@ -76,11 +76,8 @@ foreach ($values as $n => $value)
 
 if ( !isset(static::$js_added[$field->id][__FILE__]) )
 {
+	// Gallery choice and select enhancement are independent. Preserve FancyBox's configured features.
 	flexicontent_html::loadFramework('fancybox');
-
-	$js = '';
-
-	if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
 
 	static::$js_added[$field->id][__FILE__] = array();
 }
@@ -93,19 +90,13 @@ $uid = 'fc_'.$field_name_js."_fcitem".$item->id;
 
 if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 {
-	//$js = file_get_contents(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'fancybox'.DS.'dist'.DS.'jquery.fancybox.js');
-	//$js = str_replace('unique_gal_id', $uid, $js);
-
-
-
-		//TODO render json format for button buttons: ["zoom","share","slideShow","fullScreen","download","thumbs","close"],
 
 	$display_infobar      = $field->parameters->get( $PPFX_ . 'diplay_infobar', 'true' );
 	$display_toolbar      = $field->parameters->get( $PPFX_ . 'diplay_toolbar', 'auto' );
 	$display_thumbs       = $field->parameters->get( $PPFX_ . 'diplay_thumbs_autostart', 'false' );
 	$animation_effect     = $field->parameters->get( $PPFX_ . 'animation_effect', 'zoom' );
 	$animation_duration   = (int) $field->parameters->get( $PPFX_ . 'animation_duration', 400 );
-	$transition_effect    = $field->parameters->get( $PPFX_ . 'transition_effect', 'fade' );
+	$transition_effect    = $field->parameters->get( $PPFX_ . 'transition_effect', $field->parameters->get($PPFX_ . 'tansition_effect', 'fade') );
 	$transition_duration  = (int) $field->parameters->get( $PPFX_ . 'transition_duration', 400 );
 	$loop                 = $field->parameters->get( $PPFX_ . 'loop_mode', 'false' );
 	$keyboard             = $field->parameters->get( $PPFX_ . 'keyboard_mode', 'true' );
@@ -114,29 +105,27 @@ if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 	$slideshow_speed      = (int) $field->parameters->get( $PPFX_ . 'slideshow_speed', 3000 );
 	$buttons_shown        = $field->parameters->get( $PPFX_ . 'buttons_shown', array('zoom','share','slideShow','fullScreen','download','thumbs','close') );
 
-	$js = "
-	(function($)
-	{
-		$(document).ready(function()
-		{
-			$('#fb_gallery_" . $uid . " a.fb_gallery').fancybox({
-				loop: $loop,
-				keyboard: $keyboard,
-				infobar: $display_infobar,
-				toolbar: '$display_toolbar',
-				button : " . '["' . implode('","', $buttons_shown ) . '"]' . ",
-				protect: $image_protect,
-				animationEffect: '$animation_effect',
-				animationDuration: $animation_duration,
-				transitionEffect: '$transition_effect',
-				transitionDuration: $transition_duration,
-				slideShow: {autoStart: $slideshow_autostart,speed: $slideshow_speed}
-			});
-		});
-	})(jQuery);
-	";
+	// XML radio values are strings. Encode real booleans and arrays for FancyBox.
+	$as_bool = static function ($value) { return filter_var($value, FILTER_VALIDATE_BOOLEAN); };
+	$options = array(
+		'loop' => $as_bool($loop),
+		'keyboard' => $as_bool($keyboard),
+		'infobar' => $as_bool($display_infobar),
+		'toolbar' => $display_toolbar === 'auto' ? 'auto' : $as_bool($display_toolbar),
+		'buttons' => array_values(array_filter((array) $buttons_shown, 'strlen')),
+		'thumbs' => array('autoStart' => $as_bool($display_thumbs)),
+		'protect' => $as_bool($image_protect),
+		'animationEffect' => $animation_effect === 'false' ? false : $animation_effect,
+		'animationDuration' => $animation_duration,
+		'transitionEffect' => $transition_effect === 'false' ? false : $transition_effect,
+		'transitionDuration' => $transition_duration,
+		'slideShow' => array('autoStart' => $as_bool($slideshow_autostart), 'speed' => $slideshow_speed),
+	);
+	$options_json = json_encode($options, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+	$selector_json = json_encode('#fb_gallery_' . $uid . ' a.fb_gallery');
+	$js = "jQuery(function($) { $($selector_json).fancybox($options_json); });";
 
-	if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	if ($js) \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript($js);
 	static::$js_added[$field->id][__FILE__][$item->id] = true;
 }
 

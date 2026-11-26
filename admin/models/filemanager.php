@@ -11,9 +11,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.filesystem.file');
-jimport('joomla.filesystem.folder');
-jimport('joomla.filesystem.path');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
@@ -150,6 +147,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		{
 			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			FLEXIUtilities::loadMediaLanguage(JPATH_ADMINISTRATOR);
 		}
 
 
@@ -237,9 +235,9 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				return $this->_data_pending;
 			}
 
+			// This list has no LIMIT: its total is its number of rows
 			$this->_data_pending = $this->_getList($query);
-			$this->_db->setQuery('SELECT FOUND_ROWS()');
-			$this->_total_pending = $this->_db->loadResult();
+			$this->_total_pending = count($this->_data_pending);
 		}
 
 		return $this->_data_pending;
@@ -283,8 +281,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			}
 
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			$this->_db->setQuery("SELECT FOUND_ROWS()");
-			$this->_total = $this->_db->loadResult();
+			$this->_total = $this->_getTotalOfQuery();
 
 			$filter_order = $this->getState('filter_order');
 			$default_size_message = $filter_order != 'a.size' ? null : '
@@ -354,6 +351,19 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 
 	/**
+	 * Total number of the files that the list query finds: the row count of the same query with only the id column
+	 * (same tables, joins and conditions, no LIMIT)
+	 * Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+	 *
+	 * @return integer
+	 */
+	protected function _getTotalOfQuery()
+	{
+		return $this->_db->setQuery('SELECT COUNT(*) FROM (' . $this->_buildQuery(array(), $ids_only = true) . ') AS fc_list')->loadResult();
+	}
+
+
+	/**
 	 * Method to get the total nr of the records
 	 *
 	 * @return integer
@@ -374,9 +384,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 					return $this->_total_pending = 0;
 				}
 
-				$this->_getList($query, 0, 1);
-				$this->_db->setQuery("SELECT FOUND_ROWS()");
-				$this->_total_pending = $this->_db->loadResult();
+				$this->_total_pending = $this->_getTotalOfQuery();
 			}
 
 			return $this->_total_pending;
@@ -392,9 +400,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				return $this->_total = 0;
 			}
 
-			$this->_getList($query, 0, 1);
-			$this->_db->setQuery("SELECT FOUND_ROWS()");
-			$this->_total = $this->_db->loadResult();
+			$this->_total = $this->_getTotalOfQuery();
 		}
 
 		return $this->_total;
@@ -706,8 +712,19 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			{
 				$u_item_id = (int) $u_item_id;
 
-				\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-				$record = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+				$__tblType = $type = 'flexicontent_items';
+				$__tblPrefix = $prefix = '';
+				$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+				if ($__tblPrefix === 'TagsTable') {
+					$record = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+				} elseif ($__tblPrefix === 'JTable') {
+					$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+					$record = new $__tblClass($__tblDb);
+				} else {
+					$__tblClass = $__tblPrefix . ucfirst($__tblType);
+					require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+					$record = new $__tblClass($__tblDb);
+				}
 				if ($record->load($u_item_id))
 				{
 					$asset = 'com_content.article.' . $u_item_id;
@@ -780,7 +797,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		}
 		else
 		{
-			$columns[] = 'SQL_CALC_FOUND_ROWS a.*, '
+			$columns[] = 'a.*, '
 				. ' u.name AS editor, '
 				. ' ua.name AS uploader, '
 				. ' mm.id AS mm_id, '
@@ -980,6 +997,16 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 					$where[] = $filesUsedByImageField;
 				}
 			}
+		}
+
+		// A field picker lists files the field can actually use, before counting and pagination.
+		if ($this->getName() === 'fileselement' && $field && in_array($field->field_type, ['file', 'mediafile'], true))
+		{
+			$extensions = flexicontent_upload::getAllowedExtensions(flexicontent_upload::getUploadParams($field));
+			$localTypes = $extensions ? 'a.ext IN (' . implode(',', $this->_db->quote($extensions)) . ')' : '1 = 0';
+			$where[] = $field->field_type === 'mediafile'
+				? '(a.url <> 1 AND ' . $localTypes . ')'
+				: '(a.url <> 0 OR ' . $localTypes . ')';
 		}
 
 		// Text search and search scope
@@ -1662,6 +1689,310 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 
 	/**
+	 * Method to remove the assignments of the given files from the items that use them, so that the files can be deleted.
+	 * Handles: file / mediafile fields (current values and versions of the item) and download links added via Fcfile XTD button
+	 * (only the usage records are removed, links inside the text of articles are not edited).
+	 * Image fields store the file name inside serialized values, these are NOT modified
+	 *
+	 * @param   array   $file_ids  The ids of the files
+	 *
+	 * @return  array|boolean  array('items' => array of item ids that were modified, 'rows' => number of removed value rows), or false on error
+	 *
+	 * @since   3.3.0
+	 */
+	public function removeAssociations(array $file_ids)
+	{
+		$file_ids = array_values(array_filter(ArrayHelper::toInteger($file_ids)));
+		$result = array('items' => array(), 'rows' => 0);
+
+		if (!$file_ids)
+		{
+			return $result;
+		}
+
+		$db = $this->_db;
+		$id_list = implode(',', $file_ids);
+		$value_list = implode(',', array_map(array($db, 'quote'), $file_ids));
+		$types = "('file','mediafile')";
+
+		try
+		{
+			$db->transactionStart();
+
+			// Value rows to remove, remember (item, field) pairs to re-number the remaining values
+			$query = 'SELECT rel.item_id, rel.field_id'
+				. ' FROM #__flexicontent_fields_item_relations AS rel'
+				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ' . $types
+				. ' WHERE rel.value IN (' . $value_list . ')';
+			$pairs = $db->setQuery($query)->loadObjectList();
+
+			$query = 'DELETE rel FROM #__flexicontent_fields_item_relations AS rel'
+				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ' . $types
+				. ' WHERE rel.value IN (' . $value_list . ')';
+			$db->setQuery($query)->execute();
+			$result['rows'] += $db->getAffectedRows();
+
+			$done = array();
+
+			foreach ($pairs as $pair)
+			{
+				$result['items'][(int) $pair->item_id] = (int) $pair->item_id;
+				$key = $pair->item_id . ':' . $pair->field_id;
+
+				if (isset($done[$key]))
+				{
+					continue;
+				}
+				$done[$key] = true;
+
+				// Re-number value order without gaps
+				$query = 'SELECT DISTINCT valueorder FROM #__flexicontent_fields_item_relations'
+					. ' WHERE item_id = ' . (int) $pair->item_id . ' AND field_id = ' . (int) $pair->field_id
+					. ' ORDER BY valueorder ASC';
+				$orders = $db->setQuery($query)->loadColumn();
+
+				foreach ($orders as $idx => $old_order)
+				{
+					$new_order = $idx + 1;
+
+					if ((int) $old_order !== $new_order)
+					{
+						$query = 'UPDATE #__flexicontent_fields_item_relations SET valueorder = ' . $new_order
+							. ' WHERE item_id = ' . (int) $pair->item_id . ' AND field_id = ' . (int) $pair->field_id
+							. ' AND valueorder = ' . (int) $old_order;
+						$db->setQuery($query)->execute();
+					}
+				}
+			}
+
+			// Values stored in versions of the items, otherwise the file would come back when a version is loaded / saved
+			$query = 'SELECT DISTINCT iv.item_id FROM #__flexicontent_items_versions AS iv'
+				. ' JOIN #__flexicontent_fields AS fi ON fi.id = iv.field_id AND fi.field_type IN ' . $types
+				. ' WHERE iv.value IN (' . $value_list . ')';
+
+			foreach ($db->setQuery($query)->loadColumn() as $item_id)
+			{
+				$result['items'][(int) $item_id] = (int) $item_id;
+			}
+
+			$query = 'DELETE iv FROM #__flexicontent_items_versions AS iv'
+				. ' JOIN #__flexicontent_fields AS fi ON fi.id = iv.field_id AND fi.field_type IN ' . $types
+				. ' WHERE iv.value IN (' . $value_list . ')';
+			$db->setQuery($query)->execute();
+
+			// Download links added via Fcfile XTD button
+			$query = 'SELECT DISTINCT u.id FROM #__flexicontent_file_usage AS u'
+				. ' WHERE u.context = ' . $db->Quote('com_content.article') . ' AND u.file_id IN (' . $id_list . ')';
+
+			foreach ($db->setQuery($query)->loadColumn() as $item_id)
+			{
+				$result['items'][(int) $item_id] = (int) $item_id;
+			}
+
+			$db->setQuery('DELETE FROM #__flexicontent_file_usage WHERE file_id IN (' . $id_list . ')')->execute();
+			$result['rows'] += $db->getAffectedRows();
+
+			$db->transactionCommit();
+		}
+		catch (\Throwable $e)
+		{
+			$db->transactionRollback();
+			$this->setError($e->getMessage());
+
+			return false;
+		}
+
+		return $result;
+	}
+
+
+	/**
+	 * Method to get the ids of orphaned files, i.e. files (records) that are not used by any item
+	 * (file / mediafile fields, image fields using the file name, download links added via Fcfile XTD button)
+	 *
+	 * @param   int  $min_age_hours  Skip files uploaded in the last N hours, since they may be in use by an item form that is still being edited
+	 *
+	 * @return  array  array('ids' => array of file ids, 'files' => file records keyed by id (for the list), 'skipped_recent' => number of unused files that were skipped because they are recent, 'checked' => number of file records checked)
+	 *
+	 * @since   3.3.0
+	 */
+	public function getOrphanFileIds($min_age_hours = 24)
+	{
+		$db = $this->_db;
+		$min_age_hours = max(0, (int) $min_age_hours);
+
+		// Files that are used via fields storing the file id, or via download links
+		$query = 'SELECT DISTINCT rel.value'
+			. ' FROM #__flexicontent_fields_item_relations AS rel'
+			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN (' . $db->Quote('file') . ',' . $db->Quote('mediafile') . ')';
+		$used = array_flip(array_map('intval', $db->setQuery($query)->loadColumn()));
+
+		$query = 'SELECT DISTINCT file_id FROM #__flexicontent_file_usage';
+		foreach ($db->setQuery($query)->loadColumn() as $file_id)
+		{
+			$used[(int) $file_id] = 1;
+		}
+
+		// All columns that are needed for listing the files are retrieved here, to avoid another pass over the files later
+		$all = $db->setQuery('SELECT id, filename, filename_original, altname, url, secure, uploaded FROM #__flexicontent_files')->loadObjectList('id');
+		$cutoff = $min_age_hours ? \Joomla\CMS\Factory::getDate('-' . $min_age_hours . ' hours')->toUnix() : null;
+
+		$candidates = array();
+		$skipped_recent = 0;
+
+		foreach ($all as $file)
+		{
+			if (isset($used[(int) $file->id]))
+			{
+				continue;
+			}
+
+			if ($cutoff && $file->uploaded && strtotime($file->uploaded . ' UTC') > $cutoff)
+			{
+				$skipped_recent++;
+				continue;
+			}
+
+			$candidates[] = (int) $file->id;
+		}
+
+		unset($used);
+
+		// Files may still be used by image fields: the file name is stored inside serialized values.
+		// Read the values of the image fields once and collect the used names (a LIKE join per file would be very slow on big sites)
+		$field_ids = $this->getFieldsUsingDBmode('image');
+		$field_ids_list = !$field_ids ? '' : ' AND fi.id IN (' . implode(',', ArrayHelper::toInteger($field_ids)) . ')';
+
+		$query = 'SELECT rel.value'
+			. ' FROM #__flexicontent_fields_item_relations AS rel'
+			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $db->Quote('image') . $field_ids_list;
+
+		$used_names = array();
+
+		foreach ($db->setQuery($query)->loadColumn() as $value)
+		{
+			if (preg_match_all('/"(?:originalname|existingname)";s:\d+:"([^"]*)"/', (string) $value, $m))
+			{
+				foreach ($m[1] as $name)
+				{
+					if ($name !== '')
+					{
+						$used_names[$name] = 1;
+					}
+				}
+			}
+		}
+
+		$ids = array();
+
+		foreach ($candidates as $file_id)
+		{
+			if ($all[$file_id]->filename !== '' && isset($used_names[$all[$file_id]->filename]))
+			{
+				continue;
+			}
+
+			$ids[] = $file_id;
+		}
+
+		$files = array();
+
+		foreach ($ids as $file_id)
+		{
+			$files[$file_id] = $all[$file_id];
+		}
+
+		return array('ids' => $ids, 'files' => $files, 'skipped_recent' => $skipped_recent, 'checked' => count($all));
+	}
+
+
+	/**
+	 * Method to get the items that use the given files, via any of the supported ways (file / mediafile fields,
+	 * 'image' fields storing the file name, download links added to DB tables via the Fcfile XTD button)
+	 *
+	 * @param   array   $file_ids  The ids of the files
+	 *
+	 * @return  array   Items keyed by item id: array(item_id => object(id, title, files => array(file_id => true)))
+	 *
+	 * @since   3.3.0
+	 */
+	public function getFilesUsageItems(array $file_ids, &$imageFileIds = null)
+	{
+		$imageFileIds = [];
+		$file_ids = array_values(array_filter(ArrayHelper::toInteger($file_ids)));
+
+		if (!$file_ids)
+		{
+			return array();
+		}
+
+		$db = $this->_db;
+		$file_ids_list = implode(',', $file_ids);
+		$rows = array();
+
+		// (a) Fields storing the file id as value
+		$field_type_list = $db->Quote(implode("','", array('file', 'mediafile')), false);
+
+		$query = 'SELECT a.id AS file_id, i.id AS item_id, i.title'
+			. ' FROM #__content AS i'
+			. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
+			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN (' . $field_type_list . ')'
+			. ' JOIN #__flexicontent_files AS a ON a.id = rel.value AND a.id IN (' . $file_ids_list . ')';
+		$rows = array_merge($rows, $db->setQuery($query)->loadObjectList());
+
+		// (b) Fields storing the file name as a property of serialized value (image fields)
+		$format_str = 'CONCAT("%%","\"%s\";s:%%:%%\"",%s,"\"%%")';
+
+		foreach (array('originalname', 'existingname') as $field_prop)
+		{
+			$field_ids = $this->getFieldsUsingDBmode('image');
+			$field_ids_list = !$field_ids ? '' : ' AND fi.id IN (' . implode(',', ArrayHelper::toInteger($field_ids)) . ')';
+			$like_str = sprintf($format_str, $field_prop, 'a.filename');
+
+			$query = 'SELECT a.id AS file_id, i.id AS item_id, i.title'
+				. ' FROM #__content AS i'
+				. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
+				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $db->Quote('image') . $field_ids_list
+				. ' JOIN #__flexicontent_files AS a ON rel.value LIKE ' . $like_str . ' AND a.filename <> ""'
+				. ' AND a.id IN (' . $file_ids_list . ')';
+			foreach ($db->setQuery($query)->loadObjectList() as $row)
+			{
+				$imageFileIds[(int) $row->file_id] = (int) $row->file_id;
+				$rows[] = $row;
+			}
+		}
+
+		// (c) Download links added to DB tables via the Fcfile XTD button
+		$query = 'SELECT u.file_id, u.id AS item_id, i.title'
+			. ' FROM #__flexicontent_file_usage AS u'
+			. ' JOIN #__content AS i ON i.id = u.id'
+			. ' WHERE u.context = ' . $db->Quote('com_content.article')
+			. ' AND u.file_id IN (' . $file_ids_list . ')';
+		$rows = array_merge($rows, $db->setQuery($query)->loadObjectList());
+
+		$items = array();
+
+		foreach ($rows as $row)
+		{
+			if (!isset($items[$row->item_id]))
+			{
+				$items[$row->item_id] = (object) array('id' => (int) $row->item_id, 'title' => $row->title, 'files' => array());
+			}
+
+			$items[$row->item_id]->files[(int) $row->file_id] = true;
+		}
+
+		// Most files first, then by title
+		uasort($items, function ($a, $b)
+		{
+			return count($b->files) <=> count($a->files) ?: strcasecmp($a->title, $b->title);
+		});
+
+		return $items;
+	}
+
+
+	/**
 	 * Method to check if given records can not be deleted due to assignments or due to permissions
 	 *
 	 * @param   array       $cid          array of record ids to check
@@ -1784,12 +2115,19 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 * @return	string $msg
 	 * @since	1.
 	 */
+	/**
+	 * Warnings of the last call of delete(), e.g. physical files that could not be deleted
+	 *
+	 * @var array
+	 */
+	public $delete_warnings = array();
+
 	public function delete($cid, $model = null)
 	{
+		$this->delete_warnings = array();
+
 		if ( !count( $cid ) ) return false;
 
-		jimport('joomla.filesystem.path');
-		jimport('joomla.filesystem.file');
 
 		// This is already done by controller task / caller but redo
 		$cid = ArrayHelper::toInteger($cid);
@@ -1801,14 +2139,35 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 		$files = $this->_db->setQuery($query)->loadObjectList();
 
+		$imageFields = $this->_db->setQuery("SELECT id, attribs FROM #__flexicontent_fields WHERE field_type = 'image'")->loadObjectList();
+
 		foreach($files as $file)
 		{
 			if ($file->url != 1)
 			{
 				$basepath	= $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
 				$path 		= \Joomla\Filesystem\Path::clean($basepath.DS.DS.$file->filename);
-				if (!\Joomla\Filesystem\File::delete($path)) {
-					JError::raiseWarning(100, \Joomla\CMS\Language\Text::_( 'FLEXI_UNABLE_TO_DELETE' ).$path);
+
+				// A file that does not exist (anymore) is not an error, the record is deleted anyway
+				if (is_file($path) && !\Joomla\Filesystem\File::delete($path)) {
+					$this->delete_warnings[] = \Joomla\CMS\Language\Text::_( 'FLEXI_UNABLE_TO_DELETE' ) . $path;
+					\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_( 'FLEXI_UNABLE_TO_DELETE' ) . $path, 'warning');
+				}
+				if (!is_file($path))
+				{
+					// Different originals can share the stem of a generated WebP. Keep
+					// those variants while a surviving record could still own them.
+					$stem = pathinfo($file->filename, PATHINFO_FILENAME);
+					$others = $this->_db->setQuery('SELECT filename FROM #__flexicontent_files WHERE id NOT IN (' . $cid_list . ')'
+						. ' AND secure = ' . (int) $file->secure . ' AND filename LIKE ' . $this->_db->quote($this->_db->escape($stem, true) . '.%', false))->loadColumn();
+					if (!in_array($file->filename, $others, true)) foreach (flexicontent_upload::getImageThumbnails($file, $imageFields, !$others) as $thumbnail)
+					{
+						if (!\Joomla\Filesystem\File::delete($thumbnail))
+						{
+							$this->delete_warnings[] = \Joomla\CMS\Language\Text::_('FLEXI_UNABLE_TO_DELETE') . $thumbnail;
+							\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_UNABLE_TO_DELETE') . $thumbnail, 'warning');
+						}
+					}
 				}
 			}
 		}
@@ -2042,15 +2401,19 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	function getFileIds($skip_urls=true, &$total=null, $start=0, $limit=5000)
 	{
-		$query = 'SELECT SQL_CALC_FOUND_ROWS id '
-			. ' FROM #__flexicontent_files'
-			. ($skip_urls ? ' WHERE url = 0 ' : '')
+		$from_where = ' FROM #__flexicontent_files'
+			. ($skip_urls ? ' WHERE url = 0 ' : '');
+
+		// The id order makes the pages of the list (start, limit) well defined
+		$query = 'SELECT id '
+			. $from_where
+			. ' ORDER BY id'
 			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 			;
 		$file_ids = $this->_db->setQuery($query)->loadColumn();
 
 		// Get items total
-		$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+		$total = $this->_db->setQuery('SELECT COUNT(*) ' . $from_where)->loadResult();
 
 		return $file_ids;
 	}
@@ -2146,7 +2509,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			$filename = str_ireplace('.' . $ext, '', basename($full_path));
 
 			// Check preview folder
-			if (!is_dir($prv_path) && !mkdir($prv_path))
+			if (!is_dir($prv_path) && !mkdir($prv_path, 0755, true))
 			{
 				$error_mssg = $file->filename . ' : Failed to create preview folder: ' . $prv_path;
 				$this->setError($error_mssg);
@@ -2372,7 +2735,6 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			return;
 		}
 
-		jimport('joomla.log.log');
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $logger->filename,  // Sets the target log file

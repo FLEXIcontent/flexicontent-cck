@@ -2,50 +2,67 @@
 
 namespace Sabberworm\CSS\Comment;
 
+use Sabberworm\CSS\OutputFormat;
 use Sabberworm\CSS\Renderable;
+use Sabberworm\CSS\Position\Position;
+use Sabberworm\CSS\Position\Positionable;
 
-class Comment implements Renderable {
-	protected $iLineNo;
-	protected $sComment;
+class Comment implements Positionable, Renderable
+{
+    use Position;
 
-	public function __construct($sComment = '', $iLineNo = 0) {
-		$this->sComment = $sComment;
-		$this->iLineNo = $iLineNo;
-	}
+    /**
+     * @var string
+     *
+     * @internal since 8.8.0
+     */
+    protected $sComment;
 
-	/**
-	 * @return string
-	 */
-	public function getComment() {
-		return $this->sComment;
-	}
+    /**
+     * @param string $sComment
+     * @param int $iLineNo
+     */
+    public function __construct($sComment = '', $iLineNo = 0)
+    {
+        $this->sComment = $sComment;
+        $this->setPosition($iLineNo);
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getLineNo() {
-		return $this->iLineNo;
-	}
+    /**
+     * @return string
+     */
+    public function getComment()
+    {
+        return $this->sComment;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function setComment($sComment) {
-		$this->sComment = $sComment;
-	}
+    /**
+     * @param string $sComment
+     *
+     * @return void
+     */
+    public function setComment($sComment)
+    {
+        $this->sComment = $sComment;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function __toString() {
-		return $this->render(new \Sabberworm\CSS\OutputFormat());
-	}
+    /**
+     * @return string
+     *
+     * @deprecated in V8.8.0, will be removed in V9.0.0. Use `render` instead.
+     */
+    public function __toString()
+    {
+        return $this->render(new OutputFormat());
+    }
 
-	/**
-	 * @return string
-	 */
-	public function render(\Sabberworm\CSS\OutputFormat $oOutputFormat) {
-		return '/*' . $this->sComment . '*/';
-	}
-
+    /**
+     * @param OutputFormat|null $oOutputFormat
+     *
+     * @return string
+     */
+    public function render($oOutputFormat)
+    {
+        return '/*' . $this->sComment . '*/';
+    }
 }

@@ -14,7 +14,13 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentControllerBaseAdmin' => JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * FLEXIcontent Users Controller
@@ -87,9 +93,9 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 
 		// Initialize some variables
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db  = \Joomla\CMS\Factory::getDbo();
-		$me  = \Joomla\CMS\Factory::getUser();
-		$config = \Joomla\CMS\Factory::getConfig();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$me  = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$config = \Joomla\CMS\Factory::getApplication()->getConfig();
 		$MailFrom	= $config->get('mailfrom');
 		$FromName	= $config->get('fromname');
 		$SiteName	= $config->get('sitename');
@@ -122,8 +128,8 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		// Bind posted data
 		if (!$user->bind($data))
 		{
-			JError::raiseWarning(0, \Joomla\CMS\Language\Text::_('CANNOT SAVE THE USER INFORMATION'));
-			JError::raiseWarning(0, $user->getError());
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('CANNOT SAVE THE USER INFORMATION'), 'warning');
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage($user->getError(), 'warning');
 
 			// $app->redirect('index.php?option=com_flexicontent&controller=users&view=users', $user->getError());
 			// return false;
@@ -149,25 +155,26 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		// Save the \Joomla\CMS\User\User object, creating the new user if it does not exist
 		if (!$user->save())
 		{
-			JError::raiseWarning(0, \Joomla\CMS\Language\Text::_('CANNOT SAVE THE USER INFORMATION'));
-			JError::raiseWarning(0, $user->getError());
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('CANNOT SAVE THE USER INFORMATION'), 'warning');
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage($user->getError(), 'warning');
 
 			return $this->execute('edit');
 		}
 
 		// *** BOF AUTHOR EXTENDED DATA ***
-		\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'tables');
 		$author_postdata['user_id']	= $user->get('id');
 		$author_postdata['author_basicparams']	= $data['authorbasicparams'];
 		$author_postdata['author_catparams']	= $data['authorcatparams'];
 
-		$flexiauthor_extdata = \Joomla\CMS\Table\Table::getInstance('flexicontent_authors_ext', '');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_authors_ext.php';
+		$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$flexiauthor_extdata = new flexicontent_authors_ext($__fcTableDb);
 
 		// Bind data, Check data & Store the data to the database table
 		if (!$flexiauthor_extdata->save($author_postdata))
 		{
-			JError::raiseWarning(0, \Joomla\CMS\Language\Text::_('CANNOT SAVE THE AUTHOR EXTENDED INFORMATION'));
-			JError::raiseWarning(0, $flexiauthor_extdata->getError());
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('CANNOT SAVE THE AUTHOR EXTENDED INFORMATION'), 'warning');
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage($flexiauthor_extdata->getError(), 'warning');
 
 			return $this->execute('edit');
 		}
@@ -189,7 +196,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 				$adminEmail = $MailFrom;
 			}
 
-			\Joomla\CMS\Factory::getMailer()->sendMail($adminEmail, $adminName, $user->get('email'), $subject, $message);
+			\Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Mail\MailerFactoryInterface::class)->createMailer()->sendMail($adminEmail, $adminName, $user->get('email'), $subject, $message);
 		}
 
 		$ctrl = 'users.';
@@ -228,8 +235,8 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getDbo();
-		$me    = \Joomla\CMS\Factory::getUser();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$me    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 
 		$cid = $this->input->get('cid', array(), 'array');
@@ -247,7 +254,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		foreach ($cid as $id)
 		{
 			// Check the action is allowed
-			$user = \Joomla\CMS\Factory::getUser($id);
+			$user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $id);
 			$isSuperAdmin = $user->authorise('core.admin', 'root.1');
 
 			if ($id == $me->get('id'))
@@ -323,8 +330,8 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db  = \Joomla\CMS\Factory::getDbo();
-		$me  = \Joomla\CMS\Factory::getUser();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$me  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 
 		if (!$check_uids)
@@ -351,7 +358,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		foreach ($cid as $id)
 		{
 			// Check the action is allowed
-			$user = \Joomla\CMS\Factory::getUser($id);
+			$user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $id);
 			$isSuperAdmin = $user->authorise('core.admin', 'root.1');
 
 			if ($id == $me->get('id'))
@@ -391,8 +398,15 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 						$app->logout($user->id);
 					}
 
-					$user->block = $block;
-					$user->save();
+					// 0 or 1: a boolean false reaches the database as an empty string, which strict mode refuses for a number column
+					$user->block = (int) $block;
+
+					if (!$user->save())
+					{
+						$err_msg .= ($block ? 'Could not block user: ' : 'Could not unblock user: ') . $user->get('name') . ' : ' . $user->getError() . "<br>";
+						continue;
+					}
+
 					$msg .= ($block ? 'Blocked user: ' : 'Unblocked user: ') . $user->get('name') . "<br>";
 				}
 			}
@@ -421,7 +435,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$task   = $this->getTask();
 		$cids   = $this->input->get('cid', array(), 'array');

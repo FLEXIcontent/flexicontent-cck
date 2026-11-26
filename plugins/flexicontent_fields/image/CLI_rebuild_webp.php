@@ -116,11 +116,14 @@ echo "Qualité WebP : " . $options['quality'] . "\n";
 // Chargement du plugin image FLEXIcontent
 // ============================================================
 
-JLoader::register(
-	'plgFlexicontent_fieldsImage',
-	$joomla_root . '/plugins/flexicontent_fields/image/image.php'
-);
-JLoader::register('FCField', $joomla_root . '/administrator/components/com_flexicontent/helpers/fcfield/parentfield.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) use ($joomla_root) {
+	$map = array(
+		'plgFlexicontent_fieldsImage' => $joomla_root . '/plugins/flexicontent_fields/image/image.php',
+		'FCField'                     => $joomla_root . '/administrator/components/com_flexicontent/helpers/fcfield/parentfield.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 // Instancier le plugin de façon minimale (on a juste besoin des méthodes helper)
 $dispatcher = JEventDispatcher::getInstance();
@@ -131,7 +134,7 @@ $image_plugin  = new plgFlexicontent_fieldsImage($dispatcher, array());
 // Récupérer le(s) champ(s) à traiter
 // ============================================================
 
-$db = Factory::getDbo();
+$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 $query = $db->getQuery(true)
 	->select('f.id, f.name, f.label, fp.params')

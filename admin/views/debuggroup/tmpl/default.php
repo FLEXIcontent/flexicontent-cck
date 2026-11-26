@@ -10,7 +10,8 @@
 defined('_JEXEC') or die;
 
 // Include the component HTML helpers.
-\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_COMPONENT.'/helpers/html');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/fc_service_registry.php';
+flexicontent_register_html_helpers(JPATH_COMPONENT.'/helpers/html');
 
 // Load the tooltip behavior.
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
@@ -20,7 +21,7 @@ $listOrder	= $this->escape($this->state->get('list.ordering'));
 $listDirn	= $this->escape($this->state->get('list.direction'));
 ?>
 
-<form action="<?php echo \Joomla\CMS\Router\Route::_('index.php?option=com_flexicontent&view=debuggroup&user_id='.(int) $this->state->get('filter.user_id'));?>" method="post" name="adminForm" id="adminForm">
+<form action="<?php echo \Joomla\CMS\Router\Route::_('index.php?option=com_flexicontent&view=debuggroup&group_id='.(int) $this->state->get('group_id', $this->state->get('filter.group_id')));?>" method="post" name="adminForm" id="adminForm">
 	<fieldset id="filter-bar">
 		<div class="filter-search fltlft">
 			<label class="filter-search-lbl" for="filter_search"><?php echo \Joomla\CMS\Language\Text::_('COM_USERS_SEARCH_ASSETS'); ?></label>
@@ -52,15 +53,15 @@ $listDirn	= $this->escape($this->state->get('list.direction'));
 	<div class="clr"> </div>
 
 	<div>
-		<?php echo \Joomla\CMS\Language\Text::_('COM_USERS_DEBUG_LEGEND'); ?>
-		<span class="swatch"><?php echo \Joomla\CMS\Language\Text::sprintf('COM_USERS_DEBUG_NO_CHECK', '-');?></span>
+		<?php echo \Joomla\CMS\Language\Text::_('FLEXI_DEBUG_LEGEND'); ?>
+		<span class="swatch"><?php echo \Joomla\CMS\Language\Text::sprintf('FLEXI_DEBUG_NO_CHECK', '-');?></span>
 		<span class="check-0 swatch"><?php echo \Joomla\CMS\Language\Text::sprintf('COM_USERS_DEBUG_IMPLICIT_DENY', '-');?></span>
 		<span class="check-a swatch"><?php echo \Joomla\CMS\Language\Text::sprintf('COM_USERS_DEBUG_EXPLICIT_ALLOW', '&#10003;');?></span>
 		<span class="check-d swatch"><?php echo \Joomla\CMS\Language\Text::sprintf('COM_USERS_DEBUG_EXPLICIT_DENY', '&#10007;');?></span>
 	</div>
 
 
-	<table id="adminListTableFCdebuggroup class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
+	<table id="adminListTableFCdebuggroup" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 		<thead>
 			<tr>
 				<th class="left">

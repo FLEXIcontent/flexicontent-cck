@@ -1,0 +1,31 @@
+div#tags:has(.fc-tag-search) {
+  position: relative;
+}
+
+.fc-tag-suggestions, .fc-tag-status {
+  position: absolute;
+  z-index: 5;
+  inset-inline: 0;
+  top: 100%;
+  max-height: 15rem;
+  overflow: auto;
+  color: var(--bs-body-color, CanvasText);
+  background: var(--bs-body-bg, Canvas);
+  border: 1px solid var(--bs-border-color, ButtonBorder);
+  border-radius: .3rem;
+  box-shadow: 0 .25rem .75rem rgb(0 0 0 / .16);
+}
+
+.fc-tag-suggestions > [role="option"], .fc-tag-status {
+  padding: .4rem .6rem;
+}
+
+.fc-tag-suggestions > [role="option"] {
+  cursor: pointer;
+}
+
+.fc-tag-suggestions > [role="option"]:hover,
+.fc-tag-suggestions > [aria-selected="true"] {
+  color: HighlightText;
+  background: Highlight;
+}

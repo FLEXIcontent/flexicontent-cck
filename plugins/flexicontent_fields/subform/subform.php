@@ -13,7 +13,13 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 class plgFlexicontent_fieldsSubform extends FCField
 {
@@ -52,7 +58,6 @@ class plgFlexicontent_fieldsSubform extends FCField
 		// Load the subform field if earlier than Joomla 4
 		if (!FLEXI_J40GE)
 		{
-			jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 			\Joomla\CMS\Form\FormHelper::loadFieldClass('subform');   // \Joomla\CMS\Form\Field\SubformField
 		}
 
@@ -156,7 +161,7 @@ class plgFlexicontent_fieldsSubform extends FCField
 		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;
 
 		// Initialize framework objects and other variables
-		$document = Factory::getDocument();
+		$document = Factory::getApplication()->getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';
@@ -236,8 +241,8 @@ class plgFlexicontent_fieldsSubform extends FCField
 		$js = '';
 		$css = '';
 
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
+		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
 		$classes  = ' fcfield_textval' . $required_class;
 
@@ -261,6 +266,14 @@ class plgFlexicontent_fieldsSubform extends FCField
 			return;
 		}
 		$jfield_html = $jfield->input;
+		if (FLEXI_J40GE && $multiple && !$use_ingroup)
+		{
+			$document->getWebAssetManager()->registerAndUseStyle(
+				'plg_flexicontent_fields_subform.row-controls',
+				'plugins/flexicontent_fields/subform/css/form.css',
+				['version' => 'auto']
+			);
+		}
 
 		$field->html[] = $pretext . '
 			' . $jfield_html . '
@@ -273,7 +286,7 @@ class plgFlexicontent_fieldsSubform extends FCField
 		// Handle single / multiple values (multiple values are handled by the subform field itself)
 		else
 		{
-			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
+			$field->html = '<div class="fc-subform-field fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
 				' . (isset($field->html[-1]) ? $field->html[-1] : '') . $field->html[0] . '
 			</div>';
 		}
@@ -304,7 +317,7 @@ class plgFlexicontent_fieldsSubform extends FCField
 			$initialized = 1;
 
 			$app       = Factory::getApplication();
-			$document  = Factory::getDocument();
+			$document  = Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');

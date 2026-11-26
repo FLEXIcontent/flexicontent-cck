@@ -13,7 +13,7 @@ defined('_JEXEC') or die('Restricted access');
 
 // Make sure that Joomla error reporting is used (some plugin may have turned it OFF)
 // Also make some changes e.g. disable E_STRICT for maximum and leave it on only for development
-switch ( \Joomla\CMS\Factory::getConfig()->get('error_reporting') )
+switch ( \Joomla\CMS\Factory::getApplication()->getConfig()->get('error_reporting') )
 {
 	case 'default':
 	case '-1':
@@ -30,7 +30,7 @@ switch ( \Joomla\CMS\Factory::getConfig()->get('error_reporting') )
 		break;
 	
 	case 'maximum':
-		error_reporting(E_ALL & ~E_STRICT);
+		error_reporting(E_ALL & ~2048);  // 2048 = E_STRICT, its constant is deprecated in PHP 8.4
 		ini_set('display_errors',1);
 		break;
 	
@@ -40,7 +40,7 @@ switch ( \Joomla\CMS\Factory::getConfig()->get('error_reporting') )
 		break;
 	
 	default:
-		error_reporting( \Joomla\CMS\Factory::getConfig()->get('error_reporting') );
+		error_reporting( \Joomla\CMS\Factory::getApplication()->getConfig()->get('error_reporting') );
 		ini_set('display_errors', 1);
 		break;
 }
@@ -65,9 +65,6 @@ if (!defined('FLEXI_J50GE'))   define('FLEXI_J50GE', version_compare( $jversion-
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
-if ( !class_exists('\Joomla\CMS\MVC\Controller\BaseController') )  jimport('legacy.controller.legacy');
-if ( !class_exists('\Joomla\CMS\MVC\Model\BaseDatabaseModel') )       jimport('legacy.model.legacy');
-if ( !class_exists('\Joomla\CMS\MVC\View\HtmlView') )        jimport('legacy.view.legacy');
 
 // Set a default timezone if web server provider has not done so
 // phpversion() should be used instead of PHP_VERSION, if not inside Joomla code
@@ -95,7 +92,7 @@ if (!defined('FLEXI_SECTION'))				define('FLEXI_SECTION', 0);
 if (!defined('FLEXI_CAT_EXTENSION'))
 {
 	define('FLEXI_CAT_EXTENSION', $params->get('flexi_cat_extension','com_content'));
-	$db = \Joomla\CMS\Factory::getDbo();
+	$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 	$query = "SELECT lft,rgt FROM #__categories WHERE id=1 ";
 	$db->setQuery($query);
 	$obj = $db->loadObject();
@@ -156,9 +153,28 @@ if (!defined('FLEXI_ITEMVIEW'))		define('FLEXI_ITEMVIEW'	, FLEXI_J16GE ? 'item' 
 if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH'	, FLEXI_J16GE ? 'media/system/images/' : 'images/M_images/' );
 
 // Version constants
-define('FLEXI_PHP_NEEDED',	'7.0.0');
-define('FLEXI_PHP_RECOMMENDED',	'8.0.25');
-define('FLEXI_VERSION', '4.2.1');
+define('FLEXI_PHP_NEEDED',	'8.2.0');
+define('FLEXI_PHP_RECOMMENDED',	'8.4.0');
+define('FLEXI_VERSION', '5.3');
 define('FLEXI_RELEASE',	'');
-define('FLEXI_VHASH',	md5(filemtime(__FILE__) . filectime(__FILE__) . FLEXI_VERSION));
+// FLEXI_VHASH is used as cache-buster (version arg) for assets ;
+// include mtimes of the JS/CSS files most edited during development so
+// browsers don't serve stale cached versions after a file change.
+if (defined('JPATH_SITE')) {
+	define('FLEXI_VHASH',	md5(filemtime(__FILE__) . filectime(__FILE__) . FLEXI_VERSION
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/flexi-lib.js')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/flexi-lib-form.js')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/form-utils.js')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/admin.js')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/validate.js')
+		. @filemtime(JPATH_SITE . '/administrator/components/com_flexicontent/assets/js/batchprocess.js')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/fc-uploader.js')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/fc-upload-transport.js')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/css/fc-uploader.css')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/librairies/choicesjs/choices.min.js')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/css/flexi_filters.css')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/css/flexi_choices.css')));    
+} else {
+	define('FLEXI_VHASH',	md5(filemtime(__FILE__) . filectime(__FILE__) . FLEXI_VERSION));
+}
 define('FLEXI_PHP_54GE', version_compare(PHP_VERSION, '5.4.0', '>='));

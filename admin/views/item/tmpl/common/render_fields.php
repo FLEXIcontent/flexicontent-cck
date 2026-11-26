@@ -114,18 +114,18 @@ if ( !$this->params->get('auto_title', 0) || $usetitle ) :  ob_start();  // titl
 			<!-- tabber start -->
 			<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 				<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-					<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; ?> </h3>
+					<h3 class="tabberheading"> <?php echo '-'.htmlspecialchars((string) $this->itemlang->name, ENT_QUOTES, 'UTF-8').'-'; ?> </h3>
 					<?php echo $this->form->getInput('title');?>
 				</div>
 				<?php foreach ($this->row->item_translations as $t): ?>
 					<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 						<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-							<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+							<h3 class="tabberheading"> <?php echo htmlspecialchars((string) $t->name, ENT_QUOTES, 'UTF-8'); // $t->shortcode; ?> </h3>
 							<?php
 							$ff_id = 'jfdata_'.$t->shortcode.'_title';
 							$ff_name = 'jfdata['.$t->shortcode.'][title]';
 							?>
-							<input class="fc_form_title fcfield_textareaval" type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->title->value; ?>" size="36" maxlength="254" />
+							<input class="fc_form_title fcfield_textareaval" type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo htmlspecialchars($t->fields->title->value ?? '', ENT_QUOTES, 'UTF-8'); ?>" size="36" maxlength="254" />
 						</div>
 					<?php endif; ?>
 				<?php endforeach; ?>
@@ -178,18 +178,18 @@ if ($usealias) : ob_start();  // alias ?>
 			<!-- tabber start -->
 			<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 				<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-					<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; ?> </h3>
+					<h3 class="tabberheading"> <?php echo '-'.htmlspecialchars((string) $this->itemlang->name, ENT_QUOTES, 'UTF-8').'-'; ?> </h3>
 					<?php echo $this->form->getInput('alias');?>
 				</div>
 				<?php foreach ($this->row->item_translations as $t): ?>
 					<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 						<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-							<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+							<h3 class="tabberheading"> <?php echo htmlspecialchars((string) $t->name, ENT_QUOTES, 'UTF-8'); // $t->shortcode; ?> </h3>
 							<?php
 							$ff_id = 'jfdata_'.$t->shortcode.'_alias';
 							$ff_name = 'jfdata['.$t->shortcode.'][alias]';
 							?>
-							<input class="fc_form_alias fcfield_textareaval" type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->alias->value; ?>" size="36" maxlength="254" />
+							<input class="fc_form_alias fcfield_textareaval" type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo htmlspecialchars($t->fields->alias->value ?? '', ENT_QUOTES, 'UTF-8'); ?>" size="36" maxlength="254" />
 						</div>
 					<?php endif; ?>
 				<?php endforeach; ?>
@@ -288,7 +288,7 @@ if ($uselang) : ob_start();  // lang ?>
 			) : ?>
 				<?php echo $this->lists['languages']; ?>
 			<?php else: ?>
-				<?php echo $this->itemlang->image.' ['.$this->itemlang->name.']'; ?>
+				<?php echo $this->itemlang->image.' ['.htmlspecialchars((string) $this->itemlang->name, ENT_QUOTES, 'UTF-8').']'; ?>
 			<?php endif; ?>
 		</div>
 
@@ -315,7 +315,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 		ob_start();
 		?>
 		<div class="control-label" id="jform_tag-lbl-outer">
-			<label id="jform_tag-lbl" data-for="input-tags" <?php echo $label_attrs; ?> >
+			<label id="jform_tag-lbl" for="input-tags" data-for="input-tags" <?php echo $label_attrs; ?> >
 				<?php echo $field ? $field->label : Text::_($this->form->getField('tag')->getAttribute('label'));
 				/* $field->label is set per type */ ?>
 				<i class="icon-tags-2"></i>
@@ -324,6 +324,11 @@ if ($tags_displayed) : ob_start();  // tags ?>
 		<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
 
 		<div class="controls container_fcfield container_fcfield_name_tags">
+
+			<?php if ($field && !empty($field->untranslatable) && flexicontent_db::useAssociations()) : ?>
+				<div class="fc_val_translation_shared_mssg alert alert-info fc-small fc-iblock" style="margin:0 2px 6px 2px; max-width: unset;"><?php echo Text::_('FLEXI_FIELD_VALUE_IS_NON_TRANSLATABLE'); ?></div>
+				<div class="fcclear"></div>
+			<?php endif; ?>
 
 			<?php if ($tags_editable) : ?>
 				<div id="tags">
@@ -357,16 +362,16 @@ if ($tags_displayed) : ob_start();  // tags ?>
 								}
 								echo '
 								<li class="tagitem">
-									<span>' . $tag->name . ($tag->translated_text ? ' (' . $tag->translated_text . ')' : '') . '</span>
+									<span>' . htmlspecialchars((string) $tag->name, ENT_QUOTES, 'UTF-8') . ($tag->translated_text ? ' (' . htmlspecialchars((string) $tag->translated_text, ENT_QUOTES, 'UTF-8') . ')' : '') . '</span>
 									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
-									<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="'.Text::_('FLEXI_DELETE_TAG').'"></a>
+									<a href="#" class="deletetag" title="'.Text::_('FLEXI_DELETE_TAG').'"></a>
 								</li>';
 							}
 							else
 							{
 								echo '
 								<li class="tagitem plain">
-									<span>' . $tag->name . ($tag->translated_text ? ' (' . $tag->translated_text . ')' : '') . '</span>
+									<span>' . htmlspecialchars((string) $tag->name, ENT_QUOTES, 'UTF-8') . ($tag->translated_text ? ' (' . htmlspecialchars((string) $tag->translated_text, ENT_QUOTES, 'UTF-8') . ')' : '') . '</span>
 									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
 								</li>';
 							}
@@ -384,8 +389,8 @@ if ($tags_displayed) : ob_start();  // tags ?>
 						{
 							$_checked = isset($common_tags_selected[$tag->id]) ? ' checked="checked" ' : '';
 							echo '
-							<input type="checkbox" name="jform[tag][]" value="'.$tag->id.'" data-tagname="'.$tag->name.'" id="quick-tag-'.$tag->id.'" '.$_checked.' />
-							<label for="quick-tag-'.$tag->id.'" class="tagitem">'.$tag->name.'</label>
+							<input type="checkbox" name="jform[tag][]" value="'.$tag->id.'" data-tagname="'.htmlspecialchars((string) $tag->name, ENT_QUOTES, 'UTF-8').'" id="quick-tag-'.$tag->id.'" '.$_checked.' />
+							<label for="quick-tag-'.$tag->id.'" class="tagitem">'.htmlspecialchars((string) $tag->name, ENT_QUOTES, 'UTF-8').'</label>
 							';
 						}
 					}
@@ -1041,7 +1046,7 @@ if ($usepublicationdetails) : // timezone_info, publication_details ?>
 	<?php ob_start(); ?>
 		<?php
 		// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
-		$site_zone = $app->getCfg('offset');
+		$site_zone = $app->get('offset');
 		$user_zone = $user->getParam('timezone', $site_zone);
 
 		$tz = new DateTimeZone( $user_zone );
@@ -1176,18 +1181,18 @@ if ( $typeid && $usemetadata ) : ob_start(); // metadata ?>
 					<!-- tabber start -->
 					<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 						<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-							<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; ?> </h3>
+							<h3 class="tabberheading"> <?php echo '-'.htmlspecialchars((string) $this->itemlang->name, ENT_QUOTES, 'UTF-8').'-'; ?> </h3>
 							<?php echo $this->form->getInput('metadesc'); ?>
 						</div>
 						<?php foreach ($this->row->item_translations as $t): ?>
 							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 								<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+									<h3 class="tabberheading"> <?php echo htmlspecialchars((string) $t->name, ENT_QUOTES, 'UTF-8'); // $t->shortcode; ?> </h3>
 									<?php
 									$ff_id = 'jfdata_'.$t->shortcode.'_metadesc';
 									$ff_name = 'jfdata['.$t->shortcode.'][metadesc]';
 									?>
-									<textarea id="<?php echo $ff_id; ?>" class="fcfield_textareaval" rows="3" cols="46" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
+									<textarea id="<?php echo $ff_id; ?>" class="fcfield_textareaval" rows="3" cols="46" name="<?php echo $ff_name; ?>"><?php echo htmlspecialchars($t->fields->metadesc->value ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
 								</div>
 							<?php endif; ?>
 						<?php endforeach; ?>
@@ -1217,18 +1222,18 @@ if ( $typeid && $usemetadata ) : ob_start(); // metadata ?>
 					<!-- tabber start -->
 					<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 						<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-							<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; ?> </h3>
+							<h3 class="tabberheading"> <?php echo '-'.htmlspecialchars((string) $this->itemlang->name, ENT_QUOTES, 'UTF-8').'-'; ?> </h3>
 							<?php echo $this->form->getInput('metakey'); ?>
 						</div>
 						<?php foreach ($this->row->item_translations as $t): ?>
 							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 								<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+									<h3 class="tabberheading"> <?php echo htmlspecialchars((string) $t->name, ENT_QUOTES, 'UTF-8'); // $t->shortcode; ?> </h3>
 									<?php
 									$ff_id = 'jfdata_'.$t->shortcode.'_metakey';
 									$ff_name = 'jfdata['.$t->shortcode.'][metakey]';
 									?>
-									<textarea id="<?php echo $ff_id; ?>" class="fcfield_textareaval" rows="3" cols="46" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metakey->value; ?></textarea>
+									<textarea id="<?php echo $ff_id; ?>" class="fcfield_textareaval" rows="3" cols="46" name="<?php echo $ff_name; ?>"><?php echo htmlspecialchars($t->fields->metakey->value ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
 								</div>
 							<?php endif; ?>
 						<?php endforeach; ?>
@@ -1556,71 +1561,41 @@ endif; // end of template: layout_selection, layout_params
 
 
 
-if ($typeid && $use_versioning && $this->perms['canversion'] && $versionsplacement !== 0) : ob_start()  // versions ?>
-	<table class="" style="margin: 10px; width: auto;">
-		<tr>
-			<td>
-				<h3><?php echo Text::_( 'FLEXI_VERSIONS_HISTORY' ); ?></h3>
-			</td>
-		</tr>
-		<tr><td>
-			<table id="version_tbl" class="fc-table-list fc-tbl-short">
-			<?php if ($this->row->id == 0) : ?>
-			<tr>
-				<td class="versions-first" colspan="4"><?php echo Text::_( 'FLEXI_NEW_ARTICLE' ); ?></td>
-			</tr>
-			<?php
-			else :
-			$date_format = (($date_format = Text::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE') ? "d/M H:i" : $date_format;
-			foreach ($this->versions as $version) :
-				$isCurrent = (int) $version->nr === (int) $this->row->current_version;
-				$class = $isCurrent ? ' id="active-version" class="success"' : '';
-				if ((int)$version->nr > 0) :
-			?>
-			<tr<?php echo $class; ?>>
-				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo '#' . $version->nr; ?></span></td>
-				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo HTMLHelper::_('date', (($version->nr == 1) ? $this->row->created : $version->date), $date_format ); ?></span></td>
-				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->row->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
-				<td class="versions">
-
-					<a href="javascript:;" class="hasTooltip" title="<?php echo HTMLHelper::tooltipText( Text::_( 'FLEXI_COMMENT' ), ($version->comment ? $version->comment : 'No comment written'), 0, 1); ?>"><?php echo $comment_image;?></a>
-
-					<?php if (!$isSite) :?>
-
-						<?php if (!$isCurrent && $allow_versioncomparing) : ?>
-							<a class="modal-versions"
-								href="index.php?option=com_flexicontent&amp;view=itemcompare&amp;cid=<?php echo $this->row->id; ?>&amp;version=<?php echo $version->nr; ?>&amp;tmpl=component"
-								title="<?php echo Text::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>"
-							>
-								<?php echo $compare_image; ?>
-							</a>
-						<?php endif; ?>
-
-						<?php if ($isCurrent) : ?>
-							<a onclick="javascript:return clickRestore('<?php echo Uri::base(true); ?>/index.php?option=com_flexicontent&amp;view=item&amp;<?php echo $task_items;?>edit&amp;<?php echo ($isSite ? 'id=' : 'cid=') . $this->row->id;?>&amp;version=<?php echo $version->nr; ?>');" href="javascript:;"><?php echo Text::_( 'FLEXI_CURRENT' ); ?></a>
-						<?php else : ?>
-							<a onclick="javascript:return clickRestore('<?php echo Uri::base(true); ?>/index.php?option=com_flexicontent&amp;task=items.edit&amp;<?php echo ($isSite ? 'id=' : 'cid=') . $this->row->id;?>&amp;version=<?php echo $version->nr; ?>&amp;<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1');"
-								href="javascript:;"
-								title="<?php echo Text::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"
-							>
-								<?php echo $revert_image; ?>
-							</a>
-						<?php endif; ?>
-
-					<?php endif; ?>
-
-				</td>
-			</tr>
-			<?php
-				endif;
-			endforeach;
-			endif; ?>
-			</table>
-		</td></tr>
-		<tr style="background:unset;"><td style="background:unset;">
-			<div id="fc_pager"></div>
-		</td></tr>
-	</table>
+if ($typeid && $use_versioning && !empty($this->perms['canversion']) && $versionsplacement !== 0) : ob_start(); // versions
+	// The history table is always inline in the Versions tab. The setting only controls
+	// how the comparison of a version is opened: new browser tab (inline) or modal (popup).
+	$compare_mode = (!$isSite && $versionsplacement === 1) ? 'popup' : 'inline';
+	$date_format = (($date_format = Text::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE') ? "d/M H:i" : $date_format;
+	$token = \Joomla\CMS\Session\Session::getFormToken();
+	$ajax_url = Uri::base(true) . '/index.php?option=com_flexicontent&' . $task_items . 'getversionlist'
+		. '&id=' . (int) $this->row->id . '&active=' . (int) $this->row->current_version
+		. '&compare_mode=' . $compare_mode
+		. '&' . $token . '=1&format=raw&page=';
+	$version_options = array(
+		'item_id'         => (int) $this->row->id,
+		'current_version' => (int) $this->row->current_version,
+		'is_site'         => $isSite,
+		'allow_comparing' => (int) $allow_versioncomparing,
+		'can_keep'        => !$isSite,
+		'task_items'      => $task_items,
+		'token'           => $token,
+		'date_format'     => $date_format,
+		'compare_mode'    => $compare_mode,
+	);
+	?>
+	<div class="fc-versions-panel" data-fc-versions-panel
+		data-compare-mode="<?php echo $compare_mode; ?>"
+		data-ajax-url="<?php echo htmlspecialchars($ajax_url, ENT_COMPAT, 'UTF-8'); ?>"
+		data-item-id="<?php echo (int) $this->row->id; ?>"
+		data-active="<?php echo (int) $this->row->current_version; ?>"
+		data-pagecount="<?php echo (int) $this->pagecount; ?>"
+		data-current-page="<?php echo (int) $this->current_page; ?>"
+		data-confirm-restore="<?php echo htmlspecialchars(Text::_( 'FLEXI_CONFIRM_VERSION_RESTORE' ), ENT_COMPAT, 'UTF-8'); ?>"
+	>
+		<h3><?php echo Text::_( 'FLEXI_VERSIONS_HISTORY' ); ?></h3>
+		<div data-fc-versions-table><?php echo flexicontent_html::renderVersionsTable($this->versions, $this->row, $version_options); ?></div>
+		<div id="fc_pager"></div>
+	</div>
 	<div class="fcclear"></div>
 <?php
 $fn = 'versions';
@@ -1665,13 +1640,9 @@ ob_start();
 if ($this->fields && $typeid) :
 
 	$this->document->addScriptDeclaration("
-		jQuery(document).ready(function(){
-			jQuery('#jform_type_id').change(function() {
-				if (jQuery('#jform_type_id').val() != '".$typeid."')
-					jQuery('#fc-change-warning').css('display', 'block');
-				else
-					jQuery('#fc-change-warning').css('display', 'none');
-			});
+		FlexiForm.ready(function(){
+			const type = document.getElementById('jform_type_id');
+			type?.addEventListener('change', () => FlexiForm.show(document.getElementById('fc-change-warning'), type.value !== '".$typeid."'));
 		});
 	");
 	?>
@@ -1884,7 +1855,7 @@ if ($this->fields && $typeid) :
 					
 					<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 						<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-							<h3 class="tabberheading"> <?php echo '- '.$this->itemlang->name.' -'; ?> </h3>
+							<h3 class="tabberheading"> <?php echo '- '.htmlspecialchars((string) $this->itemlang->name, ENT_QUOTES, 'UTF-8').' -'; ?> </h3>
 							<?php
 								$field_tab_labels = & $field->tab_labels;
 								$field_html       = & $field->html;
@@ -1894,7 +1865,7 @@ if ($this->fields && $typeid) :
 						<?php foreach ($this->row->item_translations as $t): ?>
 							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 								<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+									<h3 class="tabberheading"> <?php echo htmlspecialchars((string) $t->name, ENT_QUOTES, 'UTF-8'); // $t->shortcode; ?> </h3>
 									<?php
 									$field_tab_labels = & $t->fields->text->tab_labels;
 									$field_html       = & $t->fields->text->html;

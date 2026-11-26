@@ -5,14 +5,20 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 class plgFlexicontent_fieldsRelation_reverse extends FCField
 {
@@ -43,7 +49,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
 
 		// Initialize framework objects and other variables
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// ***
 		// *** Check that relation field to be reversed was configured
@@ -95,7 +101,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 			// Check if also configuration is proper
 			if ($auto_relate_curritem && $auto_relate_menu_itemid)
 			{
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 				$db->setQuery(
 					'SELECT title, id, catid, state, alias '
 					. ' FROM #__content '
@@ -151,7 +157,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -202,7 +208,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 					$master_item_id = (int) reset($post);
 					if ($master_item_id)
 					{
-						$db = \Joomla\CMS\Factory::getDbo();
+						$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 						$db->setQuery(
 							'SELECT MAX(valueorder) '
 							. ' FROM #__flexicontent_fields_item_relations '

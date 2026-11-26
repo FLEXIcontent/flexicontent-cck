@@ -12,9 +12,10 @@ use Joomla\CMS\Factory;
 // first define the template name
 \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.popover', '.hasTooltip', array('trigger' => 'click hover'));
 $tmpl = $this->tmpl;
-$user = \Joomla\CMS\Factory::getUser();
+$app  = Factory::getApplication();
+$user = $app->getIdentity();
 
-$wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+$wa = $app->getDocument()->getWebAssetManager();
 
 $readon_type  = (int) $this->params->get('readon_type', 0);
 $readon_image = $this->params->get('readon_image', '');
@@ -25,6 +26,7 @@ $lazy_loading = $use_lazy_loading ? ' loading="lazy" decoding="async" ' : '';
 // Adding WebP support : define breakpoints for responsive srcset generation via phpThumb (if raw_src is available)
 // Format : 'viewport_width' => 'image_width_for_that_viewport'
 $_fc_cat_breakpoints = [480 => 480, 768 => 768]; // desktop = $img_w (taille configurée)
+$GLOBALS['_fc_cat_breakpoints'] = $_fc_cat_breakpoints; // expose to fc_cat_make_picture() (file may be included inside a method scope)
 
 // Helper : encode une URL pour usage dans srcset (préserve %20 pour les espaces, évite double-encodage)
 if (!function_exists('fc_cat_srcset_url')) {
@@ -56,13 +58,15 @@ if (!function_exists('fc_cat_make_picture_from_thumbs')) {
 		if (!$main_url) return '';
 
 		$size_order  = ['small', 'medium', 'large'];
-		$size_widths = ['small' => 480, 'medium' => 768, 'large' => 1200];
 
 		// Construire le chemin filesystem depuis un chemin relatif ou une URL absolue
 		// JPATH_SITE = /home/.../realestate/demoj4
 		// URL FC     = /realestate/demoj4/images/... → strip du base_path avant concat
 		$_url_to_fs = function($url) {
 			if (!$url) return '';
+			$host = parse_url($url, PHP_URL_HOST);
+			if ($host && strcasecmp($host, (string) parse_url(\Joomla\CMS\Uri\Uri::root(), PHP_URL_HOST)) !== 0) return '';
+
 			$decoded   = rawurldecode($url);
 			$base_path = \Joomla\CMS\Uri\Uri::root(true); // ex: /realestate/demoj4
 			// Extraire le path de l'URL (gère http:// et chemins relatifs)
@@ -89,7 +93,6 @@ if (!function_exists('fc_cat_make_picture_from_thumbs')) {
 
 		$srcset_img  = [];
 		$srcset_webp = [];
-		$sizes_parts = [];
 		$fallback_url = $main_url;
 
 		$target_idx = array_search($size, $size_order);
@@ -98,11 +101,15 @@ if (!function_exists('fc_cat_make_picture_from_thumbs')) {
 		if ($is_single) {
 			$dw = $display_w ?: 1200;
 			$srcset_img[]  = fc_cat_srcset_url($main_url) . ' ' . $dw . 'w';
-			$sizes_parts[] = $dw . 'px';
 			if ($use_webp && !$_src_is_webp && $main_exists) {
 				$webp_fs  = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_fs);
 				$webp_url = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_url);
-				if (file_exists($webp_fs)) $srcset_webp[] = fc_cat_srcset_url($webp_url) . ' ' . $dw . 'w';
+				if (file_exists($webp_fs)) {
+					$webp_dimensions = @getimagesize($webp_fs);
+					if ($webp_dimensions && $webp_dimensions[0]) {
+						$srcset_webp[(int) $webp_dimensions[0]] = fc_cat_srcset_url($webp_url) . ' ' . (int) $webp_dimensions[0] . 'w';
+					}
+				}
 			}
 		} else {
 			foreach ($size_order as $idx => $s) {
@@ -110,28 +117,39 @@ if (!function_exists('fc_cat_make_picture_from_thumbs')) {
 				$s_url = ($idx === $target_idx) ? $main_url : ($urls[$s] ?? '');
 				if (!$s_url) continue;
 				$s_fs  = $_url_to_fs($s_url);
-				$w     = ($idx === $target_idx) ? ($display_w ?: $size_widths[$s]) : $size_widths[$s];
+				if (!$s_fs) continue;
+				$dimensions = @getimagesize($s_fs);
+				if (!$dimensions || !$dimensions[0]) continue;
+				$w = (int) $dimensions[0];
 
 				// On inclut même si file_exists échoue (CDN, chemin non standard) pour le cas principal
 				$s_exists = ($idx === $target_idx) ? true : file_exists($s_fs);
 				if (!$s_exists) continue;
 
 				if ($idx < $target_idx) {
-					$srcset_img[]  = fc_cat_srcset_url($s_url) . ' ' . $w . 'w';
-					$sizes_parts[] = '(max-width:' . $w . 'px) ' . $w . 'px';
+					$srcset_img[$w] = fc_cat_srcset_url($s_url) . ' ' . $w . 'w';
 					if ($use_webp && !$_src_is_webp) {
 						$webp_fs  = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $s_fs);
 						$webp_url = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $s_url);
-						if (file_exists($webp_fs)) $srcset_webp[] = fc_cat_srcset_url($webp_url) . ' ' . $w . 'w';
+						if (file_exists($webp_fs)) {
+							$webp_dimensions = @getimagesize($webp_fs);
+							if ($webp_dimensions && $webp_dimensions[0]) {
+								$srcset_webp[(int) $webp_dimensions[0]] = fc_cat_srcset_url($webp_url) . ' ' . (int) $webp_dimensions[0] . 'w';
+							}
+						}
 					}
 				} else {
 					$fallback_url  = $main_url;
-					$srcset_img[]  = fc_cat_srcset_url($main_url) . ' ' . $w . 'w';
-					$sizes_parts[] = $w . 'px';
+					$srcset_img[$w] = fc_cat_srcset_url($main_url) . ' ' . $w . 'w';
 					if ($use_webp && !$_src_is_webp && $main_exists) {
 						$webp_fs  = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_fs);
 						$webp_url = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_url);
-						if (file_exists($webp_fs)) $srcset_webp[] = fc_cat_srcset_url($webp_url) . ' ' . $w . 'w';
+						if (file_exists($webp_fs)) {
+							$webp_dimensions = @getimagesize($webp_fs);
+							if ($webp_dimensions && $webp_dimensions[0]) {
+								$srcset_webp[(int) $webp_dimensions[0]] = fc_cat_srcset_url($webp_url) . ' ' . (int) $webp_dimensions[0] . 'w';
+							}
+						}
 					}
 				}
 			}
@@ -140,10 +158,10 @@ if (!function_exists('fc_cat_make_picture_from_thumbs')) {
 		// Toujours générer au moins l'img de base
 		if (empty($srcset_img)) {
 			$srcset_img[]  = fc_cat_srcset_url($main_url) . ' ' . ($display_w ?: 800) . 'w';
-			$sizes_parts[] = ($display_w ?: 800) . 'px';
 		}
 
-		$sizes_str  = implode(', ', $sizes_parts);
+		// Lazy images can use their actual CSS layout width; eager images need a safe fallback.
+		$sizes_str = strpos($lazy_loading, 'loading="lazy"') !== false ? 'auto, 100vw' : '100vw';
 		$has_srcset = count($srcset_img) > 1;
 
 		$img_tag = '<img style="' . $style . '" src="' . fc_cat_srcset_url($fallback_url) . '" alt="' . $alt . '"' . $size_attrs
@@ -153,7 +171,7 @@ if (!function_exists('fc_cat_make_picture_from_thumbs')) {
 
 		$html = '<picture>';
 		if (!empty($srcset_webp)) {
-			$html .= '<source type="image/webp"' . ($has_srcset ? ' sizes="' . $sizes_str . '"' : '') . ' srcset="' . implode(', ', $srcset_webp) . '">';
+			$html .= '<source type="image/webp"' . (count($srcset_webp) > 1 ? ' sizes="' . $sizes_str . '"' : '') . ' srcset="' . implode(', ', $srcset_webp) . '">';
 		}
 		$html .= $img_tag . '</picture>';
 		return $html;
@@ -164,6 +182,7 @@ if (!function_exists('fc_cat_make_picture_from_thumbs')) {
 if (!function_exists('fc_cat_make_picture')) {
 	function fc_cat_make_picture($src_webp, $src, $alt, $style, $lazy_loading, $img_w = 0, $img_h = 0, $use_webp = 1, $raw_src = '', $base_url = '') {
 		global $_fc_cat_breakpoints;
+		if (empty($_fc_cat_breakpoints)) $_fc_cat_breakpoints = [480 => 480, 768 => 768];
 		// Encoder les espaces dans les URLs (noms de fichiers avec espaces) + décoder &amp; pour srcset
 		$src      = str_replace([' ', '&amp;'], ['%20', '&'], $src);
 		$src_webp = str_replace([' ', '&amp;'], ['%20', '&'], $src_webp);
@@ -369,8 +388,6 @@ $item_placement_std = $this->params->get('item_placement', 0);  // -1: other, 0:
 $item_columns_std = $this->params->get('item_columns', 2);
 $cols_class_std  = ($item_columns_std  <= 1)  ?  ''  :  'cols_'.$item_columns_std;
 
-$document = \Joomla\CMS\Factory::getDocument();
-
 // Add masonry JS
 $load_masonry_feat = $item_placement_feat == 1 && $item_columns_feat > 1;
 $load_masonry_std  = $item_placement_std == 1 && $item_columns_std > 1;
@@ -407,7 +424,7 @@ if (!empty($this->items) && ($load_masonry_feat || $load_masonry_std))
 	$ibox_margin_left_right_feat = intval($ibox_margin_left_right_feat);
 
 	$js = "
-		jQuery(document).ready(function(){
+		FlexiForm.ready(function(){
 	";
 	if ($load_masonry_feat) {
 		$js .= "
@@ -442,7 +459,7 @@ if (!empty($this->items) && ($load_masonry_feat || $load_masonry_std))
 	$js .= "	
 		});
 	";
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	$wa->addInlineScript($js);
 }
 ?>
 
@@ -688,7 +705,7 @@ if ($leadnum) :
 					$item->image         = $src ?: $thumb_rendered;
 					// Les URLs FC sont des chemins relatifs (ex: /subdir/images/...)
 					$item->image_fc_url  = $src; // chemin relatif
-					$item->image_fc_size = $img_field_size;
+					$item->image_fc_size = $img_field_size ?? '';  // not set when no image field is configured
 					// thumbs_src contient déjà toutes les tailles après getFieldDisplay
 					$item->image_fc_urls = [
 						'small'    => $img_field->thumbs_src['small'][0]    ?? '',
@@ -859,7 +876,7 @@ if ($leadnum) :
 
 					<?php endif; ?>
 
-				<?php $captured_image = ob_get_clean(); $hasImage = (boolean) trim($captured_image); ?>
+				<?php $captured_image = ob_get_clean(); $hasImage = (bool) trim($captured_image); ?>
 				<!-- EOF item's image -->
 
 				<?php echo $content_layout_feat!=2 ? $captured_image : '';?>
@@ -1010,7 +1027,7 @@ if ($leadnum) :
 					<?php endif; ?>
 					<?php if ($readmore_shown && $content_layout_feat == 0 || $content_layout_feat == 1 || $content_layout_feat == 4 || $content_layout_feat == 5 || $content_layout_feat == 6) : ?>
 						<div class="fcitem_readon readmore <?php echo $readmore_align_feat; ?>">
-							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = this.getAttribute(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
 								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title);
 								echo $readon_type === 1
@@ -1033,7 +1050,7 @@ if ($leadnum) :
 					<?php endif; ?>
 					<?php if ($readmore_shown && $content_layout_feat == 2 || $content_layout_feat == 3 ) : ?>
 						<div class="fcitem_readon readmore <?php echo $readmore_align_feat; ?>">
-							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = this.getAttribute(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
 								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title);
 								echo $readon_type === 1
@@ -1260,7 +1277,7 @@ if ($count > $leadnum) :
 					$item->image         = $src ?: $thumb_rendered;
 					// Les URLs FC sont des chemins relatifs (ex: /subdir/images/...)
 					$item->image_fc_url  = $src; // chemin relatif
-					$item->image_fc_size = $img_field_size;
+					$item->image_fc_size = $img_field_size ?? '';  // not set when no image field is configured
 					// thumbs_src contient déjà toutes les tailles après getFieldDisplay
 					$item->image_fc_urls = [
 						'small'    => $img_field->thumbs_src['small'][0]    ?? '',
@@ -1435,7 +1452,7 @@ if ($count > $leadnum) :
 
 					<?php endif; ?>
 
-				<?php $captured_image = ob_get_clean(); $hasImage = (boolean) trim($captured_image); ?>
+				<?php $captured_image = ob_get_clean(); $hasImage = (bool) trim($captured_image); ?>
 				<!-- EOF item's image -->
 
 				<?php echo $content_layout!=2 ? $captured_image : '';?>
@@ -1585,7 +1602,7 @@ if ($count > $leadnum) :
 					<?php endif; ?>
 					<?php if ($readmore_shown && $content_layout == 0 || $content_layout == 1 || $content_layout == 4 || $content_layout == 5 || $content_layout == 6) : ?>
 						<div class="fcitem_readon readmore <?php echo $readmore_align; ?>">
-							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = this.getAttribute(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
 								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title);
 								echo $readon_type === 1
@@ -1608,7 +1625,7 @@ if ($count > $leadnum) :
 					<?php endif; ?>
 					<?php if ($readmore_shown && $content_layout == 2 || $content_layout == 3) : ?>
 						<div class="fcitem_readon readmore <?php echo $readmore_align; ?>">
-							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = this.getAttribute(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
 								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title);
 								echo $readon_type === 1

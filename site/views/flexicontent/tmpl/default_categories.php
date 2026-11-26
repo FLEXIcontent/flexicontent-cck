@@ -17,7 +17,6 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-jimport('joomla.filesystem.file');
 ?>
 
 <?php
@@ -45,7 +44,7 @@ $subcat_image_width = $this->params->get('subcat_image_width', 80);
 $subcat_image_height = $this->params->get('subcat_image_height', 80);
 
 $app = \Joomla\CMS\Factory::getApplication();
-$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
+$joomla_image_path = $app->get('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
 $joomla_image_url  = str_replace (DS, '/', $joomla_image_path);
 $joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 $joomla_image_url  = $joomla_image_url  ? $joomla_image_url.'/' : '';

@@ -14,7 +14,13 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentControllerBaseAdmin' => JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 // Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
 require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'file.php';
@@ -64,7 +70,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 	function saveprops()
 	{
 		// Set tree data into session
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$file_row_id = $this->input->get('file_row_id', '', 'string');
 		$uploader_file_data = $session->get('uploader_file_data', array(), 'flexicontent');
 		$props = array();
@@ -122,8 +128,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 		$index_urls  = $this->input->getInt('index_urls', 0);
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		// Check indexer type
@@ -133,8 +139,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		// Clear previous log file
-		$log_filename      = 'filemanager_stats_indexer_' . \Joomla\CMS\Factory::getUser()->id . '.php';
-		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
+		$log_filename      = 'filemanager_stats_indexer_' . \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.php';
+		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename);
 
 		if (file_exists($log_filename_full))
 		{
@@ -210,8 +216,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		$start_microtime = microtime(true);
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		$has_zlib      = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
@@ -421,7 +427,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			}
 			if ($mediadata_err_count || $mediadata_file_count)
 			{
-				$session->set('mediadata_stats_log_filename', 'mediadata_stats_indexer_' . \Joomla\CMS\Factory::getUser()->id . '.php', 'flexicontent');
+				$session->set('mediadata_stats_log_filename', 'mediadata_stats_indexer_' . \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.php', 'flexicontent');
 			}
 
 
@@ -537,11 +543,194 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 
 	/**
+	 * Check request for the 'Delete orphaned files' tool, terminates with a JSON error if not allowed
+	 */
+	private function _orphansPrecheck()
+	{
+		@ob_end_clean();
+		header('Content-Type: application/json; charset=utf-8');
+		header('Cache-Control: no-cache');
+
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+
+		if (!\Joomla\CMS\Session\Session::checkToken('request'))
+		{
+			jexit(json_encode(array('ok' => 0, 'error' => \Joomla\CMS\Language\Text::_('JINVALID_TOKEN'))));
+		}
+
+		if (!FlexicontentHelperPerm::getPerm()->CanConfig || !$user->authorise('flexicontent.deletefile', 'com_flexicontent'))
+		{
+			jexit(json_encode(array('ok' => 0, 'error' => \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'))));
+		}
+	}
+
+
+	/**
+	 * The list of orphaned files is kept in a temporary file (per user), not in the session: the session is released
+	 * before the long running work, otherwise other requests of the same user (e.g. other tabs of the browser) have to wait for it
+	 */
+	private function _orphansFile()
+	{
+		return \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('tmp_path') . '/fc_orphans_' . (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.json');
+	}
+
+
+	private function _orphansRead()
+	{
+		$file = $this->_orphansFile();
+		$data = is_file($file) ? json_decode((string) file_get_contents($file), true) : null;
+
+		return is_array($data) ? $data : array('ids' => array(), 'total' => 0);
+	}
+
+
+	private function _orphansWrite(array $ids, $total)
+	{
+		$file = $this->_orphansFile();
+
+		if (!$ids)
+		{
+			@unlink($file);
+
+			return;
+		}
+
+		file_put_contents($file, json_encode(array('ids' => array_values($ids), 'total' => (int) $total)), LOCK_EX);
+	}
+
+
+	/**
+	 * Find the orphaned files (not used by any item) and keep their ids in the session, for the 'Delete orphaned files' tool
+	 *
+	 * @return void
+	 */
+	public function orphanscount()
+	{
+		$this->_orphansPrecheck();
+
+		// Release the session (lock), the scan can take long
+		\Joomla\CMS\Factory::getApplication()->getSession()->close();
+
+		@set_time_limit(300);
+
+		$t_start = microtime(true);
+		$min_age = $this->input->getInt('min_age_hours', 24);
+		$model   = $this->getModel($this->record_name_pl);
+		$result  = $model->getOrphanFileIds($min_age);
+
+		$this->_orphansWrite($result['ids'], count($result['ids']));
+
+		// The list of the files (tab separated lines) is sent now, so that the browser can create the text file without another request
+		$clean = function ($str)
+		{
+			return str_replace(array("\t", "\r", "\n"), ' ', (string) $str);
+		};
+
+		$lines = array();
+
+		foreach ($result['files'] as $file)
+		{
+			$type = (int) $file->url === 1 ? 'url' : ((int) $file->url === 2 ? 'media manager' : ($file->secure ? 'secure folder' : 'media folder'));
+			$path = (int) $file->url === 1 ? $file->filename : ($file->secure ? 'secure' : 'media') . '/' . $file->filename;
+
+			$lines[] = implode("\t", array(
+				$file->id, $clean($file->filename), $clean($file->filename_original), $clean($file->altname), $type, $file->uploaded, $clean($path),
+			));
+		}
+
+		jexit(json_encode(array(
+			'ok'             => 1,
+			'count'          => count($result['ids']),
+			'skipped_recent' => $result['skipped_recent'],
+			'found_on'       => \Joomla\CMS\Factory::getDate()->toSql(),
+			'checked'        => (int) $result['checked'],
+			'elapsed'        => round(microtime(true) - $t_start, 2),
+			'lines'          => $lines,
+		), JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE));
+	}
+
+
+	/**
+	 * Delete a batch of the orphaned files found by orphanscount()
+	 *
+	 * @return void
+	 */
+	public function orphansdelete()
+	{
+		$this->_orphansPrecheck();
+
+		// Release the session (lock) before the work
+		\Joomla\CMS\Factory::getApplication()->getSession()->close();
+
+		@set_time_limit(300);
+
+		$batch = max(1, min(200, $this->input->getInt('batch', 25)));
+		$data  = $this->_orphansRead();
+		$ids   = $data['ids'];
+		$total = (int) $data['total'];
+
+		$chunk = array_splice($ids, 0, $batch);
+		$this->_orphansWrite($ids, $total);
+
+		$model = $this->getModel($this->record_name_pl);
+		$deleted = 0;
+		$skipped = 0;
+		$error = '';
+		$warnings = array();
+
+		if ($chunk)
+		{
+			// Re-check, since an item may have started using a file after the files were counted
+			$deletable = $model->getDeletable($chunk);
+			$skipped = count($chunk) - count($deletable);
+
+			if ($deletable)
+			{
+				try
+				{
+					$delete_ok = $model->delete($deletable);
+				}
+				catch (\Throwable $e)
+				{
+					$delete_ok = false;
+					$error = $e->getMessage();
+				}
+
+				$warnings = $model->delete_warnings;
+
+				if ($delete_ok)
+				{
+					$deleted = count($deletable);
+				}
+				else
+				{
+					$error = $error ?: ($model->getError() ?: \Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED'));
+				}
+			}
+		}
+
+		if (!$ids)
+		{
+			\Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent'])->clean();
+		}
+
+		jexit(json_encode(array(
+			'ok'        => $error === '' ? 1 : 0,
+			'deleted'   => $deleted,
+			'skipped'   => $skipped,
+			'remaining' => count($ids),
+			'total'     => $total,
+			'error'     => $error,
+			'warnings'  => $warnings,
+		)));
+	}
+
+
+	/**
 	 * Register Loggers for all distinct tasks
 	 */
 	private function _setUpLoggers($log_filename, $log_namespace)
 	{
-		jimport('joomla.log.log');
 
 		// Currently default logger plus only 1 custom logger, we may add more custom logger if doing more distinct tasks
 		$custom_loggers = array(

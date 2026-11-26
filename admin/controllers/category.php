@@ -15,7 +15,6 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
 // Import parent controller
-jimport('legacy.controller.form');
 
 /**
  * FLEXIcontent Category Controller
@@ -81,6 +80,15 @@ class FlexicontentControllerCategory extends \Joomla\CMS\MVC\Controller\FormCont
 	 */
 	public function edit($key = null, $urlVar = null)
 	{
+		// The category form is refused without the 'manage categories' permission (see the view).
+		// Refuse here, before the category is checked out by a user who cannot open the form to release it
+		if (!FlexicontentHelperPerm::getPerm()->CanCats)
+		{
+			$this->setRedirect('index.php?option=com_flexicontent', \Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS'), 'warning');
+
+			return false;
+		}
+
 		return parent::edit($key, $urlVar);
 	}
 
@@ -138,7 +146,7 @@ class FlexicontentControllerCategory extends \Joomla\CMS\MVC\Controller\FormCont
 	 */
 	protected function allowAdd($data = array())
 	{
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		if ($user->authorise('core.create', $this->extension))
 		{
@@ -172,7 +180,7 @@ class FlexicontentControllerCategory extends \Joomla\CMS\MVC\Controller\FormCont
 	{
 		// Initialise variables.
 		$recordId = (int) isset($data[$key]) ? $data[$key] : 0;
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$_extension = 'com_content';
 
 		// Zero record (id:0), return component edit permission by calling parent controller method

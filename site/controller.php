@@ -20,8 +20,10 @@ use Joomla\Utilities\ArrayHelper;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 
-jimport('legacy.controller.legacy');
-JLoader::register('FlexicontentControllerItems', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'items.php');  // we use JPATH_BASE since controller exists in frontend too
+// Lazy class loading (was JLoader::register): loaded only if/when used.
+spl_autoload_register(static function ($class) {
+	if ($class === 'FlexicontentControllerItems' && is_file($f = JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'items.php')) require_once $f;
+}, true, true);
 
 #[AllowDynamicProperties] //php8.2 compatibility
 
@@ -35,6 +37,46 @@ JLoader::register('FlexicontentControllerItems', JPATH_BASE.DS.'components'.DS.'
 
 class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 {
+	/**
+	 * The error messages that this controller recorded
+	 *
+	 * @var array
+	 */
+	protected $_fc_errors = array();
+
+
+	/**
+	 * Record the reason of a refused or failed step, to show it as a message.
+	 *
+	 * Joomla's controllers no longer have setError() and getError() (Joomla 5 and later), but FLEXIcontent's
+	 * controllers use them. Without these two methods a refused save ended in a PHP fatal error.
+	 *
+	 * @param   string|\Exception  $error  The message
+	 *
+	 * @return  void
+	 */
+	public function setError($error)
+	{
+		$this->_fc_errors[] = $error;
+	}
+
+
+	/**
+	 * The most recent error message (or the one with the given index), false when there is none.
+	 *
+	 * @param   int|null  $i         Index of the message, null for the most recent one
+	 * @param   bool      $toString  Return the message of an exception object
+	 *
+	 * @return  string|\Exception|false
+	 */
+	public function getError($i = null, $toString = true)
+	{
+		$error = $i === null ? end($this->_fc_errors) : ($this->_fc_errors[$i] ?? false);
+
+		return $toString && $error instanceof \Throwable ? $error->getMessage() : $error;
+	}
+
+
 	var $records_dbtbl  = 'content';
 	var $records_jtable = 'flexicontent_items';
 
@@ -240,11 +282,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		// If component is serving different pages to logged users, this will avoid
 		// having users seeing same page after login/logout when conservative caching is used
-		if ( $userid = \Joomla\CMS\Factory::getApplication()->getIdentity()->get('id') )
-		{
-			$this->input->set('__fc_user_id__', $userid);
-			$safeurlparams['__fc_user_id__'] = 'STRING';
-		}
+		// This cache discriminator belongs to the authenticated identity, including
+		// guests. Never leave a caller-supplied member id in a guest request.
+		$this->input->set('__fc_user_id__', (int) $userid);
+		$safeurlparams['__fc_user_id__'] = 'INT';
 
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 		$use_mobile_layouts  = $cparams->get('use_mobile_layouts', 0);
@@ -318,6 +359,78 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 
 	/**
+	 * Download limits: quota status of download buttons shown on a page (POST, never cached)
+	 * Request: pairs = "fieldId:fileId:itemId,..."   Response: {"fieldId:fileId:itemId": {"blocked": bool, "html": string}}
+	 *
+	 * @access public
+	 */
+	public function dlstatus()
+	{
+		$app = \Joomla\CMS\Factory::getApplication();
+		$app->allowCache(false);
+		$app->setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0', true);
+		$app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+
+		if ($app->getInput()->getMethod() !== 'POST')
+		{
+			$app->setHeader('status', 405, true);
+			$app->sendHeaders();
+			echo '{}';
+			$app->close();
+		}
+
+		require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/downloadlimit.php';
+
+		$pairs  = array_slice(array_unique(array_filter(explode(',', $this->input->post->getString('pairs', '')))), 0, 200);
+		$user   = $app->getIdentity();
+		$result = array();
+		$cache  = array();
+		$infos  = array();
+
+		foreach ($pairs as $pair)
+		{
+			if (!preg_match('/^(\d+):(\d+):(\d+)$/D', $pair, $m))
+			{
+				continue;
+			}
+
+			list(, $fieldId, $fileId, $itemId) = $m;
+			$ckey = $fieldId . ':' . $itemId;
+
+			if (!isset($cache[$ckey]))
+			{
+				$settings = flexicontent_downloadlimit::getFieldSettings($fieldId, $itemId);
+				$cache[$ckey] = array($settings, $settings ? flexicontent_downloadlimit::getState($settings, $user) : null);
+			}
+
+			list($settings, $state) = $cache[$ckey];
+
+			$result[$pair] = array(
+				'blocked' => $settings && !flexicontent_downloadlimit::canDownloadFile($settings, $state, (int) $fileId),
+				'html'    => '',
+			);
+
+			// Only blocked buttons need the text, with the time until the limit resets filled in
+			if ($result[$pair]['blocked'])
+			{
+				if (!isset($infos[$ckey]))
+				{
+					$infos[$ckey] = flexicontent_downloadlimit::getResetInfo($settings, $user);
+				}
+
+				$html = trim($settings['modal_html']) !== '' ? $settings['modal_html'] : \Joomla\CMS\Language\Text::_('FLEXI_DL_LIMIT_DEFAULT_MODAL');
+				$result[$pair]['html'] = flexicontent_downloadlimit::replacePlaceholders($html, $infos[$ckey]);
+				$result[$pair]['reset_in'] = (int) $infos[$ckey]['reset_in'];  // seconds until a download is possible again
+			}
+		}
+
+		$app->sendHeaders();
+		echo json_encode($result);
+		$app->close();
+	}
+
+
+	/**
 	 *  Ajax favourites
 	 *
 	 * @access public
@@ -345,7 +458,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		}
 
 		// Get Favourites field configuration
-		$favs_field = reset(FlexicontentFields::getFieldsByIds(array(12)));
+		$favs_fields = FlexicontentFields::getFieldsByIds(array(12));
+		$favs_field = reset($favs_fields);
 		$favs_field->parameters = new \Joomla\Registry\Registry($favs_field->attribs);
 
 		$usercount = (int) $favs_field->parameters->get('display_favoured_usercount', 0);
@@ -360,8 +474,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// Guest user does not have DB data, instead use Cookie data
 		else
 		{
-			// Get model of the give type
-			$model = $this->getModel($type);
+			// Frontend editing can register the administrator item model under the same
+			// legacy class name. Use the shared favourites helpers with an explicit ID.
+			$favourite_type = $type === 'category' ? 1 : 0;
 
 			if (!$user->id)
 			{
@@ -377,14 +492,14 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			else
 			{
 				// Toggle favourite
-				$isfav = $model->getFavoured();
+				$isfav = flexicontent_db::getFavoured($favourite_type, $id, $user->id);
 				$isfav
-					? $model->removefav()
-					: $model->addfav();
+					? flexicontent_db::removefav($favourite_type, $id, $user->id)
+					: flexicontent_db::addfav($favourite_type, $id, $user->id);
 			}
 
 			// Output response for counter (if this has been enabled)
-			$favs = $model->getFavourites();
+			$favs = flexicontent_db::getFavourites($favourite_type, $id);
 			echo $isfav
 				? ($favs && $usercount ? '-' . $favs : 'removed')
 				: ($favs && $usercount ? '+' . $favs : 'added');
@@ -416,6 +531,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		$errors = array();
 
+		$this->loadReviewLanguage();
+
 
 		/**
 		 * Check for validation failures on posted data
@@ -423,12 +540,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		if (!$content_id)
 		{
-			$errors[] = 'content_id is zero';
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_CONTENT_ID');
 		}
 
 		if ($review_type !== 'item')
 		{
-			$errors[] = 'review_type <> "item" is not yet supported';
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_TYPE_UNSUPPORTED');
 		}
 
 
@@ -470,7 +587,144 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				->where('r.type = ' . $db->Quote($review_type))
 				->where('r.user_id = ' . (int) $user->id);
 			$review = $db->setQuery($query)->loadObject();
+
+			// A review deleted by the user (trashed) is treated as non-existent
+			if ($review && (int) $review->state === -2)
+			{
+				$review = false;
+			}
 		}
+
+		// Rating (stars) picker of the review form
+		$rating_stars = $this->getReviewStars($field);
+		$rating_value = 0;
+
+		if ($review && (int) $review->average_rating > 0)
+		{
+			$rating_value = (int) round(((int) $review->average_rating) * $rating_stars / 100);
+		}
+
+		// No rating stored in a review, use the rating given via the vote stars (of this session)
+		elseif (!(int) $field->parameters->get('enable_extra_votes', 0))
+		{
+			$vote_history = \Joomla\CMS\Factory::getApplication()->getSession()->get('vote_history', array(), 'flexicontent');
+
+			if (!empty($vote_history[$content_id]['main']))
+			{
+				$rating_value = (int) round($vote_history[$content_id]['main'] * $rating_stars / $this->getReviewResolution($field));
+			}
+		}
+
+		$rating_value = max(0, min($rating_stars, $rating_value));
+		$review_has_text = $review && trim((string) $review->text) !== '';
+
+		$star_svg = '<svg viewBox="0 0 576 512" aria-hidden="true" focusable="false" style="width:1.8em;height:1.8em;display:block;"><path fill="currentColor" d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 327 113.2 469.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 327 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/></svg>';
+
+		$rating_html = '
+						<div class="fcvote-form-group">
+							<label class="fcvote-form-label">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_RATING') . '</label>
+							<div class="fcvote-review-rating" style="display:flex;gap:2px;">
+								<input type="hidden" name="rating" value="' . ($rating_value ?: '') . '" />';
+
+		for ($i = 1; $i <= $rating_stars; $i++)
+		{
+			$rating_html .= '
+								<button type="button" class="fcvote-review-star" data-value="' . $i . '"
+									aria-label="' . $i . ' / ' . $rating_stars . '" title="' . $i . ' / ' . $rating_stars . '"
+									onclick="fcvote_review_set_rating(this); return false;"
+									style="background:none;border:0;padding:0;margin:0;cursor:pointer;color:' . ($i <= $rating_value ? '#f5a623' : '#ccc') . ';">' . $star_svg . '</button>';
+		}
+
+		$rating_html .= '
+							</div>
+							<div class="fc-mssg fc-warning fc-nobgimage fcvote-review-rating-error" style="display:none;">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_RATING') . '</div>
+						</div>';
+
+		// Composite voting: the overall rating is calculated from the rating characteristics (small stars), the overall stars are read-only
+		$rv_chars = flexicontent_html::getVotingCharacteristics($field);
+
+		if ($rv_chars)
+		{
+			$rv_resolution = $this->getReviewResolution($field);
+			$rv_stored     = ($review && trim((string) $review->custom_ratings) !== '') ? (array) json_decode((string) $review->custom_ratings, true) : array();
+			$rv_history    = \Joomla\CMS\Factory::getApplication()->getSession()->get('vote_history', array(), 'flexicontent');
+			$rv_vals       = array();
+
+			foreach ($rv_chars as $xid => $rv_char)
+			{
+				$v = 0;
+
+				if (!empty($rv_stored[$xid]))
+				{
+					$v = (int) round(((int) $rv_stored[$xid]) * $rating_stars / 100);
+				}
+				elseif (!empty($rv_history[$content_id][$xid]))
+				{
+					$v = (int) round(((int) $rv_history[$content_id][$xid]) * $rating_stars / $rv_resolution);
+				}
+
+				$rv_vals[$xid] = max(0, min($rating_stars, $v));
+			}
+
+			$rv_main = !in_array(0, $rv_vals, true) ? max(1, (int) round(array_sum($rv_vals) / count($rv_vals))) : 0;
+			$star_svg_small = str_replace('1.8em', '1.25em', $star_svg);
+
+			// Overall rating (read-only, calculated by fcvote.js from the characteristics, and by the server)
+			$rating_html = '
+						<div class="fcvote-form-group">
+							<label class="fcvote-form-label">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_RATING') . '</label>
+							<div class="fcvote-review-rating fcvote-review-rating-main" data-main="1" style="display:flex;gap:2px;pointer-events:none;">
+								<input type="hidden" name="rating" value="' . ($rv_main ?: '') . '" />';
+
+			for ($i = 1; $i <= $rating_stars; $i++)
+			{
+				$rating_html .= '
+								<span class="fcvote-review-star" data-value="' . $i . '" style="color:' . ($i <= $rv_main ? '#f5a623' : '#ccc') . ';">' . $star_svg . '</span>';
+			}
+
+			$rating_html .= '
+							</div>
+						</div>
+
+						<div class="fcvote-form-group">
+							<div class="fcvote-review-chars" style="display:grid;grid-template-columns:repeat(' . (count($rv_chars) % 2 ? 3 : 2) . ',minmax(0,1fr));gap:12px 24px;">';
+
+			foreach ($rv_chars as $xid => $rv_char)
+			{
+				$rating_html .= '
+								<div class="fcvote-review-char">
+									<div class="fcvote-form-label fcvote-review-char-title"' . ($rv_char->desc !== '' ? ' data-fcvote-tip="' . htmlspecialchars($rv_char->desc, ENT_QUOTES, 'UTF-8') . '" style="cursor:help;"' : '') . '>' . htmlspecialchars($rv_char->title !== '' ? $rv_char->title : (string) $xid, ENT_QUOTES, 'UTF-8') . '</div>
+									<div class="fcvote-review-rating fcvote-review-xrating" style="display:flex;gap:2px;">
+										<input type="hidden" name="xrating[' . (int) $xid . ']" value="' . ($rv_vals[$xid] ?: '') . '" />';
+
+				for ($i = 1; $i <= $rating_stars; $i++)
+				{
+					$rating_html .= '
+										<button type="button" class="fcvote-review-star" data-value="' . $i . '"
+											aria-label="' . $i . ' / ' . $rating_stars . '" data-fcvote-tip="' . $i . ' / ' . $rating_stars . '"
+											onclick="fcvote_review_set_xrating(this); return false;"
+											style="background:none;border:0;padding:0;margin:0;cursor:pointer;color:' . ($i <= $rv_vals[$xid] ? '#f5a623' : '#ccc') . ';">' . $star_svg_small . '</button>';
+				}
+
+				$rating_html .= '
+									</div>
+								</div>';
+			}
+
+			$rating_html .= '
+							</div>
+							<div class="fc-mssg fc-warning fc-nobgimage fcvote-review-rating-error" style="display:none;">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_RATING_ALL') . '</div>
+						</div>';
+		}
+
+		// Delete button (only if the user already has a review)
+		$delete_html = $review_has_text
+			? ' <input type="button" class="btn btn-danger fcvote_review_form_delete_btn"
+					data-confirm="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_DELETE_CONFIRM'), ENT_COMPAT, 'UTF-8') . '"
+					onclick="fcvote_delete_review(\'' . $html_tagid . '\', this.form); return false;"
+					value="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_DELETE'), ENT_COMPAT, 'UTF-8') . '"
+				/>'
+			: '';
 
 		$layouts_path = null;
 
@@ -485,6 +739,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		$review_type = 'item';
 
+		$rv_max  = $this->getReviewMaxLength($field);
+		$rv_text = $review ? (string) $review->text : '';
+
 		$result = (object) array(
 			'html' => '
 				<form id="fcvote_review_form_' . $item->id . '" name="fcvote_review_form_' . $item->id . '" action="javascript:;">
@@ -494,52 +751,48 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					<input type="hidden" name="review_type" value="' . $review_type . '" />
 					<input type="hidden" name="' . \Joomla\CMS\Session\Session::getFormToken() . '" value="1" />
 
-					<table class="fc-form-tbl fcinner">
+					<div class="fcvote-form-fields">' . $rating_html . '
 
-						<tr class="fcvote_review_form_title_row">
-							<td class="key">
-								<label class="fc-prop-lbl" for="fcvote_review_form_' . $item->id . '_title">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_TITLE') . '</label>
-							</td>
-							<td>
-								<input type="text" name="title" size="200"
-									value="'.htmlspecialchars( ($review ? $review->title : ''), ENT_COMPAT, 'UTF-8' ).'"
-									id="fcvote_review_form_' . $item->id . '_title"
-								/>
-							</td>
-						</tr>
+						<div class="fcvote-form-group">
+							<label class="fcvote-form-label" for="fcvote_review_form_' . $item->id . '_title">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_TITLE') . '</label>
+							<input type="text" name="title"
+								value="'.htmlspecialchars( ($review ? $review->title : ''), ENT_COMPAT, 'UTF-8' ).'"
+								id="fcvote_review_form_' . $item->id . '_title"
+							/>
+						</div>
 
-						<tr class="fcvote_review_form_email_row">
-							<td class="key">
-								<label class="fc-prop-lbl" for="fcvote_review_form_' . $item->id . '_email">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_EMAIL') . '</label>
-							</td>
-							<td>' . ($user->id ? '<span class=badge>' . $user->email . '</span>' : '
-								<input required type="text" name="email" size="200"
-									value="'.htmlspecialchars( ($review ? $review->email : ''), ENT_COMPAT, 'UTF-8' ).'"
-									id="fcvote_review_form_' . $item->id . '_email"
-								/>') . '
-							</td>
-						</tr>
+						<div class="fcvote-form-group">
+							<label class="fcvote-form-label" for="fcvote_review_form_' . $item->id . '_name">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_NAME') . '</label>
+							' . ($user->id ? '<div class="fcvote-form-name" style="padding:0.4em 0;">' . htmlspecialchars($user->name, ENT_COMPAT, 'UTF-8') . '</div>' : '
+							<input required type="text" name="name" maxlength="100"
+								value="'.htmlspecialchars( ($review ? $review->name : ''), ENT_COMPAT, 'UTF-8' ).'"
+								id="fcvote_review_form_' . $item->id . '_name"
+							/>') . '
+						</div>
 
-						<tr class="fcvote_review_form_text_row">
-							<td class="key">
-								<label class="fc-prop-lbl" for="fcvote_review_form_' . $item->id . '_text">'.\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_TEXT').'</label>
-							</td>
-							<td class="top">
-								<textarea required name="text" rows="4" cols="200" id="fcvote_review_form_' . $item->id . '_text" >' . ($review ? $review->text : '') . '</textarea>
-							</td>
-						</tr>
+						<div class="fcvote-form-group">
+							<label class="fcvote-form-label" for="fcvote_review_form_' . $item->id . '_email">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_EMAIL') . '</label>
+							' . ($user->id ? '<div class="fcvote-form-email" style="padding:0.4em 0;">' . htmlspecialchars($user->email, ENT_COMPAT, 'UTF-8') . '</div>' : '
+							<input required type="text" name="email"
+								value="'.htmlspecialchars( ($review ? $review->email : ''), ENT_COMPAT, 'UTF-8' ).'"
+								id="fcvote_review_form_' . $item->id . '_email"
+							/>') . '
+						</div>
 
-						<tr class="fcvote_review_form_submit_btn_row">
-							<td class="key"></td>
-							<td class="top">
-								<input type="button" class="btn btn-success fcvote_review_form_submit_btn"
-									onclick="fcvote_submit_review_form(\'' . $html_tagid . '\', this.form); return false;"
-									value="' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_SUMBIT') . '"
-								/>
-							</td>
-						</tr>
+						<div class="fcvote-form-group">
+							<label class="fcvote-form-label" for="fcvote_review_form_' . $item->id . '_text">'.\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_TEXT').'</label>
+							<textarea required name="text" rows="4" id="fcvote_review_form_' . $item->id . '_text"' . ($rv_max ? ' maxlength="' . $rv_max . '" data-fcvote-max="' . $rv_max . '"' : '') . ' >' . htmlspecialchars($rv_text, ENT_COMPAT, 'UTF-8') . '</textarea>
+							' . ($rv_max ? '<div class="fcvote-counter">' . (function_exists('mb_strlen') ? mb_strlen($rv_text, 'UTF-8') : strlen($rv_text)) . '/' . $rv_max . '</div>' : '') . '
+						</div>
 
-					</table>
+						<div class="fcvote-form-group fcvote-form-submit">
+							<input type="button" class="btn btn-success fcvote_review_form_submit_btn"
+								onclick="fcvote_submit_review_form(\'' . $html_tagid . '\', this.form); return false;"
+								value="' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_SUMBIT') . '"
+							/>' . $delete_html . '
+						</div>
+
+					</div>
 
 				</form>
 		');
@@ -562,14 +815,22 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		$errors = array();
 
+		$this->loadReviewLanguage();
+
 		// Validate title
 		$title = flexicontent_html::dataFilter($this->input->get('title', '', 'string'), $maxlength=255, 'STRING', 0);  // Decode entities, and strip HTML
+
+		// Validate name: required for guests, logged users are identified by their account (their name is not stored in the review)
+		$name = $user->id ? '' : trim(flexicontent_html::dataFilter($this->input->get('name', '', 'string'), $maxlength=100, 'STRING', 0));  // Decode entities, and strip HTML
 
 		// Validate email
 		$email = $user->id ? $user->email : flexicontent_html::dataFilter($this->input->get('email', '', 'string'), $maxlength=255, 'EMAIL', 0);  // Validate email
 
 		// Validate text
 		$text = flexicontent_html::dataFilter($this->input->get('text', '', 'string'), $maxlength=10000, 'STRING', 0);  // Validate text only: decode entities and strip HTML
+
+		// Rating (number of stars), it is validated against the field's configuration below
+		$rating = $this->input->get('rating', 0, 'int');
 
 
 		/**
@@ -578,12 +839,17 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		if (!$content_id)
 		{
-			$errors[] = 'content_id is zero';
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_CONTENT_ID');
+		}
+
+		if (!$user->id && $name === '')
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NAME');
 		}
 
 		if (!$email)
 		{
-			$errors[] = 'Email is invalid or empty';
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_EMAIL');
 		}
 		elseif (!$user->id)
 		{
@@ -592,18 +858,18 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 			if ($reviewer)
 			{
-				$errors[] = 'Please login';
+				$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_PLEASE_LOGIN');
 			}
 		}
 
 		if (!$text)
 		{
-			$errors[] = 'Text is invalid or empty';
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_TEXT');
 		}
 
 		if ($review_type !== 'item')
 		{
-			$errors[] = 'review_type <> item is not yet supported';
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_TYPE_UNSUPPORTED');
 		}
 
 
@@ -618,10 +884,154 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$this->reviewPrepare($content_id, $item, $field, $errors, $_checkSubmit = true);
 		}
 
+		$char_votes = array();
+		$char_percents = array();
+
+		// Validate rating
+		if (!count($errors))
+		{
+			$rating_stars = $this->getReviewStars($field);
+
+			// Composite voting: the rating of every characteristic is required, the overall rating is calculated from them
+			$rv_chars = flexicontent_html::getVotingCharacteristics($field);
+			$char_votes = array();
+			$char_percents = array();
+
+			if ($rv_chars)
+			{
+				$posted = (array) $this->input->get('xrating', array(), 'array');
+				$resolution = $this->getReviewResolution($field);
+
+				foreach ($rv_chars as $xid => $rv_char)
+				{
+					$r = isset($posted[$xid]) ? (int) $posted[$xid] : 0;
+
+					if ($r < 1 || $r > $rating_stars)
+					{
+						$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_RATING_ALL');
+						break;
+					}
+
+					$char_votes[$xid]    = max(1, (int) round($r * $resolution / $rating_stars));
+					$char_percents[$xid] = (int) round(100 * $char_votes[$xid] / $resolution);
+				}
+			}
+			elseif ($rating < 1 || $rating > $rating_stars)
+			{
+				$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_RATING');
+			}
+		}
+
+		// Guests cannot be identified, so we allow only 1 review per email (logged users update their own review)
+		if (!count($errors) && !$user->id)
+		{
+			$query = $db->getQuery(true)
+				->select('COUNT(*)')
+				->from('#__flexicontent_reviews')
+				->where('content_id = ' . (int) $content_id)
+				->where('type = ' . $db->Quote($review_type))
+				->where('email = ' . $db->Quote($email));
+
+			if ((int) $db->setQuery($query)->loadResult())
+			{
+				$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_ALREADY');
+			}
+		}
+
+		// Maximum length of the review text
+		if (!count($errors))
+		{
+			$max_length = $this->getReviewMaxLength($field);
+			$text_length = function_exists('mb_strlen') ? mb_strlen($text, 'UTF-8') : strlen($text);
+
+			if ($max_length && $text_length > $max_length)
+			{
+				$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_TOO_LONG', $max_length);
+			}
+		}
+
+		// The rating of the review is also the rating (vote) of the item (not when using composite voting)
+		$rating_percent = null;
+
+		if (!count($errors) && $char_votes)
+		{
+			// Composite voting: the overall rating is the average of the characteristics (as the voting does), every characteristic is a vote
+			$resolution = $this->getReviewResolution($field);
+			$vote_value = max(1, (int) round(array_sum($char_votes) / count($char_votes)));
+			$rating_percent = (int) round(100 * $vote_value / $resolution);
+
+			// Lazy class loading (was JLoader::register): loaded only if/when used.
+			spl_autoload_register(static function ($class) {
+				if ($class === 'FlexicontentControllerReviews' && is_file($f = JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'reviews.php')) require_once $f;
+			}, true, true);
+
+			try
+			{
+				foreach ($char_votes as $xid => $char_vote)
+				{
+					$this->input->set('user_rating', $char_vote);
+					$this->input->set('cid', $content_id);
+					$this->input->set('xid', (int) $xid);
+					$this->input->set('no_ajax', 0);
+
+					$rman = new FlexicontentControllerReviews();
+					$rman->setVoteInternal(true);
+					$rman->ajaxvote();
+				}
+			}
+			catch (\Exception $e)
+			{
+				$errors[] = htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
+			}
+		}
+
+		elseif (!count($errors))
+		{
+			$resolution = $this->getReviewResolution($field);
+			$vote_value = max(1, (int) round($rating * $resolution / $rating_stars));
+			$rating_percent = (int) round(100 * $vote_value / $resolution);
+
+			if (!(int) $field->parameters->get('enable_extra_votes', 0))
+			{
+				// Lazy class loading (was JLoader::register): loaded only if/when used.
+				spl_autoload_register(static function ($class) {
+					if ($class === 'FlexicontentControllerReviews' && is_file($f = JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'reviews.php')) require_once $f;
+				}, true, true);
+
+				$this->input->set('user_rating', $vote_value);
+				$this->input->set('cid', $content_id);
+				$this->input->set('xid', 'main');
+				$this->input->set('no_ajax', 0);
+
+				try
+				{
+					$rman = new FlexicontentControllerReviews();
+					$rman->setVoteInternal(true);
+					$rman->ajaxvote();
+				}
+				catch (\Exception $e)
+				{
+					$errors[] = htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
+				}
+			}
+		}
+
 		if (!count($errors))
 		{
 			// Get a 'flexicontent_reviews' \Joomla\CMS\Table\Table instance
-			$review = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_reviews', $prefix = '', $config = array());
+			$__tblType = $type = 'flexicontent_reviews';
+			$__tblPrefix = $prefix = '';
+			$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			if ($__tblPrefix === 'TagsTable') {
+				$review = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+			} elseif ($__tblPrefix === 'JTable') {
+				$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+				$review = new $__tblClass($__tblDb);
+			} else {
+				$__tblClass = $__tblPrefix . ucfirst($__tblType);
+				require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+				$review = new $__tblClass($__tblDb);
+			}
 			$review_id = 0;
 
 			// Logged-in users may update only the review found by their server-side
@@ -649,26 +1059,64 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$review->reset();
 			}
 
+			// Moderation configuration of the voting (reviews) field
+			$do_approval = (int) $field->parameters->get('do_approval', 1);
+			$verify_email_ownership = (int) $field->parameters->get('verify_email_ownership', 1);
+
+			// A review that was deleted by the user (trashed) is re-created, same for a record that has no text (rating only record, created by voting)
+			$was_trashed = $review_id && (int) $review->state === -2;
+			$had_text = $review_id && !$was_trashed && trim((string) $review->text) !== '';
+
+			// Modification of an existing review that is currently approved: keep the old data
+			if ($had_text && $review->approved)
+			{
+				$review->title_old = $review->title;
+				$review->text_old  = $review->text;
+			}
+
 			$review->content_id = $content_id;
 			$review->type  = $review_type;
 			$review->title = $title;
-			$review->email = $user->id ? '' : $email;
+			$review->name  = $name;
+			$review->email = $email;
 			$review->user_id = $user->id;
 			$review->text  = $text;
+			$review->average_rating = $rating_percent;
+
+			// Composite voting: the ratings of the characteristics (percent)
+			if ($char_percents)
+			{
+				$review->custom_ratings = json_encode($char_percents);
+			}
+
+			// New or modified reviews need approval (if configured), the same as in the backend controller
+			$review->approved = $do_approval ? 0 : 1;
+
+			if (!$review_id || $was_trashed)
+			{
+				// New reviews are published, visibility is controlled by approval
+				$review->state = 1;
+
+				// Email of logged users is owned by them, for guests it needs verification (if configured)
+				$review->verified = ($user->id || !$verify_email_ownership) ? 1 : 0;
+			}
+
+			// Set the submit / update dates
+			$review->check();
 
 			// Save review into DB
 			if (!$review->store())
 			{
-				$errors[] = 'Error storing review : ' . $review->getError();
+				$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', htmlspecialchars((string) $review->getError(), ENT_QUOTES, 'UTF-8'));
 			}
 		}
 
 		// Create success response
 		if (!count($errors))
 		{
-			$mssg = $review_id
-				? 'Existing review updated'
-				: 'New review saved';
+			$mssg = \Joomla\CMS\Language\Text::_(
+				'FLEXI_VOTE_REVIEW_MSG_' . ($had_text ? 'UPDATED' : 'SAVED') . ($review->approved ? '' : '_PENDING')
+			);
 
 			$result = (object) array(
 				'error' => 0,
@@ -700,6 +1148,876 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 
 	/**
+	 * Ajax task to delete the review of the current (logged) user
+	 *
+	 * @access public
+	 * @since 3.3.0
+	 */
+	function deletereviewform()
+	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+
+		$content_id  = $this->input->get('content_id', 0, 'int');
+		$review_type = $this->input->get('review_type', 'item', 'cmd');
+
+		$errors = array();
+
+		$this->loadReviewLanguage();
+
+		if (!$content_id)
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_CONTENT_ID');
+		}
+
+		if ($review_type !== 'item')
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_TYPE_UNSUPPORTED');
+		}
+
+		// Only logged users can delete their own review
+		if (!count($errors) && !$user->id)
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_LOGIN_REQUIRED');
+		}
+
+		// Check that reviews are enabled and the content exists (submission permission is not needed for deleting)
+		if (!count($errors))
+		{
+			$item  = null;
+			$field = null;
+			$this->reviewPrepare($content_id, $item, $field, $errors, $_checkSubmit = false);
+		}
+
+		if (!count($errors))
+		{
+			$__tblType = $type = 'flexicontent_reviews';
+			$__tblPrefix = $prefix = '';
+			$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			if ($__tblPrefix === 'TagsTable') {
+				$review = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+			} elseif ($__tblPrefix === 'JTable') {
+				$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+				$review = new $__tblClass($__tblDb);
+			} else {
+				$__tblClass = $__tblPrefix . ucfirst($__tblType);
+				require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+				$review = new $__tblClass($__tblDb);
+			}
+
+			$review_props = array(
+				'content_id' => $content_id,
+				'user_id'    => (int) $user->id,
+				'type'       => $review_type,
+			);
+
+			if (!$review->load($review_props) || (int) $review->state === -2)
+			{
+				$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NOT_FOUND');
+			}
+			else
+			{
+				$old_percent = (int) $review->average_rating;
+
+				// The review is moved to the trash (it can be seen / restored in the backend), its rating is removed
+				$review->state = -2;
+				$review->average_rating = 0;
+
+				if (!$review->store())
+				{
+					$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', htmlspecialchars((string) $review->getError(), ENT_QUOTES, 'UTF-8'));
+				}
+
+				// The rating of the review is also the user's vote, remove it from the item's rating
+				else
+				{
+					$this->revertReviewVote($field, $content_id, $old_percent, $is_own = true);
+				}
+			}
+		}
+
+		$result = (object) array(
+			'error' => count($errors) ? 1 : 0,
+			'html'  => '
+				<div class="fc-mssg ' . (count($errors) ? 'fc-warning' : 'fc-success') . ' fc-nobgimage">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					' . (count($errors) ? implode('<br>', $errors) : \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_MSG_DELETED')) . '
+				</div>'
+		);
+
+		jexit(json_encode($result));
+	}
+
+
+	/**
+	 * Renders the reviews list (or a single review) using the layout of the voting field, in 'list-only' mode ($prop = 'display_reviews')
+	 *
+	 * @param   object  $item                  The item record
+	 * @param   object  $field                 The voting field (with its parameters)
+	 * @param   int     $rv_chunk_offset       0: the whole list (rating, buttons, own review, first reviews), > 0: only the next reviews
+	 * @param   int     $rv_single_review_id   If set, only this review is rendered (e.g. after the quick edit by a moderator)
+	 * @param   int     $rv_star_filter        Only the reviews with this rating (number of stars), 0: all reviews
+	 * @param   bool    $rv_inline_box         The list is displayed in the page ('All reviews' button), not in the modal window (next reviews loaded by scrolling)
+	 * @param   bool    $rv_full               Full mode: the display of the field (stars, counter / button) and the reviews card of the item view, used to refresh the page without reloading it
+	 *
+	 * @return  string|array  The HTML, in the full mode an array: field => display of the field, card => reviews card
+	 */
+	private function renderReviewsTemplate($item, $field, $rv_chunk_offset = 0, $rv_single_review_id = 0, $rv_star_filter = 0, $rv_inline_box = false, $rv_full = false)
+	{
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+
+		// Variables expected by the layout of the voting field
+		$vote = $db->setQuery(
+			$db->getQuery(true)
+				->select('rating_sum, rating_count')
+				->from('#__content_rating')
+				->where('content_id = ' . (int) $item->id)
+		)->loadObject();
+
+		$field->item_id    = (int) $item->id;
+		$field->item_title = (string) $item->title;
+
+		$prop              = $rv_full ? 'display' : 'display_reviews';
+		$allow_reviews     = 1;
+		$reviews_placement = 0;
+		$view              = 'item';
+		$pretext = $posttext = '';
+
+		// Full mode: same variables as the display of the field in the item view (voting field of the core plugin)
+		if ($rv_full)
+		{
+			$allow_reviews     = (int) $field->parameters->get('allow_reviews', 0);
+			$reviews_placement = (int) $field->parameters->get('reviews_placement', 0);
+
+			$vote_submit_inview = FLEXIUtilities::paramToArray($field->parameters->get('vote_submit_inview', array('item')));
+
+			if (!in_array('item', $vote_submit_inview))
+			{
+				$vote = $vote ?: new stdClass;
+				$vote->allow_vote = false;
+			}
+
+			// Text before / after the field
+			foreach (array('pretext', 'posttext') as $_pt)
+			{
+				$_pt_value = $field->parameters->get($_pt, '');
+
+				if ($_pt_value !== '')
+				{
+					$_cacheable = false;
+					$$_pt = (string) FlexicontentFields::replaceFieldValue($field, $item, $_pt_value, $_pt, $_cacheable);
+				}
+			}
+		}
+
+		include(JPATH_PLUGINS . '/flexicontent_fields/core/tmpl/voting/value_default.php');
+
+		if ($rv_full)
+		{
+			return array(
+				'field' => (string) $field->display,
+				'card'  => (string) $field->display_reviews,
+			);
+		}
+
+		return (string) $field->display_reviews;
+	}
+
+
+	/**
+	 * Ajax task: get the HTML of the reviews list of an item (loaded on demand, e.g. when the 'N Reviews' button is clicked)
+	 * The list is created by the layout of the voting field, in 'list-only' mode ($prop = 'display_reviews')
+	 *
+	 * @access public
+	 * @since 3.3.0
+	 */
+	function getreviewslist()
+	{
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+
+		$content_id = $this->input->get('content_id', 0, 'int');
+
+		$errors = array();
+		$html   = '';
+
+		$this->loadReviewLanguage();
+
+		if (!$content_id)
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_CONTENT_ID');
+		}
+		else
+		{
+			// Check that reviews are enabled and the content exists (submission permission is not needed for displaying)
+			$item  = null;
+			$field = null;
+			$this->reviewPrepare($content_id, $item, $field, $errors, $_checkSubmit = false);
+		}
+
+		// The user must be able to view the item
+		if (!count($errors) && (!in_array((int) $item->access, $user->getAuthorisedViewLevels())
+			|| ((int) $item->state !== 1 && !$user->authorise('core.edit.state', 'com_content.article.' . (int) $item->id))))
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR');
+		}
+
+		if (!count($errors))
+		{
+			// Offset of the first review to return, 0: the whole list (rating, buttons, own review, first reviews), > 0: only the next reviews
+			// Filter by rating (number of stars, 0: all reviews), 'inline': the list is displayed in the page (not in the modal window)
+			$html = $this->renderReviewsTemplate(
+				$item, $field,
+				max(0, $this->input->get('offset', 0, 'int')),
+				0,
+				max(0, $this->input->get('star', 0, 'int')),
+				(bool) $this->input->get('inline', 0, 'int')
+			);
+		}
+
+		jexit(json_encode((object) array(
+			'error' => count($errors) ? 1 : 0,
+			'html'  => count($errors)
+				? '<div class="fc-mssg fc-warning fc-nobgimage">' . implode('<br>', $errors) . '</div>'
+				: $html
+		)));
+	}
+
+
+	/**
+	 * Ajax task: get the current HTML of the voting field of an item (stars, reviews counter / button) and of its reviews card,
+	 * used to refresh the item page after the reviews changed, without reloading the page
+	 * The HTML is created by the layout of the voting field, as in the item view
+	 *
+	 * @access public
+	 * @since 3.3.0
+	 */
+	function getreviewsrefresh()
+	{
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+
+		$content_id = $this->input->get('content_id', 0, 'int');
+
+		$errors = array();
+		$result = (object) array('error' => 0);
+
+		$this->loadReviewLanguage();
+
+		if (!$content_id)
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_CONTENT_ID');
+		}
+		else
+		{
+			$item  = null;
+			$field = null;
+			$this->reviewPrepare($content_id, $item, $field, $errors, $_checkSubmit = false);
+		}
+
+		// The user must be able to view the item
+		if (!count($errors) && (!in_array((int) $item->access, $user->getAuthorisedViewLevels())
+			|| ((int) $item->state !== 1 && !$user->authorise('core.edit.state', 'com_content.article.' . (int) $item->id))))
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR');
+		}
+
+		// Composite voting (extra votes) is not supported by the refresh, the page must be reloaded
+		if (!count($errors) && (int) $field->parameters->get('enable_extra_votes', 0))
+		{
+			$errors[] = 'Composite voting';
+		}
+
+		if (!count($errors))
+		{
+			// Same state as in the item view (e.g. the aggregate rating markup)
+			$this->input->set('flexi_callview', 'item');
+
+			$rendered = $this->renderReviewsTemplate($item, $field, 0, 0, 0, true, $rv_full = true);
+
+			$result->field = $rendered['field'];
+			$result->card  = $rendered['card'];
+		}
+		else
+		{
+			$result->error = 1;
+			$result->msg   = implode(' ', $errors);
+		}
+
+		jexit(json_encode($result));
+	}
+
+
+	/**
+	 * Ajax task: the current user (or guest) marks a review as useful / not useful ('Was this helpful?')
+	 * Voting again with the same answer removes the vote, voting with the other answer changes the vote
+	 *
+	 * @access public
+	 * @since 3.3.0
+	 */
+	function votereviewuseful()
+	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+
+		$review_id = $this->input->get('review_id', 0, 'int');
+		$answer    = $this->input->get('vote', '', 'cmd');
+
+		$errors = array();
+		$result = (object) array('error' => 0);
+
+		$this->loadReviewLanguage();
+
+		// The review must be visible: published, approved and with text
+		$review = $review_id
+			? $db->setQuery(
+				$db->getQuery(true)
+					->select('id, content_id, user_id, useful_yes, useful_no')
+					->from('#__flexicontent_reviews')
+					->where('id = ' . (int) $review_id)
+					->where('type = ' . $db->Quote('item'))
+					->where('state = 1')
+					->where('approved = 1')
+					->where('CHAR_LENGTH(TRIM(text)) > 0')
+			)->loadObject()
+			: null;
+
+		if (!$review || !in_array($answer, array('yes', 'no'), true))
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NOT_FOUND');
+		}
+
+		if (!count($errors))
+		{
+			// Check that reviews are enabled and get the configuration of the field
+			$item  = null;
+			$field = null;
+			$this->reviewPrepare((int) $review->content_id, $item, $field, $errors, $_checkSubmit = false);
+		}
+
+		// The user must be able to view the item
+		if (!count($errors) && (!in_array((int) $item->access, $user->getAuthorisedViewLevels()) || ((int) $item->state !== 1 && !$user->authorise('core.edit.state', 'com_content.article.' . (int) $item->id))))
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR');
+		}
+
+		if (!count($errors))
+		{
+			// 0: disabled, 1: logged users, 2: anyone (guests are identified by IP address)
+			$useful_mode = (int) $field->parameters->get('reviews_useful', 1);
+
+			if (!$useful_mode)
+			{
+				$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_USEFUL_DISABLED');
+			}
+			elseif ($useful_mode === 1 && !$user->id)
+			{
+				$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_LOGIN_REQUIRED');
+			}
+			elseif ($user->id && (int) $review->user_id === (int) $user->id)
+			{
+				$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_USEFUL_OWN');
+			}
+		}
+
+		if (!count($errors))
+		{
+			list($uid, $ip) = flexicontent_html::getReviewVoterKey();
+
+			$where_voter = 'review_id = ' . (int) $review->id . ' AND user_id = ' . (int) $uid . ' AND ip = ' . $db->Quote($ip);
+			$previous    = $db->setQuery('SELECT vote FROM #__flexicontent_reviews_useful WHERE ' . $where_voter)->loadResult();
+			$new         = $answer === 'yes' ? 1 : 0;
+			$col         = array(1 => 'useful_yes', 0 => 'useful_no');
+
+			if ($previous !== null && (int) $previous === $new)
+			{
+				// Same answer again: remove the vote
+				$db->setQuery('DELETE FROM #__flexicontent_reviews_useful WHERE ' . $where_voter)->execute();
+				$db->setQuery('UPDATE #__flexicontent_reviews SET ' . $col[$new] . ' = GREATEST(' . $col[$new] . ' - 1, 0) WHERE id = ' . (int) $review->id)->execute();
+				$my_vote = '';
+			}
+			elseif ($previous !== null)
+			{
+				// Other answer: change the vote
+				$db->setQuery('UPDATE #__flexicontent_reviews_useful SET vote = ' . $new . ', vote_date = ' . $db->Quote(\Joomla\CMS\Factory::getDate()->toSql()) . ' WHERE ' . $where_voter)->execute();
+				$db->setQuery('UPDATE #__flexicontent_reviews SET ' . $col[$new] . ' = ' . $col[$new] . ' + 1, ' . $col[1 - $new] . ' = GREATEST(' . $col[1 - $new] . ' - 1, 0) WHERE id = ' . (int) $review->id)->execute();
+				$my_vote = $answer;
+			}
+			else
+			{
+				// New vote
+				$db->setQuery(
+					'INSERT INTO #__flexicontent_reviews_useful (review_id, user_id, ip, vote, vote_date) VALUES ('
+					. (int) $review->id . ', ' . (int) $uid . ', ' . $db->Quote($ip) . ', ' . $new . ', ' . $db->Quote(\Joomla\CMS\Factory::getDate()->toSql()) . ')'
+				)->execute();
+				$db->setQuery('UPDATE #__flexicontent_reviews SET ' . $col[$new] . ' = ' . $col[$new] . ' + 1 WHERE id = ' . (int) $review->id)->execute();
+				$my_vote = $answer;
+			}
+
+			$counts = $db->setQuery('SELECT useful_yes, useful_no FROM #__flexicontent_reviews WHERE id = ' . (int) $review->id)->loadObject();
+
+			$result->my_vote     = $my_vote;
+			$result->useful_yes  = (int) $counts->useful_yes;
+			$result->useful_no   = (int) $counts->useful_no;
+			$result->count_text  = $result->useful_yes
+				? \Joomla\CMS\Language\Text::plural('FLEXI_VOTE_REVIEW_USEFUL_N', $result->useful_yes)
+				: '';
+		}
+
+		if (count($errors))
+		{
+			$result->error = 1;
+			$result->msg   = implode("\n", $errors);
+		}
+
+		jexit(json_encode($result));
+	}
+
+
+	/**
+	 * Loads a review that a moderator wants to edit, and checks the permissions
+	 *
+	 * @param   int     $review_id   The review id
+	 * @param   array   $errors      Array of error messages (to be extended)
+	 *
+	 * @return  \Joomla\CMS\Table\Table|null   The review (Table object), null on error
+	 */
+	private function loadReviewForModerator($review_id, & $errors)
+	{
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+
+		$__tblType = $type = 'flexicontent_reviews';
+		$__tblPrefix = $prefix = '';
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$review = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$review = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$review = new $__tblClass($__tblDb);
+		}
+
+		if (!$review_id || !$review->load($review_id) || (int) $review->state === -2 || $review->type !== 'item')
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NOT_FOUND');
+			return null;
+		}
+
+		if (!$user->authorise('core.edit.state', 'com_content.article.' . (int) $review->content_id))
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NO_PERMISSION');
+			return null;
+		}
+
+		// Check that reviews are enabled and the content exists
+		$item  = null;
+		$field = null;
+		$this->reviewPrepare((int) $review->content_id, $item, $field, $errors, $_checkSubmit = false);
+
+		return count($errors) ? null : $review;
+	}
+
+
+	/**
+	 * Ajax task: the form for the quick edit of a review by a moderator (fix typos, approve)
+	 *
+	 * @access public
+	 * @since 3.3.0
+	 */
+	function getreviewedit()
+	{
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+
+		$review_id = $this->input->get('review_id', 0, 'int');
+		$errors    = array();
+
+		$this->loadReviewLanguage();
+
+		$review = $this->loadReviewForModerator($review_id, $errors);
+
+		if ($review)
+		{
+			$author = $review->user_id
+				? $db->setQuery('SELECT name FROM #__users WHERE id = ' . (int) $review->user_id)->loadResult()
+				: '';
+			$author = $author ?: (trim((string) $review->name) !== '' ? $review->name : \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_GUEST'));
+
+			$form_id = 'fcvote_review_edit_form_' . (int) $review->id;
+
+			// Composite voting: ratings of the characteristics (read-only, as the overall rating)
+			$rv_extra_html = '';
+			$rv_chars      = flexicontent_html::getVotingCharacteristics(flexicontent_html::getVotingFieldConfig());
+
+			if ($rv_chars && trim((string) $review->custom_ratings) !== '')
+			{
+				$rv_extra = (array) json_decode((string) $review->custom_ratings, true);
+
+				foreach ($rv_chars as $rv_xid => $rv_char)
+				{
+					if (!isset($rv_extra[$rv_xid]))
+					{
+						continue;
+					}
+
+					$rv_extra_html .= '<span class="fcvote-review-extra-item">'
+						. '<span class="fcvote-review-extra-title">' . htmlspecialchars($rv_char->title !== '' ? $rv_char->title : (string) $rv_xid, ENT_QUOTES, 'UTF-8') . '</span> '
+						. flexicontent_html::reviewStars((int) $rv_extra[$rv_xid], flexicontent_html::reviewStarsCount(), '0.8em')
+						. '</span>';
+				}
+
+				$rv_extra_html = $rv_extra_html !== '' ? '<div class="fcvote-review-extra">' . $rv_extra_html . '</div>' : '';
+			}
+
+			$html = '
+				<form id="' . $form_id . '" name="' . $form_id . '" action="javascript:;">
+
+					<input type="hidden" name="review_id" value="' . (int) $review->id . '" />
+					<input type="hidden" name="' . \Joomla\CMS\Session\Session::getFormToken() . '" value="1" />
+
+					<div class="fcvote-form-fields">
+
+						<div class="fcvote-form-group">
+							<span class="fcvote-review-author">' . htmlspecialchars((string) $author, ENT_QUOTES, 'UTF-8') . '</span>
+							' . ((int) $review->average_rating > 0 ? '<div>' . flexicontent_html::reviewStars($review->average_rating, flexicontent_html::reviewStarsCount(), '1em') . '</div>' : '') . $rv_extra_html . '
+						</div>
+
+						<div class="fcvote-form-group">
+							<label class="fcvote-form-label" for="' . $form_id . '_title">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_TITLE') . '</label>
+							<input type="text" name="title" id="' . $form_id . '_title" maxlength="255"
+								value="' . htmlspecialchars((string) $review->title, ENT_COMPAT, 'UTF-8') . '" />
+						</div>
+
+						<div class="fcvote-form-group">
+							<label class="fcvote-form-label" for="' . $form_id . '_text">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_TEXT') . '</label>
+							<textarea required name="text" rows="6" id="' . $form_id . '_text">' . htmlspecialchars((string) $review->text, ENT_COMPAT, 'UTF-8') . '</textarea>
+						</div>
+
+						<div class="fcvote-form-group">
+							<label class="fcvote-switch">
+								<input type="checkbox" name="approved" value="1"' . ((int) $review->approved ? ' checked="checked"' : '') . ' />
+								<span class="fcvote-switch-slider"></span>
+								<span class="fcvote-switch-label">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_APPROVED') . '</span>
+							</label>
+						</div>
+
+						<div class="fcvote-form-group fcvote-form-submit">
+							<input type="button" class="btn btn-success fcvote_review_form_submit_btn"
+								onclick="fcvote_review_edit_save(this.form); return false;"
+								value="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_SAVE'), ENT_COMPAT, 'UTF-8') . '" />
+						</div>
+
+					</div>
+
+				</form>';
+		}
+
+		jexit(json_encode((object) array(
+			'error' => count($errors) ? 1 : 0,
+			'html'  => count($errors)
+				? '<div class="fc-mssg fc-warning fc-nobgimage">' . implode('<br>', $errors) . '</div>'
+				: $html
+		)));
+	}
+
+
+	/**
+	 * Ajax task: save the quick edit of a review by a moderator (title, text, approved), the rating and the author are not changed
+	 *
+	 * @access public
+	 * @since 3.3.0
+	 */
+	function savereviewedit()
+	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		$review_id = $this->input->get('review_id', 0, 'int');
+		$errors    = array();
+
+		$this->loadReviewLanguage();
+
+		$title    = flexicontent_html::dataFilter($this->input->get('title', '', 'string'), $maxlength = 255, 'STRING', 0);     // Decode entities, and strip HTML
+		$text     = flexicontent_html::dataFilter($this->input->get('text', '', 'string'), $maxlength = 10000, 'STRING', 0);   // Decode entities, and strip HTML
+		$approved = $this->input->get('approved', 0, 'int') ? 1 : 0;
+
+		$review = $this->loadReviewForModerator($review_id, $errors);
+
+		if ($review && trim($text) === '')
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_TEXT');
+		}
+
+		if (!count($errors))
+		{
+			// Keep the old data, if the title / text changed
+			if ((string) $review->title !== $title || (string) $review->text !== $text)
+			{
+				$review->title_old = $review->title;
+				$review->text_old  = $review->text;
+			}
+
+			$review->title    = $title;
+			$review->text     = $text;
+			$review->approved = $approved;
+
+			if (!$review->store())
+			{
+				$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', htmlspecialchars((string) $review->getError(), ENT_QUOTES, 'UTF-8'));
+			}
+		}
+
+		// The updated review, rendered like in the list (the list is updated without reloading the page)
+		$item_html = '';
+
+		if (!count($errors))
+		{
+			$item  = null;
+			$field = null;
+			$this->reviewPrepare((int) $review->content_id, $item, $field, $errors, $_checkSubmit = false);
+
+			if (!count($errors))
+			{
+				$item_html = $this->renderReviewsTemplate($item, $field, 0, (int) $review->id);
+			}
+		}
+
+		jexit(json_encode((object) array(
+			'error'     => count($errors) ? 1 : 0,
+			'item_html' => $item_html,
+			'html'      => '
+				<div class="fc-mssg ' . (count($errors) ? 'fc-warning' : 'fc-success') . ' fc-nobgimage">
+					' . (count($errors) ? implode('<br>', $errors) : \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_MSG_EDIT_SAVED')) . '
+				</div>'
+		)));
+	}
+
+
+	/**
+	 * Ajax task: a moderator approves a pending review
+	 *
+	 * @access public
+	 * @since 3.3.0
+	 */
+	function approvereview()
+	{
+		$this->moderateReview('approve');
+	}
+
+
+	/**
+	 * Ajax task: a moderator moves a review to the trash
+	 *
+	 * @access public
+	 * @since 3.3.0
+	 */
+	function trashreview()
+	{
+		$this->moderateReview('trash');
+	}
+
+
+	/**
+	 * Method to approve / trash a review, by a user that can change the state of the reviewed content
+	 *
+	 * @param   string   $action   Either 'approve' or 'trash'
+	 *
+	 * @return  void   It sends a JSON response and exits
+	 *
+	 * @since   3.3.0
+	 */
+	private function moderateReview($action)
+	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$review_id = $this->input->get('review_id', 0, 'int');
+		$errors = array();
+
+		$this->loadReviewLanguage();
+
+		$__tblType = $type = 'flexicontent_reviews';
+		$__tblPrefix = $prefix = '';
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$review = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$review = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$review = new $__tblClass($__tblDb);
+		}
+
+		if (!$review_id || !$review->load($review_id) || (int) $review->state === -2 || $review->type !== 'item')
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NOT_FOUND');
+		}
+		elseif (!$user->authorise('core.edit.state', 'com_content.article.' . (int) $review->content_id))
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NO_PERMISSION');
+		}
+		else
+		{
+			// Check that reviews are enabled and the content exists
+			$item  = null;
+			$field = null;
+			$this->reviewPrepare((int) $review->content_id, $item, $field, $errors, $_checkSubmit = false);
+		}
+
+		if (!count($errors))
+		{
+			$old_percent = (int) $review->average_rating;
+
+			if ($action === 'approve')
+			{
+				$review->approved = 1;
+			}
+			else
+			{
+				// Moved to the trash (it can be seen / restored in the backend), its rating is removed
+				$review->state = -2;
+				$review->average_rating = 0;
+			}
+
+			if (!$review->store())
+			{
+				$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', htmlspecialchars((string) $review->getError(), ENT_QUOTES, 'UTF-8'));
+			}
+			elseif ($action === 'trash')
+			{
+				// The rating of the review is also a vote, remove it from the item's rating
+				$this->revertReviewVote($field, (int) $review->content_id, $old_percent, $is_own = ((int) $review->user_id === (int) $user->id));
+			}
+		}
+
+		$msg = count($errors)
+			? implode(' ', $errors)
+			: \Joomla\CMS\Language\Text::_($action === 'approve' ? 'FLEXI_VOTE_REVIEW_MSG_APPROVED' : 'FLEXI_VOTE_REVIEW_MSG_TRASHED');
+
+		jexit(json_encode(array(
+			'error'  => count($errors) ? 1 : 0,
+			'msg'    => strip_tags($msg),
+			'action' => $action,
+			'id'     => (int) $review_id,
+		)));
+	}
+
+
+	/**
+	 * Method to remove the vote of a review (that is deleted / trashed) from the rating of the reviewed item
+	 *
+	 * @param   object   $field        The voting field
+	 * @param   int      $content_id   The reviewed item
+	 * @param   int      $old_percent  The rating of the review as percentage
+	 * @param   boolean  $is_own       True if the review is of the current user (then session data of the vote are also cleared)
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	private function revertReviewVote($field, $content_id, $old_percent, $is_own = false)
+	{
+		// Composite voting calculates the rating from the voting characteristics
+		if ($old_percent < 1 || (int) $field->parameters->get('enable_extra_votes', 0))
+		{
+			return;
+		}
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$old_vote = max(1, (int) round($old_percent * $this->getReviewResolution($field) / 100));
+
+		$db->setQuery(
+			'UPDATE #__content_rating'
+			. ' SET rating_sum = GREATEST(CAST(rating_sum AS SIGNED) - ' . (int) $old_vote . ', 0),'
+			. '     rating_count = GREATEST(CAST(rating_count AS SIGNED) - 1, 0)'
+			. ($is_own ? ', lastip = IF(lastip = ' . $db->Quote($_SERVER['REMOTE_ADDR']) . ', ' . $db->Quote('') . ', lastip)' : '')
+			. ' WHERE content_id = ' . (int) $content_id
+		)->execute();
+
+		if ($is_own)
+		{
+			// Forget the vote in the user's session, otherwise a new vote would be counted as a change of the old vote
+			$session = \Joomla\CMS\Factory::getApplication()->getSession();
+			$vote_history = $session->get('vote_history', array(), 'flexicontent');
+			unset($vote_history[$content_id]);
+			$session->set('vote_history', $vote_history, 'flexicontent');
+		}
+
+		FLEXIUtilities::getCache($group = '', 0)->clean('com_flexicontent');
+	}
+
+
+	/**
+	 * Method to get the rating resolution of the voting field (the maximum vote value)
+	 *
+	 * @param   object   $field   The voting field
+	 *
+	 * @return  int      The resolution (5 to 100)
+	 *
+	 * @since   3.3.0
+	 */
+	private function getReviewResolution($field)
+	{
+		return max(5, min(100, (int) $field->parameters->get('rating_resolution', 5)));
+	}
+
+
+	/**
+	 * Method to get the number of rating stars used by the review form (same as the voting field stars)
+	 *
+	 * @param   object   $field   The voting field
+	 *
+	 * @return  int      Number of stars (1 to 10)
+	 *
+	 * @since   3.3.0
+	 */
+	private function getReviewStars($field)
+	{
+		$resolution = $this->getReviewResolution($field);
+
+		$stars = (int) $field->parameters->get('rating_stars', 5);
+		$stars = $stars > 0 ? min($stars, $resolution) : $resolution;
+
+		return max(1, min(10, $stars));
+	}
+
+
+	/**
+	 * Method to load the language strings used by the review forms
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	/**
+	 * Maximum number of characters of a review text (field parameter), 0: no limit
+	 */
+	private function getReviewMaxLength($field)
+	{
+		$max = $field ? (int) $field->parameters->get('reviews_max_length', 500) : 500;
+
+		return max(0, $max);
+	}
+
+
+	private function loadReviewLanguage()
+	{
+		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
+		$lang->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		$lang->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
+	}
+
+
+	/**
 	 * Method to do prechecks for loading / saving review forms
 	 *
 	 * @param   object    $item       by reference variable to return the reviewed item
@@ -721,7 +2039,19 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		 * Load content item related to the review
 		 */
 
-		$item = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+		$__tblType = $type = 'flexicontent_items';
+		$__tblPrefix = $prefix = '';
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$item = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$item = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$item = new $__tblClass($__tblDb);
+		}
 
 		if (!$item->load($content_id))
 		{
@@ -742,8 +2072,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		FlexicontentFields::loadFieldConfig($field, $item);
 
 		// Load field's language files
-		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
+		$this->loadReviewLanguage();
 
 		// Get needed parameters
 		$allow_reviews = (int) $field->parameters->get('allow_reviews', 0);
@@ -751,43 +2080,44 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// Check reviews are allowed
 		if (!$allow_reviews)
 		{
-			$errors[] = 'Reviews are disabled';
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_DISABLED');
 		}
 
-		// Check if user has the ACCESS level required for voting
+		// Check if the user is allowed to submit reviews, according to the field's reviews configuration
 		elseif ($checkSubmit)
 		{
-			$aid_arr = $user->getAuthorisedViewLevels();
-			$acclvl = (int) $field->parameters->get('submit_acclvl', 1);
-			$has_acclvl = in_array($acclvl, $aid_arr);
-
-			// Create no access Redirect Message
-			if (!$has_acclvl)
+			switch ((int) $field->parameters->get('allow_submit_review_by', 0))
 			{
-				$logged_no_acc_msg = $field->parameters->get('logged_no_acc_msg', '');
-				$guest_no_acc_msg  = $field->parameters->get('guest_no_acc_msg', '');
-				$no_acc_msg = $user->id ? $logged_no_acc_msg : $guest_no_acc_msg;
-				$no_acc_msg = $no_acc_msg ? \Joomla\CMS\Language\Text::_($no_acc_msg) : '';
+				// New review submissions are disabled
+				case 0:
+					$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_SUBMISSION_DISABLED');
+					break;
 
-				// Message not set create a Default Message
-				if (!$no_acc_msg)
-				{
-					// Find name of required Access Level
-					$acclvl_name = '';
-					if ($acclvl)
+				// Anyone (guest or logged) is allowed to submit
+				case 1:
+					break;
+
+				// Only logged users are allowed to submit
+				case 2:
+					if (!$user->id)
 					{
-						$query = 'SELECT title FROM #__viewlevels as level WHERE level.id = ' . (int) $acclvl;
-						$acclvl_name = $db->setQuery($query)->loadResult();
-						if (!$acclvl_name)
-						{
-							$acclvl_name = 'Access Level: ' . $acclvl . ' not found / was deleted';
-						}
+						$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_LOGIN_REQUIRED');
 					}
+					break;
 
-					$no_acc_msg = \Joomla\CMS\Language\Text::sprintf( 'FLEXI_NO_ACCESS_TO_VOTE' , $acclvl_name);
-				}
+				// Only users having the configured access level are allowed to submit
+				case 3:
+					$acclvl = (int) $field->parameters->get('review_submit_access', 1);
 
-				$errors[] = 'You are not authorized to submit reviews';
+					if (!in_array($acclvl, $user->getAuthorisedViewLevels()))
+					{
+						$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NOT_AUTHORIZED');
+					}
+					break;
+
+				default:
+					$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NOT_AUTHORIZED');
+					break;
 			}
 		}
 	}
@@ -802,7 +2132,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	 */
 	public function ajaxvote()
 	{
-		JLoader::register('FlexicontentControllerReviews', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'reviews.php');
+		// Lazy class loading (was JLoader::register): loaded only if/when used.
+		spl_autoload_register(static function ($class) {
+			if ($class === 'FlexicontentControllerReviews' && is_file($f = JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'reviews.php')) require_once $f;
+		}, true, true);
 
 		$rman = new FlexicontentControllerReviews();
 		$rman->ajaxvote();
@@ -819,13 +2152,18 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$name = $this->input->get('name', null, 'string');
-		$cid  = $this->input->get('id', array(0), 'array');
+		// The site router may populate the main input's id with the active menu's article id.
+		$cid  = $this->input->post->get('id', $this->input->get->get('id', array(0), 'array'), 'array');
 		$cid  = ArrayHelper::toInteger($cid, array(0));
 		$cid  = (int) $cid[0];
 
 		// Check if tag exists (id exists or name exists)
-		JLoader::register("FlexicontentModelTag", JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'tag.php');
-		$model = new FlexicontentModelTag();
+		// Lazy class loading (was JLoader::register): loaded only if/when used.
+		spl_autoload_register(static function ($class) {
+			if ($class === 'FlexicontentModelTag' && is_file($f = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'tag.php')) require_once $f;
+		}, true, true);
+		// Save must not pick up the routed article id through the model state either.
+		$model = new FlexicontentModelTag(['ignore_request' => true]);
 		$model->setId($cid);
 		$tag = $model->getTag($name);
 
@@ -897,7 +2235,6 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	public function download()
 	{
 		// Import and Initialize some joomla API variables
-		jimport('joomla.filesystem.file');
 
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
@@ -1105,7 +2442,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					. $access_clauses['select']  // has access
 
 					.' FROM #__flexicontent_files AS f '
-					.($field_type=='file' || $field_type=='mediafile' ? ' LEFT JOIN #__flexicontent_fields_item_relations AS rel ON '
+					.($field_type=='file' || $field_type=='mediafile' ? ($using_access && $task !== 'download_file' && $task !== 'download_files' ? ' INNER JOIN' : ' LEFT JOIN') . ' #__flexicontent_fields_item_relations AS rel ON '
 						. ' rel.field_id = '. $field_id . ' AND rel.value = ' . (int) $file_id . ' AND rel.item_id = ' . (int) $content_id
 						: '')  // Only check value usage for 'file' field
 					.($task !== 'download_file' && $task !== 'download_files' ? ' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = '. $field_id : '')
@@ -1136,6 +2473,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				{
 					$file->has_content_access = $this->_checkDirectFileAccess($file, $user) ? 1 : 0;
 				}
+				elseif (!in_array($field_type, array('file', 'mediafile'), true) && !$this->_checkDirectFileAccess($file, $user))
+				{
+					// A different field kind cannot lend its item's ACL to an
+					// unrelated file. Use the ordinary direct-file policy instead.
+					$file->has_content_access = 0;
+				}
 				elseif ($file->has_content_access && !$this->_canViewItemState($content_id, $file->item_state, $file->item_created_by, $user))
 				{
 					$file->has_content_access = 0;
@@ -1144,7 +2487,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 			// Add target path (with target filename) for case we were not provide a custom name like when using download_tree task
 			static $used_names = array();
-			if ($task !== 'download_tree')
+			if ($task !== 'download_tree' && !empty($file))
 			{
 				$basename = basename($file->filename);
 				if (isset($used_names[$basename]))
@@ -1297,11 +2640,67 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			 * Get item and field \Joomla\CMS\Table\Table records, and then load field's configuration
 			 */
 
-			$item = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
-			$field = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_fields', $prefix = '', $config = array());
+			$__tblType = $type = 'flexicontent_items';
+			$__tblPrefix = $prefix = '';
+			$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			if ($__tblPrefix === 'TagsTable') {
+				$item = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+			} elseif ($__tblPrefix === 'JTable') {
+				$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+				$item = new $__tblClass($__tblDb);
+			} else {
+				$__tblClass = $__tblPrefix . ucfirst($__tblType);
+				require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+				$item = new $__tblClass($__tblDb);
+			}
+			$__tblType = $type = 'flexicontent_fields';
+			$__tblPrefix = $prefix = '';
+			$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			if ($__tblPrefix === 'TagsTable') {
+				$field = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+			} elseif ($__tblPrefix === 'JTable') {
+				$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+				$field = new $__tblClass($__tblDb);
+			} else {
+				$__tblClass = $__tblPrefix . ucfirst($__tblType);
+				require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+				$field = new $__tblClass($__tblDb);
+			}
 			$item->load($file_node->contentid);
 			$field->load($file_node->fieldid);
 			FlexicontentFields::loadFieldConfig($field, $item);
+
+
+			/**
+			 * Download limits (per user group quota), only for real downloads, not for viewing
+			 */
+
+			if ($method === 'download')
+			{
+				require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/downloadlimit.php';
+				$dl_settings = flexicontent_downloadlimit::getSettings($field->parameters);
+				$dl_special  = !$using_access;  // coupon or cart token: access levels were bypassed
+
+				if ($dl_settings && (!$dl_special || $dl_settings['count_special']) && !flexicontent_downloadlimit::consume($dl_settings, $file_id, $file_node->fieldid, $user))
+				{
+					$dl_info = flexicontent_downloadlimit::getResetInfo($dl_settings, $user);
+					$dl_msg = \Joomla\CMS\Language\Text::sprintf(
+						'FLEXI_DL_LIMIT_REACHED',
+						$dl_info['limit'],
+						flexicontent_downloadlimit::formatWindow($dl_info['window']),
+						flexicontent_downloadlimit::formatDuration($dl_info['reset_in'])
+					);
+
+					// Multi-file downloads skip the file, single file download is refused
+					if ($task !== 'download_tree' && $task !== 'download_files')
+					{
+						throw new \RuntimeException($dl_msg, 403);
+					}
+
+					$app->enqueueMessage($dl_msg, 'warning');
+					continue;
+				}
+			}
 
 
 			/**
@@ -1348,7 +2747,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			 * Increment hits counter of file, and hits counter of file-user history
 			 */
 
-			$filetable = \Joomla\CMS\Table\Table::getInstance('flexicontent_files', '');
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_files.php';
+			$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$filetable = new flexicontent_files($__fcTableDb);
 			$filetable->hit($file_id);
 			if ( empty($file->history_id) )
 			{
@@ -2086,8 +3487,32 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		 * Get item and field \Joomla\CMS\Table\Table records, and then load field's configuration
 		 */
 
-		$item = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
-		$field = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_fields', $prefix = '', $config = array());
+		$__tblType = $type = 'flexicontent_items';
+		$__tblPrefix = $prefix = '';
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$item = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$item = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$item = new $__tblClass($__tblDb);
+		}
+		$__tblType = $type = 'flexicontent_fields';
+		$__tblPrefix = $prefix = '';
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$field = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$field = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$field = new $__tblClass($__tblDb);
+		}
 		$item->load($content_id);
 		$field->load($field_id);
 		FlexicontentFields::loadFieldConfig($field, $item);
@@ -2637,7 +4062,6 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		jimport('joomla.filesystem.file');
 		$all_files = array();
 
 		foreach ($nodes as $node)

@@ -13,6 +13,7 @@
 	<files>
 		<filename plugin="subform">subform.php</filename>
 		<filename>index.html</filename>
+		<folder>css</folder>
 		<folder>tmpl</folder>
 	</files>
 

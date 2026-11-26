@@ -142,7 +142,7 @@ foreach($values as $file_id)
 		$_tooltip_content = \Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_FILE_TYPE', true ) .': '. $file_data->ext;
 		$icon = '
 		<span class="fcfile_mime">
-			' . \Joomla\CMS\HTML\HTMLHelper::image($file_data->icon, $file_data->ext, 'class="fcicon-mime '.$tooltip_class.'" title="'.\Joomla\CMS\HTML\HTMLHelper::tooltipText($_tooltip_title, $_tooltip_content, 1, 0).'"') . '
+			' . \Joomla\CMS\HTML\HTMLHelper::image($file_data->icon, $file_data->ext, array('class' => 'fcicon-mime '.$tooltip_class, 'title' => \Joomla\CMS\HTML\HTMLHelper::tooltipText($_tooltip_title, $_tooltip_content, 1, 1))) . '
 		</span>';
 	}
 
@@ -223,6 +223,8 @@ foreach($values as $file_id)
 	// e. FILENAME / TITLE: decide whether to show it (if we do not use button, then displaying of filename is forced)
 	$filetitle = $file_data->altname ? $file_data->altname : $file_data->filename;
 	$filetitle_escaped = htmlspecialchars($filetitle, ENT_COMPAT, 'UTF-8');
+	// GLightbox renders the decoded data-title as HTML. Keep the title as text.
+	$lightbox_title = htmlspecialchars($filetitle_escaped, ENT_COMPAT, 'UTF-8');
 
 	if ($lowercase_filename) $filetitle = StringHelper::strtolower( $filetitle );
 	$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
@@ -231,7 +233,7 @@ foreach($values as $file_id)
 	$name_escaped = htmlspecialchars($name_str, ENT_COMPAT, 'UTF-8');
 
 	$name_classes = $file_classes . ' fcfile_title';
-	$name_html = '<span class="' . $name_classes . '">'. $name_str . '</span>';
+	$name_html = '<span class="' . $name_classes . '">'. htmlspecialchars((string) $name_str, ENT_QUOTES, 'UTF-8') . '</span>';
 
 
 	// f. DESCRIPTION: either as tooltip or as inline text
@@ -301,6 +303,9 @@ foreach($values as $file_id)
 		$dl_link = 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$item->id.'&fid='.$field->id.'&task=download';
 		$dl_link = $isAdmin ? flexicontent_html::getSefUrl($dl_link) : \Joomla\CMS\Router\Route::_( $dl_link );
 	}
+
+	// Download limits: mark the download button / link so that it can be disabled when the quota is exhausted
+	$dl_attr = $authorized ? flexicontent_downloadlimit::getButtonAttrs($field, $file_id, $item->id) : '';
 
 	// SOME behavior FLAGS
 	$not_downloadable = !$dl_link || $prop=='namelist';
@@ -393,7 +398,7 @@ else if ($prop !== 'display_properties_only') :
 			// The Download Button
 			$_download_btn_html = '
 				<button type="button" onclick="window.open(\''.$dl_link.'\', ' . ($non_file_url ? "''": "'_self'") . ')"
-					class="' . $file_classes . ' btn-success fcfile_downloadFile ' . $analytics_classes . '" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'"
+					class="' . $file_classes . ' btn-success fcfile_downloadFile ' . $analytics_classes . '"' . $dl_attr . ' title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'"
 				>
 					' . ($compact_display != 2 ? $downloadstext : '') . '
 					' . ($compact_display == 2 ? ' ' . $svg_download : '') . '
@@ -406,17 +411,32 @@ else if ($prop !== 'display_properties_only') :
 		{
 			$view_link = $dl_link . (strpos($dl_link, '?') !== false ? '&amp;' : '?') . 'method=view';
 			$view_file_classes = $file_classes . ' btn-info fcfile_viewFile';
-			$actions_arr[] = '
+
+			if ($viewinside == 1)
+			{
+				$actions_arr[] = '
+				<a href="' . $view_link . '" class="' . $view_file_classes . ' fcfile_glightbox" title="' . $viewinfo . '"
+					data-type="external" data-title="' . $lightbox_title . '"
+				>
+					' . ($compact_display != 2 ? $viewtext : '') . '
+					' . ($compact_display == 2 ? ' ' . $svg_eye : '') . '
+				</a>';
+			}
+			else
+			{
+				$actions_arr[] = '
 				<button type="button" data-href="' . $view_link . '" class="' . $view_file_classes .'" title="' . $viewinfo . '" '
-					. ($viewinside>=2 ? ' onclick="var url = jQuery(this).attr(\'data-href\'); window.open(url, ' . ($viewinside==3 ? "'_self'" : "") . ');" ' : '')
-					. ($viewinside==1 ? ' onclick="var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''. $filetitle_escaped .'\'}); return false;" ' : '')
-					. ($viewinside==0 ? ' onclick="var url = jQuery(this).attr(\'data-href\'); jQuery.fancybox.open([{ src: url , type: \'iframe\'}]); "' : '')
+					. ($viewinside>=2 ? ' onclick="var url = this.getAttribute(\'data-href\'); window.open(url, ' . ($viewinside==3 ? "'_self'" : "") . ');" ' : '')
+					. ($viewinside==0 ? ' onclick="var url = this.getAttribute(\'data-href\'); jQuery.fancybox.open([{ src: url , type: \'iframe\'}]); "' : '')
 					. '
 				>
 					' . ($compact_display != 2 ? $viewtext : '') . '
 					' . ($compact_display == 2 ? ' ' . $svg_eye : '') . '
 				</button>';
-			$fancybox_needed = $viewinside == 0;
+			}
+
+			$fancybox_needed  = $viewinside == 0;
+			$glightbox_needed = $viewinside == 1;
 		}
 
 		// ADD TO CART: the link will add file to download list (tree) (handled via a downloads manager module)
@@ -453,7 +473,7 @@ else if ($prop !== 'display_properties_only') :
 				.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
 			$actions_arr[] =
 				'<button class="' . $file_classes . ' fcfile_shareFile" title="'.$shareinfo.'" data-href="'.$send_form_url.'"
-					onclick="var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8').'\'}); return false;" '.
+					onclick="var url = this.getAttribute(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8').'\'}); return false;" '.
 				'>
 					' . ($compact_display != 2 ? htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8') : '') . '
 					' . ($compact_display == 2 ? ' ' . $svg_mail : '') . '
@@ -487,21 +507,35 @@ else if ($prop !== 'display_properties_only') :
 			// The download link, if filename/title not shown, then display a 'download' prompt text
 			$actions_arr[] =
 				($filename_shown && $link_filename ? $icon.' ' : '')
-				.'<a href="' . $dl_link . '" class="' . $file_classes . ' fcfile_downloadFile ' . $analytics_classes . '" title="' . htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8') . '" ' . ($non_file_url ? 'target="_blank"' : '') . '>'
+				.'<a href="' . $dl_link . '" class="' . $file_classes . ' fcfile_downloadFile ' . $analytics_classes . '"' . $dl_attr . ' title="' . htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8') . '" ' . ($non_file_url ? 'target="_blank"' : '') . '>'
 				.($filename_shown && $link_filename ? $name_str : $downloadstext)
 				.'</a>';
 		}
 
 		if ($authorized && $allowview && !$file_data->url)
 		{
-			$actions_arr[] = '
-				<a href="' . $dl_link . (strpos($dl_link, '?') !== false ? '&amp;' : '?') . 'method=view" ' . ($viewinside==2 ? 'target="_blank"' : '')
+			$view_link = $dl_link . (strpos($dl_link, '?') !== false ? '&amp;' : '?') . 'method=view';
+
+			if ($viewinside == 1)
+			{
+				$actions_arr[] = '
+				<a href="' . $view_link . '" class="' . $file_classes . ' fcfile_viewFile fcfile_glightbox"'
+					. ' data-type="external" data-title="' . $lightbox_title . '" title="' . $viewinfo . '" >'
+					. $viewtext
+				. '</a>';
+			}
+			else
+			{
+				$actions_arr[] = '
+				<a href="' . $view_link . '" ' . ($viewinside==2 ? 'target="_blank"' : '')
 					. ' class="' . ($viewinside==0 ? 'fancybox ' : '') . $file_classes . ' fcfile_viewFile" '.($viewinside==0 ? 'data-type="iframe" ' : '')
-					. ($viewinside==1 ? ' onclick="var url = jQuery(this).attr(\'href\');  fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''. $filetitle_escaped .'\'}); return false;" ' : '')
-					. ' title="' . $viewinfo . '" >
-					' . $viewtext . '
+					. ' title="' . $viewinfo . '" >'
+					. $viewtext . '
 				</a>';
-			$fancybox_needed = $viewinside == 0;
+			}
+
+			$fancybox_needed  = $viewinside == 0;
+			$glightbox_needed = $viewinside == 1;
 		}
 
 		// ADD TO CART: the link will add file to download list (tree) (handled via a downloads manager module)
@@ -535,7 +569,7 @@ else if ($prop !== 'display_properties_only') :
 				.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
 			$actions_arr[] =
 				'<a href="'.$send_form_url.'" class="fcfile_shareFile" title="'.$shareinfo.'" '.
-				'  onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.$sharetext.'\'}); return false;">'
+				'  onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.$sharetext.'\'}); return false;">'
 				.$sharetext
 				.'</a>';
 		}
@@ -742,12 +776,12 @@ endif;   // END OF   $prop !== 'display_properties_only'
 	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 }
 
-Factory::getDocument()->addScriptDeclaration("
+Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript("
 	fcview_mediafile_base_url['".$field_name_js."'] = '".$base_url."';
 
 	" . (!$per_value_js ? "" : "
 	//document.addEventListener('DOMContentLoaded', function()
-	jQuery(document).ready(function()
+	FlexiForm.ready(function()
 	{
 		" . $per_value_js . "
 	});

@@ -14,7 +14,13 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecords' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * HTML View class for the FLEXIcontent import screen
@@ -30,11 +36,11 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 		global $globalcats;
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getSession();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
@@ -73,16 +79,16 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 			// Add css to document
 			if ($isAdmin)
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 			}
 			else
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
@@ -134,7 +140,6 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 		{
 			$this->sidebar = null;
 
-			if(FLEXI_J30GE && !FLEXI_J40GE) $this->sidebar = JHtmlSidebar::render();
 			if(FLEXI_J40GE) $this->sidebar = \Joomla\CMS\HTML\Helpers\Sidebar::render();
 		}
 
@@ -191,8 +196,8 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 		 */
 
 		$tblname  = 'session';
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbname   = $app->getCfg('db');
+		$dbprefix = $app->get('dbprefix');
+		$dbname   = $app->get('db');
 		$db->setQuery(
 			'SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS'
 			. ' WHERE TABLE_SCHEMA = ' . $db->quote($dbname)
@@ -308,7 +313,7 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 
 		// Build language field
 		$lists['languages'] = flexicontent_html::buildlanguageslist('language'
-			, ' style="vertical-align:top;" onchange="var m=jQuery(\'#fc_import_about_langcol\'); this.value ? m.hide(600) : m.show(600);"'
+			, ' style="vertical-align:top;" onchange="FlexiForm.show(document.getElementById(\'fc_import_about_langcol\'), !this.value);"'
 			, $formvals['language'], 6/*'- '.\Joomla\CMS\Language\Text::_('FLEXI_USE_LANGUAGE_COLUMN').' -'*/, $allowed_langs, $published_only=true
 			, $disable_langs=null, $add_all=true, $_conf=array('required'=>true)
 		).'
@@ -316,7 +321,7 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 				'.\Joomla\CMS\Language\Text::_('FLEXI_USE_LANGUAGE_COLUMN_TIP').'
 			</span>';
 
-		$lists['states'] = flexicontent_html::buildstateslist('state', ' style="vertical-align:top;" onchange="var m=jQuery(\'#fc_import_about_statecol\'); this.value ? m.hide(600) : m.show(600);"'
+		$lists['states'] = flexicontent_html::buildstateslist('state', ' style="vertical-align:top;" onchange="FlexiForm.show(document.getElementById(\'fc_import_about_statecol\'), !this.value);"'
 			, $formvals['state'], 2/*'- '.\Joomla\CMS\Language\Text::_('FLEXI_USE_STATE_COLUMN').' -'*/).
 			'<span class="fc-mssg-inline fc-note fc-nobgimage" id="fc_import_about_statecol" style="display:none;">
 				'.\Joomla\CMS\Language\Text::_('FLEXI_USE_STATE_COLUMN_TIP').'
@@ -346,6 +351,35 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 
 
 		/**
+		 * Tags to assign to all imported items (tags option 'd'), with a tag selector like the one of the item form
+		 */
+
+		$perms       = FlexicontentHelperPerm::getPerm();
+		$import_tags = array();
+		$tags_ids    = ArrayHelper::toInteger((array) $model->getState('tags_ids'));
+
+		if ($tags_ids)
+		{
+			$import_tags = $db->setQuery('SELECT id, name FROM #__flexicontent_tags WHERE id IN (' . implode(',', $tags_ids) . ') ORDER BY name')->loadObjectList();
+		}
+
+		flexicontent_html::loadTagPicker('tags_ids[]', 'tags.addtag');
+		$document->addScriptDeclaration(<<<'JS'
+			FlexiForm.ready(() => {
+				for (const control of document.querySelectorAll('input[name="tags_col"]')) {
+					control.addEventListener('change', () => {
+						const mode = Number(control.value);
+						FlexiForm.show('#fc_import_tags_box', mode > 0);
+						FlexiForm.show('.fc_import_tags_hint_col', mode === 1 || mode === 2);
+						FlexiForm.show('.fc_import_tags_hint_only', mode === 3);
+					});
+				}
+			});
+		JS);
+
+
+
+		/**
 		 * Assign data to template
 		 */
 
@@ -355,6 +389,8 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 		$this->cparams = $cparams;
 		$this->file_fields = $file_fields;
 		$this->formvals = $formvals;
+		$this->import_tags = $import_tags;
+		$this->perms = $perms;
 
 		parent::display($tpl);
 	}
@@ -369,11 +405,11 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 	 */
 	function setToolbar()
 	{
-		$user     = \Joomla\CMS\Factory::getUser();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$useAssocs= flexicontent_db::useAssociations();
 		$task     = \Joomla\CMS\Factory::getApplication()->input->getCmd('task');
 
@@ -429,7 +465,7 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');

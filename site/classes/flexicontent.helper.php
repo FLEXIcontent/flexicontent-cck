@@ -24,7 +24,7 @@ if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 // Try re-appling Joomla configuration of error reporting (some installed plugins may disable it)
-switch ( \Joomla\CMS\Factory::getConfig()->get('error_reporting') )  // Set the error_reporting
+switch ( \Joomla\CMS\Factory::getApplication()->getConfig()->get('error_reporting') )  // Set the error_reporting
 {
 	case 'default': case '-1':
 		break;
@@ -49,26 +49,29 @@ switch ( \Joomla\CMS\Factory::getConfig()->get('error_reporting') )  // Set the 
 		break;
 		
 	default:
-		error_reporting( \Joomla\CMS\Factory::getConfig()->get('error_reporting') );
+		error_reporting( \Joomla\CMS\Factory::getApplication()->getConfig()->get('error_reporting') );
 		ini_set('display_errors', 1);
 		break;
 }
 
-if (!function_exists('json_encode'))  // PHP < 5.2 lack support for json
-{
-	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'json'.DS.'jsonwrapper_inner.php');
-} 
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'flexicontent_html'     => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'html.php',
+		'flexicontent_upload'   => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'upload.php',
+		'flexicontent_tmpl'     => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'tmpl.php',
+		'flexicontent_security' => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'security.php',
+		'flexicontent_downloadlimit' => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'downloadlimit.php',
+		'flexicontent_db'       => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'db.php',
+		'flexicontent_ajax'     => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'ajax.php',
+		'flexicontent_favs'     => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'favs.php',
+		'flexicontent_images'   => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'images.php',
+		'flexicontent_zip'      => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'zip.php',
+		'flexicontent_csvmedia' => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'csvmedia.php',
+		'flexicontent_remote'   => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'remote.php',
+		'FLEXIUtilities'        => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'flexiutilities.php',
+		'flexicontent_FPDI'     => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'FPDI.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
-JLoader::register('flexicontent_html', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'html.php');
-JLoader::register('flexicontent_upload', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'upload.php');
-JLoader::register('flexicontent_tmpl', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'tmpl.php');
-JLoader::register('flexicontent_security', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'security.php');
-JLoader::register('flexicontent_db', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'db.php');
-JLoader::register('flexicontent_ajax', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'ajax.php');
-JLoader::register('flexicontent_favs', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'favs.php');
-JLoader::register('flexicontent_images', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'images.php');
-JLoader::register('flexicontent_zip', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'zip.php');
-JLoader::register('flexicontent_remote', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'remote.php');
-
-JLoader::register('FLEXIUtilities', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'flexiutilities.php');
-JLoader::register('flexicontent_FPDI', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'FPDI.php');

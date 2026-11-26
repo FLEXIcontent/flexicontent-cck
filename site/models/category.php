@@ -22,7 +22,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Model
@@ -45,6 +44,13 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 * @var int
 	 */
 	var $_ids = array();
+
+	/**
+	 * Excluded category ids (used by AUTHOR layout), their descendants are excluded too
+	 *
+	 * @var array
+	 */
+	var $_excl_ids = array();
 
 	/**
 	 * Category properties
@@ -197,7 +203,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	protected function populateRecordState($ordering = null, $direction = null)
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
@@ -220,6 +226,19 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			case 'author':
 				$this->_authorid = $jinput->get('authorid', 0, 'int');
 				$this->_authorid_slug = $jinput->get('authorid', 0, 'string');
+
+				// Optional multiple categories to include / exclude (in addition to single 'cid')
+				foreach (array('cids' => '_ids', 'excl_cids' => '_excl_ids') as $_var => $_prop)
+				{
+					$_list = $jinput->get($_var, array(), 'array');
+
+					if (!is_array($_list))
+					{
+						$_list = explode(',', preg_replace('/[^0-9,]/i', '', (string) $_list));
+					}
+
+					$this->$_prop = array_values(array_filter(array_unique(ArrayHelper::toInteger($_list))));
+				}
 				break;
 
 			case 'myitems':
@@ -285,10 +304,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$this->setState('filter_order_Dir', $jinput->get('filter_order_Dir', 'ASC', 'cmd'));
 
 		// Get minimum word search length
-		$db = \Joomla\CMS\Factory::getDbo();
-		$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
-		$_dbvariable = $db->loadObject();
-		$min_word_len = (int) @ $_dbvariable->Value;
+		$min_word_len = flexicontent_db::getMinWordLen();
 		$search_prefix = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$min_word_len = !$search_prefix ?  $min_word_len : 1;
 		$app->setUserState($option.'.min_word_len', $min_word_len);
@@ -399,41 +415,81 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$app->input->set('limitstart', $limitstart);
 		$app->input->set('start', $limitstart);
 
-		try {
-			// 2, get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
-			// *** Usage of FOUND_ROWS() will fail when (e.g.) Joom!Fish or Falang are installed, in this case we will be forced to re-execute the query ...
-			// PLUS, we don't need Joom!Fish or Falang layer at --this-- STEP which may slow down the query considerably in large sites
-			$query_limited = $query
-				. ' LIMIT ' . $limit
-				. ' OFFSET ' . $limitstart;
-			$rows = flexicontent_db::directQuery($query_limited);
-			$query_ids = array();
-			foreach ($rows as $row) $query_ids[] = $row->id;
-			//$this->_db->setQuery($query, $limitstart, $limit);
-			//$query_ids = $this->_db->loadColumn();
+		$caps = $this->_getAuthorCaps();
 
-			// 3, get current items total for pagination
-			$this->_db->setQuery("SELECT FOUND_ROWS()");
-			$this->_total = $this->_db->loadResult();
+		if ($caps)
+		{
+			// Author layout with limits: get all ordered ids, apply limits, then paginate the result
+			$rows = flexicontent_db::directQuery($query);
+			$seen = array();
+			$per_cat = array();
+			$all_ids = array();
+
+			foreach ($rows as $row)
+			{
+				if (isset($seen[$row->id])) continue;
+				if ($caps['per_cat'] && (isset($per_cat[$row->lim_catid]) ? $per_cat[$row->lim_catid] : 0) >= $caps['per_cat']) continue;
+
+				$seen[$row->id] = 1;
+				$per_cat[$row->lim_catid] = (isset($per_cat[$row->lim_catid]) ? $per_cat[$row->lim_catid] : 0) + 1;
+				$all_ids[] = (int) $row->id;
+
+				if ($caps['total'] && count($all_ids) >= $caps['total']) break;
+			}
+
+			$this->_total = count($all_ids);
+			$query_ids = $limit > 0 ? array_slice($all_ids, $limitstart, $limit) : $all_ids;
 		}
 
-		catch (Exception $e) {
-			// 2, get items via normal joomla SQL layer
-			$this->_db->setQuery($query, $limitstart, $limit);
-			$query_ids = $this->_db->loadColumn();
+		else
+		{
+			try {
+				// 2, get items, we use direct query because we don't need Joom!Fish or Falang layer at --this-- STEP
+				// which may slow down the query considerably in large sites
+				$query_limited = $query
+					. ' LIMIT ' . $limit
+					. ' OFFSET ' . $limitstart;
+				$rows = flexicontent_db::directQuery($query_limited);
+				$query_ids = array();
+				foreach ($rows as $row) $query_ids[] = $row->id;
+				//$this->_db->setQuery($query, $limitstart, $limit);
+				//$query_ids = $this->_db->loadColumn();
 
-			// 3, get current items total for pagination
-			if (count($query_ids))
-			{
-				$this->_total = null;
-				$this->getTotal();
+				// 3, get current items total for pagination: every row of the list carries it (COUNT(*) OVER() in _buildQuery())
+				if ($rows)
+				{
+					$this->_total = $rows[0]->fc_list_total;
+				}
+
+				// No row to read it from. A page after the last one (or a limit of zero) still needs the total
+				elseif ($limitstart || !$limit)
+				{
+					$this->_total = null;
+					$this->getTotal();
+				}
+				else
+				{
+					$this->_total = 0;
+				}
 			}
-			else
-			{
-				$this->_total = 0;
+
+			catch (Exception $e) {
+				// 2, get items via normal joomla SQL layer
+				$this->_db->setQuery($query, $limitstart, $limit);
+				$query_ids = $this->_db->loadColumn();
+
+				// 3, get current items total for pagination
+				if (count($query_ids))
+				{
+					$this->_total = null;
+					$this->getTotal();
+				}
+				else
+				{
+					$this->_total = 0;
+				}
 			}
 		}
-
 
 		// Assign total number of items found this will be used to decide whether to do item counting per filter value
 		global $fc_catview;
@@ -520,6 +576,25 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	function &getParams()
 	{
 		return $this->_params;
+	}
+
+
+	/**
+	 * Get item limits of AUTHOR layout: total items and items per category (0 = unlimited)
+	 *
+	 * @return array|false  False if no limit is configured
+	 */
+	function _getAuthorCaps()
+	{
+		if ($this->_layout != 'author')
+		{
+			return false;
+		}
+
+		$total   = max(0, (int) $this->_params->get('author_limit_total', 0));
+		$per_cat = max(0, (int) $this->_params->get('author_limit_per_cat', 0));
+
+		return $total || $per_cat ? array('total' => $total, 'per_cat' => $per_cat) : false;
 	}
 
 
@@ -699,16 +774,33 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 		elseif (!$query_ids)
 		{
-			// SQL_CALC_FOUND_ROWS, will cause problems with 3rd-party extensions that modify the query, this will be tried with direct DB query
+			// The total of the list is a column of the list: COUNT(*) OVER(), one statement instead of SQL_CALC_FOUND_ROWS
+			// + FOUND_ROWS(), which MySQL 8.0.17+ deprecates. A window function counts the rows before DISTINCT is applied,
+			// the list is therefore grouped by the item id instead: the same rows, because every other column
+			// of the list has one value per item
+			$list_total = $count_total && !$this->_getAuthorCaps();
+
 			$query = 'SELECT '
-				. ($count_total ? 'SQL_CALC_FOUND_ROWS' : '') . ' DISTINCT i.id '
+				. ($list_total ? '' : ' DISTINCT') . ' i.id '
 				. @ $orderby_col
+				. ($this->_getAuthorCaps() ? ', rel.catid AS lim_catid, (rel.catid <> i.catid) AS lim_notmain' : '')
+				. ($list_total ? ', COUNT(*) OVER() AS fc_list_total' : '')
 				;
 		}
 
 		else
 		{
-			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename, ty.alias AS typealias, rel.catid as rel_catid,'
+			// One row per item, so an item that is in several categories needs a definite one here: the category that the
+			// list ordered it by (see below). That is its main category when the page lists it, else the lowest category id
+			$_page_cats = $this->_data_cats ? implode(',', array_map('intval', $this->_data_cats)) : '';
+			$_on_page   = $_page_cats !== '' ? ' AND rel.catid IN (' . $_page_cats . ')' : '';
+
+			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename, ty.alias AS typealias,'
+				. ' COALESCE('
+				. '  MAX(CASE WHEN rel.catid = i.catid' . $_on_page . ' THEN rel.catid END),'
+				. ($_page_cats !== '' ? '  MIN(CASE WHEN rel.catid IN (' . $_page_cats . ') THEN rel.catid END),' : '')
+				. '  MIN(rel.catid)'
+				. ' ) as rel_catid,'
 				. ' c.title AS maincat_title, c.alias AS maincat_alias,'  // Main category data
 				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
@@ -743,11 +835,43 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 		elseif (!$query_ids)
 		{
+			// Author item limits: the rows of an item (one per category) must come in a fixed order, so that the item
+			// is counted in the same category on every page load: main category first, then by category id
+			$lim_orderby = $this->_getAuthorCaps()
+				? (trim((string) $orderby) !== '' ? ', ' : ' ORDER BY ') . 'lim_notmain, lim_catid'
+				: '';
+
+			// A unique last sort key. Without SQL_CALC_FOUND_ROWS the database may stop sorting at the LIMIT,
+			// and rows with equal sort values could then repeat or go missing across pages
+			$id_orderby = $list_total && trim((string) $orderby) !== '' && strpos($orderby, 'i.id') === false
+				? ', i.id'
+				: '';
+
+			// The list is grouped by item: ordering by category and position (rel.catid, rel.ordering) then needs a definite row
+			// of an item that is in several of the listed categories. As for the author item limits above: the row of its
+			// main category when that category is listed, else the lowest category id
+			if ($list_total && strpos((string) $orderby, 'rel.') !== false)
+			{
+				$orderby = preg_replace('/\brel\.catid\b/',
+					'COALESCE(MAX(CASE WHEN rel.catid = i.catid THEN rel.catid END), MIN(rel.catid))',
+					$orderby
+				);
+
+				// The position inside that same category
+				$orderby = preg_replace('/\brel\.ordering\b/',
+					'COALESCE(MAX(CASE WHEN rel.catid = i.catid THEN rel.ordering END),'
+					. ' SUBSTRING_INDEX(GROUP_CONCAT(rel.ordering ORDER BY rel.catid), \',\', 1) + 0)',
+					$orderby
+				);
+			}
+
 			$query .= ""
 				. @ $orderby_join  // optional
 				. $where . $extra_where
-				//. ' GROUP BY i.id '
+				. ($list_total ? ' GROUP BY i.id ' : '')
 				. $orderby
+				. $id_orderby
+				. $lim_orderby
 				;
 		}
 
@@ -778,7 +902,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		if ( $this->_data_cats!==null ) return $this->_data_cats;
 
 		global $globalcats;
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$ordering = 'c.lft ASC';
 
 		$show_noauth = $this->_params->get('show_noauth', 0);   // show unauthorized items
@@ -852,7 +976,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function _buildAccessSelect()
 	{
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$show_noauth = $this->_params->get('show_noauth', 0);
 
 		$select_access = '';
@@ -1003,8 +1127,8 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $this->getState('option');
-		$user		= \Joomla\CMS\Factory::getUser();
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$user		= \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
@@ -1055,11 +1179,40 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 		if ($this->_id || count($this->_ids))
 		{
-			$id_arr = $this->_id ? array($this->_id) : $this->_ids;
+			$id_arr = array_values(array_unique(array_merge($this->_id ? array($this->_id) : array(), $this->_ids)));
+
+			// Author layout: selected categories always include their descendants, regardless of 'display_subcategories_items'
+			if ($this->_layout == 'author')
+			{
+				foreach ($id_arr as $_sel_id)
+				{
+					if (!empty($globalcats[$_sel_id]->descendantsarray))
+					{
+						foreach ($globalcats[$_sel_id]->descendantsarray as $_sub_id) $id_arr[] = (int) $_sub_id;
+					}
+				}
+				$id_arr = array_values(array_unique($id_arr));
+			}
 			// Get sub categories used to create items list, according to configuration and user access
 			$this->_getDataCats($id_arr);
 			$_data_cats = "'".implode("', '", $this->_data_cats)."'";
 			$where .= ' AND rel.catid IN ('.$_data_cats.')';
+		}
+
+		// Exclude items assigned to given categories (and their descendants), used by AUTHOR layout
+		if ($this->_layout == 'author' && count($this->_excl_ids))
+		{
+			$excl_cats = array();
+			foreach ($this->_excl_ids as $excl_id)
+			{
+				$excl_cats[$excl_id] = 1;
+				if (!empty($globalcats[$excl_id]->descendantsarray))
+				{
+					foreach ($globalcats[$excl_id]->descendantsarray as $subcatid) $excl_cats[(int) $subcatid] = 1;
+				}
+			}
+			$where .= ' AND NOT EXISTS (SELECT 1 FROM #__flexicontent_cats_item_relations AS excl_rel'
+				. ' WHERE excl_rel.itemid = i.id AND excl_rel.catid IN (' . implode(',', array_keys($excl_cats)) . '))';
 		}
 
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
@@ -1090,7 +1243,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		{
 			$lta = 'i';
 			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
-			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 
 		$where .= !FLEXI_J16GE ? ' AND i.sectionid = ' . FLEXI_SECTION : '';
@@ -1172,7 +1325,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$option = $app->input->getCmd('option', '');
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		static $text_search = null;
 
@@ -1217,7 +1370,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			: 'flexicontent_advsearch_index';
 
 		// Try to add space between words for current language using a dictionary
-		$lang_handler = FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getLanguage()->getTag());
+		$lang_handler = FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag());
 		if ($lang_handler)
 		{
 			$text = implode(' ', $lang_handler->get_segment_array($clear_previous = true, trim($text)));
@@ -1229,8 +1382,8 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$text = preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', $text_np);
 
 		// Split to words
-		$words_np = preg_split('/\s\s*/u', $text_np);
-		$words = preg_split('/\s\s*/u', $text);
+		$words_np = flexicontent_db::getBooleanSearchWords(preg_split('/\s\s*/u', $text_np), 'flexicontent_items_tmp', 'title');
+		$words = flexicontent_db::getBooleanSearchWords(preg_split('/\s\s*/u', $text), $si_tbl);
 
 		if (strlen($text))
 		{
@@ -1248,16 +1401,24 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 			/*
 			 * LIKE %word% search (needed by languages without spaces),
-			 * (1) Skip / Ignore this for languages with spaces,
+			 * (1) Skip / Ignore this for languages with spaces, unless the searched text itself is Chinese or Japanese
 			 * (2) Skip / Ignore this if current language supports splitting via dictionary
 			 */
-			if ($filter_word_like_any
-				&& in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th'))
-				&& ! FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getLanguage()->getTag(), $_hasHandlerOnly = true)
-			)
+			if (flexicontent_db::useLikeSearch($filter_word_like_any, $text_np))
 			{
-				$_index_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
-				$_title_relev = ' LOWER (i.title) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
+				// The text without the search prefix, because it is also matched inside the words of the index
+				$_index_match = flexicontent_db::getLikeSearchCondition($ts . '.search_index', $text_np, $phrase, $search_prefix);
+				$_title_relev = flexicontent_db::getLikeSearchCondition('i.title', $text_np, $phrase);
+
+				// Needed by "Most relevant first: Yes". Without it the relevance column was empty: an SQL syntax error
+				$_index_relev = $_index_match;
+			}
+
+			elseif (($terms = flexicontent_db::getQuotedSearchTerms($text_np, $phrase)) !== null)
+			{
+				$_index_match = flexicontent_db::getQuotedFulltextCondition($ts . '.search_index', $terms, $phrase, $search_prefix);
+				$_title_relev = flexicontent_db::getQuotedFulltextCondition('i.title', $terms, $phrase);
+				$_index_relev = $_index_match;
 			}
 
 			/*
@@ -1293,12 +1454,12 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 				case 'exact':
 					// Speed optimization ... 2-level searching: first require ALL words via FULLTEXT index, then require exact text via LIKE %phrase%
 					$newtext = '+' . implode(' +', $words);
-					$escaped_text = $db->escape($newtext, true);
+					$escaped_text = $db->escape($newtext);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
 					// Relevance by title, try to match (EXACT) words, via OR ignoring stop words and short words ...
 					$newtext_np = implode(' ', $words_np);
-					$escaped_text_np = $db->escape($newtext_np, true);
+					$escaped_text_np = $db->escape($newtext_np);
 					$quoted_text_np  = $db->Quote($escaped_text_np, false);
 
 					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND '.$ts.'.search_index LIKE '.$exact_text;
@@ -1308,12 +1469,12 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 				case 'all':
 					$newtext = '+' . implode( '* +', $words ) . '*';
-					$escaped_text = $db->escape($newtext, true);
+					$escaped_text = $db->escape($newtext);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
 					// Relevance by title, try to match (PREFIXED) words, via OR ignoring stop words and short words ...
 					$newtext_np = implode( '* ', $words_np ) . '*';
-					$escaped_text_np = $db->escape($newtext_np, true);
+					$escaped_text_np = $db->escape($newtext_np);
 					$quoted_text_np  = $db->Quote($escaped_text_np, false);
 
 					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
@@ -1324,12 +1485,12 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 				case 'any':
 				default:
 					$newtext = implode( '* ', $words ) . '*';
-					$escaped_text = $db->escape($newtext, true);
+					$escaped_text = $db->escape($newtext);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
 					// Relevance by title, try to match (PREFIXED) words, via OR ignoring stop words and short words ...
 					$newtext_np = implode( '* ', $words_np ) . '*';
-					$escaped_text_np = $db->escape($newtext_np, true);
+					$escaped_text_np = $db->escape($newtext_np);
 					$quoted_text_np  = $db->Quote($escaped_text_np, false);
 
 					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
@@ -1563,7 +1724,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function _buildChildsQuery($id=0)
 	{
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
 
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled
@@ -1611,9 +1772,62 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function _getassigned($id)
 	{
+		$counts = $this->_getassignedMany(array((int) $id));
+
+		return $counts[(int) $id];
+	}
+
+
+	/**
+	 * Method to get the number of assigned items of several categories (each including its sub-categories)
+	 * with one query
+	 *
+	 * @param   int[]  $ids  Category ids
+	 *
+	 * @return  int[]  Item count per category id
+	 */
+	function _getassignedMany($ids)
+	{
 		global $globalcats;
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+
+		$ids = array_values(array_unique(array_map('intval', $ids)));
+
+		if (!$ids)
+		{
+			return array();
+		}
+
+		// Map every counted category to the requested category whose sub-tree contains it. The sub-trees of
+		// sibling categories do not overlap, so COUNT(DISTINCT itemid) per group equals one count per category.
+		// If they do overlap (e.g. a multi-category view of nested categories), count each category separately.
+		$tree_of = array();
+		$overlap = false;
+
+		foreach ($ids as $id)
+		{
+			$list = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
+
+			foreach (array_map('intval', explode(',', $list)) as $catid)
+			{
+				$overlap = $overlap || isset($tree_of[$catid]);
+				$tree_of[$catid] = $id;
+			}
+		}
+
+		if ($overlap && count($ids) > 1)
+		{
+			$counts = array();
+
+			foreach ($ids as $id)
+			{
+				$counts += $this->_getassignedMany(array($id));
+			}
+
+			return $counts;
+		}
+
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		// Get the view's parameters
 		$use_tmp = true;
@@ -1647,7 +1861,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		{
 			$lta = $use_tmp ? 'i': 'ie';
 			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
-			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
@@ -1673,8 +1887,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		}
 
 		// Count items according to full depth level !!!
-		$catlist = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
-		$where .= ' AND rel.catid IN ('.$catlist.')';
+		$where .= ' AND rel.catid IN (' . implode(',', array_keys($tree_of)) . ')';
 
 		// Select only items that user has view access, if listing of unauthorized content is not enabled
 		// Checking item, category, content type access level
@@ -1687,7 +1900,15 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$where .= ' AND  i.access IN (0,'.$aid_list.')';
 		}
 
-		$query 	= 'SELECT COUNT(DISTINCT rel.itemid)'
+		// Group by the requested category that each counted category belongs to
+		$group_of = array();
+
+		foreach ($ids as $id)
+		{
+			$group_of[] = ' WHEN rel.catid IN (' . implode(',', array_keys($tree_of, $id, true)) . ') THEN ' . $id;
+		}
+
+		$query 	= 'SELECT CASE' . implode('', $group_of) . ' END AS cnt_catid, COUNT(DISTINCT rel.itemid) AS cnt'
 			. ' FROM #__flexicontent_cats_item_relations AS rel'
 			. (!$use_tmp ?
 				' JOIN #__content AS i ON rel.itemid = i.id' :
@@ -1696,12 +1917,17 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			. ' JOIN #__flexicontent_types AS ty ON ' .(!$use_tmp ? 'ie' : 'i'). '.type_id = ty.id'
 			. ' JOIN #__categories AS mc ON mc.id =   i.catid AND mc.published = 1'
 			. $where
+			. ' GROUP BY cnt_catid'
 			;
 
-		$db->setQuery($query);
-		$assigneditems = $db->loadResult();
+		$counts = array_fill_keys($ids, 0);
 
-		return $assigneditems;
+		foreach ($db->setQuery($query)->loadObjectList() as $row)
+		{
+			$counts[(int) $row->cnt_catid] = (int) $row->cnt;
+		}
+
+		return $counts;
 	}
 
 
@@ -1714,7 +1940,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function _getsubs($id)
 	{
-		$user			= \Joomla\CMS\Factory::getUser();
+		$user			= \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
 
 		// Where
@@ -1751,6 +1977,55 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $subcats;
 	}
 
+
+	/**
+	 * Method to return the sub categories of several categories with one query
+	 *
+	 * @param   int[]  $ids  Parent category ids
+	 *
+	 * @return  array  Per parent id, the same list of objects (with an 'id' property) that _getsubs() returns
+	 */
+	function _getsubsMany($ids)
+	{
+		$ids = array_values(array_unique(array_map('intval', $ids)));
+
+		if (!$ids)
+		{
+			return array();
+		}
+
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
+
+		$where = ' WHERE c.published = 1'
+			. ' AND c.parent_id IN (' . implode(',', $ids) . ')';
+
+		// Select only categories that user has view access, if listing of unauthorized content is not enabled
+		if (!$show_noauth)
+		{
+			$aid_list = implode(',', \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id));
+			$where .= ' AND c.access IN (0,' . $aid_list . ')';
+		}
+
+		// No DISTINCT: the join to the creator is one-to-one, so no category can be returned twice,
+		// and MySQL's ONLY_FULL_GROUP_BY mode rejects DISTINCT with an ordering column that is not selected
+		$query = 'SELECT c.id, c.parent_id'
+			. ' FROM #__categories as c'
+			. ' LEFT JOIN #__users AS u ON u.id = c.created_user_id'
+			. $where
+			. $this->_buildCatOrderBy()
+			;
+
+		$subcats = array();
+
+		foreach ($this->_db->setQuery($query)->loadObjectList() as $row)
+		{
+			$subcats[(int) $row->parent_id][] = (object) array('id' => $row->id);
+		}
+
+		return $subcats;
+	}
+
 	/**
 	 * Method to get the children of a category
 	 *
@@ -1763,7 +2038,8 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		// Make sure category has been loaded
 		$this->getCategory();
 
-		if (!$this->_id && !count($this->_ids))
+		// Author layout lists only items, category filters must not produce sub-category links
+		if ($this->_layout == 'author' || (!$this->_id && !count($this->_ids)))
 		{
 			return array();
 		}
@@ -1776,24 +2052,18 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$query = $this->_buildChildsQuery();
 		$this->_childs = $this->_getList($query);
 
-		$k = 0;
-		$count = count($this->_childs);
+		// Item counts and sub-category lists of all children, one query each (was two queries per child)
+		$ids = array_map(function ($c) { return (int) $c->id; }, $this->_childs);
 
-		for ($i = 0; $i < $count; $i++)
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		$counts  = $show_itemcount ? $this->_getassignedMany($ids) : array();
+		if ( $print_logging_info ) @$fc_run_times['item_counting_sub_cats'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		$subcats = $this->_getsubsMany($ids);
+
+		foreach ($this->_childs as $category)
 		{
-			$category = & $this->_childs[$i];
-			$category->assigneditems = null;
-
-			if ($show_itemcount)
-			{
-				if ( $print_logging_info )  $start_microtime = microtime(true);
-				$category->assigneditems = $this->_getassigned( $category->id );
-				if ( $print_logging_info ) @$fc_run_times['item_counting_sub_cats'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			}
-
-			$category->subcats = $this->_getsubs($category->id);
-
-			$k = 1 - $k;
+			$category->assigneditems = $show_itemcount ? ($counts[(int) $category->id] ?? 0) : null;
+			$category->subcats = $subcats[(int) $category->id] ?? array();
 		}
 
 		return $this->_childs;
@@ -1826,23 +2096,18 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$query = $this->_buildChildsQuery($this->_category->parent_id);
 		$this->_peers = $this->_getList($query);
 
-		$k = 0;
-		$count = count($this->_peers);
+		// Item counts and sub-category lists of all peers, one query each (was two queries per peer)
+		$ids = array_map(function ($c) { return (int) $c->id; }, $this->_peers);
 
-		for ($i = 0; $i < $count; $i++)
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		$counts  = $show_itemcount ? $this->_getassignedMany($ids) : array();
+		if ( $print_logging_info ) @$fc_run_times['item_counting_peer_cats'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		$subcats = $this->_getsubsMany($ids);
+
+		foreach ($this->_peers as $category)
 		{
-			$category =& $this->_peers[$i];
-			$category->assigneditems = null;
-			if ($show_itemcount)
-			{
-				if ( $print_logging_info )  $start_microtime = microtime(true);
-				$category->assigneditems = $this->_getassigned( $category->id );
-				if ( $print_logging_info ) @$fc_run_times['item_counting_peer_cats'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			}
-
-			$category->subcats = $this->_getsubs($category->id);
-
-			$k = 1 - $k;
+			$category->assigneditems = $show_itemcount ? ($counts[(int) $category->id] ?? 0) : null;
+			$category->subcats = $subcats[(int) $category->id] ?? array();
 		}
 
 		return $this->_peers;
@@ -1865,7 +2130,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 		// Initialize some vars
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Set a specific id
 		if ($pk)
@@ -2502,6 +2767,13 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			// Always add these
 			$params->set( 'item_depth', $menu_params->get('item_depth') );
 			$params->set( 'pageclass_sfx', $menu_params->get('pageclass_sfx') );
+
+			// Author layout item limits are menu item settings (not part of the overridable category configuration)
+			if ($this->_layout == 'author')
+			{
+				$params->set( 'author_limit_total', $menu_params->get('author_limit_total', 0) );
+				$params->set( 'author_limit_per_cat', $menu_params->get('author_limit_per_cat', 0) );
+			}
 		}
 
 
@@ -2695,13 +2967,13 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			else if ( !$return_sql )
 			{
 				//echo "<br>GET FILTERED Items (cat model) -- [".$filter->name."] using in-query ids :<br>". $query."<br>\n";
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 				$db->setQuery($query);
 				$filtered = $db->loadColumn();
 			}
 			else if ($return_sql===2)
 			{
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 				static $iids_tblname  = array();
 				if ( !isset($iids_tblname[$filter->id]) ) {
 					$iids_tblname[$filter->id] = 'fc_filter_iids_'.$filter->id;
@@ -2821,7 +3093,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			foreach ($this->_data as $item) $item_ids[] = $item->id;
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT COUNT(com.object_id) AS total, com.object_id AS item_id'
 		      . ' FROM #__jcomments AS com'
 		      . ' WHERE com.object_id in (' . implode(',',$item_ids) .')'
@@ -2863,7 +3135,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 	public function logSearch($search_term)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_search');
 		$enable_log_searches = $params->get('enabled');
 
@@ -2915,7 +3187,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function getFavoured()
 	{
-		return flexicontent_db::getFavoured($type=1, $this->_id, \Joomla\CMS\Factory::getUser()->id);
+		return flexicontent_db::getFavoured($type=1, $this->_id, \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
 	}
 
 
@@ -2928,7 +3200,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function removefav()
 	{
-		return flexicontent_db::removefav($type=1, $this->_id, \Joomla\CMS\Factory::getUser()->id);
+		return flexicontent_db::removefav($type=1, $this->_id, \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
 	}
 
 
@@ -2941,7 +3213,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function addfav()
 	{
-		return flexicontent_db::addfav($type=1, $this->_id, \Joomla\CMS\Factory::getUser()->id);
+		return flexicontent_db::addfav($type=1, $this->_id, \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
 	}
 
 

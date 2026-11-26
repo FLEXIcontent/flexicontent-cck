@@ -19,8 +19,6 @@
 // Check to ensure this file is included in Joomla!
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('cms.plugin.plugin');
-
 /**
  * Flexicontent Notification Plugin
  *
@@ -92,7 +90,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		$plugin  = \Joomla\CMS\Plugin\PluginHelper::getPlugin('flexicontent', 'flexinotify');
 		$params  = new \Joomla\Registry\Registry($plugin->params);
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		$debug_notifications = (int) $params->get('debug_notifications', 0);
 
@@ -143,7 +141,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 
 			if (empty($owners_notified[$item->id]))
 			{
-				$owner = \Joomla\CMS\Factory::getUser($item->created_by);
+				$owner = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $item->created_by);
 				$this->sendOwnerNotification($item, $owner, $params);
 
 				// Set flag to avoid resending notification
@@ -209,7 +207,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 
 	function _getSubscribers($itemid)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query	= 'SELECT u.* '
 				.' FROM #__flexicontent_favourites AS f'
@@ -242,15 +240,12 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 
 		$categories = $globalcats;
 		$app        = \Joomla\CMS\Factory::getApplication();
-		$config     = \Joomla\CMS\Factory::getConfig();
+		$config     = \Joomla\CMS\Factory::getApplication()->getConfig();
 
 		// Get the route helper
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
-		// Import joomla mail helper class that contains the sendMail helper function
-		jimport('joomla.mail.helper');
-
-		$mailer = \Joomla\CMS\Factory::getMailer();
+		$mailer = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Mail\MailerFactoryInterface::class)->createMailer();
 		$mailer->Encoding = 'base64';
 
 		/**
@@ -310,12 +305,12 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		 * Create parameters passed to mail helper function
 		 */
 
-		$site_info  = $app->getCfg('sitename') . ' - ' . \Joomla\CMS\Uri\Uri::root();
-		$sendermail	= $params->get('sendermail', $app->getCfg('mailfrom'));
+		$site_info  = $app->get('sitename') . ' - ' . \Joomla\CMS\Uri\Uri::root();
+		$sendermail	= $params->get('sendermail', $app->get('mailfrom'));
 		$sendermail	= \Joomla\CMS\Mail\MailHelper::cleanAddress($sendermail);
 
 		// Use 'sitename' as sender name
-		$sendername	= $params->get('sendername', $app->getCfg('sitename'));
+		$sendername	= $params->get('sendername', $app->get('sitename'));
 
 		// Use custom message subject if this is set
 		$subject = $params->get('mailsubject_owner', '')
@@ -383,15 +378,12 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		$categories = $globalcats;
 
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$config = \Joomla\CMS\Factory::getConfig();
+		$config = \Joomla\CMS\Factory::getApplication()->getConfig();
 
 		// Get the route helper
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
-		// Import joomla mail helper class that contains the sendMail helper function
-		jimport('joomla.mail.helper');
-
-		$mailer = \Joomla\CMS\Factory::getMailer();
+		$mailer = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Mail\MailerFactoryInterface::class)->createMailer();
 		$mailer->Encoding = 'base64';
 
 		$debug_notifications = (int) $params->get('debug_notifications', 0);
@@ -451,12 +443,12 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		 * Create parameters passed to mail helper function
 		 */
 
-		$site_info  = $app->getCfg('sitename') . ' - ' . \Joomla\CMS\Uri\Uri::root();
-		$sendermail	= $params->get('sendermail', $app->getCfg('mailfrom'));
+		$site_info  = $app->get('sitename') . ' - ' . \Joomla\CMS\Uri\Uri::root();
+		$sendermail	= $params->get('sendermail', $app->get('mailfrom'));
 		$sendermail	= \Joomla\CMS\Mail\MailHelper::cleanAddress($sendermail);
 
 		// Use 'sitename' as sender name
-		$sendername	= $params->get('sendername', $app->getCfg('sitename'));
+		$sendername	= $params->get('sendername', $app->get('sitename'));
 
 		// Use custom message subject if this is set
 		$subject	= $params->get('mailsubject', '')
@@ -505,7 +497,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 				if ($send_result) $count_sent++;
 			}
 
-			$send_result = (boolean) $count_sent;
+			$send_result = (bool) $count_sent;
 			if ($debug_notifications)
 			{
 				$app->enqueueMessage("** Notification Plugin: &nbsp; Sent personalized message per subscriber", 'message');
@@ -543,7 +535,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 				if ($send_result) $count_sent += count($to_100);
 			}
 
-			$send_result = (boolean) $count_sent;
+			$send_result = (bool) $count_sent;
 			if ($debug_notifications)
 			{
 				$app->enqueueMessage("** Notification Plugin: &nbsp; Sent same message to all subscribers", 'message');

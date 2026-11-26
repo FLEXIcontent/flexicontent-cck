@@ -1259,6 +1259,10 @@ td.col_edit_layout {
   /* SELECT2 */
   /* Single-choice */
   /* Multi-choises */
+  /* CHOICES.JS (equivalent of the SELECT2 width rules above) */
+  /* Single-choice */
+  /* Multi-choices */
+  /* Double size filters */
 }
 .flexicontent #fc-filters-box .fc-filter.fc-filter-double {
   min-width: 628px;
@@ -1401,6 +1405,34 @@ td.col_edit_layout {
   line-height: calc(var(--form-inp-height) - 2px) !important;
   min-height: calc(var(--form-inp-height) - 2px) !important;
 }
+.flexicontent #fc-filters-box .fc-filter .choices {
+  width: 196px !important;
+}
+.flexicontent #fc-filters-box .fc-filter .choices[data-type*="select-multiple"] {
+  width: 206px !important;
+}
+.flexicontent #fc-filters-box .fc-filter.fc-filter-double .choices {
+  width: 482px !important;
+}
+.flexicontent #fc-filters-box .fc-filter.fc-filter-double .choices[data-type*="select-multiple"] {
+  width: 490px !important;
+}
+/* Reorder toolbar filter selects: these .fc-filter are rendered outside
+   #fc-filters-box (into #fcorder_notes_box / #fc_fieldtype_filter_box),
+   so they need their own Choices width rules.
+   display:inline-block keeps them on the same line as the floated label:
+   without it the plain block .choices loses its BFC when the dropdown opens
+   and drops to the next line. */
+.flexicontent #fcorder_notes_box .choices,
+.flexicontent #fc_fieldtype_filter_box .choices {
+  width: 196px !important;
+  display: inline-block !important;
+  vertical-align: top;
+}
+.flexicontent #fcorder_notes_box .choices[data-type*="select-multiple"],
+.flexicontent #fc_fieldtype_filter_box .choices[data-type*="select-multiple"] {
+  width: 206px !important;
+}
 #s2id_scope.select2-container.use_select2_lib {
   margin: 0;
   display: inherit;
@@ -1465,7 +1497,7 @@ td.col_edit_layout {
     display: none;
   }
 }
-div#fc-filters-slide-btn {
+button#fc-filters-slide-btn {
   border: 0;
   background: none;
   box-shadow: none;
@@ -1705,7 +1737,14 @@ div.statetoggler > div.statetoggler_inner {
   min-height: auto;
   min-width: auto;
 }
-div.statetoggler > div.statetoggler_inner > div.stateopener {
+div.statetoggler > div.statetoggler_inner > button.stateopener,
+div.statetoggler > div.statetoggler_inner > .options > button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+}
+div.statetoggler > div.statetoggler_inner > .stateopener {
   line-height: auto;
   height: auto;
   width: auto;
@@ -1719,8 +1758,8 @@ div.statetoggler > div.statetoggler_inner > div.stateopener {
   text-decoration: none;
   position: relative;
 }
-div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_expired,
-div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_scheduled {
+div.statetoggler > div.statetoggler_inner > .stateopener span.fc_expired,
+div.statetoggler > div.statetoggler_inner > .stateopener span.fc_scheduled {
   position: absolute;
   left: -2px;
   right: -2px;
@@ -1730,17 +1769,17 @@ div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_scheduled {
   border-bottom: 1px solid gray;
   opacity: 1;
 }
-div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_expired + span:before,
-div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_scheduled + span:before {
+div.statetoggler > div.statetoggler_inner > .stateopener span.fc_expired + span:before,
+div.statetoggler > div.statetoggler_inner > .stateopener span.fc_scheduled + span:before {
   opacity: 0.4;
   color: black;
 }
-div.statetoggler > div.statetoggler_inner > div.stateopener.ajax-loader {
+div.statetoggler > div.statetoggler_inner > .stateopener.ajax-loader {
   background-position: center;
   padding: 8px;
   margin: -1px -1px -1px -1px;
 }
-div.statetoggler > div.statetoggler_inner > div.stateopener img {
+div.statetoggler > div.statetoggler_inner > .stateopener img {
   padding: 0;
   margin: 0;
   border: none;
@@ -1766,7 +1805,7 @@ div.statetoggler > div.statetoggler_inner > .options {
   box-sizing: border-box;
 }
 div.statetoggler > div.statetoggler_inner > .options > div,
-div.statetoggler > div.statetoggler_inner > .options > span {
+div.statetoggler > div.statetoggler_inner > .options > :is(span, button) {
   position: relative;
   float: right;
   clear: both;
@@ -1782,7 +1821,6 @@ div.statetoggler > div.statetoggler_inner > .options > span {
   min-width: auto;
   background: none repeat scroll 0 0 transparent;
   color: black;
-  outline: none;
   text-decoration: none;
   white-space: nowrap;
   text-align: right;
@@ -1793,19 +1831,19 @@ div.statetoggler > div.statetoggler_inner > .options > div {
   text-align: center;
   font-weight: bold;
 }
-div.statetoggler > div.statetoggler_inner > .options > span:hover {
+div.statetoggler > div.statetoggler_inner > .options > :is(span, button):hover {
   background-color: #e7e7e7;
   background-image: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
 }
-div.statetoggler > div.statetoggler_inner > .options > span > span,
-div.statetoggler > div.statetoggler_inner > .options > span > img {
+div.statetoggler > div.statetoggler_inner > .options > :is(span, button) > span,
+div.statetoggler > div.statetoggler_inner > .options > :is(span, button) > img {
   max-width: unset;
   padding: 0;
   margin: 0 0.5em 0 0;
   border: none;
   box-sizing: unset;
 }
-div.statetoggler > div.statetoggler_inner > .options > span > img {
+div.statetoggler > div.statetoggler_inner > .options > :is(span, button) > img {
   display: unset;
 }
 /************
@@ -2630,13 +2668,45 @@ body .icon-flexicontent:before {
   text-align: right;
   float: right;
   width: 98%;
-  display: inline-block;
+  display: block;
   clear: both;
   box-sizing: border-box;
+  padding: 12px 16px !important;
+  background-image: none;
+  font-size: 13px;
+  line-height: 1.5;
 }
 .flexicontent #fc_perf_box {
   margin: 12px 0% 48px;
   width: 100%;
+}
+#fc_perf_box .fc-perf-summary,
+#fc_perf_box .fc-perf-plugin-time {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+#fc_perf_box .fc-perf-details {
+  font-size: 12px;
+  line-height: 1.5;
+}
+#fc_perf_box .fc-perf-details > br:first-child {
+  display: none;
+}
+#fc_perf_box .fc-perf-details small {
+  display: block;
+  padding-inline-start: 20px;
+  opacity: 0.85;
+}
+#fc_perf_box .fc-perf-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px 16px;
+  margin: 6px 0;
+}
+#fc_perf_box .fc-perf-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 /****************************
  * Versioning TAB (item form)
@@ -2855,6 +2925,7 @@ ul.fcrecords {
 .records_container > ul > li.fcrecord .addfield_handle,
 .records_container > ul > li.fcrecord .delfield_handle {
   display: inline-block;
+  box-sizing: content-box; /* buttons: keep the span sizing */
   width: 18px;
   height: 16px;
   line-height: 16px;
@@ -3270,9 +3341,16 @@ a.fc_assoc_translation:before {
 }
 body div .fc-del-filter-icon {
   color: #bd362f;
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: inherit;
   /*color: #942a25; color: darkred;*/
   font-size: 12px !important;
   cursor: pointer;
+}
+button.badge {
+  border: 0;
 }
 /*******
  * Forms
@@ -5087,22 +5165,27 @@ div#permissions .tab-content {
 .fcfile_actions {
   margin: 4px;
   clear: both;
-  display: block;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
   width: 100% !important;
   box-sizing: border-box !important;
 }
 .fcfile_actions > a,
+.fcfile_actions > button,
 .fcfile_actions > input,
 .fcfile_actions > form > input {
-  margin: 4px 0;
-  width: 100% !important;
+  margin: 0;
+  width: fit-content !important;
+  max-width: 100%;
   box-sizing: border-box !important;
 }
 .fcfile_actions > form {
-  width: 100% !important;
+  width: fit-content !important;
+  max-width: 100%;
   box-sizing: border-box !important;
-  margin: 0px !important;
-  padding: 0px !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 /* File field viewing: totals */
 .fcfile_total {
@@ -5121,9 +5204,10 @@ div#permissions .tab-content {
   margin-bottom: 2px;
 }
 .fcfile_actions.fcfile_compact > a,
+.fcfile_actions.fcfile_compact > button,
 .fcfile_actions.fcfile_compact > input,
 .fcfile_actions.fcfile_compact > form > input {
-  width: unset !important;
+  width: fit-content !important;
 }
 /* Image field viewing: thumbnails */
 img.fc_field_image {
@@ -5746,6 +5830,8 @@ div table.adminform td {
 .fav-block .fcfavs-icon_box {
   display: inline-flex;
   line-height: 100%;
+  /* Checkbox of the toggle button: not shown, but it takes the click, the Tab key and the Space key */
+  /* SVG heart of toggle styles 0 and 1: an outline when not a favourite, filled when a favourite */
 }
 .fav-block .fcfavs-icon_box * {
   line-height: 100%;
@@ -5770,6 +5856,41 @@ div table.adminform td {
   cursor: pointer;
   display: inline-block;
   box-sizing: content-box;
+}
+.fav-block .fcfavs-icon_box .fcfavs-toggle-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+}
+.fav-block .fcfavs-icon_box .fcfavs-toggle-input:focus-visible + * {
+  outline: 2px solid var(--fcfavs-color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.fav-block .fcfavs-icon_box .fcfavs-svg_icon {
+  width: 28px;
+  height: 28px;
+  vertical-align: middle;
+  fill: transparent;
+  stroke: #000;
+  stroke-width: 1;
+  stroke-linejoin: round;
+  transition: fill 0.15s, stroke 0.15s;
+}
+.fav-block .fcfavs-icon_box .fcfavs-svg_icon.fcfavs-heart-fill {
+  fill: #f44336;
+  stroke: #f44336;
+}
+.fav-block .fcfavs-icon_box .fcfavs-svg_icon.fcfavs-svg_login {
+  fill: #303c42;
+  stroke: #303c42;
 }
 .fav-block .fcfavs-icon_box [class^="fcfavs"],
 .fav-block .fcfavs-icon_box [class*=" fcfavs"] {
@@ -5928,6 +6049,11 @@ div table.adminform td {
   position: absolute;
   line-height: 100%;
 }
+@media (prefers-reduced-motion: reduce) {
+  .fav-block .fcfavs-icon_box .fcfavs-svg_icon {
+    transition: none;
+  }
+}
 /***********
  * JComments
  ***********/
@@ -6032,14 +6158,18 @@ dl.tabs dt a:link,
   text-decoration: none;
   background: none;
 }
-div.current {
+div.current:not(.gslide) {
   border: 1px solid #cccccc;
   clear: both;
   padding: 10px 10px;
 }
-div.current dd {
+div.current:not(.gslide) dd {
   margin: 0;
   padding: 0;
+}
+div[class^="glightbox_fccontainer_"] {
+  display: flex;
+  flex-wrap: wrap;
 }
 #bottom-block {
   margin: 0 auto;
@@ -6147,6 +6277,64 @@ fc_search_result_category .fc-mssg-inline {
 .flexicontent.fcsearch .fc_mublock {
   display: block;
   float: left;
+}
+.flexicontent.fcsearch .fc_search_result_meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  clear: both;
+  margin: 4px 0 6px 0;
+}
+.flexicontent.fcsearch .fc_search_result_meta .fc_search_result_category {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+.flexicontent.fcsearch .fc_search_result_meta .fc-mssg-inline {
+  margin: 0;
+}
+.flexicontent.fcsearch .fc_search_result_fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  clear: both;
+  margin-top: 10px;
+}
+.flexicontent.fcsearch .fc_search_result_fields .fc_search_field_container {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid #d0d7e2;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #ffffff;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.flexicontent.fcsearch .fc_search_result_fields .fc_search_field_label {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px 3px 12px;
+  margin: 0;
+  background: #eef2f7;
+  border-radius: 0;
+  color: #4a5568;
+  font-size: 12px;
+  font-weight: 600;
+  text-shadow: none;
+  white-space: nowrap;
+}
+.flexicontent.fcsearch .fc_search_result_fields .fc_search_field_value {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px 3px 10px;
+  color: #1f2933;
+}
+.flexicontent.fcsearch .fc_search_result_fields .fc_search_field_value * {
+  display: inline;
+  margin: 0;
+  padding: 0;
 }
 /************************************************************************
  * Frontend templates: Some CSS HACKS/RULES (to fix alignment & wrapping)
@@ -6498,3 +6686,15 @@ div.fc-field-box {
 h2.fc_search_result_title a {
   text-decoration: none;
 }
+/** fix swiper **/
+.swiper.fc_swiper_main {
+  width: 100% !important;
+}
+
+/* Wrap navigation controls instead of clipping letters or expanding the page. */
+#flexicontent .pagination { flex-wrap: wrap; max-width: 100%; }
+#fc_alpha .aichargrp {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 2px;
+  float: none; position: static; width: 100%;
+}
+#fc_alpha .fc_alpha_index { float: none; position: static; }

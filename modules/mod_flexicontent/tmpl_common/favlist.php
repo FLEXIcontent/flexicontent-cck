@@ -1,11 +1,11 @@
 <?php
 if ($params->get('display_favlist', 0))
 {
-	$document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/modules/mod_flexicontent/tmpl_common/js/favlist.js');
+	$wa->registerAndUseScript('mod_flexicontent.favlist', 'modules/mod_flexicontent/tmpl_common/js/favlist.js', [], [], ['core']);
 
 	echo '
 	<p class="news_favs_head">' . \Joomla\CMS\Language\Text::_('FLEXI_MOD_RECENTLY_ADDED_FAVOURITES') . '</p>
-	<div id="mod_fc_favlist"></div>
+	<div id="mod_fc_favlist_' . (int) $module->id . '" class="mod_fc_favlist"></div>
 	';
 
 	$layouts_path = null; //realpath(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core');
@@ -38,22 +38,8 @@ if ($params->get('display_favlist', 0))
 	$forced_itemid = $params->get('forced_itemid');
 	$alt_add = \Joomla\CMS\Language\Text::_( 'FLEXI_FAVOURE' );
 	$alt_delete = \Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_FAVOURITE' );
-	$js = '
-		if (typeof jQuery != "undefined")
-		{
-			jQuery(document).ready(function()
-			{
-				var fcfavs_list = new fclib_createCookieList("fcfavs_recent");
-				var fcfavs_box = jQuery("div#mod_fc_favlist");
-				fcfavs_list_update(fcfavs_list, fcfavs_box);
 
-				if (jQuery.ui)
-				{
-					fcfavs_box.sortable();
-				}
-				jQuery("span.fcfav-toggle-btn").bind("click", favicon_clicked);
-			});
-		}
-  ';
-	$document->addScriptDeclaration($js);
+	// Native cookie rendering and Sortable use no jQuery assets.
+	flexicontent_html::loadFramework('flexi-lib');
+	flexicontent_html::loadFramework('sortable');
 }

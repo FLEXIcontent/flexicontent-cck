@@ -14,7 +14,13 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentControllerBaseAdmin' => JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 // Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
 require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'review.php';
@@ -46,6 +52,26 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	var $exitSuccess  = true;
 
 	/**
+	 * Internal voting mode: ajaxvote() is called by PHP code (e.g. when a review is saved),
+	 * it throws exceptions on errors and returns the result, instead of sending a response
+	 *
+	 * @var boolean
+	 */
+	protected $voteInternal = false;
+
+	/**
+	 * Method to set the internal voting mode
+	 *
+	 * @param   boolean  $internal  True to enable the internal mode
+	 *
+	 * @return  void
+	 */
+	public function setVoteInternal($internal = true)
+	{
+		$this->voteInternal = (bool) $internal;
+	}
+
+	/**
 	 * Constructor
 	 *
 	 * @param   array   $config    associative array of configuration settings.
@@ -55,6 +81,10 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	public function __construct($config = array())
 	{
 		parent::__construct($config);
+
+		// Language of the voting field (reviews strings live in the field's language file)
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
 
 		// Register task aliases
 		$this->registerTask('add',          'edit');
@@ -176,7 +206,44 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	 */
 	public function remove()
 	{
-		parent::remove();
+		// Remember the ratings of the selected reviews, they are also votes of the reviewed items
+		$cid = ArrayHelper::toInteger($this->input->get('cid', array(), 'array'));
+		$rated = array();
+
+		if (count($cid))
+		{
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$rated = $db->setQuery(
+				'SELECT id, content_id, average_rating, custom_ratings FROM #__' . $this->records_dbtbl
+				. ' WHERE id IN (' . implode(',', $cid) . ') AND content_id > 0 AND average_rating > 0'
+			)->loadObjectList('id');
+		}
+
+		$result = parent::remove();
+
+		// Remove the votes of the reviews that were actually deleted (permissions / locks may skip some records)
+		if (count($rated))
+		{
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$existing = $db->setQuery(
+				'SELECT id FROM #__' . $this->records_dbtbl . ' WHERE id IN (' . implode(',', array_keys($rated)) . ')'
+			)->loadColumn();
+
+			foreach ($rated as $id => $row)
+			{
+				if (!in_array($id, $existing))
+				{
+					$this->_applyRatingChange((int) $row->content_id, (int) $row->average_rating, 0);
+
+					if (trim((string) $row->custom_ratings) !== '')
+					{
+						$this->_applyCompositeChange((int) $row->content_id, (array) json_decode((string) $row->custom_ratings, true), array());
+					}
+				}
+			}
+		}
+
+		return $result;
 	}
 
 
@@ -193,7 +260,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken() or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$cid    = $this->input->get('cid', array(), 'array');
 		$cid    = ArrayHelper::toInteger($cid);
@@ -201,7 +268,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		$value  = ArrayHelper::getValue($values, $this->task, 0, 'int');
 
 		// Access checks, these are done against the content item that is being reviewed
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$content_ids = count($cid)
 			? $db->setQuery('SELECT id, content_id FROM #__' . $this->records_dbtbl . ' WHERE id IN (' . implode(',', $cid) . ')')->loadAssocList('id', 'content_id')
 			: array();
@@ -210,7 +277,12 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		{
 			$content_id = isset($content_ids[$id]) ? (int) $content_ids[$id] : 0;
 
-			if (!$content_id || !$user->authorise('core.edit.state', 'com_content.article.' . $content_id))
+			// Reviews of an item are checked against the item, reviews without item (orphans) need the reviews management permission
+			$can_change = $content_id
+				? $user->authorise('core.edit.state', 'com_content.article.' . $content_id)
+				: $this->canManage;
+
+			if (!$can_change)
 			{
 				// Prune items that you can't change.
 				unset($cid[$i]);
@@ -254,9 +326,9 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	public function edit()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		$this->input->set('view', $this->record_name);
 		$this->input->set('hidemainmenu', 1);
@@ -457,6 +529,127 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		}
 
 		/**
+		 * Reviews managers: a rating (stars) is required, a new review needs an item and a user can have only 1 review per item
+		 */
+
+		if ($this->canManage && $validated_data)
+		{
+			$isNew = !$model->get('id');
+
+			// Composite voting: the rating of every characteristic is required, the overall rating is calculated from them
+			$vfield = $model->getVotingReviewsField((object) array('type_id' => 0), true);
+			$chars  = flexicontent_html::getVotingCharacteristics($vfield);
+
+			if ($chars)
+			{
+				$posted     = isset($validated_data['custom_ratings']) && is_array($validated_data['custom_ratings']) ? $validated_data['custom_ratings'] : array();
+				$resolution = max(5, min(100, (int) $vfield->parameters->get('rating_resolution', 5)));
+				$percents   = array();
+				$votes      = array();
+
+				foreach ($chars as $xid => $char)
+				{
+					$p = isset($posted[$xid]) ? (int) $posted[$xid] : 0;
+
+					if ($p < 1 || $p > 100)
+					{
+						$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_RATING_ALL'));
+						return false;
+					}
+
+					$votes[$xid]    = max(1, (int) round($p * $resolution / 100));
+					$percents[$xid] = (int) round(100 * $votes[$xid] / $resolution);
+				}
+
+				$validated_data['custom_ratings'] = json_encode($percents);
+				$validated_data['average_rating'] = (int) round(100 * max(1, (int) round(array_sum($votes) / count($votes))) / $resolution);
+			}
+
+			if (empty($validated_data['average_rating']) || (int) $validated_data['average_rating'] < 1)
+			{
+				$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_REVIEW_ERR_RATING_REQUIRED'));
+				return false;
+			}
+
+			if ($isNew)
+			{
+				$content_id = !empty($validated_data['content_id']) ? (int) $validated_data['content_id'] : 0;
+
+				if (!$content_id)
+				{
+					$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_REVIEW_ERR_SELECT_ITEM'));
+					return false;
+				}
+
+				$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+				/**
+				 * The reviewer is either an existing user or a guest (no user selected), a reviewer can have only 1 review per item
+				 */
+				$reviewer_id = !empty($validated_data['user_id']) ? (int) $validated_data['user_id'] : 0;
+
+				if ($reviewer_id)
+				{
+					$reviewer = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $reviewer_id);
+
+					if (!$reviewer->id)
+					{
+						$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_REVIEW_ERR_USER_NOT_FOUND'));
+						return false;
+					}
+
+					// The email of a user is the email of his account
+					$validated_data['email'] = $reviewer->email;
+					$validated_data['name']  = '';
+					$where_reviewer = 'user_id = ' . $reviewer_id;
+				}
+				else
+				{
+					$validated_data['user_id'] = 0;
+					$guest_email = isset($validated_data['email']) ? trim($validated_data['email']) : '';
+					$validated_data['name'] = isset($validated_data['name']) ? trim($validated_data['name']) : '';
+
+					if ($validated_data['name'] === '')
+					{
+						$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NAME'));
+						return false;
+					}
+
+					if ($guest_email === '')
+					{
+						$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_REVIEW_ERR_GUEST_EMAIL'));
+						return false;
+					}
+
+					// The email belongs to a registered user, the review must be assigned to that user
+					$registered_id = (int) $db->setQuery('SELECT id FROM #__users WHERE email = ' . $db->Quote($guest_email))->loadResult();
+
+					if ($registered_id)
+					{
+						$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_REVIEW_ERR_EMAIL_IS_USER'));
+						return false;
+					}
+
+					$where_reviewer = 'user_id = 0 AND email = ' . $db->Quote($guest_email);
+				}
+
+				$query = $db->getQuery(true)
+					->select('COUNT(*)')
+					->from('#__flexicontent_reviews')
+					->where('content_id = ' . $content_id)
+					->where('type = ' . $db->Quote(!empty($validated_data['type']) ? $validated_data['type'] : 'item'))
+					->where($where_reviewer);
+
+				if ((int) $db->setQuery($query)->loadResult())
+				{
+					$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_REVIEW_ERR_USER_ALREADY'));
+					return false;
+				}
+			}
+		}
+
+
+		/**
 		 * If user can not manage reviews then do "Review validation on the posted data", like enforcing email and stripping HTML tags
 		 */
 
@@ -486,7 +679,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$user_id = (int) $user->id;
 		$isNew   = !$model->get('id');
 		$item  = (object) array('type_id' => empty($record->item_type_id) ? 0 : $record->item_type_id);
@@ -497,8 +690,11 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		 */
 		if ($isNew)
 		{
-			// Set owner ID
-			$validated_data['user_id'] = $user_id;
+			// Set owner ID, reviews managers choose the reviewer (a user, or a guest) in the form, otherwise the owner is the current user
+			if (!$this->canManage)
+			{
+				$validated_data['user_id'] = $user_id;
+			}
 			
 			// Unlogged submission, require email verification
 			if (!$user_id)
@@ -536,12 +732,246 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			// Modification of existing review (via non-admin), save old data if review is currently in "approved" status
 			if (!$isNew && $model->get('approved'))
 			{
-				$validated_data['title_old']       = $model->get('title');
-				$validated_data['description_old'] = $model->get('description');
+				$validated_data['title_old'] = $model->get('title');
+				$validated_data['text_old']  = $model->get('text');
 			}
 		}
-		
+
+		/**
+		 * The rating of the review is also a vote of the item, update the item's rating
+		 */
+		if ($this->canManage && isset($validated_data['average_rating']))
+		{
+			$_content_id = $isNew ? (int) $validated_data['content_id'] : (int) $model->get('content_id');
+
+			$this->_applyRatingChange(
+				$_content_id,
+				$isNew ? 0 : (int) $model->get('average_rating'),
+				(int) $validated_data['average_rating']
+			);
+
+			// Composite voting: the ratings of the characteristics are votes too
+			if (isset($validated_data['custom_ratings']))
+			{
+				$this->_applyCompositeChange(
+					$_content_id,
+					$isNew ? array() : (array) json_decode((string) $model->get('custom_ratings'), true),
+					(array) json_decode((string) $validated_data['custom_ratings'], true)
+				);
+			}
+		}
+
 		return true;
+	}
+
+
+	/**
+	 * Task to change the rating (stars) of a review, e.g. from the list of reviews (ajax)
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3
+	 */
+	public function setrating()
+	{
+		$fail = function ($msg)
+		{
+			jexit(json_encode(array('error' => 1, 'msg' => $msg)));
+		};
+
+		if (!\Joomla\CMS\Session\Session::checkToken('request'))
+		{
+			$fail(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		}
+
+		if (!$this->canManage)
+		{
+			$fail(\Joomla\CMS\Language\Text::_('JLIB_APPLICATION_ERROR_EDIT_NOT_PERMITTED'));
+		}
+
+		$id      = $this->input->get('id', 0, 'int');
+		$percent = $this->input->get('rating', 0, 'int');
+
+		// Composite voting: the overall rating is calculated from the characteristics
+		if (flexicontent_html::getVotingCharacteristics(flexicontent_html::getVotingFieldConfig()))
+		{
+			$fail(\Joomla\CMS\Language\Text::_('FLEXI_VOTE_AVERAGE_RATING_CALCULATED_AUTOMATICALLY'));
+		}
+
+		if (!$id || $percent < 1 || $percent > 100)
+		{
+			$fail(\Joomla\CMS\Language\Text::_('FLEXI_REVIEW_ERR_RATING_REQUIRED'));
+		}
+
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_reviews.php';
+		$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$review = new flexicontent_reviews($__fcTableDb);
+
+		if (!$review->load($id))
+		{
+			$fail($review->getError() ?: 'Review not found');
+		}
+
+		$old_percent = (int) $review->average_rating;
+		$review->average_rating = $percent;
+
+		if (!$review->store())
+		{
+			$fail($review->getError());
+		}
+
+		$this->_applyRatingChange((int) $review->content_id, $old_percent, $percent);
+
+		jexit(json_encode(array('error' => 0, 'rating' => $percent)));
+	}
+
+
+	/**
+	 * Method to apply a change of the rating of a review, to the rating (votes) of the reviewed item
+	 *
+	 * @param   int   $content_id   The reviewed item
+	 * @param   int   $old_percent  The old rating of the review as percentage, 0 if there was no rating
+	 * @param   int   $new_percent  The new rating of the review as percentage, 0 if the rating is removed
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3
+	 */
+	protected function _applyRatingChange($content_id, $old_percent, $new_percent)
+	{
+		if (!$content_id || $old_percent === $new_percent)
+		{
+			return;
+		}
+
+		$model = $this->getModel($this->record_name);
+		$field = $model->getVotingReviewsField((object) array('type_id' => 0), true);
+
+		// Composite voting calculates the rating of the item from the voting characteristics
+		if (!$field || (int) $field->parameters->get('enable_extra_votes', 0))
+		{
+			return;
+		}
+
+		$resolution = max(5, min(100, (int) $field->parameters->get('rating_resolution', 5)));
+		$old_vote   = $old_percent > 0 ? max(1, (int) round($old_percent * $resolution / 100)) : 0;
+		$new_vote   = $new_percent > 0 ? max(1, (int) round($new_percent * $resolution / 100)) : 0;
+
+		$delta_sum   = $new_vote - $old_vote;
+		$delta_count = ($new_vote > 0 ? 1 : 0) - ($old_vote > 0 ? 1 : 0);
+
+		if (!$delta_sum && !$delta_count)
+		{
+			return;
+		}
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$exists = (int) $db->setQuery('SELECT COUNT(*) FROM #__content_rating WHERE content_id = ' . (int) $content_id)->loadResult();
+
+		if ($exists)
+		{
+			$db->setQuery(
+				'UPDATE #__content_rating'
+				. ' SET rating_sum = GREATEST(CAST(rating_sum AS SIGNED) + ' . (int) $delta_sum . ', 0),'
+				. '     rating_count = GREATEST(CAST(rating_count AS SIGNED) + ' . (int) $delta_count . ', 0)'
+				. ' WHERE content_id = ' . (int) $content_id
+			)->execute();
+		}
+		elseif ($new_vote > 0)
+		{
+			$db->setQuery(
+				'INSERT #__content_rating SET content_id = ' . (int) $content_id . ', lastip = ' . $db->Quote('')
+				. ', rating_sum = ' . (int) $new_vote . ', rating_count = 1'
+			)->execute();
+		}
+
+		// The rating of the item changed, clean item-related caches
+		FLEXIUtilities::getCache($group = '', 0)->clean('com_flexicontent');
+	}
+
+
+	/**
+	 * Method to apply a change of the ratings of the characteristics of a review (composite voting) to the votes of the reviewed item,
+	 * the overall rating is the average of the characteristics (as calculated by the voting)
+	 *
+	 * @param   int    $content_id    The reviewed item
+	 * @param   array  $old_percents  xid => old rating (percent), empty if there was no rating
+	 * @param   array  $new_percents  xid => new rating (percent), empty if the ratings are removed
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3
+	 */
+	protected function _applyCompositeChange($content_id, $old_percents, $new_percents)
+	{
+		$model = $this->getModel($this->record_name);
+		$field = $model->getVotingReviewsField((object) array('type_id' => 0), true);
+		$chars = flexicontent_html::getVotingCharacteristics($field);
+
+		if (!$content_id || !$chars)
+		{
+			return;
+		}
+
+		$resolution = max(5, min(100, (int) $field->parameters->get('rating_resolution', 5)));
+		$db         = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$to_vote    = function ($percent) use ($resolution)
+		{
+			return $percent > 0 ? max(1, (int) round($percent * $resolution / 100)) : 0;
+		};
+
+		// Apply a change of a vote to a votes table (the record is created by the first vote)
+		$apply = function ($table, $extra_where, $extra_set, $old_vote, $new_vote) use ($db, $content_id)
+		{
+			$delta_sum   = $new_vote - $old_vote;
+			$delta_count = ($new_vote > 0 ? 1 : 0) - ($old_vote > 0 ? 1 : 0);
+
+			if (!$delta_sum && !$delta_count)
+			{
+				return;
+			}
+
+			$exists = (int) $db->setQuery('SELECT COUNT(*) FROM ' . $table . ' WHERE content_id = ' . (int) $content_id . $extra_where)->loadResult();
+
+			if ($exists)
+			{
+				$db->setQuery(
+					'UPDATE ' . $table
+					. ' SET rating_sum = GREATEST(CAST(rating_sum AS SIGNED) + ' . (int) $delta_sum . ', 0),'
+					. '     rating_count = GREATEST(CAST(rating_count AS SIGNED) + ' . (int) $delta_count . ', 0)'
+					. ' WHERE content_id = ' . (int) $content_id . $extra_where
+				)->execute();
+			}
+			elseif ($new_vote > 0)
+			{
+				$db->setQuery(
+					'INSERT ' . $table . ' SET content_id = ' . (int) $content_id . ', lastip = ' . $db->Quote('')
+					. ', rating_sum = ' . (int) $new_vote . ', rating_count = 1' . $extra_set
+				)->execute();
+			}
+		};
+
+		$old_votes = array();
+		$new_votes = array();
+
+		foreach ($chars as $xid => $char)
+		{
+			$old_votes[$xid] = $to_vote(isset($old_percents[$xid]) ? (int) $old_percents[$xid] : 0);
+			$new_votes[$xid] = $to_vote(isset($new_percents[$xid]) ? (int) $new_percents[$xid] : 0);
+
+			$apply('#__flexicontent_items_extravote', ' AND field_id = ' . (int) $xid, ', field_id = ' . (int) $xid, $old_votes[$xid], $new_votes[$xid]);
+		}
+
+		// Overall rating (a vote of the item) exists only if all characteristics are rated
+		$main = function ($votes)
+		{
+			return count($votes) && !in_array(0, $votes, true) ? max(1, (int) round(array_sum($votes) / count($votes))) : 0;
+		};
+
+		$apply('#__content_rating', '', '', $main($old_votes), $main($new_votes));
+
+		// The ratings of the item changed, clean item-related caches
+		FLEXIUtilities::getCache($group = '', 0)->clean('com_flexicontent');
 	}
 
 
@@ -569,7 +999,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$field = $model->getVotingReviewsField($item, $setAsDefault = true);
 
 		/**
@@ -589,7 +1019,19 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		 * Load content item related to the review
 		 */
 
-		$item = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+		$__tblType = $type = 'flexicontent_items';
+		$__tblPrefix = $prefix = '';
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$item = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$item = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$item = new $__tblClass($__tblDb);
+		}
 
 		if ($content_id && !$item->load($content_id))
 		{
@@ -609,9 +1051,9 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	public function ajaxvote()
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
-		$session = \Joomla\CMS\Factory::getSession();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$no_ajax     = $this->input->get('no_ajax', 0, 'int');
@@ -644,7 +1086,19 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		 * Load item
 		 */
 
-		$item = \Joomla\CMS\Table\Table::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
+		$__tblType = $type = 'flexicontent_items';
+		$__tblPrefix = $prefix = '';
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$item = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$item = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$item = new $__tblClass($__tblDb);
+		}
 		$item->load($cid);
 
 
@@ -660,8 +1114,8 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		FlexicontentFields::loadFieldConfig($field, $item);
 
 		// Load field's language files
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
 
 		// Get needed parameters
 		$rating_resolution = (int) $field->parameters->get('rating_resolution', 5);
@@ -781,6 +1235,25 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 
 		/**
+		 * Logged users: the rating of the user is also the rating of the user's review (a review record is the rating of the user in the DB),
+		 * the rating of the review is authoritative: it is used as old rating, and it is updated when the user changes his vote via the stars
+		 *
+		 * Option 'reviews_store_rating': if enabled, a rating without review (text) also creates a review record (without text, it is not displayed),
+		 * this allows a single vote per user (any browser), that can be changed. Otherwise a review record is not created by voting,
+		 * votes of users without review are protected from double voting by the user's session / IP address (as in the FLEXIcontent voting field)
+		 */
+		$sync_user_rating = $user->id
+			&& (int) $field->parameters->get('allow_reviews', 0)
+			&& !$enable_extra_votes
+			&& $xid === 'main';
+
+		$store_rating_only = $sync_user_rating && (int) $field->parameters->get('reviews_store_rating', 0);
+
+		// The rating of the user is known from the DB (review record), set below
+		$db_rating_known = false;
+
+
+		/**
 		 * Check: item id exists in our voting logging SESSION (array) variable, to avoid double voting
 		 */
 
@@ -811,6 +1284,21 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			$old_ratings['main'] = isset($vote_history[$cid]['main'])
 				? (int) round($vote_history[$cid]['main'])
 				: 0;
+
+			// Logged users: the rating of the user is stored in the DB (in his review record), so use it as old rating
+			if ($sync_user_rating)
+			{
+				// The stored rating is authoritative (also when it is zero, e.g. the review was trashed by a moderator)
+				$stored_rating = $this->_getUserRating($cid, $user, $rating_resolution, $store_rating_only);
+
+				// No review record: authoritative only if ratings without review are stored, otherwise use the rating of the user's session
+				if ($stored_rating !== null || $store_rating_only)
+				{
+					$old_ratings['main'] = (int) $stored_rating;
+					$db_rating_known = true;
+				}
+			}
+
 			$vote_history[$cid]['main'] = $user_rating_main;
 		}
 
@@ -931,8 +1419,14 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 				 * if this IP has voted for this item recently and refuse to accept vote
 				 */
 
-				if ($xid_n == $xid && !$old_rating && $currip === $db_itemratings->lastip)
+				if ($xid_n == $xid && !$old_rating && !$db_rating_known && $currip === $db_itemratings->lastip)
 				{
+					// Review form (internal call): the review is saved anyway, only its rating is not counted again as vote of the item
+					if ($this->voteInternal)
+					{
+						return null;
+					}
+
 					$error = \Joomla\CMS\Language\Text::_('FLEXI_YOU_HAVE_ALREADY_VOTED');
 					return $this->_ajaxvote_error($error, $xid, $no_ajax);
 				}
@@ -1035,6 +1529,12 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 				</div>';
 		}
 
+		// Store the rating of a logged user (reviews are enabled), if called via the review form this is done by the review form
+		if ($sync_user_rating && $voteIsComplete && !$this->voteInternal)
+		{
+			$this->_storeUserRating($cid, $user, $user_rating, $rating_resolution, $store_rating_only);
+		}
+
 		// Set the voting data, into SESSION
 		$session->set('vote_history', $vote_history, 'flexicontent');
 
@@ -1049,7 +1549,11 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		 * Set response and exit
 		 */
 
-		if ($no_ajax)
+		if ($this->voteInternal)
+		{
+			return $result;
+		}
+		elseif ($no_ajax)
 		{
 			$app->enqueueMessage($xid === 'main' ? $result->message_main.'<br/>'.$result->message : $result->message_main, 'notice');
 			return;
@@ -1063,6 +1567,94 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 
 	/**
+	 * Method to get the rating (on the voting field scale) that a logged user has given to an item
+	 *
+	 * @param   int      $cid         The content ID
+	 * @param   object   $user        The user
+	 * @param   int      $resolution  The rating resolution of the voting field
+	 * @param   boolean  $trashed     True: a review in the trash is the rating record of the user (rating zero), false: it is treated as no review record
+	 *
+	 * @return  int|null  The rating, 0 if the review of the user has no rating, null if the user has no review record
+	 */
+	protected function _getUserRating($cid, $user, $resolution, $trashed = true)
+	{
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_reviews.php';
+		$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$review = new flexicontent_reviews($__fcTableDb);
+
+		if (!$review->load(array('content_id' => (int) $cid, 'user_id' => (int) $user->id, 'type' => 'item')))
+		{
+			return null;
+		}
+
+		if (!$trashed && (int) $review->state === -2)
+		{
+			return null;
+		}
+
+		return (int) $review->average_rating > 0
+			? max(1, (int) round($review->average_rating * $resolution / 100))
+			: 0;
+	}
+
+
+	/**
+	 * Method to store the rating of a logged user, in his review record (creating a record without text if needed)
+	 *
+	 * @param   int      $cid         The content ID
+	 * @param   object   $user        The user
+	 * @param   int      $rating      The rating on the voting field scale
+	 * @param   int      $resolution  The rating resolution of the voting field
+	 * @param   boolean  $create      Create the review record if the user has none (rating without review), otherwise only an existing record is updated
+	 *
+	 * @return  boolean  True on success
+	 */
+	protected function _storeUserRating($cid, $user, $rating, $resolution, $create = true)
+	{
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_reviews.php';
+		$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$review = new flexicontent_reviews($__fcTableDb);
+
+		$exists = $review->load(array('content_id' => (int) $cid, 'user_id' => (int) $user->id, 'type' => 'item'));
+
+		// A review that was deleted by the user (trashed): keep its old data, and start a new rating only record
+		if ($exists && (int) $review->state === -2)
+		{
+			$review->title_old = $review->title;
+			$review->text_old  = $review->text;
+			$review->title     = '';
+			$review->text      = '';
+			$review->state     = 1;
+			$review->approved  = 1;
+		}
+
+		// The user has no review record (a trashed review is also treated as none), and ratings without review are not stored
+		if (!$create && (!$exists || (int) $review->state === -2))
+		{
+			return true;
+		}
+
+		if (!$exists)
+		{
+			// Rating only record: it is not displayed (no text), and it needs no approval
+			$review->reset();
+			$review->content_id = (int) $cid;
+			$review->type       = 'item';
+			$review->user_id    = (int) $user->id;
+			$review->email      = $user->email;
+			$review->state      = 1;
+			$review->approved   = 1;
+			$review->verified   = 1;
+		}
+
+		$review->average_rating = (int) round(100 * $rating / $resolution);
+		$review->check();
+
+		return $review->store();
+	}
+
+
+	/**
 	 * Method to terminate the ajax voting tasking task on error
 	 *
 	 * @since 1.0
@@ -1071,8 +1663,14 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
+		// Internal call (PHP code), let the caller handle the error
+		if ($this->voteInternal)
+		{
+			throw new RuntimeException(trim(strip_tags($mssg)));
+		}
+
 		// Handle non ajax call
-		if ($no_ajax)
+		elseif ($no_ajax)
 		{
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage($mssg, 'notice');
 			return;

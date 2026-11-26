@@ -8,7 +8,7 @@
 	$input_classes = empty($simple_form_layout)
 		? 'fcfield_textval'
 		: 'fcfield_textval fc-floated-lbl-input';
-	$ff_events = 'onfocus="jQuery(this).prev().addClass(\'fc-has-value\');" onblur="if (this.value===\'\') jQuery(this).prev().removeClass(\'fc-has-value\');"';
+	$ff_events = 'onfocus="this.previousElementSibling?.classList.add(\'fc-has-value\');" onblur="if (this.value===\'\') this.previousElementSibling?.classList.remove(\'fc-has-value\');"';
 
 	$n = 0;
 

@@ -10,7 +10,13 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
 class plgFlexicontent_fieldsComments extends FCField
@@ -44,8 +50,9 @@ class plgFlexicontent_fieldsComments extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$document	= \Joomla\CMS\Factory::getDocument();
+		$document	= \Joomla\CMS\Factory::getApplication()->getDocument();
 
+		$display = '';
 		//API comments
 		$comment_api 	= $field->parameters->get('comment_api');
 
@@ -55,7 +62,7 @@ class plgFlexicontent_fieldsComments extends FCField
 		//language
 		$mlang 					= $field->parameters->get('comment_language');
 		$autolanguage			= $field->parameters->get('autolanguage','1');
-		$jlang					= str_replace('-', '_', \Joomla\CMS\Factory::getLanguage()->getTag());
+		$jlang					= str_replace('-', '_', \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag());
 		$comments_langs 	= array("af_ZA","gn_PY","ay_BO","az_AZ","id_ID","ms_MY","jv_ID","bs_BA","ca_ES","cs_CZ","ck_US","cy_GB","da_DK","se_NO",
 		"de_DE","et_EE","ثn_IN","en_PI",	"en_GB","en_UD","en_US","es_LA","es_CL","es_CO","es_ES","es_MX","es_VE","eo_EO","eu_ES","tl_PH",
 		"fo_FO","fr_FR","fr_CA","fy_NL","ga_IE","gl_ES","ko_KR","hr_HR","xh_ZA","zu_ZA","is_IS","it_IT","ka_GE","sw_KE","tl_ST","ku_TR",
@@ -132,7 +139,7 @@ class plgFlexicontent_fieldsComments extends FCField
 					static::$css_added[$field->id] = true;
 
 					$style = '.flexi.value.field_'.$field->name.' {float: none;};';
-					$document->addStyleDeclaration($style);
+					$document->getWebAssetManager()->addInlineStyle($style);
 				}
 			}
 		}
@@ -162,7 +169,7 @@ class plgFlexicontent_fieldsComments extends FCField
 					$fdatanumposts." ".$fdatawidth." ".$fdatacolorscheme."></div>";
 	}
 	$catid= $item->catid;
-	$catids = $field->parameters->get('catid');
+	$catids = (array) $field->parameters->get('catid', []);
 	// Include : 1 or Exclude : -1 categories : 0 all
 	$method_category = $field->parameters->get('method_category', '0');
 	if ($method_category == 1 && in_array($catid, $catids)){//render comment in include mode

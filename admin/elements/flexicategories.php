@@ -19,15 +19,11 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
 //jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 //\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
-\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 // Load the category class
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
@@ -35,7 +31,6 @@ require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'
 // Load the helper classes
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 		
-flexicontent_html::loadFramework('jQuery');
 flexicontent_html::loadFramework('select2');
 
 /**
@@ -77,7 +72,7 @@ class JFormFieldFlexicategories extends \Joomla\CMS\Form\FormField
 		$element_id = $this->id;
 		$ffname = (string) $this->element['name'];
 		
-		$published_only = (boolean) @$attributes['published_only'];
+		$published_only = (bool) @$attributes['published_only'];
 		$parent_id   = (int) @$attributes['parent_id'];
 		$depth_limit = (int) @$attributes['depth_limit'];
 		$tree = flexicontent_cats::getCategoriesTree($published_only, $parent_id, $depth_limit);
@@ -126,7 +121,7 @@ class JFormFieldFlexicategories extends \Joomla\CMS\Form\FormField
 				document.getElementById(\'a_id_\' + name).value = value_list;
 			}';
 
-			\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+			\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 		}
 		
 		$html = '';

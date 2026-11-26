@@ -21,9 +21,6 @@ defined('_JEXEC') or die('Restricted access');
 //adding inline help
 if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 
-jimport('joomla.filesystem.folder');
-jimport('joomla.filesystem.file');
-jimport('joomla.filesystem.path');
 
 if ( !$this->layout->name ) die('Template folder does not exist');
 
@@ -36,7 +33,7 @@ $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 
 $app = \Joomla\CMS\Factory::getApplication();
-$db = \Joomla\CMS\Factory::getDbo();
+$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 \Joomla\CMS\Factory::getApplication()->setUserState('editor.source.syntax', 'css');
 
 $code_btn_lbls = array(
@@ -132,7 +129,7 @@ $query = $db->getQuery(true)
 		//' OR (a.name =' . $db->quote('plg_editors_none')   . ' AND a.enabled = 1) '
 	);
 $db->setQuery($query);
-$use_editor = (boolean)$db->loadResult();
+$use_editor = (bool)$db->loadResult();
 if (!$use_editor)  $app->enqueueMessage(\Joomla\CMS\Language\Text::_('Codemirror is disabled, please enable, simple textarea will be used for editting files'), 'warning');
 
 \Joomla\CMS\Language\Text::script('FLEXI_TMPLS_LOAD_FILE_BEFORE_SAVING', true);
@@ -144,7 +141,6 @@ if (!$use_editor)  $app->enqueueMessage(\Joomla\CMS\Language\Text::_('Codemirror
 <script>
 	function tmpls_fcfield_init_ordering()
 	{
-		<?php echo $this->jssort . ';' ; ?>
 	}
 
 	var jformToken   = '<?php echo \Joomla\CMS\Session\Session::getFormToken();?>';
@@ -491,13 +487,13 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 
 			<div style="max-width:1024px; margin-bottom:16px;">
 
-				<div id="fc-mini-help_btn1" class="btn" onclick="fc_toggle_box_via_btn('fc-mini-help-heritage', this, 'btn-primary');" style="margin: 0 32px 0 0;">
+				<button type="button" id="fc-mini-help_btn1" class="btn" onclick="fc_toggle_box_via_btn('fc-mini-help-heritage', this, 'btn-primary');" style="margin: 0 32px 0 0;">
 					<span class="icon-help"></span> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_HELP2'); ?>
-				</div>
+				</button>
 
-				<div id="fc-mini-help_btn2" class="btn" onclick="fc_toggle_box_via_btn('fc-mini-help-less', this, 'btn-primary');" style="margin: 0 0 0 0;">
+				<button type="button" id="fc-mini-help_btn2" class="btn" onclick="fc_toggle_box_via_btn('fc-mini-help-less', this, 'btn-primary');" style="margin: 0 0 0 0;">
 					<span class="icon-help"></span> <?php echo \Joomla\CMS\Language\Text::_('CSS'); ?> ... <small><?php echo \Joomla\CMS\Language\Text::_('FLEXI_ADVANCED_USERS'); ?></small>
-				</div>
+				</button>
 
 				<div class="fcclear"></div>
 
@@ -545,6 +541,12 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 
 							$value = $this->layout->params->getValue($fieldname, $groupname, @$this->conf->attribs[$fieldname]);
 							$value = $value !== '' ? $value : null;
+							if (FLEXI_J40GE && strcasecmp($field->type, 'color') === 0 && !$field->hidden)
+							{
+								// Keep the editable CSS value, including keywords and alpha.
+								$this->layout->params->setFieldAttribute($fieldname, 'type', 'text', $groupname);
+								$this->layout->params->setFieldAttribute($fieldname, 'class', trim($field->class . ' fc-layout-color'), $groupname);
+							}
 
 							if ($field->getAttribute('type')=='separator' || $field->hidden)
 							{
@@ -740,9 +742,9 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 
 				<?php foreach ($code_btn_lbls as $_posname => $btn_lbl) : ?>
 				<div class="code_box <?php echo $_posname; ?> nowrap_box" style="display:none;" >
-					<div class="btn <?php echo $tip_class; ?>"
+					<button type="button" class="btn <?php echo $tip_class; ?>"
 						title="<?php echo flexicontent_html::getToolTip('Insert code', $code_btn_tips[$_posname], 0, 1); ?>"
-						onclick="toggle_code_inputbox(this);"><span class="icon-eye"></span><?php echo \Joomla\CMS\Language\Text::_( $code_btn_lbls[$_posname] ); ?></div>
+						onclick="toggle_code_inputbox(this);"><span class="icon-eye"></span><?php echo \Joomla\CMS\Language\Text::_( $code_btn_lbls[$_posname] ); ?></button>
 					<div class="nowrap_box" style="display:none; float:left; clear:both; margin:2px 0px 0px 0px;">
 						<div class="alert alert-warning" style="clear:both; margin:2px 0px 2px 0px;"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_COPY_CODE' ); ?></div>
 						<div class="alert alert-info" style="clear:both; margin:2px 0px 2px 0px;">

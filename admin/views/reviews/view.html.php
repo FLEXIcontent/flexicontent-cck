@@ -14,13 +14,28 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecords' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * HTML View class for the reviews backend manager
  */
 class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 {
+	/**
+	 * Columns of this manager are shown / hidden / moved in the browser (see fc-table-tools.js),
+	 * so the old position based hiding (cookie of the old column chooser) must not apply
+	 */
+	public function hideCol($colposition)
+	{
+		return '';
+	}
+
 	var $proxy_option   = null;
 	var $title_propname = 'title';
 	var $state_propname = 'state';
@@ -36,11 +51,11 @@ class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 		global $globalcats;
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getSession();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
@@ -56,8 +71,8 @@ class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
 		{
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get model
@@ -84,9 +99,16 @@ class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 		// Various filters
 		$filter_state     = $model->getState('filter_state');
 		$filter_approved  = $model->getState('filter_approved');
+		$filter_hastext   = $model->getState('filter_hastext');
+
+		$filter_item      = (array) $model->getState('filter_item');
+		$filter_user      = (array) $model->getState('filter_user');
 
 		if (strlen($filter_state)) $count_filters++;
 		if (strlen($filter_approved)) $count_filters++;
+		if (strlen($filter_hastext)) $count_filters++;
+		if ($filter_item) $count_filters++;
+		if ($filter_user) $count_filters++;
 
 		// Text search
 		$scope  = $model->getState('scope');
@@ -103,16 +125,29 @@ class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 			// Add css to document
 			if ($isAdmin)
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+
+				// Modern (multi-column) layout of the filters box, selected in component configuration
+				if ((int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('backend_filters_style', 1) === 1)
+				{
+					$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_filters_modern.css', array('version' => FLEXI_VHASH));
+
+					// Filter presets (stored in the browser)
+					foreach (array('FLEXI_PRESET_SAVE', 'FLEXI_PRESET_SAVE_TITLE', 'FLEXI_PRESET_NAME', 'FLEXI_PRESET_MAX', 'FLEXI_PRESET_DELETE', 'FLEXI_PRESET_DELETE_CONFIRM', 'FLEXI_PRESET_HELP') as $_preset_txt)
+					{
+						\Joomla\CMS\Language\Text::script($_preset_txt);
+					}
+					$document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/filter_presets.js', array('version' => FLEXI_VHASH), array('defer' => true));
+				}
 			}
 			else
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
@@ -158,6 +193,9 @@ class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 
 		// Get content items related to reviews
 		$contentRows = $model->getContentRows($rows);
+
+		// Number of reviews of each listed item
+		$reviewCounts = $model->getReviewCounts($rows);
 
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
@@ -242,6 +280,100 @@ class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 		));
 
 
+		// Build review text filter: reviews with text, or only with rating (voting with the stars)
+		$options 	= array();
+		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  '', '-');
+		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'text', \Joomla\CMS\Language\Text::_('FLEXI_REVIEW_FILTER_WITH_TEXT'));
+		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'rating', \Joomla\CMS\Language\Text::_('FLEXI_REVIEW_FILTER_RATING_ONLY'));
+
+		$fieldname = 'filter_hastext';
+		$elementid = 'filter_hastext';
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => \Joomla\CMS\Language\Text::_('FLEXI_REVIEW_FILTER_TEXT'),
+			'html' => \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => $this->select_class,
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_hastext,
+				$elementid,
+				$translate = true
+			)
+		));
+
+
+		// Build reviewed items filter (only items having reviews)
+		$options = array();
+
+		foreach ($model->getReviewedItems() as $reviewed_item)
+		{
+			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $reviewed_item->id, $reviewed_item->title ?: (\Joomla\CMS\Language\Text::_('FLEXI_ID') . ': ' . $reviewed_item->id));
+		}
+
+		$fieldname = 'filter_item[]';
+		$elementid = 'filter_item';
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => \Joomla\CMS\Language\Text::_('FLEXI_ITEM'),
+			'label_extra_class' => ($filter_item ? ' fc-lbl-inverted' : ''),
+			'html' => \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => $this->select_class,
+					'multiple' => 'multiple',
+					'size' => '3',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_item,
+				$elementid,
+				$translate = false
+			)
+		));
+
+
+		// Build reviewers filter (only users having reviews, guests have id 0)
+		$options = array();
+
+		foreach ($model->getReviewers() as $reviewer)
+		{
+			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $reviewer->id, $reviewer->id
+				? ($reviewer->name ?: (\Joomla\CMS\Language\Text::_('FLEXI_ID') . ': ' . $reviewer->id))
+				: \Joomla\CMS\Language\Text::_('FLEXI_GUEST')
+			);
+		}
+
+		$fieldname = 'filter_user[]';
+		$elementid = 'filter_user';
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => \Joomla\CMS\Language\Text::_('FLEXI_USER'),
+			'label_extra_class' => ($filter_user ? ' fc-lbl-inverted' : ''),
+			'html' => \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
+				$options,
+				$fieldname,
+				array(
+					'class' => $this->select_class,
+					'multiple' => 'multiple',
+					'size' => '3',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+				),
+				'value',
+				'text',
+				$filter_user,
+				$elementid,
+				$translate = false
+			)
+		));
+
+
 		// Build text search scope
 		$scopes = null;
 
@@ -268,6 +400,7 @@ class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 		$this->lists       = $lists;
 		$this->rows        = $rows;
 		$this->contentRows = $contentRows;
+		$this->reviewCounts = $reviewCounts;
 		$this->pagination  = $pagination;
 
 		$this->perms  = FlexicontentHelperPerm::getPerm();
@@ -275,13 +408,8 @@ class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 		$this->view   = $view;
 		$this->state  = $this->get('State');
 
-		if (!$jinput->getCmd('nosidebar'))
-		{
-			$this->sidebar = null;
-
-			if(FLEXI_J30GE && !FLEXI_J40GE) $this->sidebar = JHtmlSidebar::render();
-			if(FLEXI_J40GE) $this->sidebar = \Joomla\CMS\HTML\Helpers\Sidebar::render();
-		}
+		// The reviews manager is displayed full width, without the FLEXIcontent sidebar menu
+		$this->sidebar = null;
 
 		/**
 		 * Render view's template
@@ -304,11 +432,11 @@ class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 	 */
 	function setToolbar()
 	{
-		$user     = \Joomla\CMS\Factory::getUser();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$useAssocs= flexicontent_db::useAssociations();
 
 		$js = '';
@@ -331,6 +459,13 @@ class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 		if ($hasCreate)
 		{
 			\Joomla\CMS\Toolbar\ToolbarHelper::addNew($contrl.'add');
+		}
+
+		// Batch approve / unapprove of the selected reviews
+		if ($hasEditState)
+		{
+			\Joomla\CMS\Toolbar\ToolbarHelper::custom($contrl.'approved', 'checkmark', '', 'FLEXI_REVIEW_APPROVE', true);
+			\Joomla\CMS\Toolbar\ToolbarHelper::custom($contrl.'unapproved', 'cancel', '', 'FLEXI_REVIEW_UNAPPROVE', true);
 		}
 
 		if (0 && $hasEdit)
@@ -462,7 +597,7 @@ class FlexicontentViewReviews extends FlexicontentViewBaseRecords
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');

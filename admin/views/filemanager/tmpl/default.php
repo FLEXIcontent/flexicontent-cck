@@ -11,6 +11,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/fileeditor.php';
+
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -18,15 +20,16 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\Path;
 use Joomla\String\StringHelper;
-HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/fc_service_registry.php';
+flexicontent_register_html_helpers(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 
 global $globalcats;
 $app      = Factory::getApplication();
 $jinput   = $app->input;
-$config   = Factory::getConfig();
-$user     = Factory::getUser();
-$session  = Factory::getSession();
-$document = Factory::getDocument();
+$config   = Factory::getApplication()->getConfig();
+$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+$session  = Factory::getApplication()->getSession();
+$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 $cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'filemanager.';
 $hlpname  = 'fcfilemanager';
@@ -52,17 +55,25 @@ $editor   = $jinput->getCmd('editor', '');
 $isXtdBtn = $jinput->getCmd('isxtdbtn', '');
 $function = $jinput->getCmd('function', 'jSelectFcfile');
 $onclick  = $this->escape($function);
+$libraryPicker = $isFilesElement && !$isXtdBtn;
+if ($libraryPicker)
+{
+	$assets = Uri::root() . 'components/com_flexicontent/assets/';
+	HTMLHelper::_('stylesheet', $assets . 'css/file-picker.css', ['version' => 'auto']);
+	HTMLHelper::_('script', $assets . 'js/file-picker.js', ['version' => 'auto'], ['defer' => true]);
+}
+
 
 if (!empty($editor))
 {
 	// This view is used also in com_menus. Load the xtd script only if the editor is set!
-	Factory::getDocument()->addScriptOptions('xtd-fcfiles', array('editor' => $editor));
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptOptions('xtd-fcfiles', array('editor' => $editor));
 	$onclick = "jSelectFcfile";
 }
 
 if (version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'ge'))
 {
-	$wa  = Factory::getDocument()->getWebAssetManager();
+	$wa  = \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager();
 	$wa->registerAndUseScript('clipboard_js', Uri::base() . 'components/com_flexicontent/assets/js/clipboard_v2.0.11.min.js');
 }
 else
@@ -164,21 +175,30 @@ $_tmpl = $isFilesElement ? 'component' : '';
 
 
 $enable_multi_uploader = 1;
+$can_upload = $use_fc_uploads && ($this->CanUpload || ($isFilesElement && $this->layout === 'image'));
+$picker_dashboard = $isFilesElement && $enable_multi_uploader && $can_upload && !$this->require_ftp;
+$has_link_tab = $this->layout !== 'image' && ($use_links || $use_jmedia_man);
 $nonimg_message = $this->layout === 'image' ? '\'\'' : '-1';
 $uploader_tag_id = 'fc_filesman_uploader';
 $up_sfx_n = $this->fieldid ?: '_';
 
 
 /**
- * JS for Columns chooser box and Filters box
+ * Resizable / movable / hideable columns (replaces the old column chooser), settings are stored in the browser
  */
 
-flexicontent_html::jscode_to_showhide_table(
-	'mainChooseColBox',
-	'adminListTableFC' . $this->getModel()->view_id,
-	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
-);
+if (!$libraryPicker)
+{
+	$fc_document = Factory::getApplication()->getDocument();
+	$fc_document->addStyleSheet(Uri::base(true) . '/components/com_flexicontent/assets/css/fc_table_tools.css', array('version' => FLEXI_VHASH));
+	$fc_document->addStyleSheet(Uri::base(true) . '/components/com_flexicontent/assets/css/fc_type_tabs.css', array('version' => FLEXI_VHASH));
+	$fc_document->addScript(Uri::base(true) . '/components/com_flexicontent/assets/js/fc-table-tools.js', array('version' => FLEXI_VHASH));
+
+	foreach (array('FLEXI_TBL_MOVE_COL', 'FLEXI_TBL_HIDE_COL', 'FLEXI_TBL_SHOW_COL', 'FLEXI_TBL_FIT_COL', 'FLEXI_TBL_RESET_WIDTHS', 'FLEXI_TBL_RESET_COLS') as $fc_txt)
+	{
+		Text::script($fc_txt);
+	}
+}
 
 
 
@@ -198,8 +218,7 @@ $tools_state = isset($FcMansConf->$fc_man_name)
 		'addfiles_box' => 1,
 	);
 
-$show_addfiles = !empty($tools_state->addfiles_box);
-$show_addfiles ? 1 : 0;
+$show_addfiles = !$picker_dashboard && !empty($tools_state->addfiles_box);
 
 
 
@@ -351,143 +370,112 @@ if ($use_jmedia_man)
 
 $js .= "
 
-// Delete a specific list filter
+// Clear list filters through their original form controls.
 function delFilter(name)
 {
-	//if(window.console) window.console.log('Clearing filter:'+name);
-	var myForm = jQuery('#adminForm');
-	var filter = jQuery('#'+name);
-
-	if (!filter.length)
-	{
-		return;
-	}
-	else if (filter.attr('type') == 'checkbox')
-	{
-		filter.checked = '';
-	}
-	else
-	{
-		filter.val('');
-
-		// Case that input has Calendar JS attached
-		if (filter.attr('data-alt-value'))
-		{
-			filter.attr('data-alt-value', '');
-		}
-	}
+	const filter = document.getElementById(name);
+	if (!filter) return;
+	if (filter.type === 'checkbox') filter.checked = false;
+	else filter.value = '';
+	if (filter.hasAttribute('data-alt-value')) filter.setAttribute('data-alt-value', '');
+	filter.fc_choices_instance?.refresh();
 }
 
 function delAllFilters()
 {
-	delFilter('search');
-	delFilter('filter_uploader');
-	delFilter('filter_state');
-	delFilter('filter_access');
-	delFilter('filter_lang');
-	delFilter('filter_url');
-	delFilter('filter_stamp');
-	delFilter('filter_secure');
-	delFilter('filter_ext');
-	delFilter('item_id');
-	delFilter('filter_order');
-	delFilter('filter_order_Dir');
+	['search', 'filter_uploader', 'filter_state', 'filter_access', 'filter_lang', 'filter_url',
+		'filter_stamp', 'filter_secure', 'filter_ext', 'item_id', 'filter_order', 'filter_order_Dir'].forEach(delFilter);
 }
 
 function disabledEventPropagation(event)
 {
-	if (event.stopPropagation)
+	event.stopPropagation();
+}
+
+function fman_zoom_thumb(event, control)
+{
+	event.stopPropagation();
+	const box = control.closest('.fc-fileman-grid-thumb-box');
+	const image = box?.querySelector('img.fc-fileman-thumb');
+	const button = box?.querySelector('.fc-fileman-preview-btn');
+	if (!image) return;
+
+	const overlay = document.getElementById('fc-fileman-overlay');
+	if (image.classList.contains('fc_zoomed'))
 	{
-		event.stopPropagation();
+		button?.classList.remove('active', 'btn-info');
+		image.classList.remove('fc_zoomed');
+		setTimeout(() => {
+			image.classList.remove('fc_zooming');
+			FlexiForm.show(overlay, false);
+		}, 320);
 	}
-	else if(window.event)
+	else if (!image.classList.contains('fc_zooming'))
 	{
-		window.event.cancelBubble=true;
+		FlexiForm.show(overlay);
+		image.classList.add('fc_zooming');
+		requestAnimationFrame(() => requestAnimationFrame(() => {
+			image.classList.add('fc_zoomed');
+			button?.classList.add('active', 'btn-info');
+		}));
 	}
 }
 
-// Thumbnail zoom
-function fman_zoom_thumb(e, obj)
+document.addEventListener('keydown', event => {
+	if (event.defaultPrevented || event.key !== 'Escape') return;
+	const image = document.querySelector('img.fc-fileman-thumb.fc_zoomed');
+	if (!image) return;
+	event.preventDefault();
+	const button = image.closest('.fc-fileman-grid-thumb-box')?.querySelector('.fc-fileman-preview-btn');
+	button?.focus();
+	fman_zoom_thumb(event, image);
+});
+
+function fman_toggle_thumb_selection(box, selected)
 {
-	disabledEventPropagation(e);
-
-	var box = jQuery(obj).closest('.fc-fileman-grid-thumb-box');
-	var img = box.find('img.fc-fileman-thumb');
-	var btn = box.find('.fc-fileman-preview-btn');
-
-	if (img.length==0) return;
-	var IEversion = fc_isIE();
-
-	if (img.hasClass('fc_zoomed'))
-	{
-		btn.removeClass('active btn-info');
-		img.removeClass('fc_zoomed');
-		setTimeout(function(){
-			img.removeClass('fc_zooming');
-			jQuery('#fc-fileman-overlay').hide();
-			if (IEversion && IEversion < 9) img.css('left', '');
-		}, (!IEversion || IEversion > 9 ? 320 : 20));
-	}
-	else
-	{
-		if (img.hasClass('fc_zooming')) return;
-		jQuery('#fc-fileman-overlay').show();
-		img.addClass('fc_zooming');
-		setTimeout(function(){
-			img.addClass('fc_zoomed');
-			btn.addClass('active btn-info');
-			if (IEversion && IEversion < 9) img.css('left', jQuery(window).width()/2-(img.width()/2));
-		}, 20);
-	}
+	if (!box) return;
+	box.classList.toggle('selected', selected);
+	box.querySelector('.fc-fileman-selection-mark')?.classList.toggle('selected', selected);
 }
 
-
-// Toggle file selection (thumbs view) when click on parent container
-function fman_toggle_thumb_selection(box, new_value)
+function fman_sync_cid(id, fromCheckbox)
 {
-	var i = box.find('.fc-fileman-selection-mark');
-	new_value ? box.addClass('selected') : box.removeClass('selected');
-	new_value ? i.addClass('selected') : i.removeClass('selected') ;
+	const input = document.getElementById('cb' + id);
+	const box = document.getElementById('_cb' + id)?.closest('.fc-fileman-grid-thumb-box');
+	if (!input) return;
+	if (!fromCheckbox) input.click();
+	fman_toggle_thumb_selection(box, input.checked);
 }
 
-
-// Sync a file selection between the details/thumb views
-function fman_sync_cid(id, is_cb)
+function fman_set_cids(input)
 {
-	is_cb = !!is_cb;
-	var CB  = jQuery('input#cb' + id);
-	var CB_box = jQuery('span#_cb' + id);
-
-	var c = CB.prop('checked');
-	if (!is_cb)
-	{
-		CB.prop('checked', !c);
-		!c ? CB.attr('checked', 'checked') : CB.removeAttr('checked');
-
-		// Run onclick function of the input TAG, this must be after the 'checked' property is manually modified
-		var input = CB.get(0);
-		if (typeof input.onclick == 'function')
-		{
-			input.onclick.apply(input);
-		}
-	}
-
-	fman_toggle_thumb_selection(CB_box.closest('.fc-fileman-grid-thumb-box'), !c);
-}
-
-
-// Select ALL files in thumbnails view
-function fman_set_cids(el)
-{
-	var val = el.prop('checked');
-	val ? el.closest('.btn').addClass('".$this->btn_iv_class."') : el.closest('.btn').removeClass('".$this->btn_iv_class."');
-
-	jQuery('div.adminthumbs.fcmanthumbs').children('.fc-fileman-grid-thumb-box').each(function(index, value)
-	{
-		fman_toggle_thumb_selection(jQuery(value), val);
+	const selected = input.checked;
+	input.closest('.btn')?.classList.toggle('".$this->btn_iv_class."', selected);
+	document.querySelectorAll('.adminthumbs.fcmanthumbs > .fc-fileman-grid-thumb-box').forEach(box => {
+		fman_toggle_thumb_selection(box, selected);
 	});
 }
 
+function fman_toggle_add_files(button)
+{
+	const panel = document.getElementById('fc-fileman-addfiles-col');
+	const shown = !FlexiForm.visible(panel);
+	const list = document.getElementById('fc-fileman-fileslist-col');
+	list.classList.toggle('span6', shown);
+	list.classList.toggle('col-md-6', shown);
+	fc_config_store(FCMAN_conf, 'addfiles_box', shown ? 1 : 0);
+	fc_toggle_box_via_btn(panel, button, '', shown ? button.nextElementSibling : button.previousElementSibling, shown ? 1 : 0);
+	return false;
+}
+
+function fman_switch_view(button, thumbnails)
+{
+	fc_toggle_view_mode(button);
+	const chooser = document.getElementById('fc_mainChooseColBox_btn');
+	if (thumbnails && chooser.classList.contains('btn-primary')) chooser.click();
+	chooser.classList.toggle('disabled', thumbnails);
+	chooser.style.pointerEvents = thumbnails ? 'none' : '';
+}
 
 var _file_data = new Array();
 ";
@@ -609,7 +597,7 @@ $js .= "
 
 
 
-if ($enable_multi_uploader)
+if ($enable_multi_uploader && $can_upload)
 {
 	// ***
 	// *** Create slider for resizing thumbnails in uploader
@@ -618,7 +606,7 @@ if ($enable_multi_uploader)
 	$cfg = new stdClass();
 	$cfg->slider_name = 'fc-uploader-grid-thumb-size';
 	$cfg->elem_container_selector = '#'.$uploader_tag_id . $up_sfx_n;
-	$cfg->element_selector = '#'.$uploader_tag_id . $up_sfx_n .' ul.plupload_filelist > li';
+	$cfg->element_selector = '#'.$uploader_tag_id . $up_sfx_n .' .fc-native-upload-list > li';
 	$cfg->element_class_prefix = 'thumb_';
 	$cfg->values = array(90, 120, 150, 200, 250);
 	$cfg->labels = array();
@@ -643,6 +631,7 @@ if ($enable_multi_uploader)
 
 	$upload_options = array(
 		'action' => Uri::base(true) . '/index.php?option=com_flexicontent&task=filemanager.uploads'
+			. '&language=' . rawurlencode($app->getLanguage()->getTag())
 			. '&view='.$this->view
 			. '&history=' . ($isFilesElement ? 1 : 0)
 			. '&fieldid='.$this->fieldid . '&u_item_id='.$this->u_item_id
@@ -667,35 +656,32 @@ if ($enable_multi_uploader)
 		}"
 	);
 
-	HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+	require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/fc_service_registry.php';
+	flexicontent_register_html_helpers(JPATH_SITE . '/components/com_flexicontent/helpers/html');
 	$upConf = HTMLHelper::_('fcuploader.getUploadConf', $this->field);
 	$uploader_html = HTMLHelper::_('fcuploader.getUploader', $this->field, $this->u_item_id, $uploader_tag_id, $up_sfx_n, $upload_options);
 
-	$js .= '
-		setTimeout(function(){
-			var defaultTab = 0;
-			var uploderTab = 0;
-			var IEversion = fc_isIE();
-			var is_IE8_IE9 = IEversion && IEversion < 10;
-			if (is_IE8_IE9) fctabber["fc-fileman-addfiles"].tabShow(uploderTab);
+	if (!$picker_dashboard)
+	{
+		$js .= '
+			setTimeout(function(){
+				// Show outer container of uploader
+				FlexiForm.show(document.getElementById("fc-fileman-formbox-2"));
+				document.getElementById("'.$uploader_tag_id . $up_sfx_n.'").style.minHeight = "180px";
 
-			// Show outer container of uploader
-			jQuery("#fc-fileman-formbox-2").show();
-			jQuery("#'.$uploader_tag_id . $up_sfx_n.'").css("min-height", 180);
+				// Show uploader
+				'.$uploader_tag_id.'.toggleUploader("'.$up_sfx_n.'");
 
-			// Show uploader
-			'.$uploader_tag_id.'.toggleUploader("'.$up_sfx_n.'");
+				// Also set filelist height
+				'.$uploader_tag_id.'.autoResize("'.$up_sfx_n.'");
 
-			// Also set filelist height
-			'.$uploader_tag_id.'.autoResize("'.$up_sfx_n.'");
+				fctabber["fc-fileman-addfiles"]?.tabShow(0);
 
-			// Uploader does not initialize properly when hidden in IE8 / IE9 with "runtime": "html4" (it does if using "runtime": "flash")
-			if (!is_IE8_IE9 || fc_has_flash_addon()) fctabber["fc-fileman-addfiles"].tabShow(defaultTab);
-
-			// Hide basic uploader form if using multi-uploader script
-			jQuery("#fc-fileman-formbox-1").hide();
-		}, 20);
-	';
+				// Hide basic uploader form if using multi-uploader script
+				FlexiForm.show(document.getElementById("fc-fileman-formbox-1"), false);
+			}, 20);
+		';
+	}
 }
 
 if ($use_jmedia_man && $use_links)
@@ -708,26 +694,26 @@ if ($use_jmedia_man && $use_links)
 if ($js)
 {
 	$document->addScriptDeclaration('
-		jQuery(document).ready(function()
+		FlexiForm.ready(function()
 		{
 			' . $js . '
+			document.getElementById("adminForm")?.addEventListener("change", event => {
+				const checkbox = event.target;
+				if (checkbox.type === "checkbox" && checkbox.name === "cid[]" && /^cb\d+$/.test(checkbox.id)) {
+					fman_sync_cid(checkbox.id.slice(2), true);
+				}
+			});
 		});
 	');
 }
 
 
-/*<div id="themeswitcher" class="pull-right"> </div>
-<script>
-	jQuery(function() {
-		jQuery.fn.themeswitcher && jQuery('#themeswitcher').themeswitcher({cookieName:''});
-	});
-</script>*/
 ?>
 
-	<div id="fc-fileman-overlay" onclick="jQuery('img.fc_zoomed, li.fc_zoomed .plupload_img_preview img').trigger('click');"></div>
+	<div id="fc-fileman-overlay" onclick="document.querySelectorAll('img.fc_zoomed').forEach(image => image.click());"></div>
 
 
-	<div id="flexicontent" class="flexicontent">
+	<div id="flexicontent" class="flexicontent<?php echo $libraryPicker ? ' fc-file-library' : ''; ?>">
 
 		<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>" id="fileman">
 
@@ -757,7 +743,7 @@ if ($js)
 
 					<?php /* echo HTMLHelper::_('tabs.start'); */ ?>
 					<!--<div class="fctabber" id="fc-fileman-addfiles">-->
-					<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+					<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?> fc-fm-row">
 
 						<!-- File listing -->
 
@@ -769,9 +755,12 @@ if ($js)
 						<div class="<?php echo $show_addfiles ? 'span6 col-md-6' : ''; ?> fullwidth_1270" id="fc-fileman-fileslist-col" data-icon-class="icon-list">
 							<fieldset class="fc-formbox" id="fc-fileman-formbox-0">
 
-								<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>&amp;layout=<?php echo $this->layout; ?>&amp;field=<?php echo $this->fieldid?>" method="post" name="adminForm" id="adminForm">
+								<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>&amp;layout=<?php echo $this->layout; ?>&amp;field=<?php echo $this->fieldid?>&amp;language=<?php echo rawurlencode($app->getLanguage()->getTag()); ?>" method="post" name="adminForm" id="adminForm">
 
-									<div id="fc-managers-header">
+									<?php if ($libraryPicker) : ?>
+										<?php require __DIR__ . '/picker_toolbar.php'; ?>
+									<?php else : ?>
+									<div id="fc-managers-header" class="fc-mh-items fc-mh-solo fc-mh-fm">
 
 										<?php if (!$this->folder_mode) : ?>
 
@@ -789,12 +778,17 @@ if ($js)
 													<input type="text" name="search" id="search" placeholder="<?php echo !empty($this->scope_title) ? $this->scope_title : Text::_('FLEXI_SEARCH'); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="fcfield_textval" />
 													<button title="" data-original-title="<?php echo Text::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : Text::_('FLEXI_GO'); ?></button>
 
-													<div id="fc_filters_box_btn" data-original-title="<?php echo Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
+													<button type="button" id="fc_filters_box_btn" aria-label="<?php echo htmlspecialchars(Text::_('FLEXI_FILTERS'), ENT_QUOTES, 'UTF-8'); ?>" data-original-title="<?php echo Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
 														<?php echo '<i class="icon-filter"></i>' . ($isFilesElement && $this->count_filters ? Text::_('FLEXI_FILTERS') : ''); ?>
 														<?php echo ($this->count_filters  ? ' <sup>' . $this->count_filters . '</sup>' : ''); ?>
-													</div>
+													</button>
 
-													<div id="fc-filters-box" <?php if (!$this->count_filters || empty($tools_state->filters_box)) echo 'style="display:none;"'; ?> class="fcman-abs" onclick="var event = arguments[0] || window.event; event.stopPropagation();">
+													<?php
+													// Modern style of the filters box, selected in component configuration (Items Manager > Appearance)
+													$filters_modern = (int) ComponentHelper::getParams('com_flexicontent')->get('backend_filters_style', 1) === 1;
+													$filters_apply_btn = $filters_modern && (int) ComponentHelper::getParams('com_flexicontent')->get('backend_filters_apply', 1) === 1;
+													?>
+													<div id="fc-filters-box" <?php if (!$this->count_filters || empty($tools_state->filters_box)) echo 'style="display:none;"'; ?> class="fcman-abs<?php echo $filters_modern ? ' fc-filters-modern fc-filters-modern-fm' : ''; ?>">
 														<?php
 														/**
 														 * When layout == image then some filters are not applicable
@@ -814,8 +808,41 @@ if ($js)
 														echo $this->lists['item_id'];
 														?>
 
-														<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
+														<?php if ($filters_apply_btn) : ?>
+														<div class="fc-filters-actions">
+															<button type="button" class="btn btn-primary fc-filters-apply" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();">
+																<span class="icon-filter"></span> <?php echo Text::_('FLEXI_APPLY'); ?>
+															</button>
+														</div>
+														<?php endif; ?>
+
+														<button type="button" id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></button>
 													</div>
+
+													<?php if ($filters_apply_btn) : ?>
+													<script>
+														/* Apply-button mode: changing a filter inside the box does not reload the list immediately.
+														   The filters are applied by the Apply button or by clicking outside of the box. */
+														(function() {
+															var box = document.getElementById('fc-filters-box');
+															if (!box) return;
+															var dirty = false;
+															var els = box.querySelectorAll('[onchange*="submitform"]');
+															for (var i = 0; i < els.length; i++) {
+																els[i].removeAttribute('onchange');
+																els[i].onchange = null;
+															}
+															var markDirty = function() { dirty = true; };
+															box.addEventListener('change', markDirty, true);
+															document.addEventListener('mousedown', function(e) {
+																if (!dirty || box.contains(e.target)) return;
+																dirty = false;
+																if (!!document.adminForm.limitstart) document.adminForm.limitstart.value = 0;
+																Joomla.submitform();
+															}, true);
+														})();
+													</script>
+													<?php endif; ?>
 
 													<button title="" data-original-title="<?php echo Text::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-cancel"></i>' : Text::_('FLEXI_CLEAR'); ?></button>
 												</div>
@@ -850,71 +877,79 @@ if ($js)
 
 										<div class="fcclear"></div>
 
-										<div class="nowrap_box" style="margin: 6px 0; display: flex;">
+										<div class="nowrap_box fc-fm-toolbar">
 											<div class="<?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" style="padding: 0 0 0 4px;"
 											     data-title="<?php echo flexicontent_html::getToolTip('', 'JGLOBAL_CHECK_ALL', 1, 1); ?>" data-placement="bottom"
 											>
 												<div class="group-fcset" style="display: inline-block; vertical-align: middle;">
 													<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value=""
-													       onclick="Joomla.checkAll(this); fman_set_cids(jQuery(this));" style="display: none;" />
+													       onclick="Joomla.checkAll(this); fman_set_cids(this);" style="display: none;" />
 													<label for="checkall-toggle" class="green single" style="color: inherit;">
 														&nbsp;<?php echo Text::_('FLEXI_ALL'); ?>
 													</label>&nbsp;
 												</div>
 											</div>
 
+											<?php if ($enable_multi_uploader && $can_upload && !$this->require_ftp) : ?>
+												<button type="button" class="btn btn-primary" data-fc-upload-dashboard
+													onclick="<?php echo $uploader_tag_id; ?>.openDashboard('<?php echo $up_sfx_n; ?>', this)">
+													<span class="icon-upload" aria-hidden="true"></span>
+													<?php echo Text::_('FLEXI_UPLOAD_FILES'); ?>
+												</button>
+											<?php endif; ?>
+											<?php if ($picker_dashboard && $has_link_tab) : ?>
+												<button type="button" class="btn btn-outline-secondary" onclick="fc_showAsDialog(document.getElementById('fc-fileman-addfiles'), 0, 0, null, {title: this.textContent.trim(), visibleOnClose: 0});">
+													<span class="icon-link" aria-hidden="true"></span> <?php echo Text::_($use_jmedia_man ? 'FLEXI_ADD_LINK' : 'FLEXI_ADD_URL'); ?>
+												</button>
+											<?php elseif (!$picker_dashboard) : ?>
 											<?php echo '
-						<span style="cursor: pointer;" class="fc_shown_1271 ' . $this->btn_sm_class . ' btn-success ' . $this->tooltip_class . '"
+						<button type="button" style="cursor: pointer;" class="fc_shown_1271 ' . $this->btn_sm_class . ' btn-success ' . $this->tooltip_class . '"
 							onclick="var box = document.getElementById(\'fc-fileman-addfiles\'); fc_fm_add_handle = fc_showAsDialog(box, 0, 0, null, { title: \'' . Text::_('FLEXI_ADD_FILE',  true) . '\', visibleOnClose: 1, paddingW: 10, paddingH: 10}); return false;"
 							data-title="' . flexicontent_html::getToolTip('', 'FLEXI_ADD_FILE', 1, 1) . '" data-placement="bottom"
 						>
 							<span class="icon-upload"></span>
-						</span>
+						</button>
 					'; ?>
 											<?php echo '
-						<span style="' . ($show_addfiles ? 'display: none;' : '') . '" class="fc_hidden_1270 btn-success fc_noeffect ' . $this->btn_sm_class . ' ' . $this->tooltip_class . '"
-							onclick="var tagid = \'fc-fileman-addfiles-col\'; var fileslist_col = jQuery(\'#fc-fileman-fileslist-col\'); var isv = jQuery(\'#\' + tagid).is(\':visible\'); isv ? fileslist_col.removeClass(\'span6 col-md-6\') : fileslist_col.addClass(\'span6 col-md-6\'); fc_config_store(FCMAN_conf, \'addfiles_box\', (isv ? 0 : 1)); fc_toggle_box_via_btn(tagid, this, \'\', jQuery(this).next()); return false;"
+						<button type="button" style="' . ($show_addfiles ? 'display: none;' : '') . '" class="fc_hidden_1270 btn-success fc_noeffect ' . $this->btn_sm_class . ' ' . $this->tooltip_class . '"
+							onclick="return fman_toggle_add_files(this);"
 							data-title="' . flexicontent_html::getToolTip('', 'FLEXI_ADD_FILE', 1, 1) . '" data-placement="bottom"
 						>
 							<span class="icon-upload"></span>
-						</span>
+						</button>
 					'; ?>
 											<?php echo '
-						<span style="' . (!$show_addfiles ? 'display: none;' : '') . '" class="fc_hidden_1270 fc_noeffect ' . $this->btn_sm_class . ' ' . $this->tooltip_class . '"
-							onclick="var tagid = \'fc-fileman-addfiles-col\'; var fileslist_col = jQuery(\'#fc-fileman-fileslist-col\'); var isv = jQuery(\'#\' + tagid).is(\':visible\'); isv ? fileslist_col.removeClass(\'span6 col-md-6\') : fileslist_col.addClass(\'span6 col-md-6\'); fc_config_store(FCMAN_conf, \'addfiles_box\', (isv ? 0 : 1)); fc_toggle_box_via_btn(tagid, this, \'\', jQuery(this).prev()); return false;"
+						<button type="button" style="' . (!$show_addfiles ? 'display: none;' : '') . '" class="fc_hidden_1270 fc_noeffect ' . $this->btn_sm_class . ' ' . $this->tooltip_class . '"
+							onclick="return fman_toggle_add_files(this);"
 							data-title="' . flexicontent_html::getToolTip('', 'FLEXI_EXPAND', 1, 1) . '" data-placement="bottom"
 						>
 							<span class="icon-expand-2"></span>
-						</span>
+						</button>
 					'; ?>
-
+											<?php endif; ?>
 
 											<?php if ($isFilesElement): ?>
 												<div class="fc-iblock nowrap_box" style="position: relative; vertical-align: middle;">
-							<span class="btn btn-primary <?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" id="insert_selected_btn" onclick="fc_fileselement_assign_files(jQuery(this));"
+							<button type="button" class="btn btn-primary <?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" id="insert_selected_btn" onclick="fc_fileselement_assign_files();"
 							      data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_FILEMAN_INSERT_SELECTED', 1, 1); ?>" data-placement="bottom">
 								<span class="icon-plus"></span> <?php echo Text::_('FLEXI_INSERT'); ?>
-							</span>
-													<span class="<?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" onclick="fc_fileselement_delete_files()" data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_DELETE', 1, 1); ?>" data-placement="bottom">
+							</button>
+													<button type="button" class="<?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" onclick="fc_fileselement_delete_files()" data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_DELETE', 1, 1); ?>" data-placement="bottom">
 								<span class="icon-remove" style="color: darkred;"></span>
-							</span>
+							</button>
 												</div>
-											<?php else: ?>
-												<span class="<?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" onclick="if (document.adminForm.boxchecked.value == 0) { alert(Joomla.JText._('FLEXI_NO_ITEMS_SELECTED')); } else { if (confirm(Joomla.JText._('FLEXI_ARE_YOU_SURE'))) { Joomla.submitbutton('filemanager.remove', 'adminForm', false); } }" data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_DELETE', 1, 1); ?>" data-placement="bottom">
-							<span class="icon-remove" style="color: darkred;"></span>
-						</span>
 											<?php endif; ?>
 
 
 											<div class="btn-group" style="margin: 0 12px;">
 												<button type="button" class="<?php echo $this->btn_sm_class; ?> list-view <?php echo $this->tooltip_class; ?> active" id="btn-fman-list-view"
-												        onclick="fc_toggle_view_mode(jQuery(this)); var c = jQuery('#fc_mainChooseColBox_btn'); c.removeClass('disabled').css('pointer-events', '');" data-toggle_selector=".fman_list_element" style="min-width: 40px;"
+												        onclick="fman_switch_view(this, false);" data-toggle_selector=".fman_list_element" style="min-width: 40px;"
 												        data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_FILEMAN_DETAILS', 1, 1); ?>" data-placement="bottom"
 												>
 													<i class="icon-list-view"></i>
 												</button>
 												<button type="button" class="<?php echo $this->btn_sm_class; ?> grid-view <?php echo $this->tooltip_class; ?>" id="btn-fman-grid-view"
-												        onclick="fc_toggle_view_mode(jQuery(this)); var c = jQuery('#fc_mainChooseColBox_btn'); c.hasClass('btn-primary') ? c.click() : false; c.addClass('disabled').css('pointer-events', 'none');" data-toggle_selector=".fman_grid_element" style="min-width: 40px;"
+												        onclick="fman_switch_view(this, true);" data-toggle_selector=".fman_grid_element" style="min-width: 40px;"
 												        data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_FILEMAN_GRID', 1, 1); ?>" data-placement="bottom"
 												>
 													<i class="icon-grid-view"></i>
@@ -922,23 +957,21 @@ if ($js)
 											</div>
 
 											<div class="fc-iblock nowrap_box" style="position: relative; vertical-align: middle;">
-												<div id="fc_mainChooseColBox_btn" class="<?php echo $this->tooltip_class . ' ' . $this->btn_sm_class . ' ' . $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" data-title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>" data-placement="bottom">
+												<button type="button" id="fc_mainChooseColBox_btn" aria-label="<?php echo htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_COLUMNS'), ENT_QUOTES, 'UTF-8'); ?>" class="<?php echo $this->tooltip_class . ' ' . $this->btn_sm_class . ' ' . $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" data-title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>" data-placement="bottom">
 													<span class="icon-contract"></span><sup id="columnchoose_totals"></sup>
-												</div>
+												</button>
 
 												<div id="mainChooseColBox" class="group-fcset fcman-abs" style="display:none;"></div>
 											</div>
 
 											<?php if (!empty($this->minihelp) && FlexicontentHelperPerm::getPerm()->CanConfig): ?>
-											<div id="fc-mini-help_btn" class=<?php echo $this->btn_sm_class . ' ' . $out_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
+											<button type="button" id="fc-mini-help_btn" class="<?php echo $this->btn_sm_class . ' ' . $out_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
 											<span class="icon-help"></span>
 											<?php echo $this->minihelp; ?>
-										</div>
+										</button>
 									<?php endif; ?>
 
-									</div>
-
-									<div class= "fc-iblock" style="margin: 8px 6px;">
+										<div class="fc-iblock fc-fm-thumbsize">
 										<select id="fc-fileman-list-thumb-size-sel" name="fc-fileman-list-thumb-size-sel" style="display: none;"></select>
 										<div id="fc-fileman-list-thumb-size_nouislider" class="fman_list_element" style="display: none; max-width: 180px;"></div>
 										<div class="fc_slider_input_box">
@@ -950,25 +983,30 @@ if ($js)
 										<div class="fc_slider_input_box">
 											<input id="fc-fileman-grid-thumb-size-val" name="fc-fileman-grid-thumb-size-val" type="text" size="12" value="140" />
 										</div>
+
+									</div>
 									</div>
 
 						</div>
 
+									<?php endif; ?>
+
+						<?php if ($libraryPicker) : ?><div class="fc-picker-table"><?php endif; ?>
 						<table id="adminListTableFC<?php echo $this->getModel()->view_id; ?>" class="adminlist table fcmanlist fman_list_element">
 							<thead>
 							<tr>
-								<th class="center hidden-phone"><?php echo Text::_( 'FLEXI_NUM' ); ?></th>
+								<th class="center hidden-phone" data-col="num"><?php echo Text::_( 'FLEXI_NUM' ); ?></th>
 
-								<th>&nbsp;</th>
+								<th data-col="cb">&nbsp;</th>
 
 								<?php if (!empty($this->cols['file_id'])) : ?>
-									<th class="center hideOnDemandClass col_id hidden-phone hidden-tablet">
+									<th class="center hideOnDemandClass col_id hidden-phone hidden-tablet" data-col="id">
 										<?php echo HTMLHelper::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 									</th>
 								<?php endif; ?>
 
-								<th class="center hideOnDemandClass"><?php echo Text::_( 'FLEXI_THUMB' ); ?></th>
-								<th class="left">
+								<th class="center hideOnDemandClass" data-col="thumb"><?php echo Text::_( 'FLEXI_THUMB' ); ?></th>
+								<th class="left" data-col="title">
 									<?php if (!$this->folder_mode) : ?>
 										<?php echo HTMLHelper::_('grid.sort', 'FLEXI_FILENAME', 'a.filename_displayed', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 										&nbsp; -- &nbsp;
@@ -978,62 +1016,73 @@ if ($js)
 									<?php endif; ?>
 								</th>
 
+								<?php foreach (array(1, 2) as $n) : ?>
+									<?php if (!empty($this->cols['custom' . $n])) : ?>
+										<th class="left hideOnDemandClass hidden-phone" data-col="custom<?php echo $n; ?>" data-col-label="<?php echo htmlspecialchars($this->custom_headings[$n]['label'], ENT_QUOTES, 'UTF-8'); ?>">
+											<?php echo HTMLHelper::_('grid.sort', htmlspecialchars($this->custom_headings[$n]['label'], ENT_QUOTES, 'UTF-8'), 'a.custom' . $n, $this->lists['order_Dir'], $this->lists['order'] ); ?>
+											<?php if ($this->custom_headings[$n]['tip'] !== '') : ?>
+												<span class="icon-info-circle" tabindex="0" title="<?php echo htmlspecialchars($this->custom_headings[$n]['tip'], ENT_QUOTES, 'UTF-8'); ?>" aria-label="<?php echo htmlspecialchars($this->custom_headings[$n]['tip'], ENT_QUOTES, 'UTF-8'); ?>"></span>
+											<?php endif; ?>
+										</th>
+									<?php endif; ?>
+								<?php endforeach; ?>
+
 								<?php if (!empty($this->cols['state'])) : ?>
-									<th class="center hideOnDemandClass">
+									<th class="center hideOnDemandClass" data-col="state">
 										<?php echo HTMLHelper::_('grid.sort', 'FLEXI_PUBLISHED', 'a.published', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 									</th>
 								<?php endif; ?>
 								<?php if (!empty($this->cols['access'])) : ?>
-									<th class="center hideOnDemandClass hidden-phone">
+									<th class="center hideOnDemandClass hidden-phone" data-col="access">
 										<?php echo HTMLHelper::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 									</th>
 								<?php endif; ?>
 								<?php if (!empty($this->cols['lang'])) : ?>
-									<th class="center hideOnDemandClass hidden-phone">
+									<th class="center hideOnDemandClass hidden-phone" data-col="lang">
 										<?php echo HTMLHelper::_('grid.sort', 'FLEXI_LANGUAGE', 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 									</th>
 								<?php endif; ?>
 
 								<?php if ($this->folder_mode) : ?>
-									<th class="center hideOnDemandClass"><?php echo Text::_('FLEXI_SIZE'); ?></th>
+									<th class="center hideOnDemandClass" data-col="size"><?php echo Text::_('FLEXI_SIZE'); ?></th>
 								<?php else : ?>
-									<th class="center hideOnDemandClass"><?php echo HTMLHelper::_('grid.sort', 'FLEXI_SIZE', 'a.size', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+									<th class="center hideOnDemandClass" data-col="size"><?php echo HTMLHelper::_('grid.sort', 'FLEXI_SIZE', 'a.size', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 								<?php endif; ?>
 
 								<?php if (!empty($this->cols['hits'])) : ?>
-									<th class="center hideOnDemandClass hidden-phone"><?php echo HTMLHelper::_('grid.sort', 'FLEXI_HITS', 'a.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+									<th class="center hideOnDemandClass hidden-phone" data-col="hits"><?php echo HTMLHelper::_('grid.sort', 'FLEXI_HITS', 'a.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 								<?php endif; ?>
 
 								<?php if (!empty($this->cols['target'])) : ?>
-									<th class="center hideOnDemandClass hidden-phone"><?php echo $secure_folder_tip; ?><?php echo HTMLHelper::_('grid.sort', 'FLEXI_URL_SECURE', 'a.secure', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+									<th class="center hideOnDemandClass hidden-phone" data-col="target" data-col-label="<?php echo Text::_('FLEXI_URL_SECURE', true); ?>"><?php echo $secure_folder_tip; ?><?php echo HTMLHelper::_('grid.sort', 'FLEXI_URL_SECURE', 'a.secure', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 								<?php endif; ?>
 
 								<?php if (!empty($this->cols['stamp'])) : ?>
-									<th class="center hideOnDemandClass hidden-phone"><?php echo $stamp_folder_tip; ?><?php echo HTMLHelper::_('grid.sort', 'FLEXI_DOWNLOAD_STAMPING', 'a.stamp', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+									<th class="center hideOnDemandClass hidden-phone" data-col="stamp" data-col-label="<?php echo Text::_('FLEXI_DOWNLOAD_STAMPING', true); ?>"><?php echo $stamp_folder_tip; ?><?php echo HTMLHelper::_('grid.sort', 'FLEXI_DOWNLOAD_STAMPING', 'a.stamp', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 								<?php endif; ?>
 
 								<?php if (!empty($this->cols['usage'])) : ?>
-									<th class="left hideOnDemandClass hidden-phone" colspan="2"><?php echo HTMLHelper::_('grid.sort', 'FLEXI_USAGE', 'a.assignments', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+									<th class="left hideOnDemandClass hidden-phone" data-col="usage" colspan="2"><?php echo HTMLHelper::_('grid.sort', 'FLEXI_USAGE', 'a.assignments', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 								<?php endif; ?>
 
 								<?php if (!$isFilesElement) : ?>
-									<th class="center hideOnDemandClass hidden-phone"><?php echo Text::_( 'FLEXI_FILE_NUM_ITEMS' ); ?> </th>
+									<th class="center hideOnDemandClass hidden-phone" data-col="items"><?php echo Text::_( 'FLEXI_FILE_NUM_ITEMS' ); ?> </th>
 								<?php endif; ?>
 
 								<?php if (!empty($this->cols['uploader'])) : ?>
-									<th class="center hideOnDemandClass hidden-phone"><?php echo HTMLHelper::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+									<th class="center hideOnDemandClass hidden-phone" data-col="uploader"><?php echo HTMLHelper::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 								<?php endif; ?>
 
 								<?php if (!empty($this->cols['upload_time'])) : ?>
-									<th class="center hideOnDemandClass hidden-phone hidden-tablet"><?php echo HTMLHelper::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'a.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+									<th class="center hideOnDemandClass hidden-phone hidden-tablet" data-col="time"><?php echo HTMLHelper::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'a.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 								<?php endif; ?>
 
 								<?php if (!$isFilesElement) : ?>
-									<th class="center hideOnDemandClass hidden-phone"><?php echo HTMLHelper::_('grid.sort', 'E-storage', 'estorage', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+									<th class="center hideOnDemandClass hidden-phone" data-col="estorage"><?php echo HTMLHelper::_('grid.sort', 'E-storage', 'estorage', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 								<?php endif; ?>
 
 								<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>
-									<th>&nbsp;</th>
+									<th data-col="del" data-col-label="<?php echo Text::_('FLEXI_REMOVE', true); ?>">&nbsp;</th>
 								<?php endif; ?>
 
 							</tr>
@@ -1128,7 +1177,7 @@ if ($js)
 								if (empty($thumb_or_icon))
 								{
 									$thumb_or_icon = file_exists($file_abspath)
-										? '<img class="fc-fileman-thumb" onclick="if (jQuery(this).hasClass(\'fc_zoomed\')) { fman_zoom_thumb(event, this); return false; }" src="' . flexicontent_images::phpThumbURL(array('src' => $file_src, 'w' => 800, 'h' => 800, 'zc' => 1, 'q' => 95, 'f' => 'jpeg', 'ar' => 'x'), true, true, !$file_inroot) . '" alt="'.$filename_original.'" />'
+										? '<img class="fc-fileman-thumb" onclick="if (this.classList.contains(\'fc_zoomed\')) { fman_zoom_thumb(event, this); return false; }" src="' . flexicontent_images::phpThumbURL(array('src' => $file_src, 'w' => 800, 'h' => 800, 'zc' => 1, 'q' => 95, 'f' => 'jpeg', 'ar' => 'x'), true, true, !$file_inroot) . '" alt="'.$filename_original.'" />'
 										: '<span class="badge badge-box badge-important">'.Text::_('FLEXI_FILE_NOT_FOUND').'</span>';
 								}
 
@@ -1153,7 +1202,7 @@ if ($js)
 											{
 												$icon_name = $this->assigned_fields_icons[$field_type];
 												$tip = $row->{'assigned_'.$field_type} . ' ' . $field_label;
-												$image = HTMLHelper::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, 'title="'.$usage_in_str.' '.$field_type.' '.$fields_str.'"' );
+												$image = HTMLHelper::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, array('title' => htmlspecialchars($usage_in_str.' '.$field_type.' '.$fields_str, ENT_COMPAT, 'UTF-8')) );
 												$row->assigned[] = $row->{'assigned_'.$field_type} . ' ' . $image;
 											}
 										}
@@ -1197,11 +1246,11 @@ if ($js)
 								}
 								?>
 								<tr class="<?php echo 'row' . ($k % 2); ?>">
-									<td class="center hidden-phone">
+									<td class="center hidden-phone" data-col="num">
 										<?php echo $this->pagination->getRowOffset($i); ?>
 									</td>
 
-									<td class="center <?php echo ($file_is_selected ? ' is-pending-file' : ''); ?>">
+									<td class="center <?php echo ($file_is_selected ? ' is-pending-file' : ''); ?>" data-col="cb">
 										<!--div class="adminlist-table-row"></div-->
 										<?php echo HTMLHelper::_($hlpname . '.grid_id', $i,
 											!$this->folder_mode ? $row->id : rawurlencode($filename),
@@ -1211,7 +1260,7 @@ if ($js)
 									</td>
 
 									<?php if (!empty($this->cols['file_id'])) : ?>
-										<td class="center col_id hidden-phone hidden-tablet">
+										<td class="center col_id hidden-phone hidden-tablet" data-col="id">
 											<?php
 											echo $row->id;
 											$urlvars = ['id' => $row->id]; // ['id' => $row->id, 'cid' => 0, 'fid' => 0];  // cid : content item id, fid : field id, id : file id
@@ -1219,7 +1268,7 @@ if ($js)
 											$link = trim(Uri::root(), '/') . str_replace(Uri::root(true), '', $link);
 
 											echo '
-											<a href="javascript:;" onclick="jQuery(\'#copyUrlModal\').find(\'.linkbox\').html(\''.$link.'\')"
+											<a href="javascript:;" onclick="document.querySelector(\'#copyUrlModal .linkbox\').textContent = \''.$link.'\'"
 												class="toolbar btn btn-info btn-copy-url" data-clipboard-text="'.$link.'"
 												data-toggle="modal" data-target="#copyUrlModal" data-bs-toggle="modal" data-bs-target="#copyUrlModal">'
 												. '<span class="icon-link"></span>
@@ -1229,13 +1278,13 @@ if ($js)
 										</td>
 									<?php endif; ?>
 
-									<td class="center">
+									<td class="center" data-col="thumb">
 										<div class="fc-fileman-list-thumb-box thumb_<?php echo $thumb_size['fm-list'] ; ?>" onclick="fman_sync_cid(<?php echo $i; ?>, 0);">
 											<?php echo $thumb_or_icon; ?>
 										</div>
 									</td>
 
-									<td class="col_title smaller">
+									<td class="col_title smaller" data-col="title">
 										<?php
 										if (!$isFilesElement)
 										{
@@ -1301,7 +1350,7 @@ if ($js)
 												// Note we will pass true to canEdit parameter because we want to create an assign link
 												echo HTMLHelper::_($hlpname . '.edit_link', $row, $i, true, array(
 													'linkedPrefix' => '<span class="icon-checkbox"></span><span class="icon-new"></span>',
-													'onclick' => 'if (jQuery(this).hasClass(\'striketext\')) return; ' . $row->file_assign_link,
+													'onclick' => 'if (this.classList.contains(\'striketext\')) return; ' . $row->file_assign_link,
 													'attribs' => array(
 														'id' => 'file' . $row->id,
 														'class' => 'fc_set_file_assignment fc-iblock text-dark ' . $this->btn_sm_class . ' ' . $this->tooltip_class,
@@ -1328,16 +1377,28 @@ if ($js)
 										?>
 									</td>
 
+									<?php foreach (array(1, 2) as $n) : ?>
+										<?php if (!empty($this->cols['custom' . $n])) : ?>
+											<?php
+											// Stored value is HTML, the list shows it as shortened plain text
+											$custom_text = html_entity_decode(strip_tags((string) ($row->{'custom' . $n} ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+											$custom_text = trim(preg_replace('/\s+/u', ' ', $custom_text) ?? $custom_text);
+											$custom_short = StringHelper::strlen($custom_text) > 100 ? StringHelper::substr($custom_text, 0, 100) . '...' : $custom_text;
+											?>
+											<td class="left smaller hidden-phone" data-col="custom<?php echo $n; ?>" title="<?php echo htmlspecialchars($custom_text, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($custom_short, ENT_QUOTES, 'UTF-8'); ?></td>
+										<?php endif; ?>
+									<?php endforeach; ?>
+
 									<?php if (!empty($this->cols['state'])) : ?>
-										<td class="center">
+										<td class="center" data-col="state">
 											<?php echo HTMLHelper::_('jgrid.published', $row->published, $i, $ctrl); ?>
 										</td>
 									<?php endif; ?>
 
 									<?php if (!empty($this->cols['access'])) : ?>
-										<td class="center hidden-phone">
+										<td class="center hidden-phone" data-col="access">
 											<?php
-											echo $this->CanFiles && ($this->CanViewAllFiles || $user->id == $row->uploaded_by)
+											echo $user->authorise('flexicontent.editfileproperties', 'com_flexicontent') && $this->CanFiles && ($this->CanViewAllFiles || $user->id == $row->uploaded_by)
 												? flexicontent_html::userlevel('access['.$row->id.']', $row->access ?? 1, 'class="fcfield_selectval" onchange="return setAccessLevel(this, '.$row->id.');"')
 												: (strlen($row->access_level ?? '') ? $this->escape($row->access_level) : '-');
 											?>
@@ -1347,7 +1408,7 @@ if ($js)
 									<?php $row->language = empty($row->language) ? '' : $row->language; /* Set language ALL when language is empty */ ?>
 
 									<?php if (!empty($this->cols['lang'])) : ?>
-										<td class="col_lang hidden-phone">
+										<td class="col_lang hidden-phone" data-col="lang">
 											<?php
 											/**
 											 * Display language
@@ -1356,37 +1417,37 @@ if ($js)
 										</td>
 									<?php endif; ?>
 
-									<td class="center"><?php echo $row->url != 1 ? (file_exists($file_abspath) ? $row->size : '<span class="badge badge-box badge-important">'.Text::_('FLEXI_FILE_NOT_FOUND').'</span>') : $row->size; ?></td>
+									<td class="center" data-col="size"><?php echo $row->url != 1 ? (file_exists($file_abspath) ? $row->size : '<span class="badge badge-box badge-important">'.Text::_('FLEXI_FILE_NOT_FOUND').'</span>') : $row->size; ?></td>
 
 									<?php if (!empty($this->cols['hits'])) : ?>
-										<td class="center hidden-phone"><span class="badge"><?php echo empty($row->hits) ? 0 : $row->hits; ?></span></td>
+										<td class="center hidden-phone" data-col="hits"><span class="badge"><?php echo empty($row->hits) ? 0 : $row->hits; ?></span></td>
 									<?php endif; ?>
 
 									<?php if (!empty($this->cols['target'])) : ?>
-										<td class="center hidden-phone"><?php echo $row->secure ? '<span class="badge bg-info badge-info">' . Text::_('FLEXI_YES') : '<span class="badge">' . Text::_('FLEXI_NO'); ?></span></td>
+										<td class="center hidden-phone" data-col="target"><?php echo $row->secure ? '<span class="badge bg-info badge-info">' . Text::_('FLEXI_YES') : '<span class="badge">' . Text::_('FLEXI_NO'); ?></span></td>
 									<?php endif; ?>
 
 									<?php if (!empty($this->cols['stamp'])) : ?>
-										<td class="center hidden-phone"><?php echo $row->stamp ? '<span class="badge bg-info badge-info">' . Text::_('FLEXI_YES') : '<span class="badge">' . Text::_('FLEXI_NO'); ?></span></td>
+										<td class="center hidden-phone" data-col="stamp"><?php echo $row->stamp ? '<span class="badge bg-info badge-info">' . Text::_('FLEXI_YES') : '<span class="badge">' . Text::_('FLEXI_NO'); ?></span></td>
 									<?php endif; ?>
 
 									<?php if (!empty($this->cols['usage'])) : ?>
-										<td class="center hidden-phone">
+										<td class="center hidden-phone" data-col="usage">
 											<span class="badge"><?php echo $row->assignments; ?></span>
 										</td>
-										<td class="center hidden-phone">
+										<td class="center hidden-phone" data-col="usage">
 											<span class="nowrap_box"><?php echo $row->assigned; ?></span>
 										</td>
 									<?php endif; ?>
 
 									<?php if (!$isFilesElement) : ?>
-										<td class="center hidden-phone">
+										<td class="center hidden-phone" data-col="items">
 											<?php echo '<a class="' . $this->btn_sm_class . '" href="'.$item_link.'" title="'.$view_entry.'">'.count($row->itemids).'</a>'; ?>
 										</td>
 									<?php endif; ?>
 
 									<?php if ($this->CanViewAllFiles && !empty($this->cols['uploader'])) : ?>
-										<td class="center hidden-phone">
+										<td class="center hidden-phone" data-col="uploader">
 											<?php if (!$isFilesElement && $this->perms->CanAuthors) :?>
 												<a target="_blank" href="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task_authors; ?>edit&amp;hidemainmenu=1&amp;cid=<?php echo $row->uploaded_by; ?>">
 													<?php echo $row->uploader; ?>
@@ -1398,20 +1459,20 @@ if ($js)
 									<?php endif; ?>
 
 									<?php if (!empty($this->cols['upload_time'])) : ?>
-										<td class="center hidden-phone hidden-tablet">
+										<td class="center hidden-phone hidden-tablet" data-col="time">
 											<?php echo HTMLHelper::Date( $row->uploaded, Text::_( 'DATE_FORMAT_LC3' )." H:i" ); ?>
 										</td>
 									<?php endif; ?>
 
 									<?php if (!$isFilesElement) : ?>
-										<td class="center col_estorage hidden-phone hidden-tablet">
+										<td class="center col_estorage hidden-phone hidden-tablet" data-col="estorage">
 											<?php echo !$row->estorage_fieldid ? Text::_('FLEXI_NO') : ($row->estorage_fieldid > 0 ? Text::_('Pending') :  Text::_('Uploading')); ?>
 										</td>
 									<?php endif; ?>
 
 									<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>
-										<td>
-											<a class="btn btn-mini ntxt" href="javascript:;" onclick="if (confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { return Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }">
+										<td data-col="del">
+											<a class="btn btn-mini ntxt" href="javascript:;" onclick="FlexiForm.confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>').then(accepted => { if (accepted) Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }); return false;">
 												<span class="icon-remove" title="<?php echo Text::_('FLEXI_REMOVE'); ?>"></span>
 											</a>
 										</td>
@@ -1424,9 +1485,14 @@ if ($js)
 							?>
 							</tbody>
 
-							<tfoot>
+							
 
-							<?php if (!$this->folder_mode && !$this->is_pending) :
+						</table>
+						<?php if ($libraryPicker) : ?></div><?php else : ?>
+						<script>window.fcTableTools && fcTableTools.init('adminListTableFC<?php echo $this->getModel()->view_id; ?>');</script>
+						<?php endif; ?>
+
+						<?php if (!$this->folder_mode && !$this->is_pending) :
 								$field_legend = array();
 								$this->assigned_fields_labels;
 								foreach($this->assigned_fields_labels as $field_type => $field_label)
@@ -1438,24 +1504,12 @@ if ($js)
 								}
 								?>
 
-								<tr>
-									<td colspan="<?php echo $list_total_cols; ?>" style="text-align: center; border-top:0px solid black;">
+								<div class="fc-table-legend fman_list_element">
 										<span class="label fc_legend_box <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_USAGE_LEGEND', 'FLEXI_FILE_USAGE_LEGEND_TIP', 1, 1); ?> " ><?php echo Text::_('FLEXI_FILE_USAGE_LEGEND'); ?></span> &nbsp;
 										<?php echo implode(' &nbsp; &nbsp; | &nbsp; &nbsp; ', $field_legend); ?>
-									</td>
-								</tr>
+									</div>
 
-							<?php else : ?>
-								<tr>
-									<td colspan="<?php echo $list_total_cols; ?>" style="text-align: center; border-top:0px solid black;">
-										--
-									</td>
-								</tr>
 							<?php endif; ?>
-
-							</tfoot>
-
-						</table>
 
 						<div id="adminListThumbsFCfiles<?php echo $this->layout.$this->fieldid; ?>" class="adminthumbs fcmanthumbs fman_grid_element" style="display: none;">
 							<?php
@@ -1510,7 +1564,7 @@ if ($js)
 											{
 												$icon_name = $this->assigned_fields_icons[$field_type];
 												$tip = $row->{'assigned_'.$field_type} . ' ' . $field_label;
-												$image = HTMLHelper::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, 'title="'.$usage_in_str.' '.$field_type.' '.$fields_str.'"' );
+												$image = HTMLHelper::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, array('title' => htmlspecialchars($usage_in_str.' '.$field_type.' '.$fields_str, ENT_COMPAT, 'UTF-8')) );
 												$row->assigned[] = $row->{'assigned_'.$field_type} . ' ' . $image;
 											}
 										}
@@ -1526,10 +1580,10 @@ if ($js)
 									<?php
 									echo $thumb_or_icon;
 									echo !$is_img ? '' : '
-					<span class="btn fc-fileman-preview-btn icon-search" onclick="fman_zoom_thumb(event, this); return false;"></span>
+					<button type="button" class="btn fc-fileman-preview-btn icon-search" aria-label="' . htmlspecialchars(Text::_('FLEXI_PREVIEW'), ENT_QUOTES, 'UTF-8') . '" onclick="fman_zoom_thumb(event, this); return false;"></button>
 					'; ?>
 									<span class="btn fc-fileman-selection-mark icon-checkmark" id="_cb<?php echo $i; ?>" ></span>
-									<span class="btn fc-fileman-delete-btn icon-remove" onclick="if (confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }"></span>
+									<button type="button" class="btn fc-fileman-delete-btn icon-remove" aria-label="<?php echo htmlspecialchars(Text::_('FLEXI_DELETE'), ENT_QUOTES, 'UTF-8'); ?>" onclick="event.stopPropagation(); FlexiForm.confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>').then(accepted => { if (accepted) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); } }); return false;"></button>
 									<span class="fc-fileman-filename-box"><?php echo $row->title_cut; ?></span>
 								</div>
 								<?php
@@ -1539,7 +1593,9 @@ if ($js)
 
 						</div>
 
-						<?php if (!$this->folder_mode) : ?>
+						<?php if ($libraryPicker && !$this->rows) : ?>
+							<p class="fc-picker-empty"><?php echo Text::_('JGLOBAL_NO_MATCHING_RESULTS'); ?></p>
+						<?php elseif (!$this->folder_mode) : ?>
 							<?php echo $pagination_footer; ?>
 						<?php endif; ?>
 
@@ -1571,15 +1627,24 @@ if ($js)
 					</div>
 
 
-					<!-- File(s) by uploading -->
+					<?php if ($picker_dashboard) : ?>
+						<div hidden>
+							<?php echo $uploader_html->container; ?>
+							<?php echo $this->ffields['file-access']; ?>
+							<?php echo $this->ffields['file-lang']; ?>
+						</div>
+					<?php endif; ?>
+
+					<?php if (!$picker_dashboard || $has_link_tab) : ?>
+					<!-- Other file sources and the standalone manager tools -->
 					<div class="span6 col-md-6" id="fc-fileman-addfiles-col" <?php echo !$show_addfiles ? ' style="display: none;" ' : ''; ?> >
 
 						<?php /*echo HTMLHelper::_('tabs.panel', Text::_( 'FLEXI_UPLOAD_FILES' ), 'fileupload' );*/ ?>
 						<?php /* echo HTMLHelper::_('tabs.start'); */ ?>
 
-						<div class="fctabber fc_hidden_1270" id="fc-fileman-addfiles">
+						<div class="fctabber<?php echo $picker_dashboard ? '' : ' fc_hidden_1270'; ?>" id="fc-fileman-addfiles">
 
-							<?php if ($use_fc_uploads) : ?>
+							<?php if ($use_fc_uploads && !$picker_dashboard) : ?>
 
 								<div class="tabbertab" id="local_tab" data-icon2-class="icon-upload fc-icon-orange" data-icon-class="fc-icon-green">
 									<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo Text::_( 'FLEXI_UPLOAD_FILES_DESC' ); ?>"> <?php echo Text::_( 'FLEXI_UPLOAD_FILES' ); ?> </h3>
@@ -1635,14 +1700,14 @@ if ($js)
 											$show_server_limit = $server_limit_exceeded && ! $enable_multi_uploader;  // plupload JS overcomes server limitations so we will not display it, if using plupload
 
 											echo '
-					<span id="fc_dispInfoBox_btn" class="' . $this->btn_sm_class . '" onclick="fc_toggle_box_via_btn(\'upload_info_box\', this, \'btn-primary\');"><i class="icon-info"></i>'. Text::_( 'FLEXI_FILES_INFO_UPLOAD' ).'</span>
+					<button type="button" id="fc_dispInfoBox_btn" class="' . $this->btn_sm_class . '" onclick="fc_toggle_box_via_btn(\'upload_info_box\', this, \'btn-primary\');"><i class="icon-info"></i>'. Text::_( 'FLEXI_FILES_INFO_UPLOAD' ).'</button>
 					'.
 												($enable_multi_uploader ? '
-						<span class="' . $this->btn_sm_class . ' ' . $this->tooltip_class.'" onclick="jQuery(\'#fc-fileman-formbox-1\').toggle(); jQuery(\'#fc-fileman-formbox-2\').toggle(); setTimeout(function(){ '.$uploader_tag_id.'.autoResize(\''.$up_sfx_n.'\'); }, 100);"
-							id="single_multi_uploader" data-title="' . flexicontent_html::getToolTip('', 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC', 1, 1) . '" style="float: ' . (Factory::getLanguage()->isRTL() ? 'left;' : 'right;') . '"
-						data-placement="'. (Factory::getLanguage()->isRTL() ? 'right' : 'left') . '">
+						<button type="button" class="' . $this->btn_sm_class . ' ' . $this->tooltip_class.'" onclick="for (const id of [\'fc-fileman-formbox-1\', \'fc-fileman-formbox-2\']) { const panel = document.getElementById(id); FlexiForm.show(panel, !FlexiForm.visible(panel)); } setTimeout(function(){ '.$uploader_tag_id.'.autoResize(\''.$up_sfx_n.'\'); }, 100);"
+							id="single_multi_uploader" data-title="' . flexicontent_html::getToolTip('', 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC', 1, 1) . '" style="float: ' . (\Joomla\CMS\Factory::getApplication()->getLanguage()->isRTL() ? 'left;' : 'right;') . '"
+						data-placement="'. (\Joomla\CMS\Factory::getApplication()->getLanguage()->isRTL() ? 'right' : 'left') . '">
 							'.Text::_( 'FLEXI_TOGGLE_BASIC_UPLOADER' ).'
-						</span>
+						</button>
 					' : '') . '
 
 				<div class="fcclear"></div>
@@ -1810,7 +1875,7 @@ if ($js)
 
 															<tr>
 																<td style="text-align:right; padding: 12px 4px;">
-																	<input type="button" id="file-props-apply" class="btn btn-success" onclick="var up = jQuery('#<?php echo $uploader_tag_id . $up_sfx_n; ?>').data('plupload_instance'); jQuery(up).data('fc_plupload_instance').submit_props_form(this, up); return false;" value="<?php echo Text::_( 'FLEXI_APPLY' ); ?>"/>
+																	<input type="button" id="file-props-apply" class="btn btn-success" onclick="FlexiUploader.submitProperties(this, '<?php echo $uploader_tag_id . $up_sfx_n; ?>'); return false;" value="<?php echo Text::_( 'FLEXI_APPLY' ); ?>"/>
 																</td>
 																<td style="text-align:left; padding: 12px 4px;">
 																	<input type="button" id="file-props-close" class="btn" onclick="fc_file_props_handle.dialog('close'); return false;" value="<?php echo Text::_( 'FLEXI_CANCEL' ); ?>"/>
@@ -1879,6 +1944,8 @@ if ($js)
 																	<textarea name="file-desc" cols="24" rows="3" id="file-desc_uploadFileForm" class="input-xxlarge"></textarea>
 																</td>
 															</tr>
+
+<?php echo flexicontent_fileeditor::renderCustomRows((object) array('id' => 0, 'custom1' => '', 'custom2' => ''), '', 3); ?>
 
 															<tr>
 																<td id="file-lang-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
@@ -1952,7 +2019,7 @@ if ($js)
 
 
 							<!-- File URL by Form -->
-							<?php if ($this->layout !='image' && ($use_links || $use_jmedia_man)) : /* not applicable for LAYOUT 'image' */ ?>
+							<?php if ($has_link_tab) : ?>
 
 								<?php /*echo HTMLHelper::_('tabs.panel', Text::_( 'FLEXI_ADD_URL' ), 'filebyurl' );*/ ?>
 								<?php
@@ -1962,7 +2029,7 @@ if ($js)
 									<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo Text::_($tab_title . '_DESC'); ?>"> <?php echo Text::_($tab_title); ?> </h3>
 
 									<div class="fc_loading_msg alert alert-info" style="display:none;"> &nbsp; &nbsp; <?php echo Text::_('FLEXI_LOADING') .' ... '. Text::_('FLEXI_PLEASE_WAIT'); ?></div>
-									<form action="<?php echo $action_url . 'addurl'; ?>" class="form-validate form-horizontal" name="addUrlForm" id="addUrlForm" method="post" onsubmit="this.style.display='none'; jQuery(this).prev().show(); return true;">
+									<form action="<?php echo $action_url . 'addurl'; ?>" class="form-validate form-horizontal" name="addUrlForm" id="addUrlForm" method="post" onsubmit="this.style.display='none'; FlexiForm.show(this.previousElementSibling); return true;">
 										<fieldset class="fc-fileman-tab" >
 											<fieldset class="fc-formbox" id="fc-fileman-formbox-3">
 
@@ -2023,7 +2090,7 @@ if ($js)
 																		$modal_url   = "index.php?option=com_ajax&view=default&tmpl=component&asset=com_content&author=&plugin=quantummanagermedia&format=html";
 																		$modal_url  .= $jmedia_subpath ? "&folder=".$jmedia_subpath : '';
 																		$modal_title = 'Select file'; $width = 0; $height = 0;
-																		$onclick_js  = "var url = jQuery(this).attr('data-href'); "
+																		$onclick_js  = "var url = this.dataset.href; "
 																			. " var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, {$width}, {$height}, null, "
 																			. " {title:'{$modal_title}', loadFunc: null}); return false;";
 																		$select_file_btn =
@@ -2033,7 +2100,7 @@ if ($js)
 																		$juri_root = \Joomla\CMS\Uri\Uri::root(true);
 																		$file_placeholder_text = 'No file selected';
 																		$file_placeholder_src  = $juri_root . '/' .'administrator/components/com_events/assets/images/person_placeholder.jpg';
-																		$file_clear_value_js   = "jQuery(this).parent().find('input[type=text]').val(''); jQuery(this).parent().parent().find('.inline-preview-img').attr('src', '".$file_placeholder_src."'); ";
+																		$file_clear_value_js   = "this.parentElement.querySelector('input[type=text]').value = ''; this.parentElement.parentElement.querySelector('.inline-preview-img').src = '".$file_placeholder_src."'; ";
 
 																		echo <<<HTML
 										<div class="control-group">
@@ -2097,7 +2164,10 @@ HTML;
     'name' => 'file-jmedia-data',
     'id' => 'file-jmedia-data',
     'value' => '',
-    'folder' => is_array($jmedia_subpath) ? $jmedia_subpath : [$jmedia_subpath], // Ensures folder is an array
+    // Folder the picker opens: J3 sub-path inside JPATH_ROOT/images, J4+ adapter path 'local-<top-level directory>:/<sub-path>'
+    'folder' => version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'lt')
+        ? $jmedia_subpath
+        : 'local-' . $jmedia_topdir . ':/' . $jmedia_subpath,
 ];
 
 if (version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'ge')) {
@@ -2109,21 +2179,26 @@ if (version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'ge')) {
         'videosExt' => is_array($videosExt) ? $videosExt : (empty($videosExt) ? [] : explode(',', $videosExt)),
         'documentsExt' => is_array($documentsExt) ? $documentsExt : (empty($documentsExt) ? [] : explode(',', $documentsExt)),
     ];
+
+    // Extensions the picker accepts per media type (media.php prints them in supported-extensions),
+    // the lists above are already empty for the types that are not allowed
+    foreach (array('images', 'audios', 'videos', 'documents') as $jmedia_type) {
+        $jMedia_file_displayData[$jmedia_type . 'AllowedExt'] = $jMedia_file_displayData[$jmedia_type . 'Ext'];
+    }
 } else {
     $jMedia_file_displayData += [
         'filetypes' => is_array($fileTypes) ? $fileTypes : (empty($fileTypes) ? [] : explode(',', $fileTypes)),
     ];
 }
 
-// Ensure mediaTypeNames is always an array to prevent implode errors in media.php
-$jMedia_file_displayData['mediaTypeNames'] = is_array($jMedia_file_displayData['mediaTypeNames'] ?? null)
-    ? $jMedia_file_displayData['mediaTypeNames']
-    : explode(',', (string) $jMedia_file_displayData['mediaTypeNames']);
+// Names of the supported media types, an array as Joomla's MediaField passes it (media.php implodes it)
+$jMedia_file_displayData['mediaTypeNames'] = array_values(array_intersect_key(
+    array('images' => 'images', 'audios' => 'audios', 'videos' => 'videos', 'docs' => 'documents'),
+    array_flip((array) $jmedia_filetypes)
+));
 
 		$media_field = \Joomla\CMS\Layout\LayoutHelper::render('joomla.form.field.media', $jMedia_file_displayData, $layouts_path ?? '');
 		$media_field_html = str_replace('{field-media-id}', 'field-media-data', $media_field);
-		echo $media_field_html;
-
 
 																		echo $media_field_html;
 																	}
@@ -2159,8 +2234,10 @@ $jMedia_file_displayData['mediaTypeNames'] = is_array($jMedia_file_displayData['
 															</td>
 														</tr>
 
+<?php echo flexicontent_fileeditor::renderCustomRows((object) array('id' => 0, 'custom1' => '', 'custom2' => ''), '', 3); ?>
+
 														<tr>
-															<td></td><td><input style="margin-top: 64px;" type="button" class="btn btn-primary" value="Advanced properties" onclick="jQuery('.advanced-file-props').toggle({ direction: 'left' }, 300);"/></td>
+															<td></td><td><input style="margin-top: 64px;" type="button" class="btn btn-primary" value="Advanced properties" onclick="document.querySelectorAll('.advanced-file-props').forEach(row => FlexiForm.show(row, !FlexiForm.visible(row)));"/></td>
 														</tr>
 
 														<tr class="advanced-file-props" style="display: none;">
@@ -2292,6 +2369,8 @@ $jMedia_file_displayData['mediaTypeNames'] = is_array($jMedia_file_displayData['
 														</td>
 													</tr>
 
+<?php echo flexicontent_fileeditor::renderCustomRows((object) array('id' => 0, 'custom1' => '', 'custom2' => ''), '', 3); ?>
+
 													<tr>
 														<td class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_FILTER_REGEX', 'FLEXI_FILE_FILTER_REGEX_DESC', 1, 1); ?>">
 															<label class="fc-prop-lbl" for="file-filter-re">
@@ -2367,6 +2446,7 @@ $jMedia_file_displayData['mediaTypeNames'] = is_array($jMedia_file_displayData['
 							<?php /* echo HTMLHelper::_('tabs.end'); */ ?>
 						</div><!-- .fctabber end -->
 					</div><!-- .span6 end -->
+					<?php endif; ?>
 
 					<!-- fc_perf -->
 				</div>  <!-- row / row-fluid -->
@@ -2384,8 +2464,8 @@ $jMedia_file_displayData['mediaTypeNames'] = is_array($jMedia_file_displayData['
 	</style>
 
 	<script>
-	  jQuery(document).ready(function() {
-		  if (jQuery('a.btn-copy-url').length) {
+	  FlexiForm.ready(function() {
+		  if (document.querySelector('a.btn-copy-url')) {
 			  var clipboard = new ClipboardJS('a.btn-copy-url');
 		  }
 	  });
@@ -2417,29 +2497,43 @@ $jMedia_file_displayData['mediaTypeNames'] = is_array($jMedia_file_displayData['
 
 <script>
 		/* Submit task access for given row_id and selected level */
-	setAccessLevel = function (el, file_id) {
-		let access = {};
-		access[file_id] = jQuery(el).val();
-	  jQuery.ajax({
-		  type: "GET",
-			dataType: 'json',
-		  url: "index.php?option=com_flexicontent&task=filemanager.access&<?php echo \Joomla\CMS\Session\Session::getFormToken(); ?>=1",
-		  data: { cid: file_id, access: access, isAjax: 1, format: 'html' }
-		}).done(function( response ) {
-			var data = response.data;
-		  console.log(response);
-	  });
-	};
+	async function setAccessLevel(input, id)
+	{
+		const url = new URL("index.php?option=com_flexicontent&task=filemanager.access&<?php echo \Joomla\CMS\Session\Session::getFormToken(); ?>=1", document.baseURI);
+		const selected = input.value;
+		const previous = input.dataset.savedAccess || [...input.options].find(option => option.defaultSelected)?.value;
+		const params = new URLSearchParams({cid: id, isAjax: '1', format: 'html'});
+		params.set('access[' + id + ']', selected);
+		for (const [name, value] of params) url.searchParams.set(name, value);
+		input.disabled = true;
+		try
+		{
+			const response = await fetch(url, {credentials: 'same-origin', cache: 'no-store'});
+			const payload = await response.json();
+			if (!response.ok || payload.error || payload.success === false) throw Error(payload.message || response.statusText);
+			input.dataset.savedAccess = selected;
+		}
+		catch (error)
+		{
+			if (previous !== undefined) input.value = previous;
+			input.fc_choices_instance?.refresh();
+			Joomla.renderMessages({error: [error.message]});
+		}
+		finally
+		{
+			input.disabled = false;
+		}
+	}
 </script>
 
 
 <?php
-Factory::getDocument()->addScriptDeclaration('
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration('
 	function fc_edit_mmdata_modal_load( container )
 	{
-		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=mediadatas") != -1 )
+		if ( FlexiForm.element(container)?.querySelector("iframe")?.contentWindow.location.href.includes("view=mediadatas") )
 		{
-			container.dialog("close");
+			fc_closeDialog("fc_modal_popup_container");
 		}
 	}
 	function fc_edit_mmdata_modal_close()
@@ -2449,16 +2543,13 @@ Factory::getDocument()->addScriptDeclaration('
 	}
 
 	function jInsertFieldValue(value, id) {
-		var elem = jQuery(\'#\'+id).get(0);
-
-		elem.value = value;
-		let preview_img = jQuery(elem).parent().parent().find(\'img.inline-preview-img\');
-		if (preview_img.length > 0) {
-			let juri_root = preview_img.attr(\'data-juri-root\');
-			preview_img.attr(\'src\', juri_root + \'/\' + value);
-		}
-		if (typeof SqueezeBox != \'undefined\') SqueezeBox.close();
-		if (typeof jQuery != \'undefined\') jQuery(\'#fc_modal_popup_container\').dialog(\'close\');
+		const input = document.getElementById(id);
+		if (!input) return;
+		input.value = value;
+		const preview = input.parentElement.parentElement.querySelector("img.inline-preview-img");
+		if (preview) preview.src = preview.dataset.juriRoot + "/" + value;
+		if (typeof SqueezeBox !== "undefined") SqueezeBox.close();
+		fc_closeDialog("fc_modal_popup_container");
 	}
 
 ');

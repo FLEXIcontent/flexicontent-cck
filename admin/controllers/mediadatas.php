@@ -14,7 +14,13 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentControllerBaseAdmin' => JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 // Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
 require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'mediadata.php';
@@ -193,7 +199,7 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken() or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$cid    = $this->input->get('cid', array(), 'array');
 		$values = array('approved' => 1, 'unapproved' => 0);
@@ -206,7 +212,7 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 			{
 				// Prune items that you can't change.
 				unset($cid[$i]);
-				JError::raiseNotice(403, \Joomla\CMS\Language\Text::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'));
+				\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'), 'notice');
 			}
 		}
 
@@ -246,9 +252,9 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 	public function edit()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		$this->input->set('view', $this->record_name);
 		$this->input->set('hidemainmenu', 1);
@@ -466,9 +472,9 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 	public function ajaxvote()
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
-		$session = \Joomla\CMS\Factory::getSession();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$no_ajax     = $this->input->get('no_ajax', 0, 'int');
@@ -495,7 +501,19 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 		 * Load item
 		 */
 
-		$item = \Joomla\CMS\Table\Table::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
+		$__tblType = $type = 'flexicontent_items';
+		$__tblPrefix = $prefix = '';
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$item = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$item = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$item = new $__tblClass($__tblDb);
+		}
 		$item->load($cid);
 
 
@@ -511,8 +529,8 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 		FlexicontentFields::loadFieldConfig($field, $item);
 
 		// Load field's language files
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
 
 		// Get needed parameters
 		$rating_resolution = (int) $field->parameters->get('rating_resolution', 5);

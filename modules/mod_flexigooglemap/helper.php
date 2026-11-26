@@ -17,6 +17,7 @@
  **/
 
 
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\Path;
@@ -108,7 +109,7 @@ class modFlexigooglemapHelper
 		/**
 		 * Retrieve the items having the map locations (for the given field and the given categories)
 		 */
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$queryLoc = 'SELECT a.*, b.field_id, b.value, b.valueorder '
 			. ', CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as itemslug'
 			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
@@ -121,12 +122,75 @@ class modFlexigooglemapHelper
 			. ' LEFT JOIN #__flexicontent_items_ext AS ext ON a.id = ext.item_id'
 			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON a.id = rel.itemid'
 			. ' LEFT JOIN #__categories AS cc ON cc.id = rel.catid'
-			. ' WHERE b.field_id = ' . $fieldAddressId . ' AND ' . $catWhere . ' AND a.state = 1'
-			. ' GROUP BY a.id, b.field_id, b.value, b.valueorder, c.id, ext.type_id'
+			. ' WHERE b.field_id = ' . $fieldAddressId . ' AND ' . $catWhere . ' AND a.state = 1';
+
+		/**
+		 * Intersect with the item IDs of the current view's filtered item list,
+		 * so that markers follow the currently applied filters
+		 */
+		$filtered_ids = static::getFilteredItemIdsForView();
+		if (is_array($filtered_ids))
+		{
+			if (empty($filtered_ids)) return [];
+			$queryLoc .= ' AND a.id IN (' . implode(',', $filtered_ids) . ')';
+		}
+
+		$queryLoc .= ' GROUP BY a.id, b.field_id, b.value, b.valueorder, c.id, ext.type_id'
 			. ' ORDER BY a.title ' . $count;
 		$itemsLoc = $db->setQuery($queryLoc)->loadObjectList();
 
 		return $itemsLoc;
+	}
+
+
+	/**
+	 * Get the item IDs of the current view's filtered item list (all results, not limited by pagination)
+	 *
+	 * This makes the map markers follow the currently AJAX/applied filters of the
+	 * com_flexicontent 'category' view (and its mcats layout, etc).
+	 *
+	 * @return array|false  The filtered item IDs (array) or false when this cannot/should not be
+	 *                      computed (e.g. current view is not a com_flexicontent category view)
+	 * @since  3.0.0
+	 */
+	public static function getFilteredItemIdsForView()
+	{
+		static $filtered_ids_cache = null;
+
+		if (isset($filtered_ids_cache)) return $filtered_ids_cache;
+
+		$app    = \Joomla\CMS\Factory::getApplication();
+		$jinput = $app->input;
+
+		if ($jinput->get('option', '', 'cmd') !== 'com_flexicontent' || $jinput->get('view', '', 'cmd') !== 'category')
+		{
+			$filtered_ids_cache = false;
+			return $filtered_ids_cache;
+		}
+
+		try
+		{
+			/**
+			 * Reuse the category model to build the exact filtered query of the current view
+			 * - the LIMIT/OFFSET is applied in model's getData(), so _buildQuery() returns all matching items
+			 */
+			$cat_model = new FlexicontentModelCategory();
+			$cat_model->getCategory(null, $raiseErrors=false, $checkAccess=false);
+			$query = $cat_model->_buildQuery();
+
+			$filtered_ids_cache = array();
+			$rows = flexicontent_db::directQuery($query);
+			foreach ($rows as $row)
+			{
+				if (!empty($row->id)) $filtered_ids_cache[] = (int) $row->id;
+			}
+		}
+		catch (Exception $e)
+		{
+			$filtered_ids_cache = false;
+		}
+
+		return $filtered_ids_cache;
 	}
 
 
@@ -251,7 +315,8 @@ class modFlexigooglemapHelper
 		if ($defaultMarker_url && $params->get('mapapi', 'googlemap') !== 'googlemap')
 		{
 			if (FLEXI_CACHE) {
-				$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
+				$cache = \Joomla\CMS\Factory::getContainer()->get(CacheControllerFactoryInterface::class)
+					->createCacheController('callback', ['defaultgroup' => 'com_flexicontent']);
 				$cache->setCaching(1);
 				$cache->setLifeTime(FLEXI_CACHE_TIME);
 				list($markerWidth, $markerHeight) = $cache->get('getimagesize', array($defaultMarker_path ?: $defaultMarker_url));
