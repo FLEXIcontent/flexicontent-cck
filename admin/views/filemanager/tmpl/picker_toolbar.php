@@ -6,18 +6,35 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Language\Text;
 
+$label = static fn ($key) => htmlspecialchars(Text::_($key), ENT_QUOTES, 'UTF-8');
 $state = $this->getModel()->getState();
 $owner = (string) $state->get('filter_uploader', '');
 $ownFilesOnly = !$this->CanViewAllFiles || ($this->assign_mode && $this->field->parameters->get('limit_by_uploader', 0));
 $sorts = [
-	'a.filename_displayed' => 'FLEXI_FILENAME', 'a.altname' => 'FLEXI_FILE_DISPLAY_TITLE',
+	'a.id' => 'FLEXI_ID', 'a.filename_displayed' => 'FLEXI_FILENAME', 'a.altname' => 'FLEXI_FILE_DISPLAY_TITLE',
 	'a.size' => 'FLEXI_SIZE', 'a.uploaded' => 'FLEXI_UPLOAD_TIME', 'a.hits' => 'FLEXI_HITS',
 ];
+foreach ([1, 2] as $n) {
+	// Text::_() returns an unknown string (the heading of the property) unchanged
+	if (!empty($this->cols['custom' . $n])) $sorts['a.custom' . $n] = $this->custom_headings[$n]['label'];
+}
+// Number of active filters of the filters panel, 'My files' / 'All files' have their own buttons
+$panelFilters = [];
+if ($this->layout !== 'image') {
+	foreach (['state', 'access', 'lang', 'stamp'] as $col) {
+		if (!empty($this->cols[$col])) $panelFilters[] = 'filter_' . $col;
+	}
+	if (isset($this->lists['filter_url'])) $panelFilters[] = 'filter_url';
+	if (!empty($this->cols['target']) && !$dbFolder) $panelFilters[] = 'filter_secure';
+}
+if (!$ownFilesOnly && $owner !== (string) $user->id) $panelFilters[] = 'filter_uploader';
+$panelFilters[] = 'filter_item';
+$activeFilters = count(array_filter($panelFilters, static fn ($name) => (string) $state->get($name, '') !== ''));
+$filtersTitle = $label('FLEXI_FILTERS') . ($activeFilters ? ' (' . $activeFilters . ')' : '');
 $order = $this->lists['order'];
 $ascending = strtolower($this->lists['order_Dir']) === 'asc';
 $gridSizes = [90, 120, 150, 200, 250];
 $total = $this->folder_mode ? count($this->rows) : (int) $this->pagination->total;
-$label = static fn ($key) => htmlspecialchars(Text::_($key), ENT_QUOTES, 'UTF-8');
 ?>
 <div class="fc-picker-bar" role="group" aria-label="<?php echo $label('FLEXI_PICKER_MY_FILES'); ?>">
 	<?php if (!$this->folder_mode) : ?>
@@ -35,7 +52,7 @@ $label = static fn ($key) => htmlspecialchars(Text::_($key), ENT_QUOTES, 'UTF-8'
 		</div>
 		<?php echo $this->lists['picker_ext']; ?>
 		<details class="fc-picker-filters">
-			<summary class="fc-picker-tool" aria-label="<?php echo $label('FLEXI_FILTERS'); ?>" title="<?php echo $label('FLEXI_FILTERS'); ?>"><span class="icon-filter" aria-hidden="true"></span></summary>
+			<summary class="fc-picker-tool" aria-label="<?php echo $filtersTitle; ?>" title="<?php echo $filtersTitle; ?>"><span class="icon-filter" aria-hidden="true"></span><?php if ($activeFilters) : ?><span class="fc-picker-filter-count" aria-hidden="true"><?php echo $activeFilters; ?></span><?php endif; ?></summary>
 			<div class="fc-picker-filter-panel">
 				<?php
 				if ($this->layout !== 'image')

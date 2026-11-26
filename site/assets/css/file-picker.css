@@ -77,6 +77,13 @@
 }
 #flexicontent .fc-picker-filters > summary::after { content: none; }
 .fc-picker-search button { padding: .2rem; }
+#flexicontent .fc-picker-filters > summary:has(.fc-picker-filter-count) {
+	width: auto; min-width: 2.5rem; padding: 0 .6rem; color: var(--picker-accent); border-color: var(--picker-accent);
+}
+.fc-picker-filter-count {
+	min-width: 1.25rem; padding: 0 .3rem; border-radius: 1rem; background: #3455c5; color: #fff;
+	font-size: .75rem; font-weight: 700; line-height: 1.25rem; text-align: center;
+}
 .fc-picker-tool, #flexicontent .fc-picker-actions .btn {
 	display: inline-flex; align-items: center; justify-content: center; gap: .35rem; margin: 0;
 	min-height: 2.5rem; padding: .4rem .75rem; border-radius: .4rem; line-height: 1.2; white-space: nowrap;
@@ -91,15 +98,36 @@
 #flexicontent .fc-picker-bar label { margin: 0; }
 .fc-picker-all { white-space: nowrap; font-size: .9rem; }
 .fc-picker-tools input[type="range"] { width: 5rem; }
+/* Filters drop down below their button, each one as a label above its control.
+   '!important' is needed to override the expanded input group styles of the manager stylesheets */
+.fc-picker-filters { position: relative; }
 .fc-picker-filter-panel {
-	position: absolute; z-index: 2; display: grid; gap: .6rem; width: min(18rem, 90vw);
+	position: absolute; top: 100%; inset-inline-start: 0; z-index: 2;
+	display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: .6rem;
+	box-sizing: border-box; width: min(18rem, calc(100vw - 1rem)); max-height: calc(100vh - 9rem); overflow-y: auto;
 	margin-top: .4rem; padding: .85rem; background: var(--picker-paper); border: 1px solid var(--picker-border);
 	border-radius: .5rem; box-shadow: 0 .5rem 1.5rem #17233726;
 }
-.fc-picker-filter-panel .fc-filter, .fc-picker-filter-panel .input-group,
-.fc-picker-filter-panel .input-group-prepend { display: block; float: none; width: 100%; }
-.fc-picker-filter-panel .input-group-text { border: 0; background: transparent; padding: 0; font-size: .85rem; }
-#flexicontent .fc-picker-filter-panel :is(select, input) { width: 100%; max-width: none; }
+#flexicontent.fc-file-library #j-main-container .fc-picker-filter-panel .fc-filter {
+	display: block; float: none; width: 100%; min-width: 0; margin: 0; white-space: normal;
+}
+#flexicontent.fc-file-library #j-main-container .fc-picker-filter-panel .fc-filter :is(.input-group, .input-group-prepend) {
+	display: flex !important; flex-direction: column; align-items: stretch; gap: .25rem;
+	width: 100% !important; min-width: 0; margin: 0 !important; padding: 0 !important;
+}
+#flexicontent.fc-file-library #j-main-container .fc-picker-filter-panel .fc-filter .input-group-text {
+	display: block; width: auto; min-width: 0 !important; max-width: none; min-height: 0 !important; margin: 0;
+	padding: 0 !important; border: 0; background: transparent !important; color: var(--picker-text) !important;
+	font-size: .85rem; font-weight: 600; line-height: 1.3 !important; text-align: start; white-space: normal;
+}
+#flexicontent.fc-file-library #j-main-container .fc-picker-filter-panel .fc-filter :is(select, input) {
+	box-sizing: border-box; width: 100% !important; min-width: 0 !important; max-width: none !important; margin: 0 !important;
+	border: 1px solid var(--picker-border) !important; border-radius: .4rem !important;
+	color: var(--picker-text) !important; background-color: var(--picker-paper) !important;
+}
+#flexicontent.fc-file-library #j-main-container .fc-picker-filter-panel .fc-filter .badge {
+	align-self: flex-start; min-height: 0 !important; line-height: 1.4 !important;
+}
 #flexicontent.fc-file-library table.fcmanlist {
 	margin: 0; border: 1px solid var(--picker-border); border-collapse: separate; border-spacing: 0; border-radius: .5rem;
 }
@@ -134,6 +162,19 @@
 }
 #flexicontent.fc-file-library td.col_title a.fc_set_file_assignment { font-size: .9rem !important; }
 #flexicontent.fc-file-library td.col_title .badge { color: var(--picker-muted); background: var(--picker-soft); }
+#flexicontent.fc-file-library table.fcmanlist .col_id { width: 1%; white-space: nowrap; }
+#flexicontent.fc-file-library td.col_id .btn-copy-url {
+	display: inline-block; width: auto;
+	margin: 0; margin-inline-start: .4rem; padding: .15rem .4rem; font-size: .75rem; line-height: 1.2;
+	color: var(--picker-muted); background: transparent; border: 1px solid var(--picker-border); border-radius: .35rem;
+}
+#flexicontent.fc-file-library .fc-picker-table td[data-col="del"] { width: 1%; white-space: nowrap; text-align: end; }
+#flexicontent.fc-file-library .fc-picker-table td[data-col="del"] .btn-mini.ntxt { margin: 0 0 0 .25rem; background: transparent; }
+#flexicontent.fc-file-library .fc-picker-table td[data-col="del"] .btn-mini.ntxt:hover:enabled { color: var(--picker-accent); }
+#flexicontent.fc-file-library a.fc-picker-items {
+	display: inline-block; min-width: 2rem; padding: .15rem .45rem; border: 1px solid var(--picker-border);
+	border-radius: .35rem; color: var(--picker-accent); font-weight: 600; text-align: center; text-decoration: none;
+}
 .fc-picker-table { max-width: 100%; overflow-x: auto; }
 .fc-picker-empty { padding: 1rem; text-align: center; color: var(--picker-muted); }
 @media (max-width: 680px) {

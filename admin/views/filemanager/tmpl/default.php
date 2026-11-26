@@ -56,6 +56,7 @@ $isXtdBtn = $jinput->getCmd('isxtdbtn', '');
 $function = $jinput->getCmd('function', 'jSelectFcfile');
 $onclick  = $this->escape($function);
 $libraryPicker = $isFilesElement && !$isXtdBtn;
+$show_items_col = !$isFilesElement || ($libraryPicker && !$this->folder_mode);  // Number of items using the file
 if ($libraryPicker)
 {
 	$assets = Uri::root() . 'components/com_flexicontent/assets/';
@@ -997,7 +998,18 @@ if ($js)
 							<tr>
 								<th class="center hidden-phone" data-col="num"><?php echo Text::_( 'FLEXI_NUM' ); ?></th>
 
-								<th data-col="cb">&nbsp;</th>
+								<th data-col="cb">
+									<?php if ($libraryPicker) : /* Selects all files of the current page */ ?>
+										<div class="group-fcset">
+											<input type="checkbox" id="checkall-toggle-head" data-picker-checkall onclick="Joomla.checkAll(this); fman_set_cids(this);">
+											<label for="checkall-toggle-head" class="green single" title="<?php echo $this->escape(Text::_('JGLOBAL_CHECK_ALL')); ?>">
+												<span class="sr-only"><?php echo Text::_('JGLOBAL_CHECK_ALL'); ?></span>
+											</label>
+										</div>
+									<?php else : ?>
+										&nbsp;
+									<?php endif; ?>
+								</th>
 
 								<?php if (!empty($this->cols['file_id'])) : ?>
 									<th class="center hideOnDemandClass col_id hidden-phone hidden-tablet" data-col="id">
@@ -1065,7 +1077,7 @@ if ($js)
 									<th class="left hideOnDemandClass hidden-phone" data-col="usage" colspan="2"><?php echo HTMLHelper::_('grid.sort', 'FLEXI_USAGE', 'a.assignments', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 								<?php endif; ?>
 
-								<?php if (!$isFilesElement) : ?>
+								<?php if ($show_items_col) : ?>
 									<th class="center hideOnDemandClass hidden-phone" data-col="items"><?php echo Text::_( 'FLEXI_FILE_NUM_ITEMS' ); ?> </th>
 								<?php endif; ?>
 
@@ -1239,11 +1251,8 @@ if ($js)
 										"fc_fileselement_assign_file(fcfiles_targetid, _file_data['" . $i . "'], '" . $file_preview . "');";
 								}
 
-								// Link to items using the field
-								else
-								{
-									$item_link = !$isAdmin ? '' : 'index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_fileid='. $row->id.'&amp;fcform=1&amp;filter_state=ALL';
-								}
+								// Link to items using the file (backend only)
+								$item_link = !$isAdmin || !$show_items_col ? '' : 'index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_fileid='. $row->id.'&amp;fcform=1&amp;filter_state=ALL';
 								?>
 								<tr class="<?php echo 'row' . ($k % 2); ?>">
 									<td class="center hidden-phone" data-col="num">
@@ -1440,9 +1449,28 @@ if ($js)
 										</td>
 									<?php endif; ?>
 
-									<?php if (!$isFilesElement) : ?>
+									<?php if ($show_items_col) : ?>
 										<td class="center hidden-phone" data-col="items">
-											<?php echo '<a class="' . $this->btn_sm_class . '" href="'.$item_link.'" title="'.$view_entry.'">'.count($row->itemids).'</a>'; ?>
+											<?php
+											if (!$isFilesElement)
+											{
+												echo '<a class="' . $this->btn_sm_class . '" href="'.$item_link.'" title="'.$view_entry.'">'.count($row->itemids).'</a>';
+											}
+											// Field picker: usage of the pending (just uploaded) files is not counted. The items are
+											// listed in a new tab, the picker and the item form stay as they are
+											elseif (!isset($row->itemids))
+											{
+												echo '-';
+											}
+											elseif ($item_link && count($row->itemids))
+											{
+												echo '<a class="fc-picker-items" href="'.$item_link.'" title="'.$view_entry.'" target="_blank" rel="noopener">'.count($row->itemids).'</a>';
+											}
+											else
+											{
+												echo count($row->itemids);
+											}
+											?>
 										</td>
 									<?php endif; ?>
 
@@ -1472,6 +1500,7 @@ if ($js)
 
 									<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>
 										<td data-col="del">
+											<?php if ($libraryPicker) require __DIR__ . '/picker_row_actions.php'; ?>
 											<a class="btn btn-mini ntxt" href="javascript:;" onclick="FlexiForm.confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>').then(accepted => { if (accepted) Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }); return false;">
 												<span class="icon-remove" title="<?php echo Text::_('FLEXI_REMOVE'); ?>"></span>
 											</a>

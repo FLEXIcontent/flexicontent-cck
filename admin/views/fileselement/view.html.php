@@ -150,7 +150,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		$filter_item      = $model->getState('filter_item');
 
 		$target_dir = $layout === 'image' ? 0 : 2;  // 0: Force media, 1: force secure, 2: allow selection
-		$optional_cols = array('state', 'access', 'lang', 'hits', 'target', 'stamp', 'usage', 'uploader', 'upload_time', 'file_id');
+		$optional_cols = array('state', 'access', 'lang', 'hits', 'target', 'stamp', 'usage', 'uploader', 'upload_time', 'file_id', 'custom1', 'custom2');
 		$cols = array();
 
 
@@ -208,6 +208,18 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 		// Fileselement view, add none of optional columns
 		else ;
+
+		// The ID column is always listed in the field picker (DB-mode), it identifies the file and allows ordering by it
+		if (!$folder_mode) $cols['file_id'] = 1;
+
+		// Columns of the 'custom1' / 'custom2' file properties, the same rules as in the file manager: listed if the property is enabled
+		require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/fileeditor.php';
+		$custom_headings = $folder_mode ? array() : flexicontent_fileeditor::customListHeadings();
+		foreach (array(1, 2) as $n)
+		{
+			unset($cols['custom' . $n]);
+			if (isset($custom_headings[$n])) $cols['custom' . $n] = 1;
+		}
 
 		if ($layout !== 'image')
 		{
@@ -771,6 +783,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		$this->target_dir = $target_dir;
 		$this->optional_cols = $optional_cols;
 		$this->cols = $cols;
+		$this->custom_headings = $custom_headings;
 		$this->count_filters = $count_filters;
 
 		$this->params      = $cparams;

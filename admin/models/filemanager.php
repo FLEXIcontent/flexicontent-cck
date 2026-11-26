@@ -324,6 +324,19 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			$this->countUsage_FcFileBtn_DownloadLinks($this->_data);
 
 
+			// The items using each file, listed as their number by the file manager and by the field picker
+			foreach ($this->_data as $row)
+			{
+				// we have multiple item list indexed by field type, concatanate these
+				$itemids_list = !empty($row->item_list)  ?  implode(',', $row->item_list)  :  '';
+				// now create a item ids array that contains duplicates
+				$itemids_dup = ($itemids_list=='') ? array() : explode(',', $itemids_list);
+				// make an array of unique item ids
+				$itemids = array();  $n = 0;
+				foreach ($itemids_dup as $itemid) $itemids[$itemid] = $n++;
+				$row->itemids = array_flip($itemids);
+			}
+
 			// These can be used by the items manager without need to recalculate
 			if ($this->sess_assignments)
 			{
@@ -332,14 +345,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
 				foreach ($this->_data as $row)
 				{
-					// we have multiple item list indexed by field type, concatanate these
-					$itemids_list = !empty($row->item_list)  ?  implode(',', $row->item_list)  :  '';
-					// now create a item ids array that contains duplicates
-					$itemids_dup = ($itemids_list=='') ? array() : explode(',', $itemids_list);
-					// make an array of unique item ids
-					$itemids = array();  $n = 0;
-					foreach ($itemids_dup as $itemid) $itemids[$itemid] = $n++;
-					$fileid_to_itemids[$row->id] = $row->itemids = array_flip($itemids);
+					$fileid_to_itemids[$row->id] = $row->itemids;
 				}
 
 				$session->set('fileid_to_itemids', $fileid_to_itemids, 'flexicontent');
