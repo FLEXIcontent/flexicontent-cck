@@ -279,6 +279,9 @@ class plgFlexicontent_fieldsCore extends FCField
 					break;
 
 				case 'voting': // voting button
+					// Final microdata type of the item (type / category / item / menu parameters), the same value that the item layout uses for its 'itemscope'
+					$field->item_microdata_itemtype = isset($item->parameters) ? $item->parameters->get('microdata_itemtype', '') : '';
+
 					// TODO: if ($raw_values!==null) $vote = convert ... $raw_values;
 					$vote = $_vote === false
 						? $item->vote
