@@ -1248,18 +1248,18 @@ class plgFlexicontent_fieldsFile extends FCField
 				$v['file-del']   = !$iform_allowdel ? 0 : (int) (!empty($v['file-del']) ? 1 : 0);
 				$v['file-title'] = !$iform_title  ? '' : flexicontent_html::dataFilter(isset($v['file-title']) ? $v['file-title'] : '',  1000, 'STRING', 0);
 				$v['file-desc']  = !$iform_desc   ? '' : flexicontent_html::dataFilter(isset($v['file-desc'])  ? $v['file-desc']  : '', 10000, 'STRING', 0);
-				$v['file-lang']  = !$iform_lang   ? '' : flexicontent_html::dataFilter(isset($v['file-lang'])  ? $v['file-lang']  : '', 9,     'STRING', 0);
-				$v['file-access']= !$iform_access ? '' : flexicontent_html::dataFilter(isset($v['file-access']) ? $v['file-access'] : '', 9,     'ACCESSLEVEL', 0);
-				$v['stamp']      = !$iform_stamp  ? 1 : ((int) (isset($v['stamp']) ? $v['stamp'] : 1) ? 1 : 0);
+				$v['file-lang']  = !$iform_lang   ? '' : flexicontent_html::dataFilter(isset($v['file-lang'])  ? $v['file-lang']  : $field->parameters->get('iform_lang_default', '*'), 9, 'STRING', 0);
+				$v['file-access']= !$iform_access ? '' : flexicontent_html::dataFilter(isset($v['file-access']) ? $v['file-access'] : (int) $field->parameters->get('iform_access_default', 1), 9, 'ACCESSLEVEL', 0);
+				$v['stamp']      = !$iform_stamp  ? 1 : ((int) (isset($v['stamp']) ? $v['stamp'] : $field->parameters->get('iform_stamp_default', 1)) ? 1 : 0);
 				foreach ($custom_props as $cn => $cp)
 				{
 					// HTML allowed, filtered according to the Text Filters of Joomla for the current user's groups
-					$v['custom' . $cn] = \Joomla\CMS\Component\ComponentHelper::filterText(isset($v['custom' . $cn]) ? (string) $v['custom' . $cn] : '');
+					$v['custom' . $cn] = \Joomla\CMS\Component\ComponentHelper::filterText(isset($v['custom' . $cn]) ? (string) $v['custom' . $cn] : $cp['default']);
 				}
 
 				if( $new_file )
 				{
-					$v['secure']   = !$iform_dir    ? 1 : ((int) (isset($v['secure']) ? $v['secure'] : 1) ? 1 : 0);
+					$v['secure']   = !$iform_dir    ? 1 : ((int) (isset($v['secure']) ? $v['secure'] : $field->parameters->get('iform_dir_default', 1)) ? 1 : 0);
 				}
 
 				$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
