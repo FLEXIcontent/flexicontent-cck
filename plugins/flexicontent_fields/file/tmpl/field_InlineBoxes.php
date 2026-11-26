@@ -251,66 +251,6 @@ HTML;
 	}
 
 
-	// Custom (HTML) file properties
-	$custom_form_html = '';
-	foreach ($custom_props as $cn => $cp)
-	{
-		if (!$cp['form']) continue;
-		$cv = plgFlexicontent_fieldsFile::getCustomFormValue($cp, $cn, $file_data, isset($form_data[$file_id]) ? $form_data[$file_id] : null);
-		$clabel = htmlspecialchars($cp['show_label'] ? $cp['label'] : '', ENT_QUOTES, 'UTF-8');
-		$custom_form_html .= '
-				<div class="'.$input_grp_class.' fc-xpended-row inlinefile-custom'.$cn.'-box">
-					'.($cp['show_label'] ? '<label class="' . $add_on_class . ' fc-lbl inlinefile-custom'.$cn.'-lbl" id="'.$elementid_n.'_custom'.$cn.'-lbl" for="'.$elementid_n.'_custom'.$cn.'">'.$clabel.'</label>' : '').'
-					<textarea id="'.$elementid_n.'_custom'.$cn.'" cols="24" rows="'.(int) $cp['rows'].'" name="'.$fieldname_n.'[custom'.$cn.']" class="fc_filecustom'.$cn.' fcfield_textareaval">'.htmlspecialchars($cv, ENT_QUOTES, 'UTF-8').'</textarea>
-				</div>';
-	}
-
-	$properties =
-			( $iform_lang ? '
-				<div class="'.$input_grp_class.' fc-xpended-row inlinefile-lang-box">
-					<label class="' . $add_on_class . ' fc-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1).'" id="'.$elementid_n.'_file-lang-lbl" for="'.$elementid_n.'_file-lang">
-						'.Text::_( 'FLEXI_LANGUAGE' ).'
-					</label>
-					'.flexicontent_html::buildlanguageslist($fieldname_n.'[file-lang]', 'class="fc_filelang use_select2_lib"', (!isset($form_data[$file_id]) ? $file_data->language : $form_data[$file_id]['file-lang']), 1).'
-				</div>' : '').
-
-			( $iform_access ? '
-				<div class="'.$input_grp_class.' fc-xpended-row inlinefile-access-box">
-					<label class="' . $add_on_class . ' fc-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1).'" id="'.$elementid_n.'_file-access-lbl" for="'.$elementid_n.'_file-access">
-						'.Text::_( 'FLEXI_ACCESS' ).'
-					</label>
-					'.\Joomla\CMS\HTML\HTMLHelper::_('access.assetgrouplist', $fieldname_n.'[file-access]', (!isset($form_data[$file_id]) ? $file_data->access : $form_data[$file_id]['file-access']), $attribs=' class="fc_fileaccess use_select2_lib" ', $config=array(/*'title' => Text::_('FLEXI_SELECT'), */'id' => $elementid_n.'_file-access')).'
-				</div>' : '').
-
-			( $iform_desc ? '
-				<div class="'.$input_grp_class.' fc-xpended-row inlinefile-desc-box">
-					<label class="' . $add_on_class . ' fc-lbl inlinefile-desc-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1).'" id="'.$elementid_n.'_file-desc-lbl" for="'.$elementid_n.'_file-desc">
-						'.Text::_( 'FLEXI_DESCRIPTION' ).'
-					</label>
-					<textarea id="'.$elementid_n.'_file-desc" cols="24" rows="3" name="'.$fieldname_n.'[file-desc]" class="fc_filedesc fcfield_textareaval">'.htmlspecialchars((string) (!isset($form_data[$file_id]) ? $file_data->description : $form_data[$file_id]['file-desc']), ENT_QUOTES, 'UTF-8').'</textarea>
-				</div>' : '').
-
-			$custom_form_html.
-
-			( $iform_dir ? '
-				<div class="'.$input_grp_class.' fc-xpended-row inlinefile-secure-box">
-					<label class="' . $add_on_class . ' fc-lbl inlinefile-secure-lbl '.$tooltip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'" id="'.$elementid_n.'_secure-lbl">
-						'.Text::_( 'FLEXI_URL_SECURE' ).'
-					</label>
-					'.($file_id ? '<span class="inlinefile-secure-info">'.Text::_($file_data->secure ? 'FLEXI_YES' : 'FLEXI_NO').'</span>' : '').'
-					<span class="inlinefile-secure-data" style="'.($file_id ? 'display:none;' : '').'">
-						'.flexicontent_html::buildradiochecklist(array(1 => Text::_('FLEXI_YES'), 0 => Text::_('FLEXI_NO')), $fieldname_n.'[secure]', $form_data[$file_id]['secure'] ?? $file_data->secure, 1, ' class="fc_filedir" '.($file_id ? 'disabled="disabled"' : ''), $elementid_n.'_secure').'
-					</span>
-				</div>' : '').
-
-			( $iform_stamp ? '
-				<div class="'.$input_grp_class.' fc-xpended-row inlinefile-stamp-box">
-					<label class="' . $add_on_class . ' fc-lbl inlinefile-stamp-lbl '.$tooltip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_DOWNLOAD_STAMPING', 'FLEXI_FILE_DOWNLOAD_STAMPING_DESC', 1, 1).'" id="'.$elementid_n.'_stamp-lbl">
-						'.Text::_( 'FLEXI_DOWNLOAD_STAMPING' ).'
-					</label>
-					'.flexicontent_html::buildradiochecklist( array(1=> Text::_( 'FLEXI_YES' ), 0=> Text::_( 'FLEXI_NO' )) , $fieldname_n.'[stamp]', (!isset($form_data[$file_id]) ? $file_data->stamp : (int)$form_data[$file_id]['stamp']), 1, ' class="fc_filestamp" ', $elementid_n.'_stamp').'
-				</div>' : '');
-
 	$field->html[] = '
 
 		<span class="fc_filedata_storage_name" style="display:none;">'.htmlspecialchars((string) $file_data->filename, ENT_QUOTES, 'UTF-8').'</span>
@@ -373,12 +313,6 @@ HTML;
 			</div>
 
 		</div>
-
-		'.($properties === '' ? '' : '
-		<details class="fc-file-value-props" data-name="'.$elementid_n.'">
-			<summary>'.Text::_('FLEXI_FILE_PROPERTIES').'</summary>
-			'.$properties.'
-		</details>').'
 
 		<div class="fcclear"></div>
 		';

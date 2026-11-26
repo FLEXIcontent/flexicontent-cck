@@ -99,8 +99,6 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
       <input class="fc-file-id" id="custom_docs_0_file-id" name="custom[docs][0][file-id]">
       <input class="fc_filedata_txt" data-fc-media-key="docs" id="custom_docs_0_file-data-txt" name="custom[docs][0][file-data-txt]">
       <input class="fc_filetitle" id="custom_docs_0_file-title" name="custom[docs][0][file-title]">
-      <details class="fc-file-value-props" data-name="custom_docs_0"><summary>File properties</summary>
-        <textarea name="custom[docs][0][custom1]" id="custom_docs_0_custom1">Original</textarea></details>
       <div class="fcfield_preview_box auto"><span class="fc_preview_text"></span><img class="fc_preview_thumb"></div>
     </div></div>`);
     for (const file of ['site/assets/js/field-repeater.js', 'site/assets/js/media-repeater.js',
@@ -117,18 +115,12 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     assert.equal(await thumb.getAttribute('src'), '/file/pdf_thumb.php?id=7');
     assert.equal(await fit(thumb), 'contain');
     assert.equal(await page.locator('.fc_filetitle').inputValue(), 'Book');
-    await page.locator('summary').focus();
-    await page.keyboard.press('Enter');
-    assert.equal(await page.locator('details').evaluate(panel => panel.open), true);
     await page.evaluate(() => {
       const row = document.querySelector('.fcfieldval_container').cloneNode(true);
       fcfield_media_rows.prepare(row, {id: 'custom_docs_1', name: 'custom[docs][1]', index: 1},
         {kind: 'file', name: 'custom[docs]', defaults: {}});
       document.getElementById('flexicontent').append(row);
     });
-    assert.equal(await page.locator('details').nth(1).evaluate(panel => panel.open), false);
-    assert.equal(await page.locator('#custom_docs_1_custom1').inputValue(), '');
-    assert.equal(await page.locator('#custom_docs_0_custom1').inputValue(), 'Original');
     const clone = page.locator('.fc_preview_thumb').nth(1);
     assert.equal(await fit(clone), 'cover');
     assert.match(await clone.getAttribute('src'), /^data:/);

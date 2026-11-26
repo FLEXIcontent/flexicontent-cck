@@ -3316,9 +3316,6 @@ textarea.fcfield_textareaval {
   white-space: normal;
   overflow-wrap: anywhere;
 }
-#flexicontent .fc-file-value-props {
-  display: none !important;
-}
 #flexicontent .card:is(.fc-image-card, .fc-video-card) .fc-xpended-btns.btn-group {
   border: 0;
   border-radius: 0;
@@ -3377,6 +3374,12 @@ textarea.fcfield_textareaval {
   text-align: center;
   white-space: normal;
   overflow-wrap: anywhere;
+}
+/* The generic ".fc-xpended-btns.btn-group > *" rule caps direct children at 42px.
+   The bottom toolbar's button group wraps to several rows on narrow cards, so it must be allowed to grow. */
+#flexicontent .card:is(.fc-image-card, .fc-video-card) .fc-image-bottom-toolbar.fc-xpended-btns.btn-group > .fc-image-btn-group {
+  max-height: none !important;
+  line-height: normal !important;
 }
 #flexicontent .fc-media-card .fc_mediafile_controls .fc-waveform-toggle {
   position: relative;
