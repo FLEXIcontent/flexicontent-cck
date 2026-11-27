@@ -520,7 +520,13 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 * NOTE: data['catid'] has already been unset above in case that field is set to be hidden
 		 */
 
-		if (!$CanChangeCat || empty($data['catid']))
+		// A hidden menu selector posts no category. Validate the same fixed category that store() will assign.
+		if ($isSite && !empty($overridecatperms) && (int) ($submit_conf['maincat_show'] ?? 0) === 1
+			&& !empty($submit_conf['maincatid']))
+		{
+			$data['catid'] = (int) $submit_conf['maincatid'];
+		}
+		elseif (!$CanChangeCat || empty($data['catid']))
 		{
 			// For new item use default main category from type configuration
 			if ($isnew && $params->get('catid_default'))
