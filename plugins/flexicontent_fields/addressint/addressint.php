@@ -124,6 +124,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 		// MAP Engine to use in item form: 'googlemap' or 'nominatim'
 		$mapapi_edit = $field->parameters->get('mapapi_edit', 'googlemap');
+		if ($mapapi_edit === 'algolia') $mapapi_edit = 'nominatim';
 
 		// Width of the address card in the item edit form
 		$form_card_width = (int) $field->parameters->get('form_card_width', 600);

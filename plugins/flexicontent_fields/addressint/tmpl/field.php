@@ -215,7 +215,7 @@ foreach ($values as $value)
 				</td>
 			</tr>
 
-		' : '') . '
+		' : '<tr hidden><td colspan="2"><input type="hidden" name="'.$fieldname_n.'[marker_anchor]" value="'.htmlspecialchars($value['marker_anchor'], ENT_QUOTES, 'UTF-8').'"></td></tr>') . '
 
 		</tbody></table>
 
