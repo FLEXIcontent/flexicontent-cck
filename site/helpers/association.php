@@ -282,7 +282,13 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 			elseif ($view === 'item')
 			{
 				$title_slug = $record->id . ':' . $record->alias;
-				$cat_slug   = self::_getItemCatSlug($record, $menu);
+				$cat_slug   = self::_getItemCatSlug($record, $menu, $categoryLanguage);
+				if ($categoryLanguage !== '*' && $categoryLanguage !== $tag)
+				{
+					// The item's category cannot be routed under a menu in the other language.
+					$associations[$tag] = 'index.php?Itemid=' . (int) $menu_item->id . '&lang=' . substr($tag, 0, 2);
+					continue;
+				}
 				$lang_code  = substr($tag, 0, 2);
 
 				$associations[$tag] = FlexicontentHelperRoute::getItemRoute($title_slug, $cat_slug, $menu_item->id, $record) . '&lang=' . $lang_code;
@@ -310,7 +316,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 	/**
 	 *  Get category slug for a content item, considering if the given menu item points to a category belonging to the item
 	 */
-	private static function _getItemCatSlug($record, $menu)
+	private static function _getItemCatSlug($record, $menu, &$categoryLanguage)
 	{
 		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
@@ -339,6 +345,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 		$cat = new flexicontent_categories(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$cat->load(array('id' => $matched_cid));
 
+		$categoryLanguage = $cat->language;
 		return $matched_cid . ($cat ? ':' . $cat->alias : '');
 	}
 }
