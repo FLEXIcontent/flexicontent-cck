@@ -204,12 +204,22 @@ class plgFlexicontent_fieldsToolbar extends FCField
 				{
 					$imageurl = $this->_extractimageurl($item);
 				}
-				// Add image if fould, making sure it is converted to ABSOLUTE URL
+				// The field can return a host-relative path that already includes the Joomla directory.
 				if ($imageurl)
 				{
-					$is_absolute = (bool) parse_url($imageurl, PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $imageurl);
-					$imageurl = $is_absolute ? $imageurl : \Joomla\CMS\Uri\Uri::root().$imageurl;
-					$document->addCustomTag("<meta property=\"og:image\" content=\"{$imageurl}\" />");
+					if (strpos($imageurl, '//') === 0)
+					{
+						$imageurl = \Joomla\CMS\Uri\Uri::getInstance()->getScheme() . ':' . $imageurl;
+					}
+					elseif ($imageurl[0] === '/')
+					{
+						$imageurl = \Joomla\CMS\Uri\Uri::getInstance()->toString(array('scheme', 'host', 'port')) . $imageurl;
+					}
+					elseif (!parse_url($imageurl, PHP_URL_SCHEME))
+					{
+						$imageurl = \Joomla\CMS\Uri\Uri::root() . $imageurl;
+					}
+					$document->addCustomTag('<meta property="og:image" content="' . htmlspecialchars($imageurl, ENT_QUOTES, 'UTF-8') . '" />');
 				}
 			}
 
@@ -293,30 +303,8 @@ class plgFlexicontent_fieldsToolbar extends FCField
 	{
 		$matches = NULL;
 		preg_match_all('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $item->text, $matches);
-		$imageurl = isset($matches[1][0]) ? $matches[1][0] : '';
+		$imageurl = isset($matches[1][0]) ? html_entity_decode($matches[1][0], ENT_QUOTES, 'UTF-8') : '';
 
-		if ($imageurl)
-		{
-			if ($imageurl[0] == '/')
-			{
-				$imageurls = explode('/', $imageurl);
-				$paths = array();
-				$found = false;
-				foreach($imageurls as $folder) {
-					if(!$found) {
-						if($folder!='images') continue;
-						else {
-							$found = true;
-						}
-					}
-					$paths[] = $folder;
-				}
-				$imageurl = '/'.implode('/', $paths);
-				$imageurl = \Joomla\CMS\Uri\Uri::root(true).$imageurl;
-			}elseif(substr($imageurl, 0, 7)=='images/') {
-				$imageurl = \Joomla\CMS\Uri\Uri::root(true).'/'.$imageurl;
-			}
-		}
 		return $imageurl;
 	}
 
