@@ -415,7 +415,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		// Add field's custom CSS / JS
 		$js .= "
-			fcfield_file.pdf_thumb_url = '".\Joomla\CMS\Uri\Uri::root()."plugins/flexicontent_fields/file/pdf_thumb.php?id=__ID__&w=400&k=".md5(\Joomla\CMS\Factory::getApplication()->get('secret').'fc_pdf_thumb')."';
+			fcfield_file.pdf_thumb_url = '".(class_exists('Imagick') && is_file(JPATH_PLUGINS . '/flexicontent_fields/file/pdf_thumb.php') ? \Joomla\CMS\Uri\Uri::root()."plugins/flexicontent_fields/file/pdf_thumb.php?id=__ID__&w=400&k=".md5(\Joomla\CMS\Factory::getApplication()->get('secret').'fc_pdf_thumb') : '')."';
 
 			/**
 			 * Method Wrappers to class methods (used for compatibility)
