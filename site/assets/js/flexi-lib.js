@@ -223,7 +223,13 @@
 					// Move focus into the loaded page, as a normal page load does: Tab then starts at its first
 					// control. Focusing that control directly would open Joomla's skip-to menu on admin pages.
 					frame.contentWindow?.focus();
-					if (params.closeOnEscape) doc?.addEventListener('keydown', event => { if (event.key === 'Escape') handle.close(); });
+					if (params.closeOnEscape) doc?.defaultView?.addEventListener('keydown', event => {
+						if (event.key !== 'Escape' || event.defaultPrevented || event.isComposing || event.repeat) return;
+						// Let an open menu or nested dialog inside the picker handle the first Escape.
+						if (doc.querySelector('dialog[open], [aria-expanded="true"][aria-haspopup="listbox"], .choices.is-open, .select2-drop-active')) return;
+						event.preventDefault();
+						handle.close();
+					});
 				} catch (_) { /* Cross-origin previews do not expose their document. */ }
 				if (typeof params.loadFunc === 'function') params.loadFunc(window.jQuery ? window.jQuery(content) : content);
 			});
