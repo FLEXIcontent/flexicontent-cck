@@ -4,6 +4,12 @@ defined('_JEXEC') or die('Restricted access');
 /** Security checks shared by field plugins and their public handlers. */
 class flexicontent_security
 {
+    /** A guest may use the category override only on a submission menu that allows guests. */
+    public static function canUseSubmissionCategoryOverride($menu, $user)
+    {
+        return !$user->guest || ($menu && (int) $menu->getParams()->get('allowunauthorize', 0) === 1);
+    }
+
     /** Accept only arrays and scalar data; never let PHP objects into field values. */
     public static function isDataValue($value, $depth = 0, &$nodes = null)
     {

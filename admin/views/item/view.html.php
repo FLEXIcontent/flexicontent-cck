@@ -570,7 +570,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				// Get create access, this includes check of creating in at least one category, and type's "create items"
 				$canAdd = $model->getItemAccess()->get('access-create');
 				$overrideCategoryACL = $page_params->get("overridecatperms", 1) && ($page_params->get("cid") || $page_params->get("maincatid"));
-				$canAssignToCategory = $canAdd || $overrideCategoryACL;  // can create in any category -OR- category ACL override is enabled
+				$canAssignToCategory = $canAdd || ($overrideCategoryACL
+					&& flexicontent_security::canUseSubmissionCategoryOverride($app->getMenu()->getActive(), $user));  // can create in any category -OR- category ACL override is enabled
 
 				// Check if Content Type can be created by current user
 				if ( empty($canCreateType) )

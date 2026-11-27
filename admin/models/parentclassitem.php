@@ -2089,7 +2089,8 @@ class ParentClassItem extends FCModelAdmin
 				$submit_conf = !empty($item_submit_conf[$h]) ? $item_submit_conf[$h] : null;
 
 				$autopublished    = $submit_conf && !empty($submit_conf['autopublished'])    ? $submit_conf['autopublished']    : null;  // Override flag for both TYPE and CATEGORY ACL
-				$overridecatperms = $submit_conf && !empty($submit_conf['overridecatperms']) ? $submit_conf['overridecatperms'] : null;  // Override flag for CATEGORY ACL
+				$overridecatperms = !empty($submit_conf['overridecatperms'])
+					&& flexicontent_security::canUseSubmissionCategoryOverride($app->getMenu()->getActive(), $user);  // Override flag for CATEGORY ACL
 
 				if ( $autopublished)
 				{
