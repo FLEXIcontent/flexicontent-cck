@@ -29,7 +29,8 @@ foreach ($field->value as $file_id)
 
 	if (!in_array($ext_lower, $imagesExt))
 	{
-		if ($ext_lower === 'pdf' && (int) $file_data->url !== 1 && class_exists('Imagick'))
+		if ($ext_lower === 'pdf' && (int) $file_data->url !== 1 && class_exists('Imagick')
+			&& is_file(JPATH_PLUGINS . '/flexicontent_fields/file/pdf_thumb.php'))
 		{
 			// Render the first page of a local PDF via the field's thumbnail endpoint
 			$preview_src = \Joomla\CMS\Uri\Uri::root() . 'plugins/flexicontent_fields/file/pdf_thumb.php?id=' . (int) $file_id . '&w=400&k=' . md5(\Joomla\CMS\Factory::getApplication()->get('secret') . 'fc_pdf_thumb');
