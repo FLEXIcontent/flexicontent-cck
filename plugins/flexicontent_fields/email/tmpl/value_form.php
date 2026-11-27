@@ -132,8 +132,8 @@ foreach ($values as $value)
 	{
 		$consent_field = '
 			<div class="field form-group control-group">
-				<input type="checkbox" id="consent" name="consent" value="consent" class="required">
-				<label for="consent">
+				<input type="checkbox" id="consent-'.$formid.'" name="consent" value="consent" class="required">
+				<label for="consent-'.$formid.'">
 				<a href="'.$consent_field_link.'" target="_blank">'. \Joomla\CMS\Language\Text::_($consent_field_text).'</a>
 				</label>
 			</div>
