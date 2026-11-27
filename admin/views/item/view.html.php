@@ -777,8 +777,13 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			2 => 'FLEXI_ARCHIVED',
 			-2 => 'FLEXI_TRASHED',
 		);
-		$published = isset($state_labels[$item->state])
-			? \Joomla\CMS\Language\Text::_($state_labels[$item->state])
+		$displayState = $item->state;
+		if ($isnew && !$perms['canpublish'])
+		{
+			$displayState = !empty($item->submit_conf['autopublished']) ? 1 : $model->getNewItemStateForNonPublisher($isSite);
+		}
+		$published = isset($state_labels[$displayState])
+			? \Joomla\CMS\Language\Text::_($state_labels[$displayState])
 			: \Joomla\CMS\Language\Text::_('FLEXI_UNKNOWN');
 
 

@@ -350,6 +350,15 @@ class ParentClassItem extends FCModelAdmin
 	}
 
 
+	/** Initial state used when a new item requires moderation. */
+	public function getNewItemStateForNonPublisher($isSite)
+	{
+		return $isSite
+			? (int) $this->_cparams->get('non_publishers_item_state_fe', -3)
+			: (int) $this->_cparams->get('non_publishers_item_state', -4);
+	}
+
+
 	/**
 	 * Method to get item's type id
 	 *
@@ -2243,7 +2252,6 @@ class ParentClassItem extends FCModelAdmin
 				}
 
 				$pubished_state = 1;
-				$draft_state = -4;
 				$pending_approval_state = -3;
 
 				// For existing items, force pending-state approval when user cannot publish, and versioning is OFF (aka not possible to use 'currently' active version + unapproved new version)
@@ -2270,9 +2278,7 @@ class ParentClassItem extends FCModelAdmin
 				// The preselected forced state of -NEW- items for users that CANNOT publish, and autopublish via menu item is disabled
 				else
 				{
-					$data['state'] = !$isSite
-						? $cparams->get('non_publishers_item_state', $draft_state)  // Use the configured setting for backend items
-						: $cparams->get('non_publishers_item_state_fe', $pending_approval_state);  // Use the configured setting for frontend items
+					$data['state'] = $this->getNewItemStateForNonPublisher($isSite);
 				}
 			}
 
