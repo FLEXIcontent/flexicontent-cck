@@ -167,7 +167,12 @@ if ( isset($forced_views[$controller]) )
 // ***
 
 // CASE 1: Use (if it exists) controller named as current view name
-if ( file_exists(JPATH_COMPONENT.'/controllers/'.$view . ($format !== 'html' ? '.' . $format : '') . '.php') )
+if (($controller === 'reviews' && $task === 'ajaxvote') || (!$controller && in_array($task, array('ajaxfav', 'ajaxvote', 'call_extfunc'), true)))
+{
+	// These public tasks live on the base controller, independently of the active menu view.
+	$controller = '';
+}
+else if ( file_exists(JPATH_COMPONENT.'/controllers/'.$view . ($format !== 'html' ? '.' . $format : '') . '.php') )
 {
 	$controller = $view;
 }
