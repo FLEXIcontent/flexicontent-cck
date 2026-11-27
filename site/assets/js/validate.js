@@ -253,6 +253,7 @@ var JFormValidator_FC = function () {
         if (text) errors.add(F.text('JLIB_FORM_FIELD_INVALID') + text.replace('*', ''));
       }
       Joomla.renderMessages({error: [...errors]});
+      invalid[0].dispatchEvent(new CustomEvent('fc:reveal-invalid', {bubbles: true}));
     } else if (valid) document.getElementById('system-message-container')?.replaceChildren();
     F.data(form, 'fcform_isValid', valid);
     F.data(form, 'fcform_input_sets', null);

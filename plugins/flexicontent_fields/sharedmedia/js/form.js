@@ -145,6 +145,15 @@ window.fcfield_sharemedia = (() => {
     }
   }
 
+  document.addEventListener('fc:reveal-invalid', event => {
+    const input = event.target;
+    if (!input.matches('input.sm_url')) return;
+    const panel = input.closest('.sm_url_props');
+    if (!panel) return;
+    togglePanel(panel, '.fc-sm-url-btn', panel.dataset.name, 1);
+    input.focus();
+  });
+
   document.addEventListener('keydown', event => {
     if (event.key !== 'Enter' || event.defaultPrevented || event.isComposing || event.keyCode === 229 || !event.target.matches?.('input.sm_url')) return;
     const fetchButton = event.target.closest('.fc-video-card')?.querySelector('.fc-sm-fetch-btn');

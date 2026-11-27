@@ -37,6 +37,27 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await page.waitForFunction(() => !!document.formvalidator);
   };
   const loadDependencies = page => page.addScriptTag({content: source('site/assets/js/flexi-lib.js')});
+  await test('a required Shared Media URL opens and receives focus on a failed save', async page => {
+    await form(page, `<label for="title">Title</label><input id="title" required>
+      <button type="button" class="fc-sm-url-btn" data-for="video_1" aria-expanded="false">URL</button>
+      <div class="sm_url_props" data-name="video_1" style="display:none">
+        <input id="video_1_url" class="sm_url required" aria-label="Media URL">
+      </div>`);
+    await page.addScriptTag({content: source('plugins/flexicontent_fields/sharedmedia/js/form.js')});
+    await validate(page);
+    const save = () => page.evaluate(() => document.formvalidator.isValid(document.forms.adminForm));
+    const url = page.locator('#video_1_url');
+    assert.equal(await save(), false);
+    assert.equal(await url.isVisible(), false);
+    await page.locator('#title').fill('New property');
+    assert.equal(await save(), false);
+    assert.equal(await url.isVisible(), true);
+    assert.equal(await page.locator('.fc-sm-url-btn').getAttribute('aria-expanded'), 'true');
+    assert.equal(await url.evaluate(input => input === document.activeElement), true);
+    await url.fill('https://example.org/property.mp4');
+    assert.equal(await save(), true);
+  });
+
   await test('Nominatim searches require submission, cache results and ignore stale responses', async page => {
     await form(page, '<div><input id="address_0_autocomplete"><div id="address_0_messages"></div></div>');
     const requests=[];let fail=false;
