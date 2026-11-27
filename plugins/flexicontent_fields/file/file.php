@@ -378,7 +378,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			{
 				var url = element.dataset.href.replace('__rowno__', element.dataset.rowno || '').replace('__thisid__', element.id);
 
-				fcfield_file.dialog_handle['".$field_name_js."'] = fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".\Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_SELECT_FILE', true)."', paddingW: 10, paddingH: 16});
+				fcfield_file.dialog_handle['".$field_name_js."'] = fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".\Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_SELECT_FILE', true)."', closeOnEscape: true, paddingW: 10, paddingH: 16});
 				return false;
 			}
 		";

@@ -124,7 +124,7 @@ foreach ($field->value as $index => $value)
 	$select_existing = '';
 	$pick_existing = '';
 	$addExistingURL = sprintf($filesElementURL, $elementid_n);
-	$addExistingURL_onclick = "fcfield_image.dialog_handle['".$field_name_js."'] = fc_field_dialog_handle_".$field->id." = fc_showDialog(this.dataset.href, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".Text::_('FLEXI_SELECT_IMAGE', true)."', paddingW: 10, paddingH: 16});";
+	$addExistingURL_onclick = "fcfield_image.dialog_handle['".$field_name_js."'] = fc_field_dialog_handle_".$field->id." = fc_showDialog(this.dataset.href, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".Text::_('FLEXI_SELECT_IMAGE', true)."', closeOnEscape: true, paddingW: 10, paddingH: 16});";
 
 	if ($image_source >= 0)
 	{

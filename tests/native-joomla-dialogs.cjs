@@ -61,6 +61,20 @@ if(!joomla)throw Error('Set FLEXI_TEST_JOOMLA to a Joomla 6 installation.');
    assert.match(await page.locator('.joomla-dialog-alert').innerText(),/Message <literal>/);
    await page.locator('.joomla-dialog-alert [data-button-ok]').click();
    await page.waitForFunction(()=>window.alertClosed);
+   // Keys pressed inside an iframe do not bubble to the parent document.
+   await page.locator('#open').focus();
+   await page.evaluate(() => { fc_showDialog('/picker', 'fc-picker', 0, 500, 400, null, {closeOnEscape:true}); });
+   const picker = page.frameLocator('#fc-picker_frame').locator('#open');
+   await picker.focus();
+   await picker.evaluate(button => {
+    button.addEventListener('keydown', event => { if (event.key === 'Escape') event.preventDefault(); }, {once:true});
+   });
+   await picker.press('Escape');
+   assert.equal(await page.locator('#fc-picker_frame').isVisible(), true);
+   await picker.press('Escape');
+   await page.locator('#fc-picker_frame').waitFor({state:'detached'});
+   assert.equal(await page.evaluate(() => document.activeElement.id), 'open');
+
    // Async confirmation must cancel the original event, then preserve normal
    // navigation, validation and the clicked submitter on acceptance.
    const submissions=[];
