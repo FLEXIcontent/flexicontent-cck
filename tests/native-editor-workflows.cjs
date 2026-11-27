@@ -177,6 +177,7 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
   });
   await test('Validation summary excludes inline error text from wrapping labels', async page => {
     await page.evaluate(() => {
+      Joomla.Text._ = key => key === 'JLIB_FORM_FIELD_INVALID' ? 'Invalid field:&#160' : key;
       Joomla.renderMessages = messages => {
         document.getElementById('system-message-container').innerHTML = messages.error.join('');
       };
@@ -187,7 +188,7 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
       assert.equal(await page.evaluate(() => document.formvalidator.isValid(document.forms.adminForm)), false);
       const link = page.locator('#system-message-container a');
       assert.equal(await link.count(), 1);
-      assert.equal(await link.textContent(), 'JLIB_FORM_FIELD_INVALIDAddress');
+      assert.equal(await link.textContent(), 'Invalid field:\u00a0Address');
       assert.equal(await link.getAttribute('href'), '#email');
       assert.equal(await page.evaluate(() => document.activeElement.id), 'email');
       await link.press('Enter');

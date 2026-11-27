@@ -253,9 +253,12 @@ var JFormValidator_FC = function () {
         if (text && !errors.has(text)) errors.set(text, el);
       }
       const messages = [];
+      // Joomla translations can contain character references, including a trailing &#160.
+      const prefix = document.createElement('textarea');
+      prefix.innerHTML = F.text('JLIB_FORM_FIELD_INVALID');
       for (const [text, el] of errors) {
         const message = document.createElement(el.id ? 'a' : 'span');
-        message.textContent = F.text('JLIB_FORM_FIELD_INVALID') + text.replace('*', '');
+        message.textContent = prefix.value + text.replace('*', '');
         if (el.id) {
           message.href = '#' + encodeURIComponent(el.id);
           message.className = 'fc-validation-link';
