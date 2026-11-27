@@ -54,6 +54,8 @@ class plgSystemFlexisystem extends CMSPlugin
 	var $cparams;    // Component parameters
 	var $autoloadLanguage = false;
 
+	private $previousUpdateChannel = null;
+
 	/**
 	 * Constructor
 	 */
@@ -1927,6 +1929,13 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		 */
 
 		if ($context === 'com_config.component' && $table->type === 'component' && $table->element === 'com_flexicontent') {
+			// Compare with the persisted choice before Joomla writes the new component options.
+			$storedParams = $db->setQuery($db->getQuery(true)
+				->select($db->qn('params'))->from($db->qn('#__extensions'))
+				->where($db->qn('extension_id') . ' = ' . (int) $table->extension_id)
+			)->loadResult();
+			$this->previousUpdateChannel = (new Registry($storedParams))->get('update_channel', 'stable');
+
 			if (Factory::getApplication()->isClient('administrator')) {
 				$raw_data = Factory::getApplication()->input->post->get('jform', array(), 'array');
 
@@ -2152,31 +2161,31 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 				? $table->params
 				: new \Joomla\Registry\Registry($table->params);
 
-			$channel = $params->get('update_channel', 'stable');
+			$channel = $params->get('update_channel');
+			if ($this->previousUpdateChannel === null || $channel === $this->previousUpdateChannel
+				|| !in_array($channel, array('stable', 'beta'), true)) {
+				return;
+			}
 
 			$urls = [
 				'stable' => 'https://flexicontent.org/updates/update.php?channel=stable',
 				'beta'   => 'https://flexicontent.org/updates/update.php?channel=beta',
 			];
-			$newUrl = $urls[$channel] ?? $urls['stable'];
+			$newUrl = $urls[$channel];
 
 			$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
-			// Mettre à jour l'URL dans #__update_sites
 			$db->setQuery(
 				$db->getQuery(true)
 					->update($db->qn('#__update_sites'))
 					->set($db->qn('location') . ' = ' . $db->q($newUrl))
-					->where($db->qn('name') . ' = ' . $db->q('FLEXIcontent CCK update'))
-			)->execute();
-
-			// Forcer last_check_timestamp à 0 pour déclencher un nouveau check immédiat
-			$db->setQuery(
-				$db->getQuery(true)
-					->update($db->qn('#__update_sites'))
 					->set($db->qn('last_check_timestamp') . ' = 0')
 					->where($db->qn('name') . ' = ' . $db->q('FLEXIcontent CCK update'))
+					->where($db->qn('location') . ' <> ' . $db->q($newUrl))
 			)->execute();
+			if (!$db->getAffectedRows()) {
+				return;
+			}
 
 			// Purger les updates en cache pour com_flexicontent
 			$db->setQuery(
