@@ -6417,7 +6417,10 @@ class FlexicontentFields
 
 				foreach ($safe_vals as $i => $v)
 				{
-					$filter->basic_texts[$v] = $filter->elements[$v]->text;
+					if (isset($filter->elements[$v]))
+					{
+						$filter->basic_texts[$v] = $filter->elements[$v]->text;
+					}
 				}
 			}
 

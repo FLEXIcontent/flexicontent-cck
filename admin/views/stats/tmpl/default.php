@@ -691,7 +691,7 @@ $ctrl_users = "task=users.";
 								<td>
 									<span class="<?php echo $tip_class; ?>" title="<?php echo \Joomla\CMS\HTML\HTMLHelper::tooltipText(\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_USER' ), $row->username, 0, 1); ?>">
 										<a href="<?php echo $link; ?>">
-											<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8').')'; ?>
+											<?php echo htmlspecialchars($row->name ?? '', ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username ?? '', ENT_QUOTES, 'UTF-8').')'; ?>
 										</a>
 									</span>
 								</td>
@@ -728,7 +728,7 @@ $ctrl_users = "task=users.";
 								<td>
 									<span class="<?php echo $tip_class; ?>" title="<?php echo \Joomla\CMS\HTML\HTMLHelper::tooltipText(\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_USER' ), $row->username, 0, 1); ?>">
 										<a href="<?php echo $link; ?>">
-											<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8').')'; ?>
+											<?php echo htmlspecialchars($row->name ?? '', ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username ?? '', ENT_QUOTES, 'UTF-8').')'; ?>
 										</a>
 									</span>
 								</td>

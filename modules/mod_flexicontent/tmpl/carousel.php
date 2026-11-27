@@ -336,6 +336,8 @@ $css_prefix = '#mod_flexicontent_' . $module->id;
 /**
  * Content display via Builder-based Layouts
  */
+$feat_builder_layout = '';
+$std_builder_layout = '';
 $feat_builder_layout_num = (int) $params->get($layout.'_builder_layout_feat', 1);
 $std_builder_layout_num  = (int) $params->get($layout.'_builder_layout', 1);
 

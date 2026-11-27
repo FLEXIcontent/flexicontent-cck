@@ -202,7 +202,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 			/**
 			 * Get module object
 			 */
-			$mod = \Joomla\CMS\Helper\ModuleHelper::getModule($object->module, $object->title);
+			$mod = \Joomla\CMS\Helper\ModuleHelper::getModuleById((string) $mymodule);
 			//echo '<pre>'; print_r($mod); echo '</pre>';
 
 			// Check if module is not assigned to current menu item (not assigned to current page), and terminate
