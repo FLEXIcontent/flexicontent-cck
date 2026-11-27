@@ -6,6 +6,8 @@
 		<action name="core.options" title="JACTION_OPTIONS" description="JACTION_OPTIONS_COMPONENT_DESC" />
 		<action name="core.manage" title="JAction_Manage" description="JACTION_MANAGE_COMPONENT_DESC" />
 
+		<action name="core.api" title="JACTION_LOGIN_API" />
+
 		<!-- CATEGORY-INHERITED PERMISSIONS -->
 		<action name="core.create" title="FLEXI_PERMISSIONS_COMPONENT_INHERITED_CATEGORY_CREATE" description="FLEXI_PERMISSIONS_COMPONENT_INHERITED_CATEGORY_CREATE_DESC" />
 		<action name="core.delete" title="FLEXI_PERMISSIONS_COMPONENT_INHERITED_CATEGORY_DELETE" description="FLEXI_PERMISSIONS_COMPONENT_INHERITED_CATEGORY_DELETE_DESC" />

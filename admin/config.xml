@@ -12,6 +12,7 @@
 		<field name="" type="separator" default="Basic" icon_class="icon-book" level="tab_open" box_type="1" remove_boxes="2" />
 
 			<field name="flexi_cat_extension" type="hidden" size="1" default="com_content" label="Category Type" description="Please save configuration once" />
+			<field name="sidebar_state" type="hidden" filter="cmd" />
 			<field name="fcdata_serialized" type="hidden" size="1" default="" label=".." description="..." />
 
 		<field name="" type="separator" default="FLEXI_TEXT_SEARCH" label="" level="level0" />
