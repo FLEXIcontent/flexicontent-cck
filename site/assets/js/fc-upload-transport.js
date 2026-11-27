@@ -28,7 +28,8 @@ window.FlexiUploadTransport = (() => {
         try {
           response = JSON.parse(xhr.responseText);
         } catch (_) {
-          reject(new Error(Joomla.Text._('FLEXI_UPLOAD_INVALID_RESPONSE')));
+          const message = xhr.status === 403 ? 'FLEXI_UPLOAD_FORBIDDEN' : 'FLEXI_UPLOAD_INVALID_RESPONSE';
+          reject(new Error(Joomla.Text._(message)));
           return;
         }
         if (xhr.status < 200 || xhr.status >= 300 || response?.jsonrpc !== '2.0' || response.error) {
