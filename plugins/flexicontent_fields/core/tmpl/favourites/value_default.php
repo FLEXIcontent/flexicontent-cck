@@ -1,7 +1,7 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-$layouts_path = null; //realpath(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core');
+$layoutOptions = array('component' => 'com_flexicontent', 'client' => 0);
 
 $displayData = array(
 	'field' => $field,
@@ -18,8 +18,8 @@ $field->{$prop} =
 	$pretext . '
 		<div class="fav-block">
 			' .
-			\Joomla\CMS\Layout\LayoutHelper::render('flexicontent_fields.favourites.favicon', $displayData, $layouts_path) .
-			\Joomla\CMS\Layout\LayoutHelper::render('flexicontent_fields.favourites.userlist', $displayData, $layouts_path)
+			\Joomla\CMS\Layout\LayoutHelper::render('flexicontent_fields.favourites.favicon', $displayData, null, $layoutOptions) .
+			\Joomla\CMS\Layout\LayoutHelper::render('flexicontent_fields.favourites.userlist', $displayData, null, $layoutOptions)
 			. '
 			<div class="fcfavs-responce_item_' . $item->id . ' fcfavs-responce-tip">
 				' . ($field->parameters->get('status_info', 0) ? '
