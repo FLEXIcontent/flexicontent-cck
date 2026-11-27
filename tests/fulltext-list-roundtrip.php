@@ -61,7 +61,7 @@ namespace {
 				}
 			}
 		}
-		$db->setQuery("INSERT INTO $table VALUES (3,'coffee table'),(4,'table for coffee'),(5,'marble bench'),(6,'vvvcoffee vvvtable')")->execute();
+		$db->setQuery("INSERT INTO $table VALUES (3,'coffee table'),(4,'table for coffee'),(5,'marble bench'),(6,'vvvcoffee vvvtable'),(7,'QA-2026 café quotes'),(8,'vvvQA-2026 vvvcafé vvvquotes')")->execute();
 		foreach (['InnoDB', 'MyISAM'] as $engine)
 		{
 			if ($engine === 'MyISAM') $db->setQuery("ALTER TABLE $table ENGINE=MyISAM")->execute();
@@ -71,6 +71,10 @@ namespace {
 				['"coffee table" marble', 'all', '', []],
 				['"coffee table" cof', 'all', '', [3]],
 				['"coffee table"', 'any', 'vvv', [6]],
+				// A hyphenated word and a token shorter than the minimum word length, next to a quoted word
+				['QA-2026 café "quotes"', 'all', '', [7]],
+				['QA-2026 café "quotes"', 'all', 'vvv', [8]],
+				['QA-2026 café "absent"', 'all', '', []],
 			] as [$query, $mode, $prefix, $expected])
 			{
 				$terms = flexicontent_db::getQuotedSearchTerms($query, $mode);
