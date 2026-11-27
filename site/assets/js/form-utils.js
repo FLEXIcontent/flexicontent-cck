@@ -45,12 +45,21 @@ window.FlexiForm = (() => {
       if (getComputedStyle(el).display === 'none') el.style.display = 'block';
     }
   }
-  function focusInvalid(form) {
-    const el = Array.from(form.querySelectorAll('.fc-field-invalid, .invalid')).find(visible)
-      || document.getElementById('system-message-container');
-    if (!el) return;
-    window.scrollTo({top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - 120), behavior: 'smooth'});
-    el.focus({preventScroll: true});
+  function focusInvalid(form, field) {
+    field = field || form.querySelector('input.invalid, select.invalid, textarea.invalid');
+    if (field) {
+      field.dispatchEvent(new CustomEvent('fc:reveal-invalid', {bubbles: true}));
+      if (visible(field) && !field.disabled) { field.focus(); return; }
+      const editor = window.tinyMCE?.get(field.id) || field.nextElementSibling?.CodeMirror;
+      if (editor?.focus) { editor.focus(); return; }
+      const widget = field.closest('.choices')?.querySelector('[tabindex="0"], input:not([type="hidden"])')
+        || field.previousElementSibling?.querySelector('.select2-focusser');
+      if (visible(widget)) { widget.focus(); return; }
+    }
+    const summary = document.getElementById('system-message-container');
+    if (!summary) return;
+    summary.setAttribute('tabindex', '-1');
+    summary.focus();
   }
   const change = el => el && el.dispatchEvent(new Event('change', {bubbles: true}));
   function cloneFieldRow(row) {

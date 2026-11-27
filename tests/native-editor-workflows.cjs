@@ -176,12 +176,22 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await page.keyboard.press('Space');assert.equal(await page.locator('.fcimg_value_props').isVisible(),false);
   });
   await test('Validation summary excludes inline error text from wrapping labels', async page => {
+    await page.evaluate(() => {
+      Joomla.renderMessages = messages => {
+        document.getElementById('system-message-container').innerHTML = messages.error.join('');
+      };
+    });
     await form(page, '<label for="email">Address<span class="form-control-feedback">This value is not valid</span><input id="email" name="email" class="validate-email" value="aaaa@" data-error-mssg="This value is not valid"></label>');
     await validate(page);
     for (let attempt = 0; attempt < 2; attempt++) {
       assert.equal(await page.evaluate(() => document.formvalidator.isValid(document.forms.adminForm)), false);
-      const summary = JSON.parse(await page.locator('#system-message-container').textContent());
-      assert.deepEqual(summary.error, ['JLIB_FORM_FIELD_INVALIDAddress']);
+      const link = page.locator('#system-message-container a');
+      assert.equal(await link.count(), 1);
+      assert.equal(await link.textContent(), 'JLIB_FORM_FIELD_INVALIDAddress');
+      assert.equal(await link.getAttribute('href'), '#email');
+      assert.equal(await page.evaluate(() => document.activeElement.id), 'email');
+      await link.press('Enter');
+      assert.equal(await page.evaluate(() => document.activeElement.id), 'email');
       assert.equal(await page.locator('label .fc-field-invalid').count(), 1);
     }
   });
