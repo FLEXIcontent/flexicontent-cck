@@ -189,7 +189,9 @@ $jcookie  = \Joomla\CMS\Factory::getApplication()->input->cookie;
 /**
  * Add masonry JS
  */
-if (($item_placement_feat === 1 && $item_columns_feat > 1) || ($item_placement_std === 1 && $item_columns_std > 1))
+$masonry_feat = $item_placement_feat === 1 && $item_columns_feat > 1;
+$masonry_std  = $item_placement_std === 1 && $item_columns_std > 1;
+if ($masonry_feat || $masonry_std)
 {
 	flexicontent_html::loadFramework('masonry');
 	flexicontent_html::loadFramework('imagesLoaded');
@@ -1098,7 +1100,7 @@ if ($std_builder_layout_num)
 
 	if ($css) $wa->addInlineStyle($css);
 
-	if ($item_placement_feat == 1 && $item_columns_feat > 1)
+	if ($masonry_feat)
 	{
 		$margin_left_right_feat = intval($margin_left_right_feat);
 		$js = "
@@ -1119,7 +1121,7 @@ if ($std_builder_layout_num)
 		";
 		if ($js) $wa->addInlineScript($js);
 	}
-	if ($item_placement_std == 1 && $item_columns_std > 1)
+	if ($masonry_std)
 	{
 		$margin_left_right = intval($margin_left_right);
 		$js = "

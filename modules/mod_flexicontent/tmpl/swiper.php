@@ -592,7 +592,8 @@ if (empty($fc_swiper_mod_js_added))
 /**
  * Add masonry JS (featured items)
  */
-if ($item_placement_feat === 1 && $item_columns_feat > 1)
+$masonry_feat = $item_placement_feat === 1 && $item_columns_feat > 1;
+if ($masonry_feat)
 {
 	flexicontent_html::loadFramework('masonry');
 	flexicontent_html::loadFramework('imagesLoaded');
@@ -1429,7 +1430,6 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 		$item_columns_feat = $item_width_feat;
 	}
 
-	$item_columns_feat_int = (int) $item_columns_feat;
 
 	$css = '';
 
@@ -1707,7 +1707,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 	if ($css) $wa->addInlineStyle($css);
 
 
-	if ($item_placement_feat == 1 && $item_columns_feat_int > 1)
+	if ($masonry_feat)
 	{
 		$js = "
 		document.addEventListener('DOMContentLoaded', function(){

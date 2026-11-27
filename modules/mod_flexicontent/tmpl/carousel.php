@@ -299,7 +299,9 @@ flexicontent_html::loadFramework('flexi-lib');
 /**
  * Add masonry JS
  */
-if (($item_placement_feat === 1 && $item_columns_feat > 1) || ($item_placement_std === 1 && $item_columns_std > 1))
+$masonry_feat = $item_placement_feat === 1 && $item_columns_feat > 1;
+$masonry_std  = $item_placement_std === 1 && $item_columns_std > 1;
+if ($masonry_feat || $masonry_std)
 {
 	flexicontent_html::loadFramework('masonry');
 	flexicontent_html::loadFramework('imagesLoaded');
@@ -1393,7 +1395,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 	if ($css) $wa->addInlineStyle($css);
 
-	if ($item_placement_feat == 1 && $item_columns_feat > 1)
+	if ($masonry_feat)
 	{
 		$js = "
 		jQuery(document).ready(function(){
@@ -1413,7 +1415,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 		";
 		if ($js) $wa->addInlineScript($js);
 	}
-	if ($item_placement_std == 1 && $item_columns_std > 1)
+	if ($masonry_std)
 	{
 		$js = "
 		jQuery(document).ready(function(){
