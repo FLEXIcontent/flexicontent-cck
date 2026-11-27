@@ -471,7 +471,7 @@ class FCIndexedField extends FCField
 			// Make sure value is an array
 			if (!is_array($value))
 			{
-				$value = strlen($value) ? array($value) : array();
+				$value = $value !== null && strlen($value) ? array($value) : array();
 			}
 
 			// Skip empty if not in field group, and at least one value was added
