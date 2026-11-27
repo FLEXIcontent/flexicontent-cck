@@ -115,7 +115,7 @@ var JFormValidator_FC = function () {
     }, 10000);
   }
   function reveal(el) {
-    document.querySelector('[href="#attrib-fcfields"]')?.click();
+    if (el.closest('#attrib-fcfields')) document.querySelector('[href="#attrib-fcfields"]')?.click();
     let tab = el.parentElement?.closest('div.tabbertab');
     while (tab) {
       const set = tab.parentElement?.closest('div.tabberlive');
@@ -244,20 +244,38 @@ var JFormValidator_FC = function () {
     const captcha = form.querySelector('#recaptcha_response_field');
     if (captcha) { response(!!captcha.value, captcha); if (!captcha.value) valid = false; }
     if (invalid.length) {
-      const errors = new Set();
+      const errors = new Map();
       for (const el of invalid) {
         const lbl = label(el), copy = lbl?.cloneNode(true);
         copy?.querySelectorAll('.fc-field-invalid, .form-control-feedback').forEach(note => note.remove());
         const text = copy?.textContent.trim() || F.data(el, 'label_text');
         if (lbl) F.show(lbl.closest('.control-group'));
-        if (text) errors.add(F.text('JLIB_FORM_FIELD_INVALID') + text.replace('*', ''));
+        if (text && !errors.has(text)) errors.set(text, el);
       }
-      Joomla.renderMessages({error: [...errors]});
-      invalid[0].dispatchEvent(new CustomEvent('fc:reveal-invalid', {bubbles: true}));
+      const messages = [];
+      // Joomla translations can contain character references, including a trailing &#160.
+      const prefix = document.createElement('textarea');
+      prefix.innerHTML = F.text('JLIB_FORM_FIELD_INVALID');
+      for (const [text, el] of errors) {
+        const message = document.createElement(el.id ? 'a' : 'span');
+        message.textContent = prefix.value + text.replace('*', '');
+        if (el.id) {
+          message.href = '#' + encodeURIComponent(el.id);
+          message.className = 'fc-validation-link';
+        }
+        messages.push(message.outerHTML);
+      }
+      Joomla.renderMessages({error: messages});
+      for (const link of document.querySelectorAll('#system-message-container a.fc-validation-link')) {
+        const field = document.getElementById(decodeURIComponent(link.hash.slice(1)));
+        if (field?.form !== form) continue;
+        link.onclick = event => { event.preventDefault(); reveal(field); F.focusInvalid(form, field); };
+      }
+      F.focusInvalid(form, invalid[0]);
     } else if (valid) document.getElementById('system-message-container')?.replaceChildren();
     F.data(form, 'fcform_isValid', valid);
     F.data(form, 'fcform_input_sets', null);
-    if (!valid && !window.fc_validateOnSubmitForm) setTimeout(() => F.focusInvalid(form), 20);
+    if (!valid && !invalid.length && !window.fc_validateOnSubmitForm) setTimeout(() => F.focusInvalid(form), 20);
     return valid;
   }
   return {attachTinyMceValidation, isValid, validate, setHandler, attachToForm, custom};
