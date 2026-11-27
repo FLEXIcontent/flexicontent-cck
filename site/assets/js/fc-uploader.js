@@ -328,6 +328,21 @@ window.FlexiUploader = (() => {
     }
 
     refresh() {
+      // The editor validator treats 'done' as a pending file assignment.
+      if (!this.disposed && queues.get(this.container) === this) {
+        const status = this.container.parentElement?.querySelector('input.validate-fcuploader');
+        if (status) {
+          const incomplete = this.files.some(entry => entry.state !== 'done' || entry.assignmentFailed);
+          const message = this.running ? translate('FLEXI_PLEASE_WAIT') : incomplete ? translate('FLEXI_UPLOAD_UNFINISHED') : '';
+          if (status.dataset.errorMssg !== message || !!status.value !== !!message) {
+            resetUploadValidation(status);
+            if (message) {
+              status.value = 'done';
+              status.dataset.errorMssg = message;
+            }
+          }
+        }
+      }
       this.input.disabled = this.running;
       this.startButton.disabled = this.running || !this.files.some(entry => entry.state !== 'done');
       this.files.forEach(entry => {
@@ -350,11 +365,6 @@ window.FlexiUploader = (() => {
       if (this.running || this.disposed || !batch.some(pending)) return;
       this.running = true;
       this.refresh();
-      const status = this.container.parentElement.querySelector('input.validate-fcuploader');
-      if (status) {
-        status.value = 'done'; // Existing FLEXIcontent validator treats this as an unfinished assignment.
-        status.dataset.errorMssg = translate('FLEXI_PLEASE_WAIT');
-      }
       try {
         for (const entry of [...batch]) {
           if (this.disposed || !pending(entry) || !this.files.includes(entry)) continue;
@@ -365,7 +375,6 @@ window.FlexiUploader = (() => {
       } finally {
         this.running = false;
         this.refresh();
-        if (queues.get(this.container) === this) resetUploadValidation(status);
       }
     }
 
