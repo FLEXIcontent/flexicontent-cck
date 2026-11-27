@@ -2064,7 +2064,8 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			$db_action_names = array();
 			foreach ($rules_data as $action_name => $data)  $db_action_names[]   = $action_name;
 			foreach ($component_actions as $action)         $file_action_names[] = $action->name;
-			$deleted_actions =  array_diff($db_action_names,   $file_action_names);
+			// Joomla 6.2.1 adds core.api to component assets independently of their access.xml.
+			$deleted_actions = array_diff($db_action_names, $file_action_names, array('core.api'));
 			$added_actions   =  array_diff($file_action_names, $db_action_names  );
 			foreach($added_actions as $i => $action_name)
 			{
@@ -2193,7 +2194,8 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			$db_action_names = array();
 			foreach ($rules_data as $action_name => $data)  $db_action_names[]   = $action_name;
 			foreach ($component_actions as $action)         $file_action_names[] = $action->name;
-			$deleted_actions =  array_diff($db_action_names,   $file_action_names);
+			// Joomla 6.2.1 adds core.api to component assets independently of their access.xml.
+			$deleted_actions = array_diff($db_action_names, $file_action_names, array('core.api'));
 			$added_actions   =  array_diff($file_action_names, $db_action_names  );
 			foreach($added_actions as $i => $action_name)
 			{
