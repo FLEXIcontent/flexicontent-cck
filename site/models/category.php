@@ -2890,7 +2890,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 				foreach ($values as $i => $v) if (isset($stateids[$v])) $filt_states[] = $stateids[$v];
 				$query  = 'SELECT id'
 						. ' FROM #__flexicontent_items_tmp'
-						. ' WHERE state IN ('. implode(",", $filt_states) .')';
+						. ' WHERE ' . ($filt_states ? 'state IN ('. implode(",", $filt_states) .')' : '0=1');  // An unknown state matches nothing
 				//$filter_query = !count($values) ? ' AND 1 ' : ' AND i.state IN ('. implode(",", $filt_states) .')';   // no db quoting needed since these were typecasted to ints
 				break;
 
@@ -2910,7 +2910,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 				$query_catids = array_keys($query_catids);
 				$query  = 'SELECT itemid'
 						. ' FROM #__flexicontent_cats_item_relations'
-						. ' WHERE catid IN ('. implode(",", $query_catids) .')';
+						. ' WHERE ' . ($query_catids ? 'catid IN ('. implode(",", $query_catids) .')' : '0=1');  // An unknown category matches nothing
 						;
 				//$filter_query = ' AND rel.catid IN ('. implode(",", $values) .')';
 				break;
