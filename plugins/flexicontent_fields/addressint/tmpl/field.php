@@ -18,7 +18,7 @@ foreach ($values as $value)
 	$value['addr_formatted'] = isset($value['addr_formatted']) ? $value['addr_formatted'] : '';
 	$value['zip_suffix']     = isset($value['zip_suffix'])     ? $value['zip_suffix'] : '';
 	$value['custom_marker']  = isset($value['custom_marker'])  ? $value['custom_marker'] : '';
-	$value['marker_anchor']  = !empty($value['marker_anchor'])  ? $value['marker_anchor'] : 'BotC';
+	$value['marker_anchor']  = $value['marker_anchor'] ?? '';
 
 	$value['url']      = isset($value['url'])   ? $value['url'] : '';
 	$value['zoom']     = isset($value['zoom'])  ? $value['zoom'] : '';
@@ -211,7 +211,7 @@ foreach ($values as $value)
 				<td style="position: relative;">' .
 					\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $marker_anchors, $fieldname_n.'[marker_anchor]',
 						' class="fc_gm_marker_anchor use_select2_lib" onchange="fcfield_addrint.updateMarkerIcon(this.id.replace(\'_marker_anchor\', \'\'), \''.$field_name_js.'\');" ',
-						'value', 'text', $value['marker_anchor'], $elementid_n.'_marker_anchor') . '
+						'value', 'text', $value['marker_anchor'] ?: 'BotC', $elementid_n.'_marker_anchor') . '
 				</td>
 			</tr>
 
