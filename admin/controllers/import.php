@@ -65,6 +65,11 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 	 */
 	public function processcsv()
 	{
+		if (!FlexicontentHelperPerm::getPerm()->CanImport)
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 403);
+		}
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 		parent::display();
 	}
 
@@ -81,13 +86,18 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 	 */
 	public function importcsv()
 	{
+		if (!FlexicontentHelperPerm::getPerm()->CanImport)
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 403);
+		}
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
 		$app = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 
 		// Check for request forgeries
 		if ($this->input->getCmd('task') !== 'importcsv')
 		{
-			\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 			echo '<link rel="stylesheet" href="' . \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/flexicontentbackend.css?' . FLEXI_VHASH . '" />';
 			$rtl_sfx = !\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl() ? '' : '_rtl';
 			$fc_css = \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x' . $rtl_sfx . '.css' : 'j3x' . $rtl_sfx . '.css');
@@ -726,8 +736,42 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 				// ***
 
 				// Get fields that use files
-				$conf['media_folder'] = $jinput->get('media_folder', '', 'string');
-				$conf['docs_folder']  = $jinput->get('docs_folder', '', 'string');
+				// The folders are given relative to the site root and must stay inside it
+				$conf['media_folder'] = flexicontent_security::siteRelativeFolder($jinput->get('media_folder', '', 'string'));
+				$conf['docs_folder']  = flexicontent_security::siteRelativeFolder($jinput->get('docs_folder', '', 'string'));
+
+				if ($conf['media_folder'] === false || $conf['docs_folder'] === false)
+				{
+					$app->enqueueMessage('The media folder and the documents folder must be existing folders inside the site, given relative to the site root', 'error');
+					$app->redirect($link);
+				}
+
+				// Files are imported only from a folder made for them, not from the site root or from a folder of the system
+				// (temporary files, e.g. the CSV files that other users uploaded, cache, logs, administrator)
+				$file_field_folders = array('image' => 'media_folder', 'file' => 'docs_folder', 'mediafile' => 'docs_folder');
+				$used_folders = array();
+
+				foreach ($conf['columns'] as $colname)
+				{
+					if (isset($conf['custom_fields'][$colname]->field_type, $file_field_folders[$conf['custom_fields'][$colname]->field_type]))
+					{
+						$used_folders[$file_field_folders[$conf['custom_fields'][$colname]->field_type]] = 1;
+					}
+				}
+
+				foreach (array('media_folder', 'docs_folder') as $folder_var)
+				{
+					if (!$this->_isImportSourceFolder($conf[$folder_var], isset($used_folders[$folder_var])))
+					{
+						$app->enqueueMessage(
+							'Files can not be imported from the folder "' . htmlspecialchars($conf[$folder_var], ENT_QUOTES, 'UTF-8') . '".'
+							. ' Please use a folder made for the imported files (e.g. tmp/fcimport_docs or a sub-folder of images),'
+							. ' and not the site root or the temporary, cache, log or administrator folder of the site',
+							'error'
+						);
+						$app->redirect($link);
+					}
+				}
 
 				/**
 				 * All parameters are passed by reference so that they are modified in case of
@@ -816,9 +860,39 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 				$data['attribs']  = array();
 				$data['metadata'] = array();
 
-				// Prepare request variable used by the item's Model
+				$c_item_id = 0;
+				$item = null;
+				$data['id'] = 0;
+
+				// Check the row before processing fields, which can create tags or import media.
 				if ($task !== 'testcsv')
 				{
+					$c_item_id = $conf['id_col'] && isset($conf['core_props']['id']) ? (int) ($_d['id'] ?? 0) : 0;
+					$isUpdate = $conf['id_col'] > 1 && $c_item_id > 0 && isset($conf['existing_ids'][$c_item_id]);
+					if ($isUpdate)
+					{
+						$item = $itemmodel->getItem($c_item_id, false, true, 0);
+						$canImportRow = $item && (int) $item->id === $c_item_id && $itemmodel->canEdit($item, $user);
+					}
+					else
+					{
+						$catid = (int) (isset($conf['core_props']['catid']) && isset($_d['catid']) ? $_d['catid'] : $conf['maincat']);
+						$typeId = (int) $conf['type_id'];
+						$canImportRow = $catid > 0 && $typeId > 0
+							&& $user->authorise('core.create', 'com_content.category.' . $catid)
+							&& $itemmodel->canCreateType(array($typeId));
+					}
+
+					if (!$canImportRow)
+					{
+						$session->set('csvimport_lineno', $lineno, 'flexicontent');
+						$conf['failure_count']++;
+						$msg = 'Item no: ' . $lineno . ' : ' . \Joomla\CMS\Language\Text::_($isUpdate ? 'FLEXI_NO_ACCESS_EDIT' : 'FLEXI_NO_ACCESS_CREATE');
+						\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::WARNING, 'com_flexicontent.importcsv');
+						echo $this->_failedItemMsg($msg);
+						continue;
+					}
+
 					$q = $db->getQuery(true)
 						->select('fi.*')
 						->from('#__flexicontent_fields AS fi')
@@ -935,22 +1009,8 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 					}
 				}
 
-				// Before setting any new values try to load item if item ID was given
-				$c_item_id = $conf['id_col'] && !empty($data['id'])
-					? $data['id']
-					: 0;
-
-				// ***
-				// *** CREATE CASE with / without ID column --OR-- item ID not given --OR-- item ID does not exist
-				// *** NOTE: we already check above,
-				// ***  that for create-only, none of the given item ID exists in the DB
-				// ***  that for update-only, all given item IDs exist in the DB
-				// ***
-
-				if ($conf['id_col'] <= 1 || empty($c_item_id) || !isset($conf['existing_ids'][$c_item_id]))
-				{
-					$data['id'] = 0;
-				}
+				// Use the same ID that was authorized above.
+				$data['id'] = $item ? (int) $item->id : 0;
 
 				$data['vstate']  = 2;
 
@@ -966,12 +1026,12 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 				if (!$data['id'])
 				{
-					$data['type_id'] = isset($data['type_id'])  ? $data['type_id']  : $conf['type_id'];
+					$data['type_id'] = (int) $conf['type_id'];
 					$data['language']= isset($data['language']) ? $data['language'] : $conf['language'];
 					$data['state']   = isset($data['state'])    ? $data['state']    : $conf['state'];
 					$data['access']  = isset($data['access'])   ? $data['access']   : $conf['access'];
 
-					$data['catid']   = isset($data['catid'])    ? $data['catid']    : $conf['maincat'];
+					$data['catid']   = isset($catid) ? $catid : (int) $conf['maincat'];
 					$data['cid']     = isset($data['cid'])      ? $data['cid']      : $conf['seccats'];
 				}
 
@@ -979,64 +1039,52 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 				// *** CREATE / UPDATE --OR-- UPDATE-only CASEs with item ID given
 				// ***
 
-				if ($data['id'] && $c_item_id)
+				if ($item)
 				{
-					// Try to Load existing item into the ITEM model
-					$item = $itemmodel->getItem($c_item_id, $check_view_access = false, $no_cache = true, $force_version = 0);
+					// Maintain content type for existing items
+					$data['type_id'] = $item->type_id;
 
-					if ($item)
+					// IMPORTANT: Get existing field values for the item
+					$items = array($item);
+					$items_custom_values = FlexicontentFields::getCustomFieldValues($items, 'item');
+					$data_custom = $data['custom'];  // Backup field values from file
+					$data['custom'] = reset($items_custom_values); // Get data of first item
+
+					// Override existing item field values with those from file
+					foreach ($data_custom as $i => $v)
 					{
-						// Maintain content type for existing items
-						$data['type_id'] = $item->type_id;
-
-						// IMPORTANT: Get existing field values for the item
-						$items = array($item);
-						$items_custom_values = FlexicontentFields::getCustomFieldValues($items, 'item');
-						$data_custom = $data['custom'];  // Backup field values from file
-						$data['custom'] = reset($items_custom_values); // Get data of first item
-
-						// Override existing item field values with those from file
-						foreach ($data_custom as $i => $v)
-						{
-							$data['custom'][$i] = $v;
-						}
-
-						// Backup attribs from file
-						$data_attribs = $data['attribs'];
-
-						if (!is_array($item->attribs) && !is_object($item->attribs))
-						{
-							$item->attribs = new \Joomla\Registry\Registry($item->attribs);
-						}
-
-						$data['attribs'] = is_object($item->attribs) ? $item->attribs->toArray() : $item->attribs;
-
-						// Override existing item attribs with those from file
-						foreach ($data_attribs as $i => $v)
-						{
-							$data['attribs'][$i] = $v;
-						}
-
-						$data_metadata = $data['metadata'];  // Backup metadata from file
-
-						if (!is_array($item->metadata) && !is_object($item->metadata))
-						{
-							$item->metadata = new \Joomla\Registry\Registry($item->metadata);
-						}
-
-						$data['metadata'] = is_object($item->metadata) ? $item->metadata->toArray() : $item->metadata;
-
-						// Override existing item metadata with those from file
-						foreach ($data_metadata as $i => $v)
-						{
-							$data['metadata'][$i] = $v;
-						}
+						$data['custom'][$i] = $v;
 					}
 
-					// INTERNAL ERROR, item could not be loaded, but we have checked above that it does exist, so this indicates a bug in our code
-					else
+					// Backup attribs from file
+					$data_attribs = $data['attribs'];
+
+					if (!is_array($item->attribs) && !is_object($item->attribs))
 					{
-						$data['id'] = -1;
+						$item->attribs = new \Joomla\Registry\Registry($item->attribs);
+					}
+
+					$data['attribs'] = is_object($item->attribs) ? $item->attribs->toArray() : $item->attribs;
+
+					// Override existing item attribs with those from file
+					foreach ($data_attribs as $i => $v)
+					{
+						$data['attribs'][$i] = $v;
+					}
+
+					$data_metadata = $data['metadata'];  // Backup metadata from file
+
+					if (!is_array($item->metadata) && !is_object($item->metadata))
+					{
+						$item->metadata = new \Joomla\Registry\Registry($item->metadata);
+					}
+
+					$data['metadata'] = is_object($item->metadata) ? $item->metadata->toArray() : $item->metadata;
+
+					// Override existing item metadata with those from file
+					foreach ($data_metadata as $i => $v)
+					{
+						$data['metadata'][$i] = $v;
 					}
 				}
 				//echo '<pre>'; print_r($data); echo '</pre>'; exit;
@@ -1079,14 +1127,6 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 						"<u>TITLE</u>: " . $_d['title'] . "<br/>" .
 						"<u>TEXT</u>: " . $_d['text'] . "<hr/>";
 					}
-				}
-
-				// Internal error, this should not happen anyway, but continue with other items
-				elseif ($data['id'] == -1)
-				{
-					$msg = 'Internal Error item with ID: "' . $c_item_id . " could not be loaded in order to be updated";
-					\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::WARNING, 'com_flexicontent.importcsv');
-					echo $this->_failedItemMsg($msg);
 				}
 
 				// Otherwise (if not testing) try to create / update the item by using Item Model's store() method
@@ -1196,6 +1236,81 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 	protected function _failedItemMsg($msg)
 	{
 		return '<div class="fc_import_failed" style="color: #c00; font-weight: bold;">' . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . '</div>';
+	}
+
+
+	/**
+	 * Check that a folder may be the source of the files that an import registers
+	 *
+	 * The folder was already checked to be an existing folder inside the site, see flexicontent_security::siteRelativeFolder().
+	 * A value of a file column may name a sub-folder too, so every file below the folder can be imported. Refused are:
+	 * - the site root, when the import has a file column that uses the folder
+	 * - the temporary folder of the site (it holds e.g. the CSV files that other users uploaded). Its sub-folders
+	 *   can be used, the default import folders are such folders
+	 * - the cache, log and administrator folders and their sub-folders
+	 *
+	 * @param   string   $folder  Folder relative to the site root, empty for the site root
+	 * @param   boolean  $used    True if the import has a file column that reads files from the folder
+	 *
+	 * @return  boolean
+	 */
+	protected function _isImportSourceFolder($folder, $used = true)
+	{
+		if (!is_string($folder))
+		{
+			return false;
+		}
+
+		if ($folder === '')
+		{
+			return !$used;
+		}
+
+		$clean = static function ($path)
+		{
+			$path = $path !== false && $path !== null && $path !== '' ? realpath((string) $path) : false;
+
+			if ($path === false)
+			{
+				return false;
+			}
+
+			$path = rtrim(str_replace('\\', '/', $path), '/');
+
+			return DIRECTORY_SEPARATOR === '\\' ? strtolower($path) : $path;
+		};
+
+		$root = $clean(JPATH_SITE);
+		$real = $root !== false ? $clean(JPATH_SITE . '/' . $folder) : false;
+
+		if ($real === false || $real === $root)
+		{
+			return false;
+		}
+
+		$app = \Joomla\CMS\Factory::getApplication();
+
+		// Refused, but not their sub-folders
+		foreach (array(JPATH_SITE . '/tmp', $app->get('tmp_path')) as $path)
+		{
+			if ($real === $clean($path))
+			{
+				return false;
+			}
+		}
+
+		// Refused together with their sub-folders
+		foreach (array(JPATH_SITE . '/cache', JPATH_SITE . '/logs', JPATH_SITE . '/administrator', JPATH_ADMINISTRATOR, $app->get('log_path')) as $path)
+		{
+			$path = $clean($path);
+
+			if ($path !== false && ($real === $path || strpos($real . '/', $path . '/') === 0))
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 

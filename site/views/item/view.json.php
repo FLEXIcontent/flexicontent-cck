@@ -118,6 +118,8 @@ class FlexicontentViewItem extends \Joomla\CMS\MVC\View\HtmlView
 		}
 
 		// Publish values only for fields the current user is allowed to view.
+		flexicontent_security::redactCoreFields($item);
+
 		$allowed_field_ids = array();
 		if (isset($item->fields) && is_array($item->fields))
 		{

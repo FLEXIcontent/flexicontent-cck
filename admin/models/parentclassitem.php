@@ -402,7 +402,8 @@ class ParentClassItem extends FCModelAdmin
 		$jinput  = $app->input;
 
 		// View access done is meant only for FRONTEND !!! ... force it to false
-		if ($app->isClient('administrator'))
+		// (also for Web Services, which work with this back-end model: the check is a method of the site model)
+		if ($app->isClient('administrator') || $app->isClient('api'))
 		{
 			$check_view_access = false;
 		}
@@ -651,9 +652,9 @@ class ParentClassItem extends FCModelAdmin
 		try
 		{
 			// ***
-			// *** Item Retrieval BACKEND
+			// *** Item Retrieval BACKEND (and Web Services, which work with the back-end models)
 			// ***
-			if ( $app->isClient('administrator') && $view !== 'itemcompare')
+			if ( ($app->isClient('administrator') || $app->isClient('api')) && $view !== 'itemcompare')
 			{
 				$item   = $this->getTable();
 				$result = $item->load($pk);  // try loading existing item data
@@ -1889,7 +1890,7 @@ class ParentClassItem extends FCModelAdmin
 	 *
 	 * @since	3.3.0
 	 */
-	function store($data, $checkACL = true)
+	function store($data, $checkACL = true, ?array $batch_excluded_ids = null)
 	{
 		global $fc_run_times;
 		$start_microtime = microtime(true);
@@ -1912,6 +1913,7 @@ class ParentClassItem extends FCModelAdmin
 		$view   = $jinput->get('view', '', 'cmd');
 		$task   = $jinput->get('task', '', 'cmd');
 		$jinput->set('isflexicontent', 'yes');
+		self::internalContentEvents(true);
 
 		$use_versioning = $cparams->get('use_versioning', 1);
 		$print_logging_info = $cparams->get('print_logging_info');
@@ -2083,14 +2085,13 @@ class ParentClassItem extends FCModelAdmin
 
 			if ($isSite && $isNew && !empty($data['submit_conf']))
 			{
-				$h = $data['submit_conf'];
-				$session = \Joomla\CMS\Factory::getApplication()->getSession();
-				$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
-				$submit_conf = !empty($item_submit_conf[$h]) ? $item_submit_conf[$h] : null;
+				$typeId = (int) ($data['type_id'] ?? $item->type_id);
+				$submitMenu = flexicontent_security::getItemSubmissionMenu($app, $typeId);
+				$submit_conf = flexicontent_security::getItemSubmitConfiguration($app, $submitMenu, $typeId, $data['submit_conf']);
 
 				$autopublished    = $submit_conf && !empty($submit_conf['autopublished'])    ? $submit_conf['autopublished']    : null;  // Override flag for both TYPE and CATEGORY ACL
 				$overridecatperms = !empty($submit_conf['overridecatperms'])
-					&& flexicontent_security::canUseSubmissionCategoryOverride($app->getMenu()->getActive(), $user);  // Override flag for CATEGORY ACL
+					&& flexicontent_security::canUseSubmissionCategoryOverride($submitMenu, $user);  // Override flag for CATEGORY ACL
 
 				if ( $autopublished)
 				{
@@ -2150,13 +2151,16 @@ class ParentClassItem extends FCModelAdmin
 				$data['catid'] = $maincatid;
 			}
 
-			if (!empty($allowed_cid))
-			{
-				// Add existing item's categories into the user allowed categories
-				$allowed_cid = array_merge($allowed_cid, $item->categories);
+			$checkNewSiteCategory = $isSite && $isNew && $option === 'com_flexicontent';
 
-				// Check main category tampering
-				if (!in_array($data['catid'], $allowed_cid) && $data['catid'] != $item->catid)
+			// A list that comes from ACL is also enforced when it is empty: the user may then create in no category
+			if ($checkNewSiteCategory || !$overridecatperms || !empty($allowed_cid))
+			{
+				// Existing assignments are allowed when editing an item.
+				if (!$checkNewSiteCategory) $allowed_cid = array_merge($allowed_cid, $item->categories);
+
+				// Check main category tampering. The main category of a new item is the requested one, so it is never "unchanged"
+				if (!in_array($data['catid'], $allowed_cid) && ($isNew || $data['catid'] != $item->catid))
 				{
 					$this->setError( 'main category is not in allowed list (form tampered ?)' );
 					return false;
@@ -2580,7 +2584,7 @@ class ParentClassItem extends FCModelAdmin
 			$files = null;  // $_FILES;  //$app->input->files->get('files');
 			$core_data_via_events = null;
 
-			$result = $this->saveFields($isNew, $item, $data, $files, $old_item, $core_data_via_events, $checkACL);
+			$result = $this->saveFields($isNew, $item, $data, $files, $old_item, $core_data_via_events, $checkACL, $batch_excluded_ids ?? array());
 
 			// Allow custom redirection on failure
 			if (!empty($item->abort_save))
@@ -2666,7 +2670,7 @@ class ParentClassItem extends FCModelAdmin
 		{
 			// Save -both- item CORE data AND custom fields, rebinding the CORE ITEM DATA since the onBeforeSaveField may have modified them
 			if ( $print_logging_info ) $start_microtime = microtime(true);
-			if( !$this->applyCurrentVersion($item, $data, $createonly=false) ) return false;
+			if( !$this->applyCurrentVersion($item, $data, $createonly=false, $batch_excluded_ids) ) return false;
 			if ( $print_logging_info ) @$fc_run_times['item_store_core'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			//echo "<pre>"; var_dump($data); exit();
 
@@ -2712,6 +2716,18 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 
 		if ( $print_logging_info ) $start_microtime = microtime(true);
+
+		// The item form offers "notify the owner" and "notify the subscribers" only when the configuration allows them,
+		// a request for them that was posted anyway is dropped
+		if (!(int) $cparams->get('allow_owner_notify' . $CFGsfx, $isSite ? 0 : 1))
+		{
+			unset($data['notify_owner']);
+		}
+
+		if (!(int) $cparams->get('allow_subscribers_notify' . $CFGsfx, $isSite ? 0 : 1))
+		{
+			unset($data['notify']);
+		}
 
 		$results = FLEXI_J40GE
 			? $app->triggerEvent('onAfterSaveItem', array(&$item, &$data))
@@ -2877,7 +2893,7 @@ class ParentClassItem extends FCModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function saveFields($isNew, &$item, &$data, &$files, &$old_item = null, &$core_data_via_events = null, $checkACL = true)
+	function saveFields($isNew, &$item, &$data, &$files, &$old_item = null, &$core_data_via_events = null, $checkACL = true, array $excluded_assoc_ids = array())
 	{
 		if (!$old_item)
 		{
@@ -2918,7 +2934,7 @@ class ParentClassItem extends FCModelAdmin
 			// ... Get item ids of the associated items, so that we save into the untranslatable fields
 			$_langAssocs = $langAssocs;
 			unset($_langAssocs[$this->_id]);
-			$assoc_item_ids = array_keys($_langAssocs);
+			$assoc_item_ids = array_diff(array_keys($_langAssocs), $excluded_assoc_ids);
 		}
 		if (empty($assoc_item_ids)) $assoc_item_ids = array();
 
@@ -3638,7 +3654,7 @@ class ParentClassItem extends FCModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function applyCurrentVersion(&$item, &$data, $createonly=false)
+	function applyCurrentVersion(&$item, &$data, $createonly=false, ?array $batch_excluded_ids = null)
 	{
 		$app     = \Joomla\CMS\Factory::getApplication();
 		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
@@ -3732,7 +3748,7 @@ class ParentClassItem extends FCModelAdmin
 		{
 			// Get (non-cached) associations, they may have been just changed
 			$assocs = flexicontent_db::getLangAssocs(array((int) $item->id));
-			$assoc_item_ids = isset($assocs[$item->id]) ? array_diff(array_keys($assocs[$item->id]), array((int) $item->id)) : array();
+			$assoc_item_ids = isset($assocs[$item->id]) ? array_diff(array_keys($assocs[$item->id]), array((int) $item->id), $batch_excluded_ids ?? array()) : array();
 
 			foreach ($assoc_item_ids as $assoc_item_id)
 			{
@@ -3791,7 +3807,8 @@ class ParentClassItem extends FCModelAdmin
 
 		if (!$isNew && $this->useAssociations() && flexicontent_db::isCategoriesFieldUntranslatable())
 		{
-			flexicontent_db::propagateCategoriesToAssocs((int) $item->id);
+			$allowed_cats = $batch_excluded_ids !== null ? FlexicontentHelperPerm::getAllowedCats($user, array('core.create')) : null;
+			flexicontent_db::propagateCategoriesToAssocs((int) $item->id, $allowed_cats, $batch_excluded_ids ?? array());
 		}
 
 		return true;
@@ -3945,7 +3962,10 @@ class ParentClassItem extends FCModelAdmin
 		if (!$force && !empty($this->_record->parameters)) return;
 
 		$app = \Joomla\CMS\Factory::getApplication();
-		$menu = $app->getMenu()->getActive();  // Retrieve currently active menu item (NOTE: this applies when Itemid variable or menu item alias exists in the URL)
+
+		// Web Services work with the back-end models and have no menu (asking Joomla for it is an error there)
+		$isApi = $app->isClient('api');
+		$menu  = $isApi ? null : $app->getMenu()->getActive();  // Retrieve currently active menu item (NOTE: this applies when Itemid variable or menu item alias exists in the URL)
 		$isnew = !$this->_id;
 
 
@@ -3995,7 +4015,7 @@ class ParentClassItem extends FCModelAdmin
 		$itemParams = $this->_new_JRegistry($itemParams);
 
 		// Retrieve Layout's parameters, also deciding the layout
-		if ($app->isClient('administrator') || !empty($this->isForm))
+		if ($app->isClient('administrator') || $isApi || !empty($this->isForm))
 		{
 			$ilayout = $itemParams->get('ilayout', $typeParams->get('ilayout', 'grid'));
 			$this->setItemLayout($ilayout);
@@ -4951,8 +4971,9 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function & getNotificationsConf(&$params)
 	{
-		static $nConf = null;
-		if ($nConf !== null) return $nConf;
+		// Not kept between calls: the recipients depend on the categories of the current item,
+		// and a batch (e.g. approval requests of several items) calls this once per item
+		$nConf = null;
 
 		// (a) Check if notifications are not enabled
 		if ( !$params->get('enable_notifications', 0) )
@@ -5052,11 +5073,22 @@ class ParentClassItem extends FCModelAdmin
 
 			$user_emails_ugrps = array();
 
-			if (count($nConf->{$ugrps[$ntype]}))
+			// The group ids come from stored component, type and category parameters: use them as integers only
+			$_group_ids = array();
+
+			foreach ((array) $nConf->{$ugrps[$ntype]} as $_group_id)
+			{
+				if (is_scalar($_group_id) && (int) $_group_id > 0)
+				{
+					$_group_ids[(int) $_group_id] = (int) $_group_id;
+				}
+			}
+
+			if (count($_group_ids))
 			{
 				// emails for user groups
 				$query = 'SELECT DISTINCT email FROM #__users as u'
-					. ' JOIN #__user_usergroup_map ugm ON u.id = ugm.user_id AND ugm.group_id IN (' . implode(',', $nConf->{$ugrps[$ntype]}) . ')';
+					. ' JOIN #__user_usergroup_map ugm ON u.id = ugm.user_id AND ugm.group_id IN (' . implode(',', $_group_ids) . ')';
 
 				$user_emails_ugrps = $db->setQuery($query)->loadColumn();
 			}
@@ -5203,13 +5235,16 @@ class ParentClassItem extends FCModelAdmin
 		$nf_extra_properties = array('creator', 'modifier', 'created', 'modified', 'viewlink', 'editlinkfe', 'editlinkbe');
 
 		// ADD INFO for item title
+		// This body is HTML: titles and names are encoded (the subject is plain text and is not)
+		$nf_html = static function ($text) { return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8'); };
+
 		$body  = '<b>'.\Joomla\CMS\Language\Text::_( 'FLEXI_NF_CONTENT_TITLE' ) . "</b>: ";
 		if ( !$isNew ) {
 			$_changed = $oitem->title != $this->get('title');
 			$body .= " [ ". \Joomla\CMS\Language\Text::_($_changed ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br/>\r\n";
-			$body .= !$_changed ? "" : $oitem->title . " &nbsp; ==> &nbsp; ";
+			$body .= !$_changed ? "" : $nf_html($oitem->title) . " &nbsp; ==> &nbsp; ";
 		}
-		$body .= $this->get('title'). "<br/>\r\n<br/>\r\n";
+		$body .= $nf_html($this->get('title')). "<br/>\r\n<br/>\r\n";
 
 		// ADD INFO about state
 		$state_names = array(1=>'FLEXI_PUBLISHED', -5=>'FLEXI_IN_PROGRESS', 0=>'FLEXI_UNPUBLISHED', -3=>'FLEXI_PENDING', -4=>'FLEXI_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVED', -2=>'FLEXI_TRASHED');
@@ -5229,14 +5264,14 @@ class ParentClassItem extends FCModelAdmin
 			if ( !$isNew ) {
 				$_changed = $oitem->created_by != $this->get('created_by');
 				$body .= " [ ". \Joomla\CMS\Language\Text::_($_changed ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br/>\r\n";
-				$body .= !$_changed ? "" : $oitem->creator . " &nbsp; ==> &nbsp; ";
+				$body .= !$_changed ? "" : $nf_html($oitem->creator) . " &nbsp; ==> &nbsp; ";
 			}
-			$body .= $this->get('creator'). "<br/>\r\n";
+			$body .= $nf_html($this->get('creator')). "<br/>\r\n";
 		}
 		if ( in_array('modifier',$nf_extra_properties) && !$isNew )
 		{
 			$body .= '<b>'.\Joomla\CMS\Language\Text::_( 'FLEXI_NF_MODIFIER_LONG' ) . "</b>: ";
-			$body .= $this->get('modifier'). "<br/>\r\n";
+			$body .= $nf_html($this->get('modifier')). "<br/>\r\n";
 		}
 		$body .= "<br/>\r\n";
 
@@ -5278,7 +5313,7 @@ class ParentClassItem extends FCModelAdmin
 		{
 			foreach ($cats_titles as $i => $cats_title)
 			{
-				$body .= " &nbsp; ". ($i+1) .". ". $cats_title ."<br/>\r\n";
+				$body .= " &nbsp; ". ($i+1) .". ". $nf_html($cats_title) ."<br/>\r\n";
 			}
 		}
 
@@ -5288,7 +5323,7 @@ class ParentClassItem extends FCModelAdmin
 			$body .= '<b>'.\Joomla\CMS\Language\Text::_( 'FLEXI_NF_ITEM_CATEGORIES_ADDED') . "</b> : <br/>\r\n";
 			foreach ($cats_added_titles as $i => $cats_title)
 			{
-				$body .= " &nbsp; ". ($i+1) .". ". $cats_title ."<br/>\r\n";
+				$body .= " &nbsp; ". ($i+1) .". ". $nf_html($cats_title) ."<br/>\r\n";
 			}
 		}
 		if ( !empty($cats_removed_titles) )
@@ -5296,7 +5331,7 @@ class ParentClassItem extends FCModelAdmin
 			$body .= '<b>'.\Joomla\CMS\Language\Text::_( 'FLEXI_NF_ITEM_CATEGORIES_REMOVED') . "</b> : <br/>\r\n";
 			foreach ($cats_removed_titles as $i => $cats_title)
 			{
-				$body .= " &nbsp; ". ($i+1) .". ". $cats_title ."<br/>\r\n";
+				$body .= " &nbsp; ". ($i+1) .". ". $nf_html($cats_title) ."<br/>\r\n";
 			}
 		}
 		$body .= "<br/>\r\n<br/>\r\n";
@@ -5413,9 +5448,15 @@ class ParentClassItem extends FCModelAdmin
 		if (FlexicontentHelperNotificationMail::isAvailable())
 		{
 			$notification_fields = $this->getNotificationFields();
+
+			// The {FIELDS} summary lists only the fields that every recipient may view: any user or user group can be
+			// configured as recipient (per category too), these are not always users who may view all fields of the item
 			$template_data       = array_merge(
 				$template_data,
-				FlexicontentHelperNotificationMail::getFieldTags($notification_fields)
+				FlexicontentHelperNotificationMail::getFieldTags(
+					$notification_fields,
+					FlexicontentHelperNotificationMail::getRecipientViewLevels($notify_emails)
+				)
 			);
 		}
 
@@ -5477,7 +5518,7 @@ class ParentClassItem extends FCModelAdmin
 			."<br/>FROMNAME:  $fromname <br/>"
 			."<br/>RECIPIENTS: " .implode(",", $recipient)
 			."<br/>BCC: ". ($bcc ? implode(",",$bcc) : '')."<br/>"
-			."<br/>SUBJECT: $subject <br/>"
+			."<br/>SUBJECT: " . htmlspecialchars($subject, ENT_QUOTES, 'UTF-8') . " <br/>"
 			."<br/><br/>**********<br/>BODY<br/>**********<br/> $body <br/>"
 			;
 
@@ -5552,7 +5593,11 @@ class ParentClassItem extends FCModelAdmin
 		// We will use the email receivers of --new items-- pending approval, as receivers of the manual approval request
 		$nConf = $this->getNotificationsConf($this->_cparams);
 		$validators = new stdClass();
-		$validators->notify_emails = $nConf->emails->notify_new_pending;
+
+		// No configuration when notifications are disabled: no receivers, the caller then uses the address of the site
+		$validators->notify_emails = $nConf && isset($nConf->emails->notify_new_pending)
+			? (array) $nConf->emails->notify_new_pending
+			: array();
 		$validators->notify_text = ''; // clear this ... default is : 'text_notify_new_pending', but it is not used the case of manual approval
 
 		return $validators;
@@ -5582,13 +5627,13 @@ class ParentClassItem extends FCModelAdmin
 		{
 			// Check if not owned (while not have global request approval privilege)
 			if ( !$requestApproval && $approvable->created_by != (int) $user->get('id') ) {
-				$noprivilege[] = $item->title;
+				$noprivilege[] = $approvable->title;
 				continue;
 			}
 
 			// Check if checked out (edited) by different user
 			if ( $approvable->checked_out != 0 && $approvable->checked_out != (int) $user->get('id') ) {
-				$checked_out[] = $item->title;
+				$checked_out[] = $approvable->title;
 				continue;
 			}
 
@@ -6147,6 +6192,8 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		// Get "edit items" permission on the type of the item
+		// NOTE: these always return true. A type has no such permission, it restricts the creation of its items only
+		// (see FlexicontentHelperPerm::checkTypeAccess): the permissions of the item and of its category decide
 		$hasTypeEdit    = !$record->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($record->type_id, 'core.edit');
 		$hasTypeEditOwn = !$record->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($record->type_id, 'core.edit.own');
 		if (!$hasTypeEdit && !$hasTypeEditOwn) return false;
@@ -6192,6 +6239,7 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		// Get "edit items state" permission on the type of the item
+		// NOTE: these always return true, a type has no such permission (see FlexicontentHelperPerm::checkTypeAccess)
 		$hasTypeEditState    = !$record->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($record->type_id, 'core.edit.state');
 		$hasTypeEditStateOwn = !$record->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($record->type_id, 'core.edit.state.own');
 		if (!$hasTypeEditState && !$hasTypeEditStateOwn) return false;

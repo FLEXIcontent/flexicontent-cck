@@ -107,7 +107,7 @@ foreach ($items as $i => $item) :
 
 <!-- tab start -->
 <?php echo '<'.$mainAreaTag; ?> id="tablist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?> group" <?php echo $microdata_itemtype_code; ?>>
-	<h3 class="tabberheading"><?php echo StringHelper::substr($item->title, 0, 20); ?></h3><!-- tab title -->
+	<h3 class="tabberheading"><?php echo htmlspecialchars((string) StringHelper::substr($item->title, 0, 20), ENT_QUOTES, 'UTF-8'); ?></h3><!-- tab title -->
 	
 	<?php echo ( ($mainAreaTag == 'section') ? '<header>' : ''); ?>
 	
@@ -173,8 +173,8 @@ foreach ($items as $i => $item) :
 		<?php echo '<h'.$itemTitleHeaderLevel; ?> class="contentheading">
 			<span class="fc_item_title" itemprop="name">
 			<?php
-				echo ( StringHelper::strlen($item->title) > (int) $this->params->get('title_cut_text',200) ) ?
-					StringHelper::substr($item->title, 0, (int) $this->params->get('title_cut_text',200)) . ' ...'  :  $item->title;
+				echo htmlspecialchars((string) (( StringHelper::strlen($item->title) > (int) $this->params->get('title_cut_text',200) ) ?
+					StringHelper::substr($item->title, 0, (int) $this->params->get('title_cut_text',200)) . ' ...'  :  $item->title), ENT_QUOTES, 'UTF-8');
 			?>
 			</span>
 		<?php echo '</h'.$itemTitleHeaderLevel; ?>>
@@ -356,7 +356,7 @@ foreach ($items as $i => $item) :
 		
 		<a href="<?php echo \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" class="btn" itemprop="url">
 			<span class="icon-chevron-right"></span>
-			<?php echo $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title); ?>
+			<?php echo $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8')); ?>
 		</a>
 		
 	</span>

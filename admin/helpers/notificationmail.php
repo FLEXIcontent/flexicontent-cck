@@ -254,11 +254,16 @@ class FlexicontentHelperNotificationMail
 	 * {<FIELD_NAME>} unless the name conflicts with a core tag such as {TITLE}.
 	 * All non-core fields with a non empty value are also available in the {FIELDS} summary tag.
 	 *
-	 * @param   array  $fields  Field objects (with name, label, value and iscore properties)
+	 * The {FIELDS} summary is a part of the default mail bodies, so it can be limited to the fields that every
+	 * recipient of the mail is allowed to view, see getRecipientViewLevels(). A tag of a single field is used only
+	 * where the author of a mail template wrote it, these tags are not limited.
+	 *
+	 * @param   array       $fields       Field objects (with name, label, value, access and iscore properties)
+	 * @param   array|null  $viewLevels   View access levels of the fields to include in {FIELDS}, null for all fields
 	 *
 	 * @return  array
 	 */
-	public static function getFieldTags(array $fields)
+	public static function getFieldTags(array $fields, $viewLevels = null)
 	{
 		$tags     = array('fields' => '');
 		$reserved = array_flip(static::getCoreTags());
@@ -284,7 +289,12 @@ class FlexicontentHelperNotificationMail
 				$tags[$tagName] = $value;
 			}
 
-			if (empty($field->iscore) && $value !== '')
+			// As in the item view: a field without access level (0) is viewable by everybody
+			$viewable = !is_array($viewLevels)
+				|| empty($field->access)
+				|| in_array((int) $field->access, $viewLevels);
+
+			if (empty($field->iscore) && $value !== '' && $viewable)
 			{
 				$label  = \Joomla\CMS\Language\Text::_(!empty($field->label) ? $field->label : $name);
 				$list[] = $label . ': ' . $value;
@@ -294,6 +304,83 @@ class FlexicontentHelperNotificationMail
 		$tags['fields'] = implode("\n", $list);
 
 		return $tags;
+	}
+
+
+	/**
+	 * Get the view access levels that all the recipients of a notification have.
+	 *
+	 * The recipients are the users and the user groups that were configured to be notified (in the component,
+	 * the content type and, by the editors of a category, in the category), these are not always users that may
+	 * view every field of the item. An address that is not the address of a user gets the levels of a guest.
+	 * The address of the site itself (the sender, and main recipient when sending as BCC) is not looked at.
+	 *
+	 * @param   array  $recipients  Recipient email addresses
+	 *
+	 * @return  array|null  The view levels, null when there is no recipient to look at
+	 */
+	public static function getRecipientViewLevels($recipients)
+	{
+		$site_address = strtolower(trim((string) Factory::getApplication()->get('mailfrom')));
+		$addresses    = array();
+		$quoted       = array();
+
+		$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		foreach ((array) $recipients as $email)
+		{
+			$email = is_scalar($email) ? trim((string) $email) : '';
+
+			if ($email !== '' && strtolower($email) !== $site_address && !isset($addresses[strtolower($email)]))
+			{
+				$addresses[strtolower($email)] = 0;
+				$quoted[] = $db->quote($email);
+			}
+		}
+
+		if (!$addresses)
+		{
+			return null;
+		}
+
+		// The addresses were read from the users table, they are matched as they are stored
+		$query = 'SELECT id, email FROM #__users WHERE block = 0 AND email IN (' . implode(',', $quoted) . ')';
+
+		try
+		{
+			$rows = (array) $db->setQuery($query)->loadObjectList();
+		}
+		catch (\Throwable $e)
+		{
+			// Not a reason to fail the notification: all recipients get the levels of a guest
+			$rows = array();
+		}
+
+		foreach ($rows as $row)
+		{
+			$address = strtolower(trim((string) $row->email));
+
+			if (isset($addresses[$address]))
+			{
+				$addresses[$address] = (int) $row->id;
+			}
+		}
+
+		$levels = null;
+
+		// One look per user id: all the addresses that are not of a user share the id 0 (guest)
+		foreach (array_unique($addresses) as $user_id)
+		{
+			$user_levels = array_map('intval', (array) \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user_id));
+			$levels      = $levels === null ? $user_levels : array_intersect($levels, $user_levels);
+
+			if (!$levels)
+			{
+				break;
+			}
+		}
+
+		return array_values(array_unique($levels));
 	}
 
 
@@ -623,7 +710,11 @@ class FlexicontentHelperNotificationMail
 			$mailer->addTemplateData($data);
 
 			// Escape all user supplied values in the HTML version of the email
-			$mailer->addUnsafeTags(array_keys($data));
+			// (the method was added in Joomla 5.1.3, calling it where it is missing would end here and send no mail at all)
+			if (method_exists($mailer, 'addUnsafeTags'))
+			{
+				$mailer->addUnsafeTags(array_keys($data));
+			}
 
 			$from = $app->get('mailfrom');
 			$seen = array();

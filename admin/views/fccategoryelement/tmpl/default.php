@@ -414,7 +414,7 @@ if ($js)
 
 					<?php elseif ($activate_row): ?>
 
-						<a style="cursor: pointer;" href="javascript:;" onclick="window.parent.fcSelectCategory('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');" class="<?php echo $this->tooltip_class; ?>" title="<?php echo \Joomla\CMS\HTML\HTMLHelper::tooltipText(\Joomla\CMS\Language\Text::_('FLEXI_SELECT'), $pcpath, 0, 1); ?>" >
+						<a style="cursor: pointer;" href="javascript:;" onclick="window.parent.fcSelectCategory('<?php echo $row->id; ?>', <?php echo htmlspecialchars(json_encode((string) $row->title, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_INVALID_UTF8_SUBSTITUTE), ENT_QUOTES, 'UTF-8'); ?>);" class="<?php echo $this->tooltip_class; ?>" title="<?php echo \Joomla\CMS\HTML\HTMLHelper::tooltipText(\Joomla\CMS\Language\Text::_('FLEXI_SELECT'), $pcpath, 0, 1); ?>" >
 
 					<?php else: ?>
 

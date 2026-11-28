@@ -46,7 +46,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 	);
 	?>
 	
-	<form class="mod_flexicontent<?php echo $params->get('moduleclass_sfx'); ?>" name="select_form_<?php echo $module->id; ?>" id="select_form_<?php echo $module->id; ?>">
+	<form class="mod_flexicontent<?php echo htmlspecialchars((string) $params->get('moduleclass_sfx'), ENT_QUOTES, 'UTF-8'); ?>" name="select_form_<?php echo $module->id; ?>" id="select_form_<?php echo $module->id; ?>">
 	<?php
 	$attribs = array('class' => 'use_select2_lib', 'onchange' => 'window.location=this.form.select_list_'.$module->id.'.value;');
 	$options = array();

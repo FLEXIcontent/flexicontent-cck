@@ -42,7 +42,7 @@ class modFlexiTagCloudHelper
 		$method_types = (int)$params->get('method_types', '1');  // (current) Type method
 		$cids = $params->get('categories');
 		$cids = is_array($cids)
-			? $cids
+			? array_values(array_filter(array_map('intval', array_filter($cids, 'is_scalar'))))
 			: ((int) $cids ? array((int) $cids) : array());
 		$treeinclude 		= $params->get('treeinclude');
 
@@ -55,12 +55,16 @@ class modFlexiTagCloudHelper
 			. ' AND c.published = 1'
 			. ' AND tag.published = 1';
 
-		// access scope
+		// access scope: the item, its main category and its type must all be viewable (same rule as the items module)
+		$joinaccess = '';
 		if (!$show_noauth)
 		{
-			$aid_arr  = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$aid_arr  = array_map('intval', \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id));
 			$aid_list = implode(",", $aid_arr);
 			$where  .= ' AND i.access IN ('.$aid_list.')';
+			$where  .= ' AND c.access IN (0,'.$aid_list.')';
+			$where  .= ' AND (ty.id IS NULL OR ty.access IN (0,'.$aid_list.'))';
+			$joinaccess = ' LEFT JOIN #__flexicontent_types AS ty ON ty.id = i.type_id';  // to check the access level of the type
 		}
 
 
@@ -163,6 +167,7 @@ class modFlexiTagCloudHelper
 			. ' JOIN #__flexicontent_items_tmp AS i ON i.id = rel.itemid'
 			. ' JOIN #__categories AS c ON c.id = i.catid'  // to check publication state and limit to specific cats
 			. ' JOIN #__flexicontent_tags as tag ON tag.id = rel.tid'  // to check publication state
+			. $joinaccess
 			. $where
 			. ' GROUP BY rel.tid'
 			. ' ORDER BY no DESC'

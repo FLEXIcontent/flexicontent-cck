@@ -354,7 +354,7 @@ if ($js)
 				echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
 					'ctrl'     => 'items',
 					'view'     => 'item',
-					'onclick'  => 'var url = this.getAttribute(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;" ',
+					'onclick'  => 'var url = this.getAttribute(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;',
 				));
 				?>
 			</td>

@@ -357,6 +357,16 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$create_coupons = $field->parameters->get( 'create_coupons', 0 ) ;
 		if ($create_coupons)
 		{
+			/**
+			 * A coupon gives edit access to the item that has its id. Remove what an earlier item left behind: a coupon of this id
+			 * (this item is new, so that coupon belongs to an item that is gone) and coupons of items that no longer exist,
+			 * e.g. because the save of a new item was aborted after its coupon was created
+			 */
+			$query = 'DELETE FROM #__flexicontent_edit_coupons'
+				. ' WHERE id = ' . (int) $item->id . ' OR id NOT IN (SELECT c.id FROM #__content AS c)';
+			$db->setQuery( $query );
+			$db->execute();
+
 			$token = bin2hex(random_bytes(32));
 			$query = 'INSERT #__flexicontent_edit_coupons '
 				. 'SET timestamp = '.time()
@@ -387,6 +397,20 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 	// Method called just before the item is deleted to remove custom item data related to the field
 	public function onBeforeDeleteField(&$field, &$item)
 	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
+
+		// The edit coupon of the item must not outlive it: a later item that gets the same id would be editable with it
+		if (empty($item->id)) return;
+
+		try
+		{
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$db->setQuery('DELETE FROM #__flexicontent_edit_coupons WHERE id = ' . (int) $item->id)->execute();
+		}
+		catch (\Exception $e)
+		{
+			// The table is created when the field issues its first coupon, there is nothing to remove before that
+		}
 	}
 
 

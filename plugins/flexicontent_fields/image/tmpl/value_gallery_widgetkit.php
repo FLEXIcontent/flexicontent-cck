@@ -25,7 +25,7 @@ foreach ($values as $n => $value)
 		'<a style="'.$style.'" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" class="fc_image_thumb" data-lightbox="on" data-spotlight="effect:bottom" '.$group_str.' title="' . $title_attr . '">
 			'.$img_legend.'
 			<div class="overlay">
-				'.'<b>'.$title.'</b>: '.$desc.'
+				'.'<b>'.htmlspecialchars((string) $title, ENT_QUOTES, 'UTF-8').'</b>: '.htmlspecialchars((string) $desc, ENT_QUOTES, 'UTF-8').'
 			</div>
 		</a>'
 		. $inline_info

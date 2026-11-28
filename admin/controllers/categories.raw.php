@@ -62,6 +62,12 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 	{
 		parent::__construct($config);
 
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanCats;
+		if (!$this->canManage)
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 403);
+		}
+
 		// The prefix to use with controller messages.
 		$this->text_prefix = 'COM_CONTENT';
 

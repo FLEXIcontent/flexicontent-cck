@@ -27,8 +27,8 @@ foreach ($categories as $category)
 		$isMain = $catid == $item->catid;
 
 		$display = $link_to_view ?
-			'<a class="fc_categories fc_category_' .$catid. ' '.($isMain ? 'fc_ismain_cat' : '').' link_' .$field->name. '" href="' . $cat_links[$catid] . '">' . $category->title . '</a>' :
-			'<span class="fc_categories fc_category_' .$catid. ' '.($isMain ? 'fc_ismain_cat' : '').' nolink_' .$field->name. '">' . $category->title . '</span>' ;
+			'<a class="fc_categories fc_category_' .$catid. ' '.($isMain ? 'fc_ismain_cat' : '').' link_' .$field->name. '" href="' . $cat_links[$catid] . '">' . htmlspecialchars((string) $category->title, ENT_QUOTES, 'UTF-8') . '</a>' :
+			'<span class="fc_categories fc_category_' .$catid. ' '.($isMain ? 'fc_ismain_cat' : '').' nolink_' .$field->name. '">' . htmlspecialchars((string) $category->title, ENT_QUOTES, 'UTF-8') . '</span>' ;
 
 		// Place main category to the front
 		$isMain ?

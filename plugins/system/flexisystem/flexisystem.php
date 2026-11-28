@@ -166,8 +166,6 @@ class plgSystemFlexisystem extends CMSPlugin
 		$fcreturn = $app->input->get('fcreturn', null);
 		if ($return && ($isfcurl || $fcreturn)) $app->input->set('return', strtr($return, '-_,', '+/='));
 
-		$username = $app->input->get('fcu', null);
-		$password = $app->input->get('fcp', null);
 		$option   = $app->input->get('option', null);
 		$session = Factory::getApplication()->getSession();
 
@@ -237,12 +235,7 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		if ($print_logging_info) $fc_run_times['auto_checkin_auto_state'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
-		// (b) Autologin for frontend preview
-		if (!empty($username) && !empty($password) && $this->cparams->get('autoflogin', 0)) {
-			$result = $this->loginUser();
-		}
-
-		// (c) Route PDF format to HTML format for J1.6+
+		// (b) Route PDF format to HTML format for J1.6+
 		$redirect_pdf_format = $this->params->get('redirect_pdf_format', 1);
 		if ($redirect_pdf_format && $app->input->get('format', 'html', 'cmd') == 'pdf') {
 			$app->input->set('format', 'html');
@@ -370,6 +363,8 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			)
 		) {
 			if (Factory::getApplication()->getDocument() !== null) {
+				// The helper classes of the component are not loaded yet on a page of another component
+				require_once(JPATH_SITE . '/components/com_flexicontent/classes/flexicontent.helper.php');
 				flexicontent_html::loadFramework('form-utils');
 			}
 			$js .= "
@@ -985,44 +980,6 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		}
 	}
 
-
-
-	/**
-	 * Utility Function:
-	 * to allow automatic logins, e.g. previewing during editing
-	 * or when previewing links sent via notification emails
-	 *
-	 * @access public
-	 * @return void
-	 */
-	function loginUser()
-	{
-		$app = Factory::getApplication();
-
-		$username  = $app->input->get('fcu', null);
-		$password  = $app->input->get('fcp', null);
-
-		$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-		$query 	= 'SELECT id, password'
-			. ' FROM #__users'
-			. ' WHERE username = ' . $db->Quote($username)
-			. ' AND password = ' . $db->Quote($password);
-		$db->setQuery($query);
-		$result = $db->loadObject();
-
-		if ($result) {
-			PluginHelper::importPlugin('user');
-			$response = new stdClass();
-			$response->username = $username;
-			$response->password = $password;
-			$response->language = '';
-			$options = FLEXI_J16GE ? array('action' => 'core.login.site') : $options = array('action' => '');
-			$loginEvent = FLEXI_J16GE ? 'onUserLogin' : 'onLoginUser';
-			$result = $app->triggerEvent($loginEvent, array((array)$response, $options));
-		}
-
-		return;
-	}
 
 
 	/**
@@ -1856,6 +1813,45 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 	}
 
 
+	/**
+	 * A parameter that is written into a .less file becomes LESS source text, so it is limited to a plain number
+	 * (inside the range of a number field), a length, a hex colour or a keyword
+	 *
+	 * @param   mixed   $value  The stored value
+	 * @param   object  $field  The form field of the parameter
+	 *
+	 * @return  string|null  The value to write, null to leave the parameter out
+	 */
+	private function _cleanLessValue($value, $field)
+	{
+		$pattern = '/^(?:#[0-9a-fA-F]{3,8}|-?[0-9]+(?:\.[0-9]+)?(?:px|em|rem|%|pt|vh|vw)?|[a-zA-Z][a-zA-Z0-9-]{0,39})$/D';
+		$numeric = strtolower((string) $field->getAttribute('type')) === 'number';
+
+		foreach (array($value, $field->getAttribute('default')) as $v)
+		{
+			$v = is_scalar($v) ? trim((string) $v) : '';
+
+			if ($v === '' || ($numeric ? !is_numeric($v) : !preg_match($pattern, $v)))
+			{
+				continue;
+			}
+
+			if ($numeric)
+			{
+				$v   = $v + 0;
+				$min = $field->getAttribute('min');
+				$max = $field->getAttribute('max');
+				$v   = is_numeric($min) ? max($v, $min + 0) : $v;
+				$v   = is_numeric($max) ? min($v, $max + 0) : $v;
+			}
+
+			return (string) $v;
+		}
+
+		return null;
+	}
+
+
 	private function _storeLessConf($table)
 	{
 		$xml_path  = \Joomla\Filesystem\Path::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/config.xml');
@@ -1888,12 +1884,10 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			foreach ($jform->getFieldset($fsname) as $field) {
 				if ($field->getAttribute('cssprep') != 'less') continue;  // Only add parameters meant to be less variables
 				$v = $table->params->get($field->fieldname);
-				if (is_array($v)) continue;  // array parameters not supported
-				$v = trim($v);
-				if (!strlen($v)) {
-					$v = $field->getAttribute('default');
-					if (!strlen($v)) continue;  // do not add empty parameters
-				}
+				if (is_array($v) || is_object($v)) continue;  // array parameters not supported
+				$v = $this->_cleanLessValue($v, $field);
+				if ($v === null) continue;  // do not add empty or unusable parameters
+				$table->params->set($field->fieldname, $v);
 				$less_data .= '@' . $field->fieldname . ': ' . $v . ";\n";
 			}
 		}
@@ -1915,10 +1909,12 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 	 * @param   Table   $table    Table instance
 	 * @param   bool    $isNew    Flag to determine whether this is a new extension
 	 *
-	 * @return void
+	 * @return void|false  False to stop the record from being stored
 	 */
 	public function onExtensionBeforeSave($context, $table, $isNew)
 	{
+		$this->_rememberStoredFileLinks($context, $table, $isNew);
+
 		$app   = Factory::getApplication();
 		$user  = $app->getIdentity();
 		$db    = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
@@ -1940,8 +1936,21 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 				$raw_data = Factory::getApplication()->input->post->get('jform', array(), 'array');
 
 				$table->params = new Registry($table->params);
-				$iflayout_params = !empty($raw_data['iflayout']) ? $raw_data['iflayout'] : array();
+				$iflayout_params = !empty($raw_data['iflayout']) && is_array($raw_data['iflayout']) ? $raw_data['iflayout'] : array();
+
+				// These are the parameters of the item form layouts. They are posted unfiltered, so they may not replace
+				// an option of the component itself, which the configuration form has filtered
+				$config_fields = array();
+				$config_xml    = @simplexml_load_file(JPATH_ADMINISTRATOR . '/components/com_flexicontent/config.xml');
+
+				foreach ($config_xml ? $config_xml->xpath('//field[@name]') : array() as $config_field) {
+					$config_fields[(string) $config_field['name']] = 1;
+				}
+
 				foreach ($iflayout_params as $i => $v) {
+					if (!$config_xml || isset($config_fields[(string) $i])) {
+						continue;
+					}
 					$table->params[$i] = $v;
 				}
 
@@ -2012,6 +2021,15 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		}
 
 
+		// The PHP rule of a module is executed when the module is rendered. The check in onAfterRoute only
+		// sees posted forms, here the record about to be stored is checked, whichever way it was submitted
+		if (($context === 'com_modules.module' || $context === 'com_advancedmodules.module') && !$this->_canSaveModulePhpRule($table, $isNew)) {
+			$table->setError('Module was not saved. Changing the PHP rule of a module needs the Templates administration privilege (in frontend or via the API: a Super User)');
+
+			return false;
+		}
+
+
 		// ***
 		// *** Add custom LAYOUT parameters to non-FC components (cleared during their validation)
 		// *** DONE modules, TODO: add support to menus,
@@ -2021,8 +2039,11 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		// Check for com_modules context
 		if ($context === 'com_modules.module' || $context === 'com_advancedmodules.module' || substr($context, 0, 10) === 'com_falang') {
 			// Check for non-empty layout parameter
-			$layout = $_POST['jform']['params']['layout'];
+			$layout = isset($_POST['jform']['params']['layout']) ? $_POST['jform']['params']['layout'] : '';
 			if (empty($layout)) return;
+
+			// A layout is a file name, optionally with a template name in front, it is used to build the path of an XML file
+			if (!is_string($layout) || !preg_match('/^(?:[A-Za-z0-9_-]+:)?[A-Za-z0-9_-]+$/D', $layout)) return;
 
 			// Check for currently supported cases, !!! TODO add case of MENUS
 			if (empty($table->module)) return;
@@ -2078,7 +2099,47 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 			// Set parameters back to module's DB table object
 			$table->params = $params->toString();
+
+			// The layout parameters were merged after the PHP rule check above, check the record that will be stored
+			if (($context === 'com_modules.module' || $context === 'com_advancedmodules.module') && !$this->_canSaveModulePhpRule($table, $isNew)) {
+				$table->setError('Module was not saved. Changing the PHP rule of a module needs the Templates administration privilege (in frontend or via the API: a Super User)');
+
+				return false;
+			}
 		}
+	}
+
+
+	/**
+	 * Check that the current user may store the PHP rule settings (enable_php_rule, php_rule) of a module record
+	 *
+	 * @param   Table  $table  The module record that is about to be stored
+	 * @param   bool   $isNew  Flag to determine whether this is a new module
+	 *
+	 * @return  bool   False if the settings are being changed by a user that may not save PHP code
+	 */
+	private function _canSaveModulePhpRule($table, $isNew)
+	{
+		$app  = Factory::getApplication();
+		$user = $app->getIdentity();
+
+		// Same privilege as in onAfterRoute: templates administrators in backend, super users everywhere else
+		if ($user && ($app->isClient('administrator') ? $user->authorise('core.admin', 'com_templates') : $user->authorise('core.admin'))) {
+			return true;
+		}
+
+		$old_params = null;
+
+		if (!$isNew && !empty($table->id)) {
+			$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$old_params = $db->setQuery('SELECT params FROM #__modules WHERE id = ' . (int) $table->id)->loadResult();
+		}
+
+		$old = new Registry($old_params);
+		$new = new Registry($table->params);
+
+		return (bool) $old->get('enable_php_rule', 0) === (bool) $new->get('enable_php_rule', 0)
+			&& $old->get('php_rule', '') === $new->get('php_rule', '');
 	}
 
 
@@ -2241,6 +2302,12 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			return true;
 		}
 
+		// The fields of the item are added to the article form that the site and the back end show. Other applications
+		// (Web Services) load this form only to validate the data that they save, they have no page to show the fields in
+		if (!$app->isClient('site') && !$app->isClient('administrator')) {
+			return true;
+		}
+
 		// Check for empty data, create empty object
 		if (!$data) {
 			$data = new stdClass();
@@ -2253,7 +2320,8 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			$data = (object) $data;
 		}
 
-		if (Factory::getApplication()->input->getInt('a_id', 0)) {
+		// "a_id" is the record id of the frontend form of com_content only, in the backend it is not a record id
+		if (Factory::getApplication()->isClient('site') && Factory::getApplication()->input->getInt('a_id', 0)) {
 			$_id = Factory::getApplication()->input->getInt('a_id', 0);
 			$data->id = $_id;
 			Factory::getApplication()->input->set('id', $_id);
@@ -2417,7 +2485,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		if (
 			$app->input->get('option', '', 'CMD') != 'com_content' ||
 			$app->input->get('view', '', 'CMD') != 'article' ||
-			$app->input->get('isflexicontent', false, 'CMD')
+			$this->_isInternalEvent()
 		) return;
 
 
@@ -2592,7 +2660,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 	 */
 	public function onContentChangeState($context, $pks, $value)
 	{
-		if ($context != 'com_content.article' || Factory::getApplication()->input->get('isflexicontent', false, 'CMD')) {
+		if ($context != 'com_content.article' || $this->_isInternalEvent()) {
 			return true;
 		}
 
@@ -2602,23 +2670,28 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		//*** Call backend 'flexicontent' items model to update flexicontent temporary data
 		//***
 
-		// Load the FLEXIcontent item
-		$app  = Factory::getApplication();
-		$cid = $app->input->get('cid', array(), 'array');
-		$cid = (int) reset($cid);
+		// All records that changed state are given by the event, the request may list other ids or none at all
+		$rows = array();
+
+		foreach (ArrayHelper::toInteger((array) $pks) as $pk) {
+			if ($pk > 0) {
+				$rows[] = (object) array('id' => $pk);
+			}
+		}
+
+		// An empty list would make the model re-insert the data of all items
+		if (!$rows) {
+			return true;
+		}
 
 		// Update temporary date by calling model's respective method
 		// NOTE 1: since using controller task to trigger temporary data updating will not work because the DB tables have not been updated yet
 		// NOTE 2: we will skip the change state event triggering since com_content 'articles' model will do this
-		$itemmodel = new FlexicontentModelItem();
 
-		// Get item setting it into the model (ITEM DATE: _id, _type_id, _params, etc will be updated)
-		$item = $itemmodel->getItem($cid, $check_view_access = false, $no_cache = true);
-
-		// Load backend 'flexicontent' items model and use it to update flexicontent temporary data
+		// Load backend 'flexicontent' items model and use it to update flexicontent temporary data (only the ids of the records are needed)
 		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/models/items.php';
 		$items_model = new FlexicontentModelItems();
-		$items_model->updateItemCountingData(array($item));
+		$items_model->updateItemCountingData($rows);
 
 		return true;
 	}
@@ -2643,14 +2716,18 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			return $this->onExtensionBeforeSave($context, $item, $isNew);
 		}
 
-		if (($context !== 'com_content.article' && $context !== 'com_content.form') || Factory::getApplication()->input->get('isflexicontent', false, 'CMD')) {
+		$this->_rememberStoredFileLinks($context, $item, $isNew);
+
+		if (($context !== 'com_content.article' && $context !== 'com_content.form') || $this->_isInternalEvent()) {
 			return true;
 		}
 
-		if (Factory::getApplication()->input->getInt('a_id', 0)) {
-			$_id = Factory::getApplication()->input->getInt('a_id', 0);
+		// The frontend form of com_content names the record id "a_id". It is copied to "id" for the code that follows, only
+		// when it is the id of the record that com_content loaded and authorised: the record is never pointed at another id
+		$_id = Factory::getApplication()->input->getInt('a_id', 0);
+
+		if ($_id && Factory::getApplication()->isClient('site') && !empty($item->id) && (int) $item->id === $_id) {
 			Factory::getApplication()->input->set('id', $_id);
-			$item->id = $_id;
 
 			if (is_object($data)) {
 				$data->id = $_id;
@@ -2659,11 +2736,23 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			}
 		}
 
+		$this->_loadFcHelpersAndLanguage();
+
+		// Joomla's ACL has allowed this save. The rules that FLEXIcontent adds in its own item form apply to it as well
+		$refusal = $this->_articleSaveRefusal($item, $isNew);
+
+		if ($refusal !== '') {
+			method_exists($item, 'setError')
+				? $item->setError($refusal)
+				: Factory::getApplication()->enqueueMessage($refusal, 'error');
+
+			return false;
+		}
+
 		//***
 		//*** Maintain flexicontent-specific article parameters
 		//***
 
-		$this->_loadFcHelpersAndLanguage();
 		$model = new FlexicontentModelItem();
 
 		$record = new \flexicontent_items(Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
@@ -2688,11 +2777,215 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 	}
 
 
+	/**
+	 * Before batch event of Joomla's models. A batch task stores the record without the before save event, so for an
+	 * article the rules of onContentBeforeSave are applied here: the ones of a new article to a batch copy, the ones of
+	 * an existing article to a batch change (access level, language). The event has no result, a refused record ends
+	 * the batch with an error: the records that the batch handled before it are done
+	 *
+	 * @param   \Joomla\Event\EventInterface  $event  The event, with the record as 'src' and the batch task as 'type'
+	 *
+	 * @return  void
+	 *
+	 * @throws  \RuntimeException  When the rules do not allow the record to be stored
+	 */
+	public function onBeforeBatch(\Joomla\Event\EventInterface $event)
+	{
+		$src = $event->getArgument('src');
+
+		if (!is_object($src) || !method_exists($src, 'getTableName') || $src->getTableName() !== '#__content' || $this->_isInternalEvent()) {
+			return;
+		}
+
+		$this->_loadFcHelpersAndLanguage();
+
+		$refusal = $this->_articleSaveRefusal($src, $event->getArgument('type') === 'copy' || empty($src->id));
+
+		if ($refusal !== '') {
+			throw new \RuntimeException($refusal, 403);
+		}
+	}
+
+
+	/**
+	 * True while FLEXIcontent code triggers the content events itself: its own item save, state change and item view.
+	 * The flag is set by FLEXIcontent code only, the request variable 'isflexicontent' is not read for it
+	 *
+	 * @return  bool
+	 */
+	private function _isInternalEvent()
+	{
+		return class_exists('FCModelAdmin', false) && FCModelAdmin::internalContentEvents();
+	}
+
+
+	/**
+	 * Check a save of an article that is made through Joomla's own article form, Web Services or a batch task, and that
+	 * Joomla's ACL has allowed, against the rules that the FLEXIcontent item form adds: creatable type and author quota for
+	 * a new article, edit permission of the item, approval of changes and the right to change the owner for an existing one
+	 *
+	 * @param   Table  $item   The article record that is about to be stored
+	 * @param   bool   $isNew  True for a new article
+	 *
+	 * @return  string  The reason why the save is refused, an empty string if it is allowed
+	 */
+	private function _articleSaveRefusal($item, $isNew)
+	{
+		$app  = Factory::getApplication();
+		$user = $app->getIdentity();
+
+		$this->_releaseAuthorQuotaLock();
+
+		// Saves made by code without a user (command line) and by Super Users are not restricted
+		if ($app->isClient('cli') || !$user || $user->authorise('core.admin')) {
+			return '';
+		}
+
+		$model   = new FlexicontentModelItem();
+		$user_id = (int) $user->id;
+		$canEditCreator = $user->authorise('flexicontent.editcreator', 'com_flexicontent');
+
+		if ($isNew) {
+			// onContentAfterSave assigns the type of the article form, or else the first type that the user may create
+			if (!$model->canCreateType()) {
+				return Text::sprintf('FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', Text::_('FLEXI_ANY'));
+			}
+
+			if (!$canEditCreator && !empty($item->created_by) && (int) $item->created_by !== $user_id) {
+				return 'Article was not saved. Setting another user as its author needs the FLEXIcontent privilege to edit the creator';
+			}
+
+			return $this->_authorQuotaRefusal($user_id);
+		}
+
+		// The record as it is stored now, with its FLEXIcontent type
+		$record = new \flexicontent_items(Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
+		$record->load((int) $item->id);
+
+		if (!$model->canEdit($record, $user)) {
+			return Text::_('FLEXI_NO_ACCESS_EDIT');
+		}
+
+		if (!$canEditCreator && (int) $item->created_by !== (int) $record->created_by) {
+			return 'Article was not saved. Changing its author needs the FLEXIcontent privilege to edit the creator';
+		}
+
+		// As in the item model: the right to edit the state is calculated for the owner and the category that will be stored
+		$stored_state = (int) $record->state;
+		$record->created_by = $item->created_by;
+		$record->catid      = $item->catid;
+
+		if ($model->canEditState($record, $user) || $user->authorise('flexicontent.autoapprovechanges', 'com_flexicontent')) {
+			return '';
+		}
+
+		// Without that right the item form stores the changes as a new version that waits for approval, and the current version
+		// stays. Joomla's form has stored the article itself by the time FLEXIcontent sees the save, so it is refused here.
+		// No approval is needed with versioning off or while the item is not visible yet (draft, pending approval)
+		$model->setId((int) $item->id);
+
+		if ((int) $model->getComponentTypeParams()->get('use_versioning', 1) && $stored_state !== -3 && $stored_state !== -4) {
+			return 'Article was not saved. Your changes to this article need approval, please submit them with the FLEXIcontent item form';
+		}
+
+		return '';
+	}
+
+
+	/**
+	 * Author quota (maximum number of authored items) for a new article. As in the item controller, the check and the
+	 * insert are kept together for concurrent saves of the same author: the lock is released in onContentAfterSave
+	 *
+	 * @param   int  $user_id  The id of the saving user
+	 *
+	 * @return  string  The reason why the save is refused, an empty string if it is allowed
+	 */
+	private function _authorQuotaRefusal($user_id)
+	{
+		$limit = $user_id > 0 ? (int) flexicontent_db::getUserConfig($user_id)->get('max_auth_limit', 0) : 0;
+
+		if ($limit <= 0) {
+			return '';
+		}
+
+		$db       = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$database = (string) $db->setQuery('SELECT DATABASE()')->loadResult();
+		$lock     = $db->quote('fc_item_quota_' . substr(hash('sha256', $database . ':' . $db->getPrefix() . ':' . $user_id), 0, 40));
+
+		if (!$db->setQuery('SELECT GET_LOCK(' . $lock . ', 5)')->loadResult()) {
+			return 'Another item save is in progress. Please try again.';
+		}
+
+		$this->_author_quota_lock = $lock;
+
+		if ((int) $db->setQuery('SELECT COUNT(id) FROM #__content WHERE created_by = ' . $user_id)->loadResult() >= $limit) {
+			$this->_releaseAuthorQuotaLock();
+
+			return Text::sprintf('FLEXI_ALERTNOTAUTH_CREATE_MORE', $limit);
+		}
+
+		return '';
+	}
+
+
+	/**
+	 * The quoted name of the database lock that the author quota check holds until the new article is stored
+	 *
+	 * @var string|null
+	 */
+	private $_author_quota_lock = null;
+
+
+	/**
+	 * Release the lock of the author quota check, if this request holds it
+	 */
+	private function _releaseAuthorQuotaLock()
+	{
+		if ($this->_author_quota_lock !== null) {
+			$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$db->setQuery('SELECT RELEASE_LOCK(' . $this->_author_quota_lock . ')')->loadResult();
+			$this->_author_quota_lock = null;
+		}
+	}
+
+
+	/**
+	 * The stored values of the custom fields of an item, in the form of the posted "custom" array: field name => values
+	 *
+	 * @param   object  $model    The item model
+	 * @param   int     $item_id  The id of the item
+	 *
+	 * @return  array
+	 */
+	private function _storedCustomFieldValues($model, $item_id)
+	{
+		$values = $model->getCustomFieldsValues((int) $item_id, 0);
+
+		if (!$values) {
+			return array();
+		}
+
+		$db    = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$query = $db->getQuery(true)
+			->select($db->qn(array('id', 'name')))
+			->from($db->qn('#__flexicontent_fields'))
+			->where($db->qn('iscore') . ' = 0')
+			->where($db->qn('id') . ' IN (' . implode(',', ArrayHelper::toInteger(array_keys($values))) . ')');
+		$custom = array();
+
+		foreach ($db->setQuery($query)->loadObjectList() as $field) {
+			$custom[$field->name] = $values[$field->id];
+		}
+
+		return $custom;
+	}
+
+
 
 	/**
 	 * Various tables. Update usage of Files in download links created via the XTD-editor file button
 	 */
-	private function _updateFileUsage_FcFileBtn_DownloadLinks($context, $item, $isNew, $propValues, $path = '', $depth = 0)
+	private function _updateFileUsage_FcFileBtn_DownloadLinks($context, $item, $isNew, $propValues, $path = '', $depth = 0, $recorded_ids = array())
 	{
 		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
@@ -2701,6 +2994,14 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 		//Factory::getApplication()->enqueueMessage("context: $context");
 		if ($depth === 0) {
+			// Links that are already recorded for this record are kept, whoever saves it
+			$query = $db->getQuery(true)
+				->select($db->qn('file_id'))
+				->from($db->qn('#__flexicontent_file_usage'))
+				->where($db->qn('id') . ' = ' . $db->q($item->id))
+				->where($db->qn('context') . ' = ' . $db->q($context));
+			$recorded_ids = array_map('intval', $db->setQuery($query)->loadColumn() ?: array());
+
 			// First delete existing usage
 			$query = $db->getQuery(true)
 				->delete($db->qn('#__flexicontent_file_usage'))
@@ -2708,6 +3009,13 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 				->where($db->qn('context') . ' = ' . $db->q($context));
 			$db->setQuery($query)->execute();
 			//Factory::getApplication()->enqueueMessage($query);
+
+			$key = $context . ':' . $item->id;
+			$this->_file_link_rule = array(
+				'stored' => isset($this->_stored_file_links[$key]) ? $this->_stored_file_links[$key] : null,
+				'owner'  => isset($item->created_by) ? (int) $item->created_by : 0,
+			);
+			unset($this->_stored_file_links[$key]);
 		}
 
 		if ($propValues) foreach ($propValues as $prop => $value) {
@@ -2724,7 +3032,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 			if (!is_string($value)) {
 				if (is_array($value) && $depth <= 3) {
-					$this->_updateFileUsage_FcFileBtn_DownloadLinks($context, $item, $isNew, $value, $path . $prop . '.', $depth + 1);
+					$this->_updateFileUsage_FcFileBtn_DownloadLinks($context, $item, $isNew, $value, $path . $prop . '.', $depth + 1, $recorded_ids);
 				}
 				continue;
 			}
@@ -2744,6 +3052,14 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 						!empty($vars['option']) && !empty($vars['task']) && !empty($vars['id']) &&
 						$vars['option'] === 'com_flexicontent' && $vars['task'] === 'download_file'
 					) {
+						// A usage row lets the viewers of this record download the file, so a new one
+						// is added only for a file that the saving user may already use in the file manager
+						$file_id = is_scalar($vars['id']) ? (int) $vars['id'] : 0;
+
+						if ($file_id <= 0 || (!in_array($file_id, $recorded_ids, true) && !$this->_mayRecordFileLink($file_id))) {
+							continue;
+						}
+
 						//Factory::getApplication()->enqueueMessage('FOUND');
 						$query = $db->getQuery(true)
 							->insert($db->qn('#__flexicontent_file_usage'))
@@ -2756,7 +3072,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 							->values(
 								$db->q($item->id) . ', ' .
 									$db->q($context) . ', ' .
-									$db->q($vars['id']) . ', ' .
+									$db->q($file_id) . ', ' .
 									$db->q($path . $prop)
 							);
 
@@ -2770,6 +3086,191 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 				}
 			}
 		}
+	}
+
+
+	/**
+	 * File ids linked in the stored copy of a record, taken just before the record is saved
+	 *
+	 * @var array  context:id => int[]
+	 */
+	private $_stored_file_links = array();
+
+	/**
+	 * The stored links and the owner of the record whose saved values are being walked
+	 *
+	 * @var array
+	 */
+	private $_file_link_rule = array('stored' => null, 'owner' => 0);
+
+
+	/**
+	 * Find the file ids of the download links inside a value, strings are searched, arrays and objects are walked
+	 *
+	 * @param   mixed  $value  The value
+	 * @param   int    $depth  The current depth
+	 *
+	 * @return  int[]
+	 */
+	private function _downloadLinkFileIds($value, $depth = 0)
+	{
+		$ids = array();
+
+		if (is_array($value) || is_object($value)) {
+			if ($depth <= 4) {
+				foreach ((array) $value as $v) {
+					$ids = array_merge($ids, $this->_downloadLinkFileIds($v, $depth + 1));
+				}
+			}
+
+			return $ids;
+		}
+
+		if (!is_string($value) || strpos($value, 'download_file') === false) {
+			return $ids;
+		}
+
+		// Parameters of a registry column are stored as JSON, in which the quotes and slashes of a link are escaped
+		$decoded = $depth <= 4 && ($value[0] === '{' || $value[0] === '[') ? json_decode($value, true) : null;
+
+		if (is_array($decoded)) {
+			return $this->_downloadLinkFileIds($decoded, $depth + 1);
+		}
+
+		$matches = array();
+		preg_match_all('/[ \t\n\r]+href="((http:\/\/|https:\/\/)?([^"]*)index.php\?([^"]*))"/', $value, $matches);
+
+		foreach ($matches[4] as $query_string) {
+			parse_str(html_entity_decode($query_string), $vars);
+
+			if (
+				!empty($vars['option']) && !empty($vars['task']) && !empty($vars['id']) &&
+				$vars['option'] === 'com_flexicontent' && $vars['task'] === 'download_file' && is_scalar($vars['id']) && (int) $vars['id'] > 0
+			) {
+				$ids[] = (int) $vars['id'];
+			}
+		}
+
+		return $ids;
+	}
+
+
+	/**
+	 * Remember which files the stored copy of a record links to, before the record is saved
+	 *
+	 * @param   string   $context  The context
+	 * @param   object   $item     The record that is about to be saved
+	 * @param   boolean  $isNew    Is new record
+	 *
+	 * @return  void
+	 */
+	private function _rememberStoredFileLinks($context, $item, $isNew)
+	{
+		if ($isNew || !is_string($context) || !($item instanceof \Joomla\CMS\Table\Table) || empty($item->id) || !is_scalar($item->id)) {
+			return;
+		}
+
+		try {
+			$stored = clone $item;
+
+			if (!$stored->load($item->id)) {
+				return;
+			}
+
+			// Only the columns of the table: the copy still carries any other value that was bound to the record for this save
+			$values  = get_object_vars($stored);
+			$columns = method_exists($stored, 'getFields') ? (array) $stored->getFields() : array();
+			$ids     = $this->_downloadLinkFileIds($columns ? array_intersect_key($values, $columns) : $values);
+
+			// The values of the FLEXIcontent fields of a content item
+			if ($context === 'com_content.article' || $context === 'com_content.form') {
+				$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+				$query = $db->getQuery(true)
+					->select($db->qn('value'))
+					->from($db->qn('#__flexicontent_fields_item_relations'))
+					->where($db->qn('item_id') . ' = ' . (int) $item->id)
+					->where($db->qn('value') . ' LIKE ' . $db->q('%download_file%'));
+				$ids = array_merge($ids, $this->_downloadLinkFileIds($db->setQuery($query)->loadColumn() ?: array()));
+			}
+		} catch (\Throwable $e) {
+			return;
+		}
+
+		$this->_stored_file_links[$context . ':' . $item->id] = array_values(array_unique($ids));
+	}
+
+
+	/**
+	 * Check that a download link without a usage row may get one in the save that is running
+	 *
+	 * @param   int  $file_id  The id of the file
+	 *
+	 * @return  bool
+	 */
+	private function _mayRecordFileLink($file_id)
+	{
+		if (!$this->_canLinkFile($file_id)) {
+			return false;
+		}
+
+		// The link is added by this save, or the stored copy of the record is not known
+		if (!is_array($this->_file_link_rule['stored']) || !in_array((int) $file_id, $this->_file_link_rule['stored'], true)) {
+			return true;
+		}
+
+		// The link was stored earlier and has no usage row: it was refused when it was added. Another user saving the record
+		// does not grant it, unless the owner of the record may link the file too
+		$owner = $this->_file_link_rule['owner'] > 0 ? $this->_getUserById($this->_file_link_rule['owner']) : null;
+
+		return $owner && !empty($owner->id) && $this->_canLinkFile($file_id, $owner);
+	}
+
+
+	/**
+	 * Load a user
+	 *
+	 * @param   int  $id  The id of the user
+	 *
+	 * @return  \Joomla\CMS\User\User|null
+	 */
+	private function _getUserById($id)
+	{
+		try {
+			return Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $id);
+		} catch (\Throwable $e) {
+			return null;
+		}
+	}
+
+
+	/**
+	 * Check that the current user may add a download link of a file to a record,
+	 * these are the users for which the direct download of the file is always allowed: file managers and the uploader of the file
+	 *
+	 * @param   int  $file_id  The id of the file
+	 *
+	 * @return  bool
+	 */
+	private function _canLinkFile($file_id, $user = null)
+	{
+		$user = $user ?: Factory::getApplication()->getIdentity();
+
+		if (!$user || !$user->id) {
+			return false;
+		}
+
+		if ($user->authorise('core.admin', 'com_flexicontent') || $user->authorise('flexicontent.viewallfiles', 'com_flexicontent')) {
+			return true;
+		}
+
+		$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$query = $db->getQuery(true)
+			->select($db->qn('uploaded_by'))
+			->from($db->qn('#__flexicontent_files'))
+			->where($db->qn('id') . ' = ' . (int) $file_id);
+		$uploaded_by = $db->setQuery($query)->loadResult();
+
+		return $uploaded_by !== null && (int) $uploaded_by === (int) $user->id;
 	}
 
 
@@ -2798,9 +3299,12 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		 */
 		$this->_updateFileUsage_FcFileBtn_DownloadLinks($context, $item, $isNew, $data);
 
-		if (($context !== 'com_content.article' && $context !== 'com_content.form') || Factory::getApplication()->input->get('isflexicontent', false, 'CMD')) {
+		if (($context !== 'com_content.article' && $context !== 'com_content.form') || $this->_isInternalEvent()) {
 			return true;
 		}
+
+		// The new article is stored, the author quota check of onContentBeforeSave is complete
+		$this->_releaseAuthorQuotaLock();
 
 		/**
 		 * Call 'flexicontent' items model to update flexicontent item data: fields, version data, temporary data
@@ -2810,6 +3314,18 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 		$app  = Factory::getApplication();
 
+		// Joomla's batch copy and batch move fire this event themselves: without the before save event, and with the values
+		// of Joomla's custom fields as its data instead of the article. There is no article data to give to the item model
+		// then, and the article parameters that an earlier save has left in the session are not the ones of this record.
+		// Only the temporary item data of the article's category are updated, as after every save
+		if (!$isNew && empty($data['id'])) {
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/models/items.php';
+			$items_model = new FlexicontentModelItems();
+			$items_model->updateItemCountingData(false, $item->catid);
+
+			return true;
+		}
+
 		// Needed for new items, since now an item has been created
 		$data['id'] = $isNew ? $item->id : $data['id'];
 
@@ -2817,7 +3333,12 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		$data['vstate'] = 2;
 
 		// RAW (flexicontent) Custom fields data, validation will be done by each field
-		$data['custom'] = $app->input->post->get('custom', array(), 'array');
+		$data['custom'] = $app->input->post->get('custom', null, 'array');
+
+		// The FLEXIcontent box of the article form posts the field values as "custom" and always posts "unique_tmp_itemid".
+		// A save that posted neither (Web Services, a form without that box) did not submit any field values
+		$custom_posted = $data['custom'] !== null || $app->input->post->get('unique_tmp_itemid', null, 'cmd') !== null;
+		$data['custom'] = is_array($data['custom']) ? $data['custom'] : array();
 
 
 		// ***
@@ -2850,8 +3371,21 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		$tags_tmp = isset($data['tags']) ? $data['tags'] : null;
 		unset($data['tags']);
 
-		// Save FLEXIcontent item, using the provided data
-		$model->store($data);
+		// No field values were submitted: the stored values are given to the model, like it does itself for the fields that
+		// a form does not show. An empty list would make it clear every field that the user may edit
+		if (!$isNew && !$custom_posted) {
+			$data['custom'] = $this->_storedCustomFieldValues($model, $data['id']);
+		}
+
+		// Save FLEXIcontent item, using the provided data. The model marks its own save as internal:
+		// that mark must not last longer, a following save of this request is checked and synchronised too
+		$was_internal = FCModelAdmin::internalContentEvents();
+
+		try {
+			$model->store($data);
+		} finally {
+			FCModelAdmin::internalContentEvents($was_internal);
+		}
 
 		// Replace FC tag assignments with Joomla tag assignments
 		$model->mergeJTagsAssignments($_item = null, $_jtags = null, $_replaceTags = true);
@@ -2911,7 +3445,11 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		require_once(JPATH_SITE . '/components/com_flexicontent/classes/flexicontent.categories.php');
 		require_once(JPATH_SITE . '/components/com_flexicontent/helpers/permission.php');
 
-		require_once JPATH_BASE . '/components/com_flexicontent/models/item.php';
+		// The site and the back end have their own item model. Web Services have no FLEXIcontent files (JPATH_BASE is the
+		// "api" folder there): they save articles with Joomla's back-end article model, the back-end item model goes with it
+		$base = Factory::getApplication()->isClient('api') ? JPATH_ADMINISTRATOR : JPATH_BASE;
+
+		require_once $base . '/components/com_flexicontent/models/item.php';
 	}
 
 

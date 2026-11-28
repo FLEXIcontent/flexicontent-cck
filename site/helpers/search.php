@@ -234,6 +234,8 @@ class FLEXIadvsearchHelper
 	static function _smartSubstr($text, $length, $searchword, &$wordpos)
 	{
 		$textlen = StringHelper::strlen($text);
+		// The snippet's text may be shorter after its HTML tags have been stripped.
+		$length = min($length, $textlen);
 		$lsearchword = StringHelper::strtolower($searchword);
 		$wordpos = false;
 		$pos = 0;

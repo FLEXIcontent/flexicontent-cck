@@ -87,7 +87,8 @@ class FlexicontentModelItem extends ParentClassItem
 		//*************************************************************
 
 		// (a) Calculate if owned by current user
-		$isOwner = $this->_record->created_by== $user->get('id');
+		// A guest owns nothing, also not a record that has no owner
+		$isOwner = (int) $user->get('id') > 0 && (int) $this->_record->created_by === (int) $user->get('id');
 
 		// (b) Calculate edit access ...
 		// NOTE: we will allow view access if current user can edit the item (but set a warning message about it, see bellow)

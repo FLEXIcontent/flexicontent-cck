@@ -29,6 +29,7 @@ else
 
 $connected    = isset($check['connect']) && $check['connect'] == 1;
 $hasUpdate    = $connected && $remoteCurrent !== null && $remoteCurrent == -1;
+$canUpdate    = \Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.admin', 'com_flexicontent');
 
 // Status used by the dashboard badge next to the "Update check" accordion title
 $versionStatus = !$connected ? 'error' : ($hasUpdate ? 'update' : 'ok');
@@ -130,7 +131,7 @@ if ($installedDate)
 				&nbsp;<strong><?php echo \Joomla\CMS\Language\Text::_('FLEXI_RELEASED_DATE'); ?></strong>:
 				<?php echo htmlspecialchars($remoteReleased); ?>
 
-				<?php if ($hasUpdate) : ?>
+				<?php if ($hasUpdate && $canUpdate) : ?>
 				&nbsp;
 				<a class="btn btn-sm btn-primary d-inline-flex" href="<?php echo $updateUrl; ?>" style="margin-left:8px;">
 					<span class="icon-upload" aria-hidden="true"></span>

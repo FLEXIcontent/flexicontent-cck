@@ -822,9 +822,9 @@ if ($leadnum) :
 						<span class="fcitem_title_box">
 							<h2 class="fcitem_title" itemprop="name">
 							<?php if ($this->params->get('link_titles', 0)) : ?>
-								<a href="<?php echo $link_url; ?>"><?php echo $item->title; ?></a>
+								<a href="<?php echo $link_url; ?>"><?php echo htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'); ?></a>
 							<?php else : ?>
-								<?php echo $item->title; ?>
+								<?php echo htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'); ?>
 							<?php endif; ?>
 							</h2>
 						</span>
@@ -1029,9 +1029,9 @@ if ($leadnum) :
 						<div class="fcitem_readon readmore <?php echo $readmore_align_feat; ?>">
 							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = this.getAttribute(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
-								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title);
+								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'));
 								echo $readon_type === 1
-									? '<img src="' . $readon_image . '" alt="' . \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title) . '" />'
+									? '<img src="' . $readon_image . '" alt="' . \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8')) . '" />'
 									: '<span class="icon-chevron-right"></span> ' . $read_more_text;
 								?>
 							</a>
@@ -1052,9 +1052,9 @@ if ($leadnum) :
 						<div class="fcitem_readon readmore <?php echo $readmore_align_feat; ?>">
 							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = this.getAttribute(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
-								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title);
+								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'));
 								echo $readon_type === 1
-									? '<img src="' . $readon_image . '" alt="' . \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title) . '" />'
+									? '<img src="' . $readon_image . '" alt="' . \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8')) . '" />'
 									: '<span class="icon-chevron-right"></span> ' . $read_more_text;
 								?>
 							</a>
@@ -1397,9 +1397,9 @@ if ($count > $leadnum) :
 						<span class="fcitem_title_box">
 							<h2 class="fcitem_title" itemprop="name">
 							<?php if ($this->params->get('link_titles', 0)) : ?>
-								<a href="<?php echo $link_url; ?>"><?php echo $item->title; ?></a>
+								<a href="<?php echo $link_url; ?>"><?php echo htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'); ?></a>
 							<?php else : ?>
-								<?php echo $item->title; ?>
+								<?php echo htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'); ?>
 							<?php endif; ?>
 							</h2>
 						</span>
@@ -1604,9 +1604,9 @@ if ($count > $leadnum) :
 						<div class="fcitem_readon readmore <?php echo $readmore_align; ?>">
 							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = this.getAttribute(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
-								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title);
+								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'));
 								echo $readon_type === 1
-									? '<img src="' . $readon_image . '" alt="' . \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title) . '" />'
+									? '<img src="' . $readon_image . '" alt="' . \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8')) . '" />'
 									: '<span class="icon-chevron-right"></span> ' . $read_more_text;
 								?>
 							</a>
@@ -1627,9 +1627,9 @@ if ($count > $leadnum) :
 						<div class="fcitem_readon readmore <?php echo $readmore_align; ?>">
 							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = this.getAttribute(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
-								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title);
+								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'));
 								echo $readon_type === 1
-									? '<img src="' . $readon_image . '" alt="' . \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title) . '" />'
+									? '<img src="' . $readon_image . '" alt="' . \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8')) . '" />'
 									: '<span class="icon-chevron-right"></span> ' . $read_more_text;
 								?>
 							</a>

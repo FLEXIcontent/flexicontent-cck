@@ -46,14 +46,17 @@ foreach ($field->value as $file_id)
 				$img_path = \Joomla\CMS\Uri\Uri::root(true) . '/' . (empty($file_data->secure) ? $mediapath : $docspath) . '/' . $file_data->filename;
 				break;
 			case 1:
-				$img_path = $file_data->filename;
+				// A URL or path registered by a user: a (signed) thumbnail URL is built for public images only
+				$img_path = flexicontent_images::phpThumbPublicImage($file_data->filename, true) ? $file_data->filename : '';
 				break;
 			case 2:
 			default:
 				$img_path = \Joomla\CMS\Uri\Uri::root(true) . '/' . $file_data->filename;
 				break;
 		}
-		$preview_src = flexicontent_images::phpThumbURL(array('src' => $img_path, 'w' => 100, 'h' => 100, 'zc' => 1, 'q' => 95, 'ar' => 'x'), true, true);
+		$preview_src = $img_path === ''
+			? $image_placeholder
+			: flexicontent_images::phpThumbURL(array('src' => $img_path, 'w' => 100, 'h' => 100, 'zc' => 1, 'q' => 95, 'ar' => 'x'), true, true);
 		$preview_text = '';
 		$has_preview = true;
 	}

@@ -1192,6 +1192,14 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			elseif (!is_array($v))
 			{
 				$file_id = (int) $v;
+
+				// A posted id is accepted only for a file that the user may use, see canAssignFileToField()
+				if ($file_id && !flexicontent_security::canAssignFileToField($field->id, $file_id, isset($item->id) ? $item->id : 0))
+				{
+					$file_id = 0;
+					$v = 0;
+				}
+
 				$v = $v ?: ($use_ingroup ? null : false);
 			}
 
@@ -1199,6 +1207,13 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			else
 			{
 				$file_id = (int) $v['file-id'];
+
+				// A posted id is accepted only for a file that the user may use, see canAssignFileToField()
+				if ($file_id && !flexicontent_security::canAssignFileToField($field->id, $file_id, isset($item->id) ? $item->id : 0))
+				{
+					$file_id = 0;
+					$v['file-id'] = 0;
+				}
 
 				$err_code = isset($_FILES['custom']['error'][$field->name][$n]['file-data'])
 					? $_FILES['custom']['error'][$field->name][$n]['file-data']
@@ -1273,7 +1288,9 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 					if ($existing_file)
 					{
-						$file_id = $existing_file->id;
+						$file_id = flexicontent_security::canAssignFileToField($field->id, $existing_file->id, isset($item->id) ? $item->id : 0)
+							? (int) $existing_file->id
+							: 0;
 					}
 					else {
 						// Add file by calling filemanager controller upload() task, which will do the data filtering too
@@ -1334,11 +1351,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					// Delete existing file if so requested
 					if ( $v['file-del'] )
 					{
-						$canDelete = $this->canDeleteFile($field, $file_id, $item);
-						if ($isAssigned && $canDelete)
+						// The file is deleted after the values are stored, see onAfterSaveField()
+						if ($isAssigned)
 						{
-							$fm = new FlexicontentModelFilemanager();
-							$fm->delete( array($file_id) );
+							$field->delete_file_ids[] = (int) $file_id;
 						}
 						if ($use_ingroup) $newpost[$new++] = null;
 						continue;  // Skip file since unloading / removal was requested
@@ -1368,6 +1384,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				elseif( $new_file )
 				{
 					// new file was uploaded, but also handle previous selected file ...
+					$replaced_file_id = 0;
 					if ($file_id)
 					{
 						// Security concern, check file is assigned to current item
@@ -1380,17 +1397,17 @@ class plgFlexicontent_fieldsMediafile extends FCField
 							Factory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$_filename."', that is not assigned to current item", 'warning' );*/
 						}
 
-						// Delete previous file if no longer used
-						else if ( $this->canDeleteFile($field, $file_id, $item) )
+						// Delete previous file if no longer used: after the values are stored, see onAfterSaveField()
+						else
 						{
-							$fm = new FlexicontentModelFilemanager();
-							$fm->delete( array($file_id) );
+							$replaced_file_id = (int) $file_id;
 						}
 					}
 
 					// Skip file if unloading / removal was requested
 					if ( $v['file-del'] )
 					{
+						if ($replaced_file_id) $field->delete_file_ids[] = $replaced_file_id;
 						if ($use_ingroup) $newpost[$new++] = null;
 						continue;
 					}
@@ -1416,6 +1433,9 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					$upload_errs = null;
 					$file_id = $fman->upload(null, $upload_errs);
 					$v = !empty($file_id) ? $file_id : ($use_ingroup ? null : false);
+
+					// The previous file is deleted only when its replacement arrived
+					if (!empty($file_id) && $replaced_file_id) $field->delete_file_ids[] = $replaced_file_id;
 
 					if (empty($file_id)) foreach ($upload_errs as $err_type => $upload_err)
 					{
@@ -1447,7 +1467,26 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	public function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	public function onAfterSaveField( &$field, &$post, &$file, &$item )
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
+
+		/**
+		 * Delete the files that were removed from the item with the request to delete them, or that were replaced by an upload.
+		 * This is done here, after the values of the item are stored: a save that was aborted deletes nothing, and a file
+		 * that the item still uses (other value, other field, version that was not approved) counts as used
+		 */
+		$file_ids = !empty($field->delete_file_ids) ? array_unique($field->delete_file_ids) : array();
+		unset($field->delete_file_ids);
+
+		foreach ($file_ids as $file_id)
+		{
+			if ($this->canDeleteFile($field, $file_id, $item))
+			{
+				$fm = new FlexicontentModelFilemanager();
+				$fm->delete( array($file_id) );
+			}
+		}
 	}
 
 
@@ -1871,25 +1910,27 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 
 	// ************************************************
-	// Returns an array of images that can be deleted
-	// e.g. of a specific field, or a specific uploader
+	// Check if a file that was removed from the item can be deleted:
+	// the user needs the right to delete it and nothing may use it.
+	// Must be called after the values of the item are stored
 	// ************************************************
 	function canDeleteFile( &$field, $file_id, &$item )
 	{
 		// Check file exists in DB
 		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-		$query = 'SELECT id'
+		$query = 'SELECT id, uploaded_by'
 			. ' FROM #__flexicontent_files'
-			. ' WHERE id='. $db->Quote($file_id)
+			. ' WHERE id='. (int) $file_id
 			;
-		$db->setQuery($query);
-		$file_id = $db->loadResult();
-		if (!$file_id)  return true;
+		$file = $db->setQuery($query)->loadObject();
+		if (!$file)  return false;
 
-		$ignored = array($item->id);
+		// The right of the file manager: delete any file, or delete own files for the uploader
+		if (!flexicontent_security::canDeleteFileRecord($file))  return false;
 
+		// No item is left out of the usage check: the item was saved, so what it still uses is counted too
 		$fm = new FlexicontentModelFilemanager();
-		return $fm->candelete( array($file_id), $ignored );
+		return $fm->candelete( array((int) $file->id) );
 	}
 
 

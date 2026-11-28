@@ -85,7 +85,7 @@ class FlexicontentViewStats extends FlexicontentViewBaseRecords
 
 
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
-		$document->addStyleSheet('//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css');
+		$document->addStyleSheet('https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css', array(), array('integrity' => 'sha384-AffZlgbG7cpfFC8c+2YXeerKP7qKEeiLt9gnzEj9V6OSxGFRkjur9nroezRkdhLk', 'crossorigin' => 'anonymous'));
 		// ESL exposes AMD globals: load it only after Joomla's scripts have initialized.
 		$chart_base = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/';
 		$local_charts = is_dir(JPATH_SITE . '/components/com_flexicontent/librairies/echarts')
@@ -102,6 +102,14 @@ class FlexicontentViewStats extends FlexicontentViewBaseRecords
 				'https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/bar.js',
 				'https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/pie.js',
 				'https://cdnjs.cloudflare.com/ajax/libs/zrender/2.0.7/zrender.js',
+			),
+			// Hash of each CDN file, stats.js gives it to the browser
+			'integrity' => $local_charts ? array() : array(
+				'https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/echarts.js'    => 'sha384-+dkIrDfGP1dWWFZ/0dUuBeOuAt7LJzvp1PxVocfQpas6OOnA6aXza5BU2mMh+o04',
+				'https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/line.js' => 'sha384-hwihy5Za41cKBv5jCG38NGxe4cwMHasb5gUNDaH2Iz8z9flUHuQz62HKwBV5D/1v',
+				'https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/bar.js'  => 'sha384-+TAf5vMH5c4X+ZDX1wlT08ek8fggihcbXKDmsdGaDw9vG+ce8J1c50otgiXZSdT7',
+				'https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/pie.js'  => 'sha384-hMJhrlb413Ppksfm0vbgy0L55iR5YkilUE5Jp7K8PD4sgB3mGPHZl56FySD0oPrI',
+				'https://cdnjs.cloudflare.com/ajax/libs/zrender/2.0.7/zrender.js'    => 'sha384-S4L7qWNMazXec+LsCIOny2az6Crg8P95wgjkpsb/+6cIxdS7lexupEXr2fNLW7EN',
 			),
 		));
 		\Joomla\CMS\Language\Text::script('FLEXI_STATS_CHARTS_UNAVAILABLE');

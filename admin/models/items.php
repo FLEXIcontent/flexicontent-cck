@@ -1777,13 +1777,177 @@ class FlexicontentModelItems extends FCModelAdminList
 	}
 
 	/**
-	 * Method to copy items 
+	 * Resolve and authorize the effective values before any batch records are written.
+	 */
+	public function getBatchTargets($record_model, array $cid, int $method, $languages, ?int $state, int $maincat, ?array $seccats, int $type_id, ?int $access, array $allowed_cats): array
+	{
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$perms = FlexicontentHelperPerm::getPerm();
+		$copy = $method !== 2;
+		// Translating also changes the original item's language associations.
+		$copy_uneditable = in_array($method, array(1, 3), true) && $this->cparams->get('copytask_allow_uneditable', 1);
+		$view_levels = $copy_uneditable ? $user->getAuthorisedViewLevels() : array();
+		$now = $copy_uneditable ? \Joomla\CMS\Factory::getDate()->toSql() : null;
+		$null_date = $copy_uneditable ? $this->_db->getNullDate() : null;
+		$languages = $this->normaliseBatchLanguages($languages);
+		$targets = array();
+		$state_changes = array();
+		$creatable_types = array();
+
+		if ($method === 1)
+		{
+			$maincat = $type_id = 0;
+			$seccats = $access = null;
+		}
+
+		$access_levels = $access && $perms->CanAccLvl
+			? $this->_db->setQuery('SELECT id FROM #__viewlevels')->loadColumn()
+			: array();
+
+		foreach ($cid as $id)
+		{
+			$item = $record_model->getRecord($id);
+			if (empty($item->id) || (int) $item->id !== $id)
+			{
+				continue;
+			}
+
+			$can_copy_source = $copy_uneditable
+				&& in_array((int) $item->state, array(1, 2), true)
+				&& (!$item->publish_up || $item->publish_up <= $now)
+				&& (!$item->publish_down || $item->publish_down === $null_date || $item->publish_down >= $now)
+				&& !array_diff(array($item->access, $item->category_access, $item->type_access), $view_levels);
+			if (!$record_model->canEdit($item, $user) && !$can_copy_source)
+			{
+				continue;
+			}
+
+			$item_type = (int) $item->type_id;
+			$target_type = $type_id ?: $item_type;
+			if ($copy || $target_type !== $item_type)
+			{
+				$creatable_types[$target_type] ??= $target_type > 0 && $record_model->canCreateType(array($target_type));
+				if (!$creatable_types[$target_type])
+				{
+					continue;
+				}
+			}
+
+			$change_access = $access && $access !== (int) $item->access;
+			if ($change_access && (!in_array($access, $access_levels) || (!$copy && !$record_model->canEditState($item, $user))))
+			{
+				continue;
+			}
+
+			$item_cat = (int) $item->catid;
+			$item_categories = $this->_db->setQuery('SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . $id)->loadColumn();
+			$item_categories = array_map('intval', $item_categories);
+
+			if (!$copy)
+			{
+				$target_cat = $maincat ?: $item_cat;
+				$added_cats = array_diff($seccats ?? array(), $item_categories);
+				if ($target_cat !== $item_cat)
+				{
+					$added_cats[] = $target_cat;
+				}
+				if (array_diff($added_cats, $allowed_cats))
+				{
+					continue;
+				}
+
+				$change_state = $state !== null && $state !== (int) $item->state;
+				if ($change_state)
+				{
+					$state_changes[] = $id;
+				}
+
+				$targets[$id] = (object) array(
+					'catid' => $target_cat !== $item_cat ? $target_cat : 0,
+					'categories' => $seccats,
+					'state' => $change_state ? $state : null,
+					'type_id' => $target_type !== $item_type ? $target_type : 0,
+					'access' => $change_access ? $access : null,
+				);
+				continue;
+			}
+
+			$target_state = $state ?? (int) $item->state;
+			if (!isset($record_model->supported_conditions[$target_state]) || !$this->canSetWorkflowState($target_state))
+			{
+				continue;
+			}
+
+			$copies = array();
+			foreach ($languages ?: array((string) $item->language) as $language)
+			{
+				$target_cat = $this->getBatchCopyCategory($item_cat, $maincat, $method, $language);
+				$target_categories = array_values(array_unique(array_merge($seccats ?? $item_categories, array($target_cat))));
+				if (!$target_cat || array_diff($target_categories, $allowed_cats))
+				{
+					continue 2;
+				}
+
+				// A copy retains the original owner. Check the ACL that applies to the new item.
+				$target = (object) array(
+					'id' => 0,
+					'created_by' => $item->created_by,
+					'catid' => $target_cat,
+					'categories' => $target_categories,
+					'state' => $target_state,
+					'type_id' => $target_type,
+					'access' => $change_access ? $access : (int) $item->access,
+				);
+
+				if (($target_state !== 0 || $change_access) && !$record_model->canEditState($target, $user))
+				{
+					continue 2;
+				}
+
+				$copies[$language] = $target;
+			}
+			$targets[$id] = $copies;
+		}
+
+		if ($state_changes)
+		{
+			$denied = $locked = array();
+			$this->canDoAction($state_changes, $denied, $locked, $state);
+			$targets = array_diff_key($targets, array_flip(array_merge($denied, $locked)));
+		}
+
+		return $targets;
+	}
+
+
+	protected function getBatchCopyCategory(int $source_cat, int $maincat, int $method, string $language): int
+	{
+		if ($method !== 99 || $maincat !== -99)
+		{
+			return $maincat ?: $source_cat;
+		}
+
+		global $globalcats;
+		if (!isset($globalcats[$source_cat]) || $globalcats[$source_cat]->language === '*')
+		{
+			return $source_cat;
+		}
+
+		$associations = \Joomla\CMS\Language\Associations::getAssociations('com_content', '#__categories', 'com_categories.item', $source_cat, 'id', 'alias', '');
+		$associated_cat = (int) ($associations[$language]->id ?? 0);
+
+		return isset($globalcats[$associated_cat]) ? $associated_cat : $source_cat;
+	}
+
+
+	/**
+	 * Method to copy items
 	 *
 	 * @access	public
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function copyitems($cid, $keeptags = 2, $prefix = '', $suffix = '', $copynr = 1, $lang_arr = null, $state = null, $method = 1, $maincat = null, $seccats = null, $type_id = null, $access = null, $tags = array())
+	function copyitems(array $targets, $keeptags = 2, $prefix = '', $suffix = '', $copynr = 1, $lang_arr = null, $method = 1, $tags = array())
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
@@ -1857,24 +2021,24 @@ class FlexicontentModelItems extends FCModelAdminList
 		/**
 		 * Loop through the items, copying, moving, or translating them
 		 */
-		$cid_reverse = array_reverse($cid);
+		$cid_reverse = array_reverse(array_keys($targets));
 		$total_cnt = 0;
 		$this->copiedIds = array();
-		global $globalcats;
 
 		$items = array();
 		$assoc_data_map = array();
-		$cat_assoc_ids_map = array();
 
 		foreach ($cid_reverse as $itemid)
 		{
 			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_items.php';
 			$item = new flexicontent_items(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
-			$item->load($itemid);
+			if (!$item->load($itemid))
+			{
+				continue;
+			}
 
 			$items[$itemid] = $item;
 			$assoc_data_map[$itemid] = null;
-			$cat_assoc_ids_map[$itemid] = null;
 		}
 
 		$processing_pairs = array();
@@ -1894,10 +2058,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		{
 			foreach ($cid_reverse as $itemid)
 			{
-				$item = $items[$itemid];
-				$langs = $lang_arr ?: array($item->language);
-
-				foreach ($langs as $lang)
+				foreach (array_keys($targets[$itemid]) as $lang)
 				{
 					$processing_pairs[] = array($itemid, $lang);
 				}
@@ -1907,12 +2068,16 @@ class FlexicontentModelItems extends FCModelAdminList
 		foreach ($processing_pairs as $processing_pair)
 		{
 			list($itemid, $lang) = $processing_pair;
+			if (!isset($items[$itemid]))
+			{
+				continue;
+			}
+			$target = $targets[$itemid][$lang];
 			$item = $items[$itemid];
 
 			for( $nr=0; $nr < $copynr; $nr++ )  // Number of copies to create, meaningful only when copying without TRANSLATING items
 			{
 				$assoc_data = & $assoc_data_map[$itemid];
-				$cat_assoc_ids = & $cat_assoc_ids_map[$itemid];
 
 					// Some shortcuts
 					$sourceid 	= (int)$item->id;
@@ -1943,9 +2108,10 @@ class FlexicontentModelItems extends FCModelAdminList
 					$lang_from			= substr($row->language,0,2);
 					$row->language	= $lang ? $lang : $row->language;
 					$lang_to				= substr($row->language,0,2);
-					$row->state			= strlen((string) $state) ? $state : $row->state;  // keep original if: null, ''
-					$row->type_id		= $type_id ? $type_id : $row->type_id;    // keep original if: null, zero, ''
-					$row->access		= $access ? $access : $row->access;       // keep original if: null, zero, ''
+					$row->catid         = $target->catid;
+					$row->state         = $target->state;
+					$row->type_id       = $target->type_id;
+					$row->access        = $target->access;
 
 					$doauto['title'] = $doauto['introtext'] = $doauto['fulltext'] = $doauto['metakey'] = $doauto['metadesc'] = true;    // In case JF data is missing
 					if ($translate_method == 2 || $translate_method == 4)
@@ -2053,17 +2219,17 @@ class FlexicontentModelItems extends FCModelAdminList
 					}
 					//print_r($row->fulltext); exit;
 
-					// Check new item
-					$row->check();
-
-					// Create a new item in the content fc_items_ext table
-					$row->store();
-
 					// Not doing a translation, we start a new language group for the new item
 					if ($translate_method == 0)
 					{
-						$row->lang_parent_id = 0; //$row->id;
-						$row->store();
+						$row->lang_parent_id = 0;
+					}
+
+					if (!$row->check() || !$row->store())
+					{
+						$this->setError($row->getError());
+						$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ERROR_COPY_ITEMS') . ' (' . $itemid . ')', 'error');
+						continue;
 					}
 
 
@@ -2108,10 +2274,11 @@ class FlexicontentModelItems extends FCModelAdminList
 					if ($use_versioning)
 					{
 						$v = new stdClass();
-						$v->item_id    = (int)$item->id;
+						$v->item_id    = (int) $row->id;
 						$v->version_id = 1;
-						$v->created    = $item->created;
-						$v->created_by = $item->created_by;
+						$v->created    = $row->created;
+						$v->created_by = $row->created_by;
+						$v->state      = $row->state;
 						$v->comment    = ''; //'copy version.';
 						$this->_db->insertObject('#__flexicontent_versions', $v);
 					}
@@ -2126,6 +2293,11 @@ class FlexicontentModelItems extends FCModelAdminList
 
 					foreach ($curversions as $cv)
 					{
+						// Keep version 1 in sync with the new item's category assignments.
+						if ((int) $cv->field_id === 13 && (int) $cv->valueorder === 1 && (int) $cv->suborder === 1)
+						{
+							$cv->value = serialize($target->categories);
+						}
 						$query 	= 'INSERT INTO #__flexicontent_items_versions (`version`, `field_id`, `item_id`, `valueorder`, `suborder`, `value`)'
 							. ' VALUES(1 ,'  . $cv->field_id . ', ' . $row->id . ', ' . $cv->valueorder . ', ' . $cv->suborder . ', ' . $this->_db->Quote($cv->value)
 							. ')'
@@ -2133,14 +2305,7 @@ class FlexicontentModelItems extends FCModelAdminList
 						$this->_db->setQuery($query)->execute();
 					}
 
-					// Get the item categories
-					$query 	= 'SELECT catid'
-						. ' FROM #__flexicontent_cats_item_relations'
-						. ' WHERE itemid = '. $sourceid
-					;
-					$cats = $this->_db->setQuery($query)->loadColumn();
-
-					foreach($cats as $cat)
+					foreach ($target->categories as $cat)
 					{
 						$query 	= 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`)'
 							.' VALUES(' . $cat . ',' . $row->id . ')'
@@ -2163,7 +2328,11 @@ class FlexicontentModelItems extends FCModelAdminList
 						$tags_source = $this->_db->setQuery($query)->loadColumn();
 					}
 
-					if ($keeptags === 0 || $keeptags === 1)
+					if ($keeptags === 0)
+					{
+						$tags_final = array();
+					}
+					elseif ($keeptags === 1)
 					{
 						// Do not copy tags from source, use only new tags
 						$tags_final = $tags;
@@ -2198,52 +2367,6 @@ class FlexicontentModelItems extends FCModelAdminList
 								.' VALUES(' . (int) $tag . ',' . (int) $row->id . ')';
 							$this->_db->setQuery($query)->execute();
 						}
-					}
-
-					if ($method == 3)
-					{
-						$this->moveitem($row->id, $maincat, $seccats, null, null, 0, null, $tags, $keeptags);
-					}
-					elseif ($method == 99 && ($maincat || $seccats))
-					{
-						/**
-						 * Auto-selected associated category or use same category (of language ALL) as the original item
-						 * NOTE: the quicktranslate task should prevent selecting a language that has no associated category
-						 * No check is done here if a language has indeed ab associated category. If not the item will be created
-						 * in the same category as the original item
-						 */
-						if ($maincat == -99)
-						{
-							// Get associations of item that was duplicated
-							if ($cat_assoc_ids === null)
-							{
-								$cat_assoc_ids = array();
-
-								// Existing associations of the item's category
-								if (isset($globalcats[$item->catid]) && $globalcats[$item->catid]->language !== '*')
-								{
-									$cat_associations = \Joomla\CMS\Language\Associations::getAssociations('com_content', '#__categories', 'com_categories.item', $item->catid, 'id', 'alias', '');
-									foreach ($cat_associations as $tag => $cat_association)
-									{
-										if (isset($globalcats[(int)$cat_association->id]))
-										{
-											$cat_assoc_ids[$tag] = (int)$cat_association->id;
-										}
-									}
-								}
-							}
-
-							if (isset($cat_assoc_ids[$row->language]))
-							{
-								$row->catid = $cat_assoc_ids[$row->language];
-							}
-						}
-						else
-						{
-							$row->catid = $maincat ? $maincat : $row->catid;
-						}
-
-						$this->moveitem($row->id, $row->catid, $seccats, null, null, 0, null, $tags, $keeptags);
 					}
 
 					/**
@@ -2413,7 +2536,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function moveitem($itemid, $maincat, $seccats = null, $lang = null, $state = null, $type_id = 0, $access = null, $tags = array(), $keeptags = 2)
+	function moveitem($itemid, $maincat, $seccats = null, $lang = null, $state = null, $type_id = 0, $access = null, $tags = array(), $keeptags = 2, ?array $allowed_cats = null, array $excluded_items = array())
 	{
 		$itemid = (int) $itemid;
 		if ($seccats !== null)
@@ -2423,7 +2546,11 @@ class FlexicontentModelItems extends FCModelAdminList
 		$tags = array_values(array_filter(ArrayHelper::toInteger((array) $tags)));
 
 		$item = $this->getTable($this->records_jtable, '');
-		$item->load($itemid);
+		if (!$item->load($itemid))
+		{
+			$this->setError($item->getError());
+			return false;
+		}
 
 		// Keep original if: null, zero, ''
 		$item->catid    = $maincat ?: $item->catid;
@@ -2434,7 +2561,11 @@ class FlexicontentModelItems extends FCModelAdminList
 		// keep original if: null, ''
 		$item->state = strlen((string) $state) ? $state : $item->state;
 
-		$item->store();
+		if (!$item->store())
+		{
+			$this->setError($item->getError());
+			return false;
+		}
 
 		if ($seccats === null)
 		{
@@ -2552,7 +2683,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		// Categories field is configured as "Non-translatable": apply the categories to the associated items too
 		if (flexicontent_db::isCategoriesFieldUntranslatable())
 		{
-			flexicontent_db::propagateCategoriesToAssocs((int) $itemid);
+			flexicontent_db::propagateCategoriesToAssocs((int) $itemid, $allowed_cats, $excluded_items);
 		}
 
 		return true;
@@ -3809,14 +3940,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	public function filterByPermission($cid, $action)
 	{
-		// State -3, -4 are automatic workflow state and manual change is allowed only to configuration managers
-		if (in_array($action, array(-3, -4)) && !FlexicontentHelperPerm::getPerm()->SuperAdmin)
-		{
-			return $cid;
-		}
-
-		// State 2 is archived and setting items to it, requires a special privilege (besides also required edit.state.*)
-		if (in_array($action, array(2)) && !FlexicontentHelperPerm::getPerm()->CanArchives)
+		if (is_int($action) && !$this->canSetWorkflowState($action))
 		{
 			return $cid;
 		}
@@ -3824,6 +3948,14 @@ class FlexicontentModelItems extends FCModelAdminList
 		return parent::filterByPermission($cid, $action);
 	}
 
+	protected function canSetWorkflowState(int $state): bool
+	{
+		$perms = FlexicontentHelperPerm::getPerm();
+
+		// Manual workflow states and archival each require an extra right.
+		return (!in_array($state, array(-3, -4), true) || $perms->SuperAdmin)
+			&& ($state !== 2 || $perms->CanArchives);
+	}
 
 	/**
 	 * Method to find which records having assignments blocking a state change

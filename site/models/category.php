@@ -546,6 +546,49 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 
 	/**
+	 * Display name of the author of the AUTHOR layout, for the page heading
+	 *
+	 * The name is given only for an author who has at least one item in the list of the current visitor
+	 * (the configured list, before the text search and the filters of the request), and to the author himself.
+	 * Any other user id gets an empty name, like a user id that does not exist, thus the layout does not tell
+	 * visitors the names of accounts that have no content that the visitor may see
+	 *
+	 * @return string
+	 */
+	function getAuthorName()
+	{
+		if ($this->_layout !== 'author' || (int) $this->_authorid <= 0)
+		{
+			return '';
+		}
+
+		$listed = (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id === (int) $this->_authorid
+			|| (int) $this->getTotal() > 0;
+
+		if (!$listed)
+		{
+			// The current list is empty, this may be due to the text search or the filters of the request: look at the list without them
+			global $fc_catview;
+
+			if (!empty($fc_catview['where_conf_only']) && isset($fc_catview['join_clauses']))
+			{
+				$query = 'SELECT 1 FROM #__flexicontent_items_tmp AS i ' . $fc_catview['join_clauses'] . $fc_catview['where_conf_only'];
+				$listed = (bool) $this->_db->setQuery($query, 0, 1)->loadResult();
+			}
+		}
+
+		if (!$listed)
+		{
+			return '';
+		}
+
+		$author = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $this->_authorid);
+
+		return $author ? (string) $author->name : '';
+	}
+
+
+	/**
 	 * Method to get the pagination object
 	 *
 	 * @access	public
@@ -967,6 +1010,45 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	}
 
 
+	/**
+	 * Get the categories having an unpublished category in their path (the category itself or an ancestor),
+	 * or if view levels are given, having a category of a view level other than these in their path.
+	 * The item view does not show the items of such a category
+	 *
+	 * @param   array|null  $aid_arr  The view levels to check the path against, null to check the published state instead
+	 *
+	 * @return  array  The category ids
+	 */
+	function _getClosedPathCats($aid_arr = null)
+	{
+		global $globalcats;
+
+		$closed  = array();
+		$allowed = $aid_arr === null ? null : array_flip($aid_arr);
+
+		foreach ((array) $globalcats as $cat)
+		{
+			foreach ($cat->ancestorsarray as $pcid)
+			{
+				if (!isset($globalcats[$pcid]))
+				{
+					continue;
+				}
+
+				$pcat = $globalcats[$pcid];
+
+				if ($allowed === null ? $pcat->published != 1 : ((int) $pcat->access && !isset($allowed[(int) $pcat->access])))
+				{
+					$closed[] = (int) $cat->id;
+					break;
+				}
+			}
+		}
+
+		return $closed;
+	}
+
+
 
 	/**
 	 * Method to build the part of SELECT clause that calculates item access
@@ -1230,6 +1312,10 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
 			$where .= ' AND ( ( i.publish_up is NULL OR i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) ' . $OR_isOwner . ')';   // . $OR_isModifier
 			$where .= ' AND ( ( i.publish_down is NULL OR i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) ' . $OR_isOwner . ')';   // . $OR_isModifier
+
+			// Limit to a published main category that has no unpublished ancestor, as the item view does (same exception for owned items)
+			$closed_cats = $this->_getClosedPathCats();
+			$where .= ' AND ( ( c.published = 1' . ($closed_cats ? ' AND i.catid NOT IN (' . implode(',', $closed_cats) . ')' : '') . ' ) ' . $OR_isOwner . ')';
 		}
 		else
 		{
@@ -1257,6 +1343,10 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$where .= ' AND ty.access IN (0,'.$aid_list.')';
 			$where .= ' AND  c.access IN (0,'.$aid_list.')';
 			$where .= ' AND  i.access IN (0,'.$aid_list.')';
+
+			// Also the ancestors of the main category, as the item view does
+			$closed_cats = $this->_getClosedPathCats($aid_arr);
+			$where .= $closed_cats ? ' AND i.catid NOT IN (' . implode(',', $closed_cats) . ')' : '';
 		}
 
 

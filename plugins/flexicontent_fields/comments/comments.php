@@ -74,6 +74,7 @@ class plgFlexicontent_fieldsComments extends FCField
 
 		// Params for disqus
 		$forum_shortname 	= $field->parameters->get('pforum_shortname');
+		$forum_shortname 	= is_string($forum_shortname) && preg_match('/^[A-Za-z0-9-]+$/D', $forum_shortname) ? $forum_shortname : '';
 
 		// Params for Facebook
 		$fappId = $field->parameters->get('fappId');
@@ -89,6 +90,9 @@ class plgFlexicontent_fieldsComments extends FCField
 			</div>';
 		} else {
 				$page_identifier 	= $item->id;
+
+				// The URL is printed inside a JS block comment, as a JSON string its slashes are escaped and it cannot end the comment
+				$page_url = json_encode((string) $page_url, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_INVALID_UTF8_SUBSTITUTE);
 				$document->addCustomTag('
 				<script>
 				    /**
@@ -165,7 +169,7 @@ class plgFlexicontent_fieldsComments extends FCField
 				}(document, \'script\', \'facebook-jssdk\'));</script>
 			');
 
-		$display = "<div id='fb-root'></div><div class='fb-comments' data-href='http://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']."' ".
+		$display = "<div id='fb-root'></div><div class='fb-comments' data-href='".htmlspecialchars('http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')."' ".
 					$fdatanumposts." ".$fdatawidth." ".$fdatacolorscheme."></div>";
 	}
 	$catid= $item->catid;

@@ -361,27 +361,6 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			$submit_redirect_url_fe = $params->get('submit_redirect_url_fe', '');
 			$dolog = $params->get('print_logging_info');
 
-			// Get submit configuration override
-			if ($isnew && $original_task != 'save2copy')
-			{
-				$h = $data['submit_conf'];
-				$item_submit_conf = $session->get('item_submit_conf', array(), 'flexicontent');
-
-				$submit_conf      = @ $item_submit_conf[$h];
-				$allowunauthorize = (int) $params->get('allowunauthorize', 0);
-				$allowunauthorize = $allowunauthorize === 1 || ($allowunauthorize === 2 && !$user->guest);
-				$autopublished    = @ $submit_conf['autopublished'];     // Override flag for both TYPE and CATEGORY ACL
-				$overridecatperms = !empty($submit_conf['overridecatperms'])
-					&& flexicontent_security::canUseSubmissionCategoryOverride($menu, $user);  // Override flag for CATEGORY ACL
-			}
-			else
-			{
-				$submit_conf      = false;
-				$allowunauthorize = false;
-				$autopublished    = false;
-				$overridecatperms = false;
-			}
-
 			// We use some strings from administrator part, load english language file
 			// for 'com_flexicontent' component then override with current language file
 			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
@@ -740,21 +719,20 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			}
 		}
 
-		// Special CASEs of overriding CREATE ACL in FrontEnd via menu item
-		elseif ($isSite)
+		// Apply overrides only from the submission form for the validated type.
+		$submit_conf = array();
+		if ($isnew && $isSite && $original_task !== 'save2copy')
 		{
-			// Allow creating via submit menu OVERRIDE
-			if ($allowunauthorize)
-			{
-				$canAdd = true;
-				$canCreateType = true;
-			}
-
-			// If without create privelege and category override is enabled then only check type and do not check category ACL
-			elseif (!$canAdd)
-			{
-				$canAdd = $overridecatperms && $canCreateType;
-			}
+			$submit_menu = flexicontent_security::getItemSubmissionMenu($app, $type_id);
+			$submit_conf = flexicontent_security::getItemSubmitConfiguration($app, $submit_menu, $type_id, $validated_data['submit_conf'] ?? null);
+			$canCreateType = $canCreateType || ($submit_conf && isset($types[$type_id])
+				&& flexicontent_security::canOverrideItemSubmissionType($submit_menu, $user));
+			$canAdd = $canAdd || (!empty($submit_conf['overridecatperms'])
+				&& flexicontent_security::canUseSubmissionCategoryOverride($submit_menu, $user));
+		}
+		if (!$submit_conf)
+		{
+			unset($validated_data['submit_conf']);
 		}
 
 		// New item: check if user can create in at least one category
@@ -829,7 +807,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 */
 
 		// If saving fails, do any needed cleanup, and then redirect back to record form
-		if (!$model->store($validated_data))
+		$stored = $isnew
+			? $this->storeNewItem($model, $validated_data, $db, $user)
+			: $model->store($validated_data);
+		if (!$stored)
 		{
 			if (empty($model->abort_redirect_url))
 			{
@@ -1298,6 +1279,39 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	}
 
 
+	/** Keep the quota check and insert together for concurrent saves by the same author. */
+	protected function storeNewItem($model, $data, $db, $user)
+	{
+		$authorId = (int) $user->id;
+		$limit = $authorId > 0 ? (int) flexicontent_db::getUserConfig($authorId)->get('max_auth_limit', 0) : 0;
+		if ($limit <= 0)
+		{
+			return $model->store($data);
+		}
+
+		$database = (string) $db->setQuery('SELECT DATABASE()')->loadResult();
+		$lock = $db->quote('fc_item_quota_' . substr(hash('sha256', $database . ':' . $db->getPrefix() . ':' . $authorId), 0, 40));
+		if (!$db->setQuery('SELECT GET_LOCK(' . $lock . ', 5)')->loadResult())
+		{
+			throw new \RuntimeException('Another item save is in progress. Please try again.', 409);
+		}
+
+		try
+		{
+			$count = (int) $db->setQuery('SELECT COUNT(id) FROM #__content WHERE created_by = ' . $authorId)->loadResult();
+			if ($count >= $limit)
+			{
+				throw new \RuntimeException(\Joomla\CMS\Language\Text::sprintf('FLEXI_ALERTNOTAUTH_CREATE_MORE', $limit), 403);
+			}
+			return $model->store($data);
+		}
+		finally
+		{
+			$db->setQuery('SELECT RELEASE_LOCK(' . $lock . ')')->loadResult();
+		}
+	}
+
+
 	/**
 	 * Logic to create the view for record editing
 	 *
@@ -1717,12 +1731,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$model = $this->getModel($this->record_name_pl);
 		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$cid = $this->input->get('cid', array(), 'array');
-		$cid = ArrayHelper::toInteger($cid);
+		$cid = array_values(array_unique(array_filter(ArrayHelper::toInteger($cid), static function ($id) { return $id > 0; })));
 
 		// Check at least one item was selected
 		if (!count($cid))
@@ -1771,21 +1784,30 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		$method   = $this->input->get('method', 1, 'int');
-		$keeepcats = $this->input->get('keeepcats', 1, 'int');
+		if (!in_array($method, array(1, 2, 3, 99), true))
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('JGLOBAL_VALIDATION_FORM_FAILED'), 400);
+		}
+
 		$keeptags = $this->input->get('keeptags', 2, 'int');
 		$prefix   = $this->input->get('prefix', 1, 'string');
 		$suffix   = $this->input->get('suffix', 1, 'string');
 		$copynr   = $this->input->get('copynr', 1, 'int');
-		$maincat  = $this->input->get('maincat', '', 'int');
+		$maincat  = $this->input->get('maincat', 0, 'int');
 		$seccats  = $this->input->get('seccats', array(), 'array');
 		$seccats  = array_values(array_filter(ArrayHelper::toInteger($seccats), static function ($id) { return $id > 0; }));
 		$tags     = $this->input->get('tags', array(), 'array');
 		$keepseccats = $this->input->get('keepseccats', 0, 'int');
 
-		$state   = $this->input->get('state', '', 'string');
-		$state   = strlen($state) ? (int) $state : null;
+		$record_model = $this->getModel($this->record_name);
+		$state = $this->input->get('state', '', 'string');
+		if ($state !== '' && (!preg_match('/^-?\d+$/D', $state) || !isset($record_model->supported_conditions[(int) $state])))
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('JGLOBAL_VALIDATION_FORM_FAILED'), 400);
+		}
+		$state = $state === '' ? null : (int) $state;
 
-		$type_id = $this->input->get('type_id', '', 'int');
+		$type_id = $this->input->get('type_id', 0, 'int');
 
 		$access  = $this->input->get('access', '', 'string');
 		$access  = strlen($access) ? (int) $access : null;
@@ -1794,61 +1816,38 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$seccats = $keepseccats ? null : $seccats;
 		$tags    = ArrayHelper::toInteger($tags);
 
-		// Access check
-		$copytask_allow_uneditable = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('copytask_allow_uneditable', 1);
-
-		if (!$copytask_allow_uneditable || $method == 2)  // If method is 2 (move) we will deny moving uneditable items
+		if ($method === 99 && !$lang_arr && $lang === '_not_posted_')
 		{
-			// Remove uneditable items
-			$auth_cid = array();
-			$non_auth_cid = array();
-
-			// Get record owner and other record data
-			$q = $this->_getRecordsQuery($cid, array('id', 'created_by', 'catid'));
-			$itemdata = $db->setQuery($q)->loadObjectList('id');
-
-			// Check authorization for edit operation
-			foreach ($cid as $id)
-			{
-				$isOwner = $itemdata[$id]->created_by == $user->id;
-				$asset = 'com_content.article.' . $id;
-				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
-
-				if ($canEdit)
-				{
-					$auth_cid[] = $id;
-				}
-				else
-				{
-					$non_auth_cid[] = $id;
-				}
-			}
-
-			// echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
-		}
-		else
-		{
-			$auth_cid = & $cid;
-			$non_auth_cid = array();
+			jexit('<div class="alert alert-warning">Nothing to do, please select target languages</div>');
 		}
 
-		// Set warning for uneditable items
-		if (count($non_auth_cid))
+		$languages = $method === 1 ? $lang : ($lang_arr ?: $lang);
+		$allowed_cats = FlexicontentHelperPerm::getAllowedCats($user, array('core.create'));
+		$targets = $model->getBatchTargets($record_model, $cid, $method, $languages, $state, $maincat, $seccats, $type_id, $access, $allowed_cats);
+		$auth_cid = array_keys($targets);
+		$non_auth_cid = array_diff($cid, $auth_cid);
+
+		if ($non_auth_cid)
 		{
-			$msg_noauth = \Joomla\CMS\Language\Text::_('FLEXI_CANNOT_COPY_ASSETS') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_REASON_NO_EDIT_PERMISSION')
-				. '<br>' . \Joomla\CMS\Language\Text::_('FLEXI_ROWS_SKIPPED') . ' : '. implode(',', $non_auth_cid);
+			$msg_noauth = \Joomla\CMS\Language\Text::sprintf('FLEXI_SKIPPED_N_ROWS_UNAUTHORISED', count($non_auth_cid), \Joomla\CMS\Language\Text::_('FLEXI_ITEMS'))
+				. ' (' . implode(', ', $non_auth_cid) . ')';
 			$app->enqueueMessage($msg_noauth, 'warning');
 
-			if (!count($auth_cid))  // Cancel task if no items can be copied
+			if (!$auth_cid)
 			{
+				$app->setHeader('status', 403, true);
+				if ($this->input->getInt('fc_ajax', 0))
+				{
+					header('Content-Type: application/json; charset=utf-8');
+					jexit(json_encode(array('ok' => false, 'created' => 0, 'message' => '', 'errors' => array($msg_noauth))));
+				}
+
 				$this->setRedirect($this->returnURL);
 
 				return false;
 			}
 		}
 
-		// Keep the authorised subset. Replacing it with the original selection
-		// would reintroduce rows that the edit-permission check just rejected.
 		$clean_cache_flag = false;
 
 
@@ -1857,76 +1856,59 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 */
 		switch ($method)
 		{
-			// Copy CASE
-			case 1:
-				if ($model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state, $method, null, null, null, null, $tags))
-				{
-					$msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_ITEMS_COPY_SUCCESS', count($auth_cid));
-					$clean_cache_flag = true;
-				}
-				else
-				{
-					$app->setHeader('status', 500);
-					$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ERROR_COPY_ITEMS') . " " . $model->getError(), 'error');
-					$msg = '';
-				}
-				break;
-
 			// Update CASE (optionally moving)
 			case 2:
-				$msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_ITEMS_MOVE_SUCCESS', count($auth_cid));
+				$updated = array();
 
-				foreach ($auth_cid as $itemid)
+				foreach ($targets as $itemid => $target)
 				{
-					if (!$model->moveitem($itemid, $maincat, $seccats, $lang, $state, $type_id, $access, $tags, $keeptags))
+					if ($model->moveitem($itemid, $target->catid, $target->categories, $lang, $target->state, $target->type_id, $target->access, $tags, $keeptags, $allowed_cats, $cid))
+					{
+						$updated[] = $itemid;
+					}
+					else
 					{
 						$app->setHeader('status', 500);
 						$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ERROR_MOVE_ITEMS') . " " . $model->getError(), 'error');
-						$msg = '';
 					}
 				}
 
-				$clean_cache_flag = true;
+				$total_cnt = count($updated);
+				$clean_cache_flag = $total_cnt > 0;
+				$msg = $total_cnt ? \Joomla\CMS\Language\Text::sprintf('FLEXI_ITEMS_MOVE_SUCCESS', $total_cnt) : '';
 				break;
 
-			// Translate
-			case 99:
-				// CHECK CASE OF TRANSLATING SINGLE ITEM TO MULTIPLE LANGUAGES but zero languages have been given and terminate with error (we are in modal window)
-				if (!$lang_arr && $lang === '_not_posted_')
-				{
-					jexit('<div class="alert alert-warning">Nothing to do, please select target languages</div>');
-				}
-
-			// Copy and update CASE (optionally moving) 
+			// Copy, optionally changing the destination or translating.
+			case 1:
 			case 3:
-				$languages = $lang_arr ?: array($lang);
-				$total_cnt = $model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $languages, $state, $method, $maincat, $seccats, $type_id, $access, $tags);
+			case 99:
+				$total_cnt = $model->copyitems($targets, $keeptags, $prefix, $suffix, $copynr, $languages, $method, $tags);
 				if ($total_cnt)
 				{
-					$msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_ITEMS_COPYMOVE_SUCCESS', $total_cnt);   //count($auth_cid)
+					$key = $method === 1 ? 'FLEXI_ITEMS_COPY_SUCCESS' : 'FLEXI_ITEMS_COPYMOVE_SUCCESS';
+					$msg = \Joomla\CMS\Language\Text::sprintf($key, $total_cnt);
 					$clean_cache_flag = true;
 				}
 				else
 				{
 					$app->setHeader('status', 500);
-					$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ERROR_COPYMOVE_ITEMS') . " " . $model->getError(), 'error');
+					$key = $method === 1 ? 'FLEXI_ERROR_COPY_ITEMS' : 'FLEXI_ERROR_COPYMOVE_ITEMS';
+					$app->enqueueMessage(\Joomla\CMS\Language\Text::_($key) . " " . $model->getError(), 'error');
 					$msg = '';
 				}
 				break;
 
-			default:
-				die('Unknown batch mode: ' . $method);
-				break;
 		}
 
 		// Set custom field values (updated items, or the new items created by copying)
 		if (in_array($method, array(1, 2, 3)))
 		{
-			$batch_cid = $method == 2 ? $auth_cid : $model->copiedIds;
+			$batch_cid = $method === 2 ? $updated : $model->copiedIds;
 			$field_msg = $this->_batchSetFields(
 				$batch_cid,
 				$this->input->get('batch_fields', array(), 'array'),
-				$this->input->get('custom', array(), 'array')
+				$this->input->get('custom', array(), 'array'),
+				$method === 2 ? array_diff($cid, $updated) : $non_auth_cid
 			);
 
 			if ($field_msg)
@@ -1949,15 +1931,6 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				}
 			}
 
-			if (isset($total_cnt) && $total_cnt)
-			{
-				$created = (int) $total_cnt;
-			}
-			else
-			{
-				$created = $method == 99 || $method == 3 ? 0 : count($auth_cid);
-			}
-
 			if ($clean_cache_flag)
 			{
 				$this->_cleanCache();
@@ -1965,8 +1938,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 			header('Content-Type: application/json; charset=utf-8');
 			jexit(json_encode(array(
-				'ok'      => !$errors && $created > 0,
-				'created' => $created,
+				'ok'      => !$errors && $total_cnt > 0,
+				'created' => (int) $total_cnt,
 				'message' => trim(strip_tags($msg)),
 				'errors'  => $errors,
 			)));
@@ -2005,12 +1978,13 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 * @param   int[]   $cid           Ids of the items to update
 	 * @param   array   $batch_fields  Field ids => array('mode' => ...)
 	 * @param   array   $custom        Posted values: field name => values
+	 * @param   int[]   $excluded_ids  Selected items skipped by the batch
 	 *
 	 * @return  string  Result message, empty if no fields were requested
 	 *
 	 * @since   3.3
 	 */
-	protected function _batchSetFields(array $cid, array $batch_fields, array $custom)
+	protected function _batchSetFields(array $cid, array $batch_fields, array $custom, array $excluded_ids = array())
 	{
 		$cid = array_values(array_filter(ArrayHelper::toInteger($cid)));
 
@@ -2142,7 +2116,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 						continue;
 					}
 
-					$assoc_ids[] = (int) $association->id;
+					if (!in_array((int) $association->id, $excluded_ids, true))
+					{
+						$assoc_ids[] = (int) $association->id;
+					}
 
 					if (substr($tag, 0, 2) === $site_default && substr($record->language, 0, 2) !== $site_default)
 					{
@@ -2294,7 +2271,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			}
 
 			$app->input->set('unique_tmp_itemid', $item_id);
-			$result = $record_model->store($data);
+			$result = $record_model->store($data, true, $excluded_ids);
 			$app->input->set('unique_tmp_itemid', null);
 
 			if ($result)

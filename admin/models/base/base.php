@@ -151,6 +151,47 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 	 */
 	var $mergeableGroups = array();
 
+	/**
+	 * Set while FLEXIcontent code triggers Joomla's content events itself (item save, state change, item view)
+	 * with a "com_content.*" context
+	 */
+	private static $internalContentEvents = false;
+
+
+	/**
+	 * Tell, and optionally set, whether FLEXIcontent code is triggering Joomla's content events itself. The FLEXIcontent
+	 * system plugin then leaves these events alone. Only code can set this: the request variable 'isflexicontent',
+	 * which is still set for other extensions, is not read for it
+	 *
+	 * @param   bool|null  $set  The new value, null to only read the current one
+	 *
+	 * @return  bool  The value before the call
+	 */
+	public static function internalContentEvents($set = null)
+	{
+		$current = self::$internalContentEvents;
+
+		if ($set !== null)
+		{
+			self::$internalContentEvents = (bool) $set;
+		}
+
+		return $current;
+	}
+
+
+	/**
+	 * The folder of the application that a model works for. The site and the back end have their own FLEXIcontent forms.
+	 * Web Services have none (JPATH_BASE is the "api" folder there): they save with the back-end models of Joomla, and
+	 * the FLEXIcontent models use the forms of the back end with them
+	 *
+	 * @return  string
+	 */
+	public static function clientBasePath()
+	{
+		return \Joomla\CMS\Factory::getApplication()->isClient('api') ? JPATH_ADMINISTRATOR : JPATH_BASE;
+	}
+
 
 	/**
 	 * Constructor
@@ -665,8 +706,8 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 	public function getForm($data = array(), $loadData = true)
 	{
 		// Set form path in case we are called form different extension
-		\Joomla\CMS\Form\Form::addFormPath(JPATH_BASE.DS.'components'.DS.'com_flexicontent' . '/models/forms');
-		\Joomla\CMS\Form\Form::addFieldPath(JPATH_BASE.DS.'components'.DS.'com_flexicontent' . '/models/fields');
+		\Joomla\CMS\Form\Form::addFormPath(self::clientBasePath().DS.'components'.DS.'com_flexicontent' . '/models/forms');
+		\Joomla\CMS\Form\Form::addFieldPath(self::clientBasePath().DS.'components'.DS.'com_flexicontent' . '/models/fields');
 
 		// Get the form.
 		$form_name    = $this->events_context;
@@ -1043,12 +1084,12 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		foreach($options['model_names'] as $extension_name => $model_name)
 		{
 			// Check XML file exists
-			$model_xml_filepath = \Joomla\Filesystem\Path::clean(JPATH_BASE.DS.'components'.DS . $extension_name . DS.'models'.DS.'forms'.DS . $model_name . '.xml');
+			$model_xml_filepath = \Joomla\Filesystem\Path::clean(self::clientBasePath().DS.'components'.DS . $extension_name . DS.'models'.DS.'forms'.DS . $model_name . '.xml');
 			$file_exists = file_exists($model_xml_filepath);
 
 			if (!$file_exists && FLEXI_J40GE)
 			{
-				$model_xml_filepath = \Joomla\Filesystem\Path::clean(JPATH_BASE.DS.'components'.DS . $extension_name . DS.'forms'.DS . $model_name . '.xml');
+				$model_xml_filepath = \Joomla\Filesystem\Path::clean(self::clientBasePath().DS.'components'.DS . $extension_name . DS.'forms'.DS . $model_name . '.xml');
 				$file_exists = file_exists($model_xml_filepath);
 			}
 
@@ -1555,6 +1596,17 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 					$this->_addPathRecords($_id, $cid, 'children');
 				}
 			}
+
+			// Authorize every record in the cascade before writing any changes.
+			$table = $this->getTable();
+			$cid = array_values(array_unique($cid));
+			foreach ($cid as $_id)
+			{
+				if (!$table->load((int) $_id) || !$this->canEditState($table, $user))
+				{
+					throw new \RuntimeException(\Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS_CHANGE_STATE'), 403);
+				}
+			}
 		}
 
 		$cid = ArrayHelper::toInteger($cid);
@@ -1670,6 +1722,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 				$current_option = $jinput->getCmd('option', '');
 
 				$jinput->set('isflexicontent', 'yes');
+				self::internalContentEvents(true);
 				$jinput->set('view', $parts[1]);
 				$jinput->set('option', $parts[0]);
 

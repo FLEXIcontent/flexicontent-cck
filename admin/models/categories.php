@@ -151,6 +151,36 @@ class FlexicontentModelCategories extends FCModelAdminList
 
 
 	/**
+	 * Validate the whole batch before Joomla changes the category tree ordering.
+	 */
+	public function saveorder($pks, $order, $group_id = 0)
+	{
+		$pks = ArrayHelper::toInteger($pks);
+		$order = ArrayHelper::toInteger($order);
+		if (!$this->canManage || !$pks || array_keys($pks) !== array_keys($order))
+		{
+			$this->setError(\Joomla\CMS\Language\Text::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'));
+			return false;
+		}
+
+		$query = $this->_db->getQuery(true)
+			->select('COUNT(*)')
+			->from('#__categories')
+			->where('id IN (' . implode(',', $pks) . ')')
+			->where('extension = ' . $this->_db->quote(FLEXI_CAT_EXTENSION))
+			->where('parent_id > 0');
+		$matched = (int) $this->_db->setQuery($query)->loadResult();
+		if ($matched !== count($pks) || $this->filterByPermission($pks, 'core.edit.state'))
+		{
+			$this->setError(\Joomla\CMS\Language\Text::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'));
+			return false;
+		}
+
+		return parent::saveorder(array_values($pks), array_values($order), $group_id);
+	}
+
+
+	/**
 	 * Method to build the query for the records
 	 *
 	 * @return  \Joomla\Data\DataObjectbaseQuery   The DB Query object

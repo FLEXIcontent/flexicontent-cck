@@ -24,8 +24,8 @@ foreach ($tags as $tag)
 
 		// With / without link
 		$display = $link_to_view ?
-			'<a class="fc_tags fc_tag_' .$tag->id. ' link_' .$field->name. '" href="' . $tag_links[$tag_id] . '">' . $tag->name . '</a>' :
-			'<span class="fc_tags fc_tag_' .$tag->id. ' nolink_' .$field->name. '">' . $tag->name . '</span>' ;
+			'<a class="fc_tags fc_tag_' .$tag->id. ' link_' .$field->name. '" href="' . $tag_links[$tag_id] . '">' . htmlspecialchars((string) $tag->name, ENT_QUOTES, 'UTF-8') . '</a>' :
+			'<span class="fc_tags fc_tag_' .$tag->id. ' nolink_' .$field->name. '">' . htmlspecialchars((string) $tag->name, ENT_QUOTES, 'UTF-8') . '</span>' ;
 		$field->{$prop}[] = $pretext . $display . $posttext;
 
 		// Some extra data

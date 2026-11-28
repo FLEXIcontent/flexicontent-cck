@@ -84,6 +84,25 @@ class modFlexifilterHelper
 				break;
 		}
 
+		// The selector shows titles and description excerpts: skip categories whose access level the visitor lacks,
+		// unless the listing of unauthorised content is enabled
+		if ($allowedtree && !(int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('show_noauth', 0))
+		{
+			$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
+			$levels = array_flip(array_map('intval', \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user ? (int) $user->id : 0)));
+			$viewable = array();
+
+			foreach ($allowedtree as $catid => $cat)
+			{
+				if (!is_object($cat) || !isset($cat->access) || isset($levels[(int) $cat->access]))
+				{
+					$viewable[$catid] = $cat;
+				}
+			}
+
+			return $viewable;
+		}
+
 		return $allowedtree;
 	}
 }

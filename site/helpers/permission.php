@@ -406,6 +406,16 @@ class FlexicontentHelperPerm
 	/*
 	 * Lookups the ACTION for the content type
 	 *
+	 * A content type restricts the creation of its items only: 'core.create' ("create items") is the only item action that
+	 * the permissions of a type have (section "type" of access.xml), and it applies when the type is set to use it
+	 * ('itemscreatable'). Which items of a type a user may edit, publish or delete is decided by the permissions of the
+	 * item and its category alone: for every other rule this method answers true, there is no type permission to look up.
+	 * A rule must not be looked up here before it is added to access.xml: no site can set it per type, so the lookup would
+	 * answer with what the component grants and keep out the users whose right comes from a category or from the item
+	 *
+	 * The creation of items is checked with the type record by ParentClassItem::canCreateType(). Without a type record
+	 * this method cannot tell if the type uses its ACL, and answers true for 'core.create' as well
+	 *
 	 * @access	public
 	 * @param	integer		$type_id		The TYPE ID
 	 * @param	string		$rule				The ACL rule name
@@ -431,13 +441,14 @@ class FlexicontentHelperPerm
 
 			if ($rule=='core.create')
 			{
-				$cache[$rule][$type_id] = ($type ? ! $type->itemscreatable : true) || $user->authorise($rule, $asset);
+				$cache[$rule][$type_id] = ($type ? ! $type->itemscreatable : true)
+					|| \Joomla\CMS\Factory::getApplication()->getIdentity()->authorise($rule, $asset);
 			}
 
-			// A non-implemented ACL (yet), just return TRUE
+			// Not a permission of a type (see above), just return TRUE
 			else
 			{
-				$cache[$rule][$type_id] = true;  // $user->authorise($rule, $asset);
+				$cache[$rule][$type_id] = true;
 			}
 		}
 

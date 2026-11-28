@@ -37,7 +37,12 @@ abstract class JHtmlFclayoutbuilder
 
 
 	/**
-	 * Create CSS file, typical creating a LESS file to prefix the CSS and compiling it
+	 * Create CSS file: the CSS of the layout with every selector prefixed, written as plain CSS
+	 *
+	 * The CSS is entered by whoever may edit the module and it is never compiled as LESS. The CSS parser keeps
+	 * function calls and @import rules as they are, and LESS would run them: data-uri() and @import read files
+	 * of the server into a public CSS file. The file inside the 'less' folder is only the marker that is removed
+	 * when the module is saved (see prepareLess), so that the CSS file is written again
 	 *
 	 * @param   object  $params       The configuration parameters that also contain the CSS
 	 * @param   string  $path         The folder path
@@ -71,39 +76,40 @@ abstract class JHtmlFclayoutbuilder
 			}
 		}
 
-		$less_code  = $oCssDocument->render();
+		$css_code  = $oCssDocument->render();
 
 		$matches = null;
-		preg_match_all("/@keyframes ([0-9a-zA-Z_]+) /", $less_code, $matches);
+		preg_match_all("/@keyframes ([0-9a-zA-Z_]+) /", $css_code, $matches);
 
 		foreach ($matches[0] as $i => $v)
 		{
 			$cssname = $matches[1][$i];
-			$less_code = str_replace(': ' . $cssname . ' ', ': ' . $cssname . '_' . $cnt . ' ', $less_code);
-			$less_code = str_replace($v, '@keyframes ' . $cssname . '_' . $cnt . ' ', $less_code);
+			$css_code = str_replace(': ' . $cssname . ' ', ': ' . $cssname . '_' . $cnt . ' ', $css_code);
+			$css_code = str_replace($v, '@keyframes ' . $cssname . '_' . $cnt . ' ', $css_code);
 		}
 
 		// Handle rules starting with body rule
-		$less_code  = str_replace($css_prefix . ' body', $css_prefix, $less_code);
+		$css_code  = str_replace($css_prefix . ' body', $css_prefix, $css_code);
 
-		//echo '<pre>' . $less_code . '</pre>';
-		$less_file  = 'less/' . $layout_name . '_' . $module->id . '.less';
-		$less_path  = \Joomla\Filesystem\Path::clean($path . $less_file);
+		$file_name  = preg_replace('/[^A-Za-z0-9_-]/', '', (string) $layout_name) . '_' . (int) $module->id;
+		$less_path  = \Joomla\Filesystem\Path::clean($path . 'less/' . $file_name . '.less');
+		$css_path   = \Joomla\Filesystem\Path::clean($path . 'css/' . $file_name . '.css');
 
-		// Create LESS file
+		// Write the CSS file (again) when the marker file was removed by a module save, the CSS is not compiled
 		if (!file_exists($less_path))
 		{
-			$_resource = fopen($less_path, "w");
-			fwrite($_resource, $less_code);
-			fclose($_resource);
+			foreach (array(dirname($css_path), dirname($less_path)) as $folder)
+			{
+				if (!is_dir($folder))
+				{
+					@mkdir($folder, 0755, true);
+				}
+			}
 
-			// Compile LESS file
-			$force = flexicontent_html::checkedLessCompile(
-				array($less_file),
-				$path,
-				$inc_path = $path . 'less/include/',
-				$force = false
-			);
+			if (@file_put_contents($css_path, $css_code) !== false)
+			{
+				@file_put_contents($less_path,'/* The CSS of this layout is written to the css folder, this file only marks it as up to date */' . "\n");
+			}
 		}
 	}
 
@@ -121,6 +127,12 @@ abstract class JHtmlFclayoutbuilder
 	{
 		$jinput    = \Joomla\CMS\Factory::getApplication()->input;
 		$id        = $jinput->getInt('id', 0);
+
+		// The path is a posted form value: only the marker file of a layout inside a builder 'less' folder may be removed
+		if (!is_string($file_path) || !preg_match('#^(/[A-Za-z0-9_-]+)+/builder/less/[A-Za-z0-9_-]+_\{\{id\}\}$#D', $file_path))
+		{
+			return '';
+		}
 
 		if ($id)
 		{

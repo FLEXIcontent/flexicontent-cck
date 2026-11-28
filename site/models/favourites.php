@@ -262,6 +262,10 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 			$andaccess .= ' AND  c.access IN (0,'.$aid_list.')';
 			$andaccess .= ' AND  i.access IN (0,'.$aid_list.')';
 			$select_access .= ', 1 AS has_access';
+
+			// Also the ancestors of the main category, as the item view does
+			$closed_cats = $this->_getClosedPathCats($aid_arr);
+			$andaccess .= $closed_cats ? ' AND i.catid NOT IN (' . implode(',', $closed_cats) . ')' : '';
 		}
 
 		// Access Flags for: content type, main category, item
@@ -356,6 +360,45 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 
 
 	/**
+	 * Get the categories having an unpublished category in their path (the category itself or an ancestor),
+	 * or if view levels are given, having a category of a view level other than these in their path.
+	 * The item view does not show the items of such a category
+	 *
+	 * @param   array|null  $aid_arr  The view levels to check the path against, null to check the published state instead
+	 *
+	 * @return  array  The category ids
+	 */
+	function _getClosedPathCats($aid_arr = null)
+	{
+		global $globalcats;
+
+		$closed  = array();
+		$allowed = $aid_arr === null ? null : array_flip($aid_arr);
+
+		foreach ((array) $globalcats as $cat)
+		{
+			foreach ($cat->ancestorsarray as $pcid)
+			{
+				if (!isset($globalcats[$pcid]))
+				{
+					continue;
+				}
+
+				$pcat = $globalcats[$pcid];
+
+				if ($allowed === null ? $pcat->published != 1 : ((int) $pcat->access && !isset($allowed[(int) $pcat->access])))
+				{
+					$closed[] = (int) $cat->id;
+					break;
+				}
+			}
+		}
+
+		return $closed;
+	}
+
+
+	/**
 	 * Build the order clause
 	 *
 	 * @access private
@@ -434,6 +477,10 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
 			$where .= ' AND ( ( i.publish_up is NULL OR i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) ' . $OR_isOwner . ')';   // . $OR_isModifier
 			$where .= ' AND ( ( i.publish_down is NULL OR i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) ' . $OR_isOwner . ')';   // . $OR_isModifier
+
+			// Limit to a published main category that has no unpublished ancestor, as the item view does (same exception for owned items)
+			$closed_cats = $this->_getClosedPathCats();
+			$where .= ' AND ( ( c.published = 1' . ($closed_cats ? ' AND i.catid NOT IN (' . implode(',', $closed_cats) . ')' : '') . ' ) ' . $OR_isOwner . ')';
 		}
 		else
 		{

@@ -1126,6 +1126,15 @@ class _FlexicontentSiteRouter
 		}
 
 		/**
+		 * A login name is resolved to a user id only for authors of published content,
+		 * otherwise the author URLs would tell visitors whether an account with a given login name exists
+		 */
+		if ($tbl === '#__users')
+		{
+			$query->where('EXISTS (SELECT 1 FROM ' . $db->QuoteName('#__content') . ' AS a WHERE a.created_by = i.id AND a.state IN (1, -5))');
+		}
+
+		/**
 		 * Limit to parent category (or parent record), because same record alias may exist in for records in other categories
 		 */
 		if ($parent_id)
@@ -1243,8 +1252,10 @@ class _FlexicontentSiteRouter
 			if ($add_item_sef_segment !== 2)
 			{
 				// User Fix: Enforce strict alias matching when add_item_sef_segment is 0 or 1
+				// Not for the users table: the "alias" of an author segment is a login name, and answering differently
+				// for a right and a wrong name would confirm the login name of any user id. The id alone selects the author
 				$slug = str_replace(':', '-', $segments[$i]);
-				if (strpos($slug, '-') !== false)
+				if ($tbls[0] !== '#__users' && strpos($slug, '-') !== false)
 				{
 					$record_alias_from_url = substr($slug, stripos($slug, '-') + 1);
 					$record_id_from_url    = (int) substr($slug, 0, stripos($slug, '-'));

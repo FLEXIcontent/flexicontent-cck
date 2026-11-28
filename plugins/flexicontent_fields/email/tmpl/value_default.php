@@ -42,9 +42,11 @@ foreach ($values as $value)
 	}
 	else
 	{
+		// Address and link text are stored text: encoded for the attribute and for the HTML text
+		$text_html = htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
 		$html = $mailto_link ?
-			'<a href="mailto:' . $addr . '" target="_blank" itemprop="email">' . $text . '</a>' :
-			$text;
+			'<a href="mailto:' . htmlspecialchars((string) $addr, ENT_QUOTES, 'UTF-8') . '" target="_blank" itemprop="email">' . $text_html . '</a>' :
+			$text_html;
 	}
 
 	// Add prefix / suffix

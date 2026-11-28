@@ -59,9 +59,7 @@ class FlexicontentlinksTagged_items extends \Joomla\CMS\Object\CMSObject {
 
 	public function getList()
 	{
-		$wf = WFEditorPlugin::getInstance();
-
-		if ($wf->checkAccess('links.joomlalinks.content', 1)) {
+		if (WFLinkBrowser_Flexicontentlinks::contentAllowed()) {
 			return '
 			<li id="index.php?option=com_flexicontent_tagged_items&view=category&layout=tags" class="folder fctagged nolink">
 				<div class="uk-tree-row">
@@ -117,12 +115,6 @@ class FlexicontentlinksTagged_items extends \Joomla\CMS\Object\CMSObject {
 
 	private static function route($url)
 	{
-		$wf = WFEditorPlugin::getInstance();
-
-		if ($wf->getParam('links.joomlalinks.sef_url', 0)) {
-			$url = WFLinkExtension::route($url);
-		}
-
-		return $url;
+		return WFLinkBrowser_Flexicontentlinks::route($url);
 	}
 }

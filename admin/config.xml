@@ -2403,6 +2403,7 @@
 			<field name="upload_extensions" type="textarea" rows="2" default="bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics" label="FLEXI_ALLOWED_EXTENSIONS" description="FLEXI_ALLOWED_EXTENSIONS_DESC" class="input-xxlarge" />
 
 			<field name="" type="separator" default="FLEXI_REMOTE_FILES" label="" level="level3" />
+			<field name="remote_site_host" type="text" size="50" default="" label="FLEXI_REMOTE_SITE_HOST" description="FLEXI_REMOTE_SITE_HOST_DESC" filter="string" />
 			<field name="remote_trusted_hosts" type="textarea" rows="3" default="" label="FLEXI_REMOTE_TRUSTED_HOSTS" description="FLEXI_REMOTE_TRUSTED_HOSTS_DESC" class="input-xxlarge" />
 			<field name="remote_probe_size" type="radio" default="0" label="FLEXI_REMOTE_PROBE_SIZE" description="FLEXI_REMOTE_PROBE_SIZE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">JNO</option>

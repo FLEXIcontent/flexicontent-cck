@@ -137,11 +137,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$image_source = (int) $field->parameters->get('image_source', 0);
 		$image_source = $image_source > 1 ? $this->nonImplementedMode($image_source, $field) : $image_source;
 
-		$media_params     = ComponentHelper::getParams('com_media');
-		//$file_path        = $media_params->get('file_path', 'images');
-		$image_path       = $media_params->get('image_path', 'images');
-
-		$jmedia_topdir    = $field->parameters->get('jmedia_topdir', $image_path);
+		$jmedia_topdir    = self::mediaTopDirectory($field);
 		$jmedia_subpath   = $field->parameters->get('jmedia_subpath', '');
 		$jmedia_filetypes = $field->parameters->get('jmedia_filetypes', array('folders', 'images'));
 
@@ -718,7 +714,8 @@ class plgFlexicontent_fieldsImage extends FCField
 					$value = $array ?: array('originalname' => $value);
 				}
 
-				$csv_value = !empty($value['originalname']) ? basename($value['originalname']) : '';
+				unset($value['default_image'], $value['image_path'], $value['image_size']);
+				$csv_value = is_string($value['originalname'] ?? null) ? basename($value['originalname']) : '';
 
 				// Add original image file to the ZIP file of the CSV export (if enabled), this may rename the file
 				if (strlen($csv_value) && $image_source !== -1)
@@ -789,10 +786,15 @@ class plgFlexicontent_fieldsImage extends FCField
 					);
 				}
 
+				if ($image_source !== -1)
+				{
+					unset($value['default_image'], $value['image_path'], $value['image_size']);
+				}
+
 				// Try to check / rebuild thumbnails
 				if (plgFlexicontent_fieldsImage::rebuildThumbs($field, $value, $item))
 				{
-					$usable_values[$index] = $values[$index];
+					$usable_values[$index] = serialize($value);
 				}
 
 				// In case of failed thumbnailing, add empty value if in fieldgroup
@@ -848,7 +850,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				$image_DF['urllink']      = '';
 
 				// Create thumbnails for default image
-				if (plgFlexicontent_fieldsImage::rebuildThumbs($field, $image_DF, $item))
+				if ($this->rebuildThumbs($field, $image_DF, $item, true))
 				{
 					$values = array(serialize($image_DF));
 				}
@@ -1389,8 +1391,13 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		if ($image_source === -2)
 		{
-			$dest_path_media = 'images/';
-			$dest_path_media_full = Path::clean( JPATH_SITE .DS. $dest_path_media );
+			$media_top = self::mediaTopDirectory($field);
+			if ($media_top === '')
+			{
+				throw new \InvalidArgumentException('Invalid configured media directory', 400);
+			}
+			$dest_path_media = $media_top . '/';
+			$dest_path_media_full = Path::clean(JPATH_SITE . DS . $dest_path_media);
 		}
 
 
@@ -1402,6 +1409,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$post = !is_array($post) ? array($post) : $post;
 
 		$new_filenames = array();
+		$stored_filenames = null;  // The names that the field has in the item now, loaded when first needed
 		$newpost = array();
 		$new = 0;
 		foreach ($post as $n => $v)
@@ -1438,20 +1446,38 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 
 
+			// Stored rows must not control the paths used for configured default or core images.
+			unset($v['default_image'], $v['image_path'], $v['image_size']);
+			$original = $v['originalname'] ?? '';
+			$storedMediaThumbnail = false;
+			if (!$is_importcsv && $usemediaurl && is_string($original) && preg_match('~^https?://~i', $original)
+				&& flexicontent_security::safeUrl($original, false) === $original)
+			{
+				$stored_filenames ??= array_flip($this->getStoredFilenames($field, $item));
+				$storedMediaThumbnail = isset($stored_filenames[$original]);
+			}
+			if (!$storedMediaThumbnail && $original !== '' && !self::isSafeImagePath($original, $is_importcsv && $import_media_folder ? true : ($image_source === -2 ? $dest_path_media : false)))
+			{
+				throw new \InvalidArgumentException('Invalid original image path', 400);
+			}
+
 			// Handle copying original files from a server folder during CSV import
 			// (the item form has no file input for this field: its uploader sends the files in requests of their own)
 			if ($is_importcsv && $import_media_folder )
 			{
-				$filename = basename($v['originalname']);
-				$sub_folder = dirname($v['originalname']);
+				$filename = basename($original);
+				$sub_folder = dirname($original);
 				$sub_folder = $sub_folder && $sub_folder!='.' ? DS.$sub_folder : '';
 
 				if ($image_source >= 1)
 				{
-					$src_file_path  = Path::clean( $srcpath_original . $v['originalname'] );
+					$src_file_path = realpath($srcpath_original . $original);
+					$import_root = realpath($srcpath_original);
 					$dest_file_path = Path::clean( $dest_path_original . $filename );
 					$result = false;
-					if ( file_exists($src_file_path) )
+					if ($src_file_path && $import_root
+						&& flexicontent_security::isContainedPath($src_file_path, $import_root)
+						&& self::isRasterImage($filename) && is_file($src_file_path) && @getimagesize($src_file_path))
 					{
 						$result = File::copy( $src_file_path,  $dest_file_path );
 						if ( $result && Path::canChmod($dest_file_path) )
@@ -1470,10 +1496,13 @@ class plgFlexicontent_fieldsImage extends FCField
 
 				elseif ($image_source == -2)
 				{
-					$src_file_path  = Path::clean( $srcpath_original . $v['originalname'] );
+					$src_file_path = realpath($srcpath_original . $original);
+					$import_root = realpath($srcpath_original);
 					$dest_file_path = Path::clean( $dest_path_media_full . $filename );
 					$result = false;
-					if ( file_exists($src_file_path) )
+					if ($src_file_path && $import_root
+						&& flexicontent_security::isContainedPath($src_file_path, $import_root)
+						&& self::isRasterImage($filename) && is_file($src_file_path) && @getimagesize($src_file_path))
 					{
 						$result = File::copy( $src_file_path,  $dest_file_path );
 						if ( $result && Path::canChmod($dest_file_path) )
@@ -1530,6 +1559,10 @@ class plgFlexicontent_fieldsImage extends FCField
 				// Handle replacing image with a new existing image
 				if ( $v['existingname'] )
 				{
+					if (!is_string($v['existingname']))
+					{
+						throw new \InvalidArgumentException('Invalid existing image path', 400);
+					}
 					// Handle value containing more than just the filepath
 					if ($image_source == -2)
 					{
@@ -1552,12 +1585,52 @@ class plgFlexicontent_fieldsImage extends FCField
 			{
 				if ($v)
 				{
+					// A replacement must pass the normal file checks even if it replaces a stored external thumbnail.
+					$keepMediaThumbnail = $storedMediaThumbnail && $v['originalname'] === $original;
+					if (!$keepMediaThumbnail && $v['originalname'] !== '' && !self::isSafeImagePath($v['originalname'], $image_source === -2 ? $dest_path_media : false))
+					{
+						throw new \InvalidArgumentException('Invalid image path', 400);
+					}
+					if (!$keepMediaThumbnail && $image_source === -2 && !self::resolveMediaImage($v['originalname'], $media_top))
+					{
+						throw new \InvalidArgumentException('Image is outside the configured media directory or no longer exists', 400);
+					}
+
+					/**
+					 * DB-mode: a name that is not already a value of this field in this item must be an image of the file manager
+					 * that the user may use here, see canAssignImageToField(). A name alone would give thumbnails of any image of the folder.
+					 * (An import is done by users who manage imports, it takes the names as they are)
+					 */
+					if ($image_source === 0 && !$is_importcsv)
+					{
+						$v['originalname'] = (string) $v['originalname'];
+
+						if ($stored_filenames === null)
+						{
+							$stored_filenames = array_flip($this->getStoredFilenames($field, $item));
+						}
+
+						if (!isset($stored_filenames[$v['originalname']]) && !flexicontent_security::canAssignImageToField($field, $v['originalname']))
+						{
+							$app->enqueueMessage('Field: ' . $field->label . ' : ' . htmlspecialchars($v['originalname'], ENT_QUOTES, 'UTF-8') . ' is not an image that you can select for this field', 'warning');
+
+							// Skip the value, but allow empty (null) placeholder value if in fieldgroup
+							if ($use_ingroup) $newpost[$new++] = null;
+							continue;
+						}
+					}
+
 					$new_filenames[$v['originalname']] = 1;
 
 					// Validate other value properties (a CSV import value has only the properties that it gives)
 					$v += array('urllink' => '', 'mediaurl' => '', 'alt' => '', 'title' => '', 'desc' => '', 'cust1' => '', 'cust2' => '');
-					$v['urllink'] = $linkto_url ? flexicontent_html::dataFilter($v['urllink'], 4000, 'URL', 0) : null;
-					$v['mediaurl'] = $usemediaurl ? flexicontent_html::dataFilter($v['mediaurl'], 4000, 'URL', 0) : null;
+
+					// Store only the known value properties. Thumbnail sizes are measured on display, never taken from the request.
+					$v = array_intersect_key($v, array_flip(array('originalname', 'existingname', 'urllink', 'mediaurl', 'alt', 'title', 'desc', 'cust1', 'cust2')));
+
+					// Links may only be http(s) URLs or site-relative references.
+					$v['urllink'] = $linkto_url ? self::safeLinkUrl(flexicontent_html::dataFilter($v['urllink'], 4000, 'URL', 0)) : null;
+					$v['mediaurl'] = $usemediaurl ? self::safeLinkUrl(flexicontent_html::dataFilter($v['mediaurl'], 4000, 'URL', 0)) : null;
 					if ($usemediaurl === 1 && strpos($v['mediaurl'], 'youtube') === false && strpos($v['mediaurl'], 'vimeo') === false)
 					{
 						$v['mediaurl'] = '';
@@ -1587,35 +1660,14 @@ class plgFlexicontent_fieldsImage extends FCField
 		// Remove no longer used files, if limiting existing image list to current field, or if existing image list is hidden/disabled
 		if ($image_source === 0 && ($field->parameters->get('auto_delete_unused', 1) || !$field->parameters->get('list_all_media_files', 0)))
 		{
-			// Get existing field values,
-			if (!isset($item->fieldvalues))
+			// The files that the item no longer names are checked and removed after the values are stored, see onAfterSaveField()
+			foreach ($stored_filenames !== null ? array_keys($stored_filenames) : $this->getStoredFilenames($field, $item) as $filename)
 			{
-				$_fieldvalues = FlexicontentFields::getFieldValsById(null, array($item->id));
-				$item->fieldvalues = isset($_fieldvalues[$item->id])
-					? $_fieldvalues[$item->id]
-					: array();
-			}
-			$db_values = !empty($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
-			//echo "<pre>"; print_r($new_filenames); print_r($db_values);
+				$filename = (string) $filename;
 
-			// Remove unused files
-			foreach($db_values as $i => $v)
-			{
-				$array = $this->unserialize_array($v, $force_array=false, $force_value=false);
-				$v = $array ?: array(
-					'originalname' => $v
-				);
-
-				$filename = isset($v['originalname']) ? $v['originalname'] : false;
-				if ($filename && !isset($new_filenames[$filename]))
+				if (!isset($new_filenames[$filename]) && !preg_match('~^https?://~i', $filename))
 				{
-					// Check if value is in use
-					$canDeleteImage = $this->canDeleteImage($field, $filename, $item);
-					if ($canDeleteImage)
-					{
-						$this->removeOriginalFile($field, $filename);
-						//$app->enqueueMessage('Field: ' . $field->label . ' ['.$n.'] : ' . 'Deleted image file: ' . $filename . ' from server storage');
-					}
+					$field->delete_filenames[] = $filename;
 				}
 			}
 		}
@@ -1635,6 +1687,22 @@ class plgFlexicontent_fieldsImage extends FCField
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	public function onAfterSaveField( &$field, &$post, &$file, &$item )
 	{
+		/**
+		 * DB-mode: remove the files that the item no longer names (see onBeforeSaveField). This is done here, after the values
+		 * of the item are stored: a save that was aborted removes nothing, and an image that the item still uses
+		 * (other field, version that was not approved) counts as used
+		 */
+		$filenames = !empty($field->delete_filenames) ? array_unique($field->delete_filenames) : array();
+		unset($field->delete_filenames);
+
+		foreach ($filenames as $filename)
+		{
+			if ($this->canDeleteImage($field, $filename, $item))
+			{
+				$this->removeOriginalFile($field, $filename);
+			}
+		}
+
 		if ( empty($post) ) return;
 
 		$app    = Factory::getApplication();
@@ -2180,6 +2248,18 @@ class plgFlexicontent_fieldsImage extends FCField
 		// DB-mode
 		elseif ($image_source === 0)
 		{
+			// Only a file of the file manager is removed: without a record of this name in the folder of the field, nothing is touched
+			$file_ids = array();
+			foreach ($this->getImageFileRecords($field, $filename) as $file_record)
+			{
+				$file_ids[] = (int) $file_record->id;
+			}
+
+			if (!$file_ids)
+			{
+				return false;
+			}
+
 			$thumbfolder = Path::clean( JPATH_SITE .DS. $field->parameters->get('dir') );
 			$origfolder  = Path::clean( ($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) );
 		}
@@ -2221,10 +2301,10 @@ class plgFlexicontent_fieldsImage extends FCField
 			$app->enqueueMessage('Field: ' . $field->label . ' : ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_UNABLE_TO_DELETE_FILE') . ': ' . $src_path, 'warning');
 		}
 
-		// For DB-mode, also delete file from database
+		// For DB-mode, also delete file from database: the records found above (same name, same folder), not every record of that name
 		if ($image_source === 0)
 		{
-			$query = 'DELETE FROM #__flexicontent_files  WHERE ' . $db->quoteName('filename') . ' = ' . $db->Quote($filename);
+			$query = 'DELETE FROM #__flexicontent_files  WHERE ' . $db->quoteName('id') . ' IN (' . implode(',', $file_ids) . ')';
 			$db->setQuery($query)->execute();
 		}
 
@@ -2237,7 +2317,84 @@ class plgFlexicontent_fieldsImage extends FCField
 	 * Smart image thumbnail size check and rebuilding
 	 */
 
-	function rebuildThumbs(&$field, &$value, &$item)
+	private static function mediaTopDirectory($field)
+	{
+		$directory = trim((string) $field->parameters->get('jmedia_topdir', ''));
+		if ($directory === '')
+		{
+			$directory = (string) ComponentHelper::getParams('com_media')->get('image_path', 'images');
+		}
+
+		$directory = rtrim($directory, '/');
+		return self::isSafeImagePath($directory, true) ? $directory : '';
+	}
+
+	private static function resolveMediaImage($path, $directory)
+	{
+		if ($directory === '' || !self::isSafeImagePath($path, $directory . '/')) return false;
+
+		$root = realpath(JPATH_SITE . '/' . urldecode($directory));
+		$file = realpath(JPATH_SITE . '/' . urldecode($path));
+		return $root && $file && is_file($file) && flexicontent_security::isContainedPath($file, $root) ? $file : false;
+	}
+
+	private static function isSafeImagePath($path, $subdirectories = false)
+	{
+		if (is_int($path)) $path = (string) $path; // Legacy CSV file IDs.
+		if (!is_string($path) || $path === '') return false;
+
+		foreach (array($path, urldecode($path)) as $candidate)
+		{
+			if (preg_match('/[\x00-\x1f\x7f\\\\:<>|?*"]/', $candidate)) return false;
+			if (!$subdirectories && strpos($candidate, '/') !== false) return false;
+			if (is_string($subdirectories) && strpos($candidate, $subdirectories) !== 0) return false;
+			foreach (explode('/', $candidate) as $part)
+			{
+				if ($part === '' || $part[0] === '.' || rtrim($part, ' .') !== $part) return false;
+			}
+		}
+
+		// Encoded separators in a filename must never become filesystem separators.
+		return substr_count($path, '/') === substr_count(urldecode($path), '/');
+	}
+
+
+	/**
+	 * Return a link value only if it is an http(s) URL or a site-relative reference, otherwise an empty string.
+	 *
+	 * Used when saving and again when displaying, so that values stored before the save-side check are covered too.
+	 * HTML character references are decoded until none remain, so the returned text cannot turn into another URL
+	 * when a browser decodes an attribute. Callers must still escape the value for the context they print it in.
+	 */
+	public static function safeLinkUrl($url)
+	{
+		if (!is_string($url)) return '';
+
+		for ($i = 0; $i < 5; $i++)
+		{
+			$decoded = html_entity_decode($url, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+			if ($decoded === $url) break;
+			$url = $decoded;
+		}
+		if (html_entity_decode($url, ENT_QUOTES | ENT_HTML5, 'UTF-8') !== $url) return '';
+
+		$url = trim(preg_replace('/[\x00-\x1F\x7F]+/', '', $url));
+		$url = str_replace(array(' ', '"', "'", '<', '>', '`'), array('%20', '%22', '%27', '%3C', '%3E', '%60'), $url);
+
+		return flexicontent_security::safeUrl($url);
+	}
+
+
+	private static function isRasterImage($filename)
+	{
+		$ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+		return in_array($ext, array('jpg', 'jpeg', 'jpe', 'jfif', 'png', 'gif', 'bmp', 'wbmp',
+			'ico', 'webp', 'avif', 'tif', 'tiff', 'j2k', 'jp2'), true)
+			&& !preg_match('/\.(?:php[a-z0-9]*|phtml|phar|pht|cgi|pl|asp[a-z]*)(?:\.|$)/i', $filename);
+	}
+
+
+	function rebuildThumbs(&$field, &$value, &$item, $useDefaultImage = false)
 	{
 		static $images_processed = array();
 
@@ -2257,8 +2414,11 @@ class plgFlexicontent_fieldsImage extends FCField
 			);
 		}
 
+		// Only the display code can opt in to a configured default image.
+		if (!$useDefaultImage) unset($value['default_image']);
+
 		// Check for empty filename
-		$value['originalname'] = isset($value['originalname']) ? trim($value['originalname']) : '';
+		$value['originalname'] = is_string($value['originalname'] ?? null) ? trim($value['originalname']) : '';
 
 		if (!$value['originalname'])
 		{
@@ -2268,14 +2428,17 @@ class plgFlexicontent_fieldsImage extends FCField
 		// Do not thumbnail URLs (we only check for absolute URLs)
 		if (preg_match("#^(?:[a-z]+:)?//#", $value['originalname']))
 		{
-			return true;
+			return flexicontent_security::safeUrl($value['originalname']) !== '';
 		}
 
 		$filename = urldecode(basename($value['originalname']));
+		if (!self::isRasterImage($filename)) return false;
 
 
 		// Extra thumbnails sub-folder
 		list($file_path, $src_path, $dest_path, $field_index, $extra_prefix) = $this->getThumbPaths($field, $item, $value);
+
+		if ($file_path === '') return false;
 
 		// Return cached data, avoiding rechecking/recreating image thumbnails multiple times
 		if (isset($images_processed[$field_index][$file_path]))
@@ -2284,7 +2447,8 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 		// Check for original file have been deleted or is not being a file
-		if (!file_exists($file_path) || !is_file($file_path))
+		$filesize = is_file($file_path) ? @getimagesize($file_path) : false;
+		if (!$filesize)
 		{
 			return ($images_processed[$field_index][$file_path] = false);
 		}
@@ -2304,7 +2468,6 @@ class plgFlexicontent_fieldsImage extends FCField
 		 * Check dimension of thumbs and rebuild as needed
 		 */
 
-		$filesize	= getimagesize($file_path);
 		$origsize_h = $filesize[1];
 		$origsize_w = $filesize[0];
 
@@ -2416,20 +2579,89 @@ class plgFlexicontent_fieldsImage extends FCField
 
 	function canDeleteImage( &$field, $record, &$item )
 	{
-		// Retrieve available (and appropriate) images from the DB
-		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-		$query = 'SELECT id'
-			. ' FROM #__flexicontent_files'
-			. ' WHERE filename='. $db->Quote($record)
+		$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		// Without a file record there is nothing that this field may delete
+		$files = $this->getImageFileRecords($field, $record);
+		if (!$files)  return false;
+
+		// The right of the file manager: delete any file, or delete own files for the uploader
+		$file_ids = array();
+		foreach ($files as $file)
+		{
+			if (!flexicontent_security::canDeleteFileRecord($file))  return false;
+			$file_ids[] = (int) $file->id;
+		}
+
+		// A value that is the file name alone (not serialized) is a use too, the usage check below does not see it
+		$query = 'SELECT rel.value'
+			. ' FROM #__flexicontent_fields_item_relations AS rel'
+			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $db->Quote('image')
+			. ' WHERE rel.value = ' . $db->Quote($record)
 		;
-		$db->setQuery($query);
-		$file_id = $db->loadResult();
-		if (!$file_id)  return true;
+		if (in_array($record, (array) $db->setQuery($query)->loadColumn(), true))  return false;
 
-		$ignored = array($item->id);
-
+		// No item is left out of the usage check: the item was saved, so what it still uses is counted too
 		$fm = new FlexicontentModelFilemanager();
-		return $fm->candelete( array($file_id), $ignored );
+		return $fm->candelete( $file_ids );
+	}
+
+
+	/**
+	 * The file manager records of an image of a field in DB-mode: same name and same folder (secure or media) as the field uses.
+	 * The database compares names without regard to case, the file system may not, so only the exact name is returned
+	 */
+	protected function getImageFileRecords($field, $filename)
+	{
+		$filename = (string) $filename;
+		$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$query = 'SELECT id, filename, uploaded_by'
+			. ' FROM #__flexicontent_files'
+			. ' WHERE filename = ' . $db->Quote($filename)
+			. '  AND secure = ' . ((int) $field->parameters->get('target_dir', 1) ? 1 : 0)
+			. '  AND url = 0'
+		;
+		$files = array();
+		foreach ((array) $db->setQuery($query)->loadObjectList() as $file)
+		{
+			if ($file->filename === $filename)  $files[] = $file;
+		}
+
+		return $files;
+	}
+
+
+	/**
+	 * The original file names that the values of the field have in the item now (database, not the posted form)
+	 */
+	protected function getStoredFilenames($field, $item)
+	{
+		if (empty($item->id))  return array();
+
+		if (!isset($item->fieldvalues))
+		{
+			$_fieldvalues = FlexicontentFields::getFieldValsById(null, array($item->id));
+			$item->fieldvalues = isset($_fieldvalues[$item->id])
+				? $_fieldvalues[$item->id]
+				: array();
+		}
+		$db_values = !empty($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
+
+		$filenames = array();
+		foreach ($db_values as $v)
+		{
+			$array = $this->unserialize_array($v, $force_array=false, $force_value=false);
+			$v = $array ?: array(
+				'originalname' => $v
+			);
+
+			if (isset($v['originalname']) && is_scalar($v['originalname']) && (string) $v['originalname'] !== '')
+			{
+				$filenames[] = (string) $v['originalname'];
+			}
+		}
+
+		return $filenames;
 	}
 
 
@@ -2605,6 +2837,19 @@ class plgFlexicontent_fieldsImage extends FCField
 		$of_usage = $field->untranslatable ? 1 : $field->parameters->get('of_usage', 0);
 		$u_item_id = ($of_usage && $item->lang_parent_id && $item->lang_parent_id != $item->id)  ?  $item->lang_parent_id  :  $item->id;
 
+		$special_path = $value['default_image'] ?? ($image_source === -1 ? ($value['image_path'] ?? '') : '');
+		$media_manager = $image_source === -2 && $special_path === '';
+		$original = $value['originalname'] ?? '';
+		$media_top = $media_manager ? self::mediaTopDirectory($field) : '';
+		if ($media_manager ? !self::resolveMediaImage($original, $media_top) : !self::isSafeImagePath($original))
+		{
+			return array('', '', '', '', '');
+		}
+		if (($special_path !== '' || $image_source === -1) && !self::isSafeImagePath($special_path, true))
+		{
+			return array('', '', '', '', '');
+		}
+
 		// Extract sub-folder pathfrom the (filepath) value (if it exists)
 		$subpath  = dirname($value['originalname']);
 		$subpath  = $subpath !== '.' ? $subpath . DS  : '';
@@ -2692,6 +2937,19 @@ class plgFlexicontent_fieldsImage extends FCField
 		$src_path = urldecode($src_path);
 		$dest_path = urldecode($dest_path);
 
+		if (!$rel)
+		{
+			$base = $media_manager ? JPATH_SITE . '/' . urldecode($media_top) : ($special_path !== '' ? JPATH_SITE : $src_path);
+			$resolved = realpath($file_path);
+			$base = realpath($base);
+			if (is_link(rtrim($dest_path, '/\\'))
+				|| ($image_source >= 1 && $special_path === '' && is_link(rtrim($src_path, '/\\')))
+				|| ($resolved && (!$base || !flexicontent_security::isContainedPath($resolved, $base))))
+			{
+				return array('', '', '', '', '');
+			}
+		}
+
 		// echo 'file_path: ' . $file_path ."<br/>" . 'dest_path: ' . $dest_path ."<br/><br/>";
 
 		return array($file_path, $src_path, $dest_path, $field_index, $extra_prefix);
@@ -2708,13 +2966,21 @@ class plgFlexicontent_fieldsImage extends FCField
 		$image_source = (int) $field->parameters->get('image_source', 0);
 		$image_source = $image_source > 1 ? $this->nonImplementedMode($image_source, $field) : $image_source;
 
-		if ($image_source < 1  ||  !file_exists($src_path))
+		if ($image_source < 1) return;
+
+		$field_root = realpath(JPATH_SITE . DS . $field->parameters->get('dir'));
+		$original_folder = realpath($src_path);
+		if (!$field_root || !$original_folder || !is_dir($original_folder)
+			|| basename($original_folder) !== 'original'
+			|| !flexicontent_security::isContainedPath($original_folder, $field_root))
 		{
 			return;
 		}
 
+		$htaccess_file = $original_folder . DS . '.htaccess';
+		if (is_link($htaccess_file)) return;
+
 		$protect_original = $field->parameters->get('protect_original', 1);
-		$htaccess_file = Path::clean( $src_path . '.htaccess' );
 		$file_contents = $protect_original
 			?
 			'# do not allow direct access and also deny scripts'."\n".

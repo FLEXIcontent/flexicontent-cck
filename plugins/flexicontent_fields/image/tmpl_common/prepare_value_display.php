@@ -6,7 +6,22 @@
 		'originalname' => $value
 	);
 
-	$image_subpath = $value['originalname'] = isset($value['originalname']) ? trim($value['originalname']) : '';
+	$image_subpath = $value['originalname'] = isset($value['originalname']) && is_string($value['originalname']) ? trim($value['originalname']) : '';
+
+	// The image name becomes part of URLs that every layout prints in HTML attributes: refuse markup and control characters
+	if (preg_match('/["<>`\x00-\x1F\x7F]/', $image_subpath))
+	{
+		$image_subpath = $value['originalname'] = '';
+	}
+
+	// Links of the value may only be http(s) URLs or site-relative references (also covers values stored before the save-side check)
+	foreach (array('urllink', 'mediaurl') as $_link_prop)
+	{
+		if (isset($value[$_link_prop]))
+		{
+			$value[$_link_prop] = self::safeLinkUrl($value[$_link_prop]);
+		}
+	}
 
 	// Check if image file is a URL (e.g. we are using Media URLs to videos)
 	$isURL = preg_match("#^(?:[a-z]+:)?//#", $image_subpath);
@@ -211,6 +226,7 @@
 				case 4: $ogp_src =  $isURL ? $srco : \Joomla\CMS\Uri\Uri::root().$srco; break;
 				default: $ogp_src = $isURL ? $srcm : \Joomla\CMS\Uri\Uri::root().$srcm; break;
 			}
+			$ogp_src = htmlspecialchars($ogp_src, ENT_QUOTES, 'UTF-8');
 			$document->addCustomTag('<link rel="image_src" href="'.$ogp_src.'" />');
 			$document->addCustomTag('<meta property="og:image" content="'.$ogp_src.'" />');
 		}
@@ -242,15 +258,18 @@
 
 	if ($size !== 'o')
 	{
-		$w = isset($value['size_w_' . $size]) ? $value['size_w_' . $size] : $field->parameters->get('w_' . $size, self::$default_widths[$size]);
-		$h = isset($value['size_h_' . $size]) ? $value['size_h_' . $size] : $field->parameters->get('h_' . $size, self::$default_heights[$size]);
+		// Sizes are printed in HTML attributes by this file and by the gallery layouts: integers only
+		$_int_size = static function ($v) { return is_scalar($v) ? (int) $v : 0; };
 
-		$size_w_s = isset($value['size_w_s']) ? $value['size_w_s'] : 0;
-		$size_h_s = isset($value['size_h_s']) ? $value['size_h_s'] : 0;
-		$size_w_m = isset($value['size_w_m']) ? $value['size_w_m'] : 0;
-		$size_h_m = isset($value['size_h_m']) ? $value['size_h_m'] : 0;
-		$size_w_l = isset($value['size_w_l']) ? $value['size_w_l'] : 0;
-		$size_h_l = isset($value['size_h_l']) ? $value['size_h_l'] : 0;
+		$w = $_int_size(isset($value['size_w_' . $size]) ? $value['size_w_' . $size] : $field->parameters->get('w_' . $size, self::$default_widths[$size]));
+		$h = $_int_size(isset($value['size_h_' . $size]) ? $value['size_h_' . $size] : $field->parameters->get('h_' . $size, self::$default_heights[$size]));
+
+		$size_w_s = $_int_size($value['size_w_s'] ?? 0);
+		$size_h_s = $_int_size($value['size_h_s'] ?? 0);
+		$size_w_m = $_int_size($value['size_w_m'] ?? 0);
+		$size_h_m = $_int_size($value['size_h_m'] ?? 0);
+		$size_w_l = $_int_size($value['size_w_l'] ?? 0);
+		$size_h_l = $_int_size($value['size_h_l'] ?? 0);
 
 		// Inform about smaller image sizes than the current selected
 		$srcset = array();
@@ -261,7 +280,7 @@
 			if ($srcl)
 			{
 				$minmax_prefix  = ! (int) $field->parameters->get( 'l_thumb_width_as_min_or_max', 0) ? 'min' : 'max';
-				$w_l = $size_w_l ?: $field->parameters->get('w_l', self::$default_widths['l']);
+				$w_l = $size_w_l ?: (int) $field->parameters->get('w_l', self::$default_widths['l']);
 				$srcset[] = (!$isURL ? \Joomla\CMS\Uri\Uri::root(true).'/' : '') . str_replace(' ', '%20', $srcl) . ' ' . $w_l . 'w';
 				$_sizes[] = '(' . $minmax_prefix . '-width: ' . $w_l . 'px) ' . $w_l . 'px';
 			}
@@ -272,14 +291,14 @@
 			if ($srcm)
 			{
 				$minmax_prefix  = ! (int) $field->parameters->get( 'm_thumb_width_as_min_or_max', 0) ? 'min' : 'max';
-				$w_m = $size_w_m ?: $field->parameters->get('w_m', self::$default_widths['m']);
+				$w_m = $size_w_m ?: (int) $field->parameters->get('w_m', self::$default_widths['m']);
 				$srcset[] = (!$isURL ? \Joomla\CMS\Uri\Uri::root(true).'/' : '') . str_replace(' ', '%20', $srcm) . ' ' . $w_m . 'w';
 				$_sizes[] = '(' . $minmax_prefix . '-width: ' . $w_m . 'px) ' . $w_m . 'px';
 			}
 			if ($srcs)
 			{
 				$minmax_prefix  = ! (int) $field->parameters->get( 's_thumb_width_as_min_or_max', 0) ? 'min' : 'max';
-				$w_s = $size_w_s ?: $field->parameters->get('w_s', self::$default_widths['s']);
+				$w_s = $size_w_s ?: (int) $field->parameters->get('w_s', self::$default_widths['s']);
 				$srcset[] = (!$isURL ? \Joomla\CMS\Uri\Uri::root(true).'/' : '') . str_replace(' ', '%20', $srcs) . ' ' . $w_s . 'w';
 				$_sizes[] = '(' . $minmax_prefix . '-width: ' . $w_s . 'px) ' . $w_s . 'px';
 			}
@@ -287,8 +306,8 @@
 
 		if (count($srcset))
 		{
-			$img_size_attrs .= ' srcset="' . implode(', ', $srcset) . '"';
-			$img_size_attrs .= ' sizes="' . implode(', ', $_sizes) . '"';
+			$img_size_attrs .= ' srcset="' . htmlspecialchars(implode(', ', $srcset), ENT_QUOTES, 'UTF-8') . '"';
+			$img_size_attrs .= ' sizes="' . htmlspecialchars(implode(', ', $_sizes), ENT_QUOTES, 'UTF-8') . '"';
 		}
 
 		// --- WebP srcset : dérivé de $srcset, filtré selon les .webp existants sur disque ---
@@ -321,10 +340,12 @@
 	if (!function_exists('fc_img_make_picture')) {
 		// $webp_exists : booléen précalculé en amont via file_exists sur chemin relatif pur
 		function fc_img_make_picture($abs_src_webp, $abs_src, $alt, $legend, $class, $img_size_attrs, $lazy_loading, $srcset_webp_str = '', $sizes_str = '', $webp_exists = false) {
+			// Every source is escaped for the attribute it is printed in
+			$abs_src = htmlspecialchars((string) $abs_src, ENT_QUOTES, 'UTF-8');
 			if ($webp_exists && $abs_src_webp) {
 				// Construire les attributs srcset/sizes du <source> WebP
-				$source_srcset = $srcset_webp_str ?: $abs_src_webp;
-				$source_sizes  = $sizes_str ? ' sizes="' . $sizes_str . '"' : '';
+				$source_srcset = htmlspecialchars((string) ($srcset_webp_str ?: $abs_src_webp), ENT_QUOTES, 'UTF-8');
+				$source_sizes  = $sizes_str ? ' sizes="' . htmlspecialchars((string) $sizes_str, ENT_QUOTES, 'UTF-8') . '"' : '';
 				return '<picture>'
 					. '<source srcset="' . $source_srcset . '"' . $source_sizes . ' type="image/webp">'
 					. '<img src="' . $abs_src . '" alt="' . $alt . '"' . $legend . ' class="' . $class . '" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>'
@@ -339,8 +360,8 @@
 		case 'display_backend':
 		case 'display_backend_thumb':
 			// Pas de WebP pour le backend (taille 'b' non gérée)
-			$img_legend   = '<img src="'.$abs_srcb.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
-			$img_nolegend = '<img src="'.$abs_srcb.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
+			$img_legend   = '<img src="'.htmlspecialchars($abs_srcb, ENT_QUOTES, 'UTF-8').'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
+			$img_nolegend = '<img src="'.htmlspecialchars($abs_srcb, ENT_QUOTES, 'UTF-8').'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
 			break;
 
 		case 'display_small':
@@ -364,8 +385,8 @@
 		case 'display_original':
 		case 'display_original_thumb':
 			// Pas de WebP pour l'original
-			$img_legend   = '<img src="'.$abs_srco.'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
-			$img_nolegend = '<img src="'.$abs_srco.'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
+			$img_legend   = '<img src="'.htmlspecialchars($abs_srco, ENT_QUOTES, 'UTF-8').'" alt="'.$alt_encoded.'"'.$legend.' class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
+			$img_nolegend = '<img src="'.htmlspecialchars($abs_srco, ENT_QUOTES, 'UTF-8').'" alt="'.$alt_encoded.'" class="'.$class.'" itemprop="image" ' . $img_size_attrs . $lazy_loading . '/>';
 			break;
 
 		case 'display':
@@ -421,8 +442,8 @@
 			$inline_info = '
 			<div class="fc_img_tooltip_data alert alert-info" style="' . $style . '">
 
-			' . ($showtitle && $title ? '<div class="fc_img_tooltip_title" style="line-height:1em; font-weight:bold;">'.$title.'</div>' : '') . '
-			' . ($showdesc && $desc ? '<div class="fc_img_tooltip_desc" style="line-height:1em;">'.$desc.'</div>' : '') . '
+			' . ($showtitle && $title ? '<div class="fc_img_tooltip_title" style="line-height:1em; font-weight:bold;">'.htmlspecialchars((string) $title, ENT_QUOTES, 'UTF-8').'</div>' : '') . '
+			' . ($showdesc && $desc ? '<div class="fc_img_tooltip_desc" style="line-height:1em;">'.htmlspecialchars((string) $desc, ENT_QUOTES, 'UTF-8').'</div>' : '') . '
 
 			</div>';
 		}

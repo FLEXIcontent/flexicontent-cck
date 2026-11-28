@@ -403,6 +403,13 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		$fields_text = array_filter($fields_text, $can_view_field);
 		$filters = array_filter($filters, $can_view_field);
 
+		// The merged basic index of an item has the text of all its fields. For a user that may not view one of the text-searchable
+		// fields, use the basic index that has a row per field, so that only the fields that the user may view are matched and shown
+		$basic_by_field = !$txtmode && $db->setQuery('SELECT 1 FROM #__flexicontent_fields'
+			. ' WHERE published = 1 AND issearch IN (1,2)'
+			. ' AND access NOT IN (0' . (count($field_view_levels) ? ',' . implode(',', $field_view_levels) : '') . ')'
+			. ' LIMIT 1')->loadResult();
+
 		/**
 		 * Load Plugin parameters
 		 */
@@ -445,7 +452,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		// ***
 
 		$select_relevance = array();
-		$text_search = $this->_buildTextSearch($text, $phrase, $txtmode, $select_relevance);
+		$text_search = $this->_buildTextSearch($text, $phrase, $txtmode, $select_relevance, $basic_by_field);
 
 		// Priority of the content types (type parameter 'search_priority'), it is the first sort criterion
 		$type_priority_cases = array();
@@ -726,24 +733,31 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		// ***
 
 		// JOIN clause - USED - to limit returned 'text' to the text of TEXT-SEARCHABLE only fields ... (NOT shared with filters)
-		if ( !$txtmode )
+		if ( !$txtmode && !$basic_by_field )
 		{
 			$onBasic_textsearch    = $text_search;
 			$onAdvanced_textsearch = '';
 			$join_textsearch = '';
 			$join_textfields = '';
+			$join_textdata   = '';
 		}
 
 		else
 		{
 			$onBasic_textsearch    = '';
 			$onAdvanced_textsearch = $text_search;
-			$join_textsearch = ' JOIN #__flexicontent_advsearch_index as ts ON ts.item_id = i.id AND ts.field_id IN ('
-				. (count($fields_text) ? implode(',', array_keys($fields_text)) : '0') . ')';
+			$join_textsearch = $txtmode
+				? ' JOIN #__flexicontent_advsearch_index as ts ON ts.item_id = i.id AND ts.field_id IN ('
+					. (count($fields_text) ? implode(',', array_keys($fields_text)) : '0') . ')'
+				: ' JOIN #__flexicontent_basicsearch_index as ts ON ts.item_id = i.id';
 			// Apply this to both the matching query and the result-text query.
 			$join_textfields = ' JOIN #__flexicontent_fields as txtf ON txtf.id=ts.field_id'
-				. ' AND txtf.published = 1 AND txtf.isadvsearch IN (1,2)'
+				. ' AND txtf.published = 1 AND txtf.' . ($txtmode ? 'isadvsearch' : 'issearch') . ' IN (1,2)'
 				. ' AND txtf.access IN (0' . (count($field_view_levels) ? ',' . implode(',', $field_view_levels) : '') . ')';
+			// Basic index: an item found only via filters is also listed when it has no text that the user may view
+			$join_textdata = $txtmode
+				? $join_textsearch . $join_textfields
+				: ' LEFT JOIN (#__flexicontent_basicsearch_index as ts' . $join_textfields . ') ON ts.item_id = i.id';
 		}
 
 		// JOIN clauses ... (shared with filters)
@@ -886,9 +900,9 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 
 		$query_data = 'SELECT i.id, i.title AS title, i.created, i.id AS fc_item_id, i.access, ie.type_id, i.language'
 			. ', c.title AS maincat_title, c.alias AS maincat_alias'  // Main category data
-			. ( !$txtmode ?
+			. ( !$txtmode && !$basic_by_field ?
 				', ie.search_index AS text' :
-				', GROUP_CONCAT(ts.search_index ORDER BY txtf.ordering ASC SEPARATOR \' \') AS text'
+				', COALESCE(GROUP_CONCAT(ts.search_index ORDER BY txtf.ordering ASC SEPARATOR \' \'), \'\') AS text'
 				)
 			. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
 			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
@@ -896,8 +910,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 			. $select_access
 			. ' FROM #__flexicontent_items_tmp AS i'
 			. $join_clauses     // without on-join for basic text search
-			. $join_textsearch  // without on-join for advanced text search
-			. $join_textfields  // we need the text searchable fields to do ordering of text search fields above (minor effect)
+			. $join_textdata    // without on-join for advanced text search, with the text searchable fields: their access and the ordering of their texts above
 			//. $orderby_join
 			//. $joinaccess
 			. ' WHERE i.id IN ('.implode(',',$item_ids).') '
@@ -954,7 +967,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 	 * @access private
 	 * @return array
 	 */
-	function _buildTextSearch($text = null, $phrase = null, $txtmode = 0, & $select_relevance = array())
+	function _buildTextSearch($text = null, $phrase = null, $txtmode = 0, & $select_relevance = array(), $basic_by_field = false)
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$option = $app->input->getCmd('option', '');
@@ -1030,7 +1043,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		}
 
 		$si_tbl = !$txtmode
-			? 'flexicontent_items_ext'
+			? ($basic_by_field ? 'flexicontent_basicsearch_index' : 'flexicontent_items_ext')
 			: 'flexicontent_advsearch_index';
 
 		// Try to add space between words for current language using a dictionary
@@ -1056,7 +1069,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 
 		if (strlen($text))
 		{
-			$ts = !$txtmode ? 'ie' : 'ts';
+			$ts = !$txtmode && !$basic_by_field ? 'ie' : 'ts';
 			$escaped_text_np = $db->escape($text_np, true);
 			$quoted_text_np  = $db->Quote($escaped_text_np, false);
 

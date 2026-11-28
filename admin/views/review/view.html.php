@@ -40,6 +40,10 @@ class FlexicontentViewReview extends FlexicontentViewBaseRecord
 
 		$app        = \Joomla\CMS\Factory::getApplication();
 		$jinput     = $app->input;
+		$jinput->set('browser_cachable', null);
+		$app->allowCache(false);
+		$app->setHeader('Cache-Control', 'private, no-store', true);
+
 		$document   = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db         = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
@@ -76,6 +80,13 @@ class FlexicontentViewReview extends FlexicontentViewBaseRecord
 		// Get model and load the record data
 		$model = $this->getModel();
 		$row   = $this->get('Item');
+
+		// Direct display requests must pass the same ACL check as the edit task.
+		if (!$row || !$model->canEdit($row))
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 403);
+		}
+
 		$isnew = ! $row->id;
 
 		// Get \Joomla\CMS\Form\Form

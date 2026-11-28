@@ -76,8 +76,9 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 		{
 			if ( !strlen($mod_param) ) continue;
 
-			list($param_label, $param_name) = preg_split("/[\s]*!![\s]*/", $mod_param);
-			$param_value = isset($value[$param_name]) ? $value[$param_name] : '';
+			list($param_label, $param_name) = array_pad(preg_split("/[\s]*!![\s]*/", $mod_param), 2, '');
+			if (!static::isItemModuleParam($param_name)) continue;
+			$param_value = isset($value[$param_name]) && is_scalar($value[$param_name]) ? (string) $value[$param_name] : '';
 
 			$field->html[] = '
 				<tr>
@@ -230,8 +231,9 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 			{
 				if ( !strlen($mod_param) ) continue;
 
-				list($param_label, $param_name) = preg_split("/[\s]*!![\s]*/", $mod_param);
-				$custom_mod_params[$param_name] = isset($value[$param_name]) ? $value[$param_name] : null;
+				list($param_label, $param_name) = array_pad(preg_split("/[\s]*!![\s]*/", $mod_param), 2, '');
+				if (!static::isItemModuleParam($param_name)) continue;
+				$custom_mod_params[$param_name] = isset($value[$param_name]) ? static::cleanItemModuleParamValue($value[$param_name]) : null;
 			}
 			$_mod_params = new \Joomla\Registry\Registry($mod->params);
 			foreach ($custom_mod_params as $i => $v)
@@ -282,6 +284,69 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 
 		// Make sure posted data is an array
 		$post = !is_array($post) ? array($post) : $post;
+
+		// Keep only the module parameters that the field configuration offers, as plain text values
+		$allowed = array();
+
+		foreach (preg_split("/[\s]*%%[\s]*/", (string) $field->parameters->get('mod_params', '')) as $mod_param)
+		{
+			$parts = array_pad(preg_split("/[\s]*!![\s]*/", $mod_param), 2, '');
+
+			if (static::isItemModuleParam($parts[1]))
+			{
+				$allowed[$parts[1]] = 1;
+			}
+		}
+
+		foreach ($post as $n => $v)
+		{
+			$clean = array();
+
+			foreach (is_array($v) ? array_intersect_key($v, $allowed) : array() as $param_name => $param_value)
+			{
+				$param_value = static::cleanItemModuleParamValue($param_value);
+
+				if ($param_value !== null && $param_value !== '')
+				{
+					$clean[$param_name] = $param_value;
+				}
+			}
+
+			$post[$n] = $clean;
+		}
+	}
+
+
+	/**
+	 * Module parameters that an item value never sets: they are executed as PHP, unserialized, or used to build a file path
+	 */
+	protected static $unsafe_mod_params = array('php_rule', 'enable_php_rule', 'dynamic_catids', 'layout', 'cache', 'cache_time', 'cachemode');
+
+
+	/**
+	 * Check that a parameter name of the field configuration may be set per item
+	 */
+	public static function isItemModuleParam($param_name)
+	{
+		return is_string($param_name) && preg_match('/^[A-Za-z0-9_-]+$/D', $param_name) && !in_array(strtolower($param_name), static::$unsafe_mod_params, true);
+	}
+
+
+	/**
+	 * A module parameter value that comes from an item is plain text. Modules print some of their parameters into HTML
+	 * attributes, styles and scripts as they are, so the characters that leave those contexts are removed
+	 *
+	 * @return  string|null  The value, null if it is not usable
+	 */
+	public static function cleanItemModuleParamValue($value)
+	{
+		if (!is_scalar($value)) return null;
+
+		$value = strip_tags((string) $value);
+		$value = str_replace(array('<', '>', '"', '`', '\\', "\0", "\r", "\n"), '', $value);
+		$value = str_replace("'", "\u{2019}", $value);
+
+		return trim(function_exists('mb_substr') ? mb_substr($value, 0, 1000, 'UTF-8') : substr($value, 0, 1000));
 	}
 
 

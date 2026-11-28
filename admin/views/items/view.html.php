@@ -333,8 +333,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
-		$badcatitems  = (int) $model->getUnboundedItems($limit=10000000, $count_only=true, $checkNoExtData=false, $checkInvalidCat=true);
-		$unassociated = (int) $model->getUnboundedItems($limit=10000000, $count_only=true, $checkNoExtData=true, $checkInvalidCat=false);
+		$badcatitems  = $perms->CanConfig ? (int) $model->getUnboundedItems($limit=10000000, $count_only=true, $checkNoExtData=false, $checkInvalidCat=true) : 0;
+		$unassociated = $perms->CanConfig ? (int) $model->getUnboundedItems($limit=10000000, $count_only=true, $checkNoExtData=true, $checkInvalidCat=false) : 0;
 
 		$bind_limit = $jinput->get('bind_limit', ($unassociated >= 1000 ? 1000 : 250), 'int');
 

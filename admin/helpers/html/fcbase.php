@@ -212,7 +212,7 @@ abstract class JHtmlFcbase
 	 *   'ctrl' : controller name,
 	 *   'option' : component name,
 	 *   'keyprop' : property with the record id,
-	 *   'onclick' : onclick JS, we will create a link, like this: <a onclick="..." href="javascript:;" data-href="URL">...</a>
+	 *   'onclick' : onclick JS (plain JS, not HTML-encoded), we will create a link, like this: <a onclick="..." href="javascript:;" data-href="URL">...</a>
 	 *   'noTitle' : do add title text inside the link
 	 *   'useModal' : create a modal, link will be same as onclick above
 	 *   'attribs' : attributes of the link (except for onclick which must be given seperately)
@@ -292,7 +292,8 @@ abstract class JHtmlFcbase
 
 		if (!empty($config['onclick']))
 		{
-			$attrs .= ' onclick="' . $config['onclick'] . '"';
+			// Encode the JS for the attribute. Some callers end it with a stray double quote, which is dropped: once encoded it would be an unterminated JS string
+			$attrs .= ' onclick="' . htmlspecialchars(preg_replace('/;\s*"\s*$/', ';', $config['onclick']), ENT_QUOTES, 'UTF-8') . '"';
 		}
 		elseif (!empty($config['useModal']))
 		{

@@ -70,7 +70,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 			<li class="<?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>" >
 				<a href="<?php echo $item->link; ?>"
 						class="fcitem_link <?php echo $tooltip_class; ?>">
-					<?php echo $item->title; ?>
+					<?php echo htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'); ?>
 				</a>
 			</li>
 			<!-- EOF current item -->
@@ -90,7 +90,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 			<li class="<?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>" >
 				<a href="<?php echo $item->link; ?>"
 						class="fcitem_link <?php echo $tooltip_class; ?>">
-					<?php echo $item->title; ?>
+					<?php echo htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'); ?>
 				</a>
 			</li>
 			<!-- EOF current item -->

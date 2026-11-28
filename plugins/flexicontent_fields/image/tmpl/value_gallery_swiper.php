@@ -270,7 +270,7 @@ foreach ($values as $n => $value)
 	// Determine the image/video opened by GLightbox
 	if (!empty($usemediaurl) && !empty($value['mediaurl']))
 	{
-		$modal_href    = $value['mediaurl'];
+		$modal_href    = htmlspecialchars($value['mediaurl'], ENT_QUOTES, 'UTF-8');
 		$modal_attribs = '';
 		if (strpos($value['mediaurl'], 'youtube') === false && strpos($value['mediaurl'], 'vimeo') === false)
 		{

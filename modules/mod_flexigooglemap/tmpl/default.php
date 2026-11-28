@@ -37,15 +37,24 @@ Text::script('MOD_FLEXIGOOGLEMAP_GEOLOCATION_NOT_SUPPORTED');
 Text::script('MOD_FLEXIGOOGLEMAP_SEARCHING_TXT');
 Text::script('MOD_FLEXIGOOGLEMAP_GEOLOCATION_UNABLE');
 
+/**
+ * Parameters are printed inside style and script elements:
+ * - CSS sizes keep only the characters of a length or of a calc() / var() expression
+ * - numbers are cast, names are reduced to letters, strings are printed as JSON literals
+ */
+$_css_size  = static function ($v) { return trim(preg_replace('/[^A-Za-z0-9.%()+\-*\/, ]/', '', is_scalar($v) ? (string) $v : '')); };
+$_js_flags  = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE;
+$_js_string = static function ($v) use ($_js_flags) { return json_encode(is_scalar($v) ? (string) $v : '', $_js_flags); };
+
 // Module config
 $width  = $params->get('width', '100%');
 $height = $params->get('height', '60vh');
-$width  = is_numeric($width) ? $width . 'px' : $width;
-$height = is_numeric($height) ? $height . 'px' : $height;
+$width  = is_numeric($width) ? $width . 'px' : $_css_size($width);
+$height = is_numeric($height) ? $height . 'px' : $_css_size($height);
 
 $mapapi    = $params->get('mapapi', 'googlemap');
 $mapcenter = $params->get('mapcenter', '48.8566667, 2.3509871');
-$maptype   = $params->get('maptype', '');
+$maptype   = preg_replace('/[^A-Za-z_]/', '', (string) $params->get('maptype', '')) ?: 'ROADMAP';
 $apikey    = $params->get('apikey', '');
 
 $defaut_icon_url = $mapapi === 'googlemap'
@@ -64,16 +73,17 @@ $geo_locate_zoom_def = (int) $params->get('geo_locate_zoom_def', 10);
 
 $marker_list_update_to_map_bounds = (int) $params->get('marker_list_update_to_map_bounds', 1);
 
-$mapstyle  = $params->get('mapstyle', '');
-$mapstyle  = substr($mapstyle, 1, -1); // Remove[] at end and start
-$map_style = trim($params->get('mapstyle', ''));
+// The map style is printed inside the map script: only valid JSON is used, printed again as a JSON literal
+$mapstyle  = '[]';
+$map_style = trim((string) $params->get('mapstyle', ''));
 if ($map_style) {
-	json_decode($map_style);
+	$_map_style_data = json_decode($map_style);
 	if (json_last_error() == JSON_ERROR_NONE) {
 		// ALL good, user gave good style
+		$mapstyle = json_encode(is_array($_map_style_data) ? $_map_style_data : array(), $_js_flags);
 	} else {
 		$map_style = null;
-		echo '<div class="alert alert-warning"> Bad map styling was set for Module with ID #: ' . $module->id . '</div>';
+		echo '<div class="alert alert-warning"> Bad map styling was set for Module with ID #: ' . (int) $module->id . '</div>';
 	}
 }
 //modal size
@@ -100,7 +110,7 @@ if ($info_popup <= 1) {
 	if ($marker_clicktarget === '_popup') {
 		$onclick_js  = 'fc_field_dialog_handle_' . $module->id . ' = fc_showDialog(this._fcContentLink, \'fc_modal_popup_container\', 0, ' . $windows_width . ', ' . $windows_height . ', 0, {title: \'\'}); return false;';
 	} else {
-		$onclick_js  = 'window.open(this._fcContentLink, \'' . $_target_win . '\', \'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=' . $windows_width . ',height=' . $windows_height . '\'); return false;';
+		$onclick_js  = 'window.open(this._fcContentLink, ' . $_js_string($_target_win) . ', \'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=' . $windows_width . ',height=' . $windows_height . '\'); return false;';
 	}
 
 	// For case of link to item views we will add tmpl=component to the URL
@@ -113,10 +123,13 @@ if ($info_popup <= 1) {
 }
 
 $gridsize = $params->get('gridsize', '');
+$gridsize = is_numeric($gridsize) ? (int) $gridsize : 50;
 $maxzoom  = $params->get('maxzoom', '');
+$maxzoom  = is_numeric($maxzoom) ? (int) $maxzoom : 17;
 $ratiomap = $params->get('ratiomap', '');
-$usescrollmouse = $params->get('usescrollmouse', 'true');
+$usescrollmouse = in_array($params->get('usescrollmouse', 'true'), array('false', '0', 0, false, ''), true) ? 'false' : 'true';
 $marker_opacity = $params->get('marker_opacity', '0.7');
+$marker_opacity = is_numeric($marker_opacity) ? rtrim(rtrim(sprintf('%.4F', (float) $marker_opacity), '0'), '.') : '0.7';
 
 $clustermode = $params->get('clustermode', '');
 if ($clustermode) {
@@ -226,16 +239,16 @@ if ($use_mlist)
     $marker_list_wrap_limit = $marker_list_wrap_limit >= 0 ? $marker_list_wrap_limit : 1200;
 
     $map_height_wrapped = $params->get('map_height_wrapped', '45vh');
-    $map_height_wrapped = is_numeric($map_height_wrapped) ? $map_height_wrapped . 'px' : $map_height_wrapped;
+    $map_height_wrapped = is_numeric($map_height_wrapped) ? $map_height_wrapped . 'px' : $_css_size($map_height_wrapped);
 
     $marker_list_height_wrapped = $params->get('marker_list_height_wrapped', '45vh');
-    $marker_list_height_wrapped = is_numeric($marker_list_height_wrapped) ? $marker_list_height_wrapped . 'px' : $marker_list_height_wrapped;
+    $marker_list_height_wrapped = is_numeric($marker_list_height_wrapped) ? $marker_list_height_wrapped . 'px' : $_css_size($marker_list_height_wrapped);
 
     // ← C'était manquant
     $map_list_width = $params->get('map_list_width', '320px');
-    $map_list_width = is_numeric($map_list_width) ? $map_list_width . 'px' : $map_list_width;
+    $map_list_width = is_numeric($map_list_width) ? $map_list_width . 'px' : $_css_size($map_list_width);
 
-    $mid = $module->id;
+    $mid = (int) $module->id;
 
     $_inlineCSS_WRAP_WIDTH = <<<CSS
 #map-bounds-box{$mid}.map-bounds-box,
@@ -472,7 +485,8 @@ CSS;
 			if (!!!ol) return;
 
 			let li = document.createElement("li");
-			li.innerHTML = '<img class="fc_module_marker_list_icon" src="' + marker._icon_url + '" /> ' + marker._location_info;
+			li.innerHTML = '<img class="fc_module_marker_list_icon" /> ' + marker._location_info;
+			li.querySelector('img.fc_module_marker_list_icon').src = marker._icon_url;
 
 			/*let btn = document.createElement("button");
 			btn.innerHTML = 'Center';
@@ -538,7 +552,7 @@ CSS;
 			 * Define your locations: HTML content for the info window, latitude, longitude
 			 */
 			let locations = [<?php echo implode(",",  $renderedMapLocations); ?>];
-			let mapItems = <?php echo json_encode($mapItemData); ?>;
+			let mapItems = <?php echo json_encode($mapItemData, $_js_flags); ?>;
 
 			let map = new google.maps.Map(document.getElementById('fc_module_map_<?= $module->id; ?>'), {
 				maxZoom: [<?php echo $maxzoommarker; ?>],
@@ -548,7 +562,7 @@ CSS;
 				streetViewControl: true,
 				scrollwheel: <?php echo $usescrollmouse; ?>,
 				panControl: true,
-				styles: [<?php echo $mapstyle; ?>],
+				styles: <?php echo $mapstyle; ?>,
 				zoomControlOptions: {
 					position: google.maps.ControlPosition.LEFT_BOTTOM
 				}
@@ -563,12 +577,12 @@ CSS;
 
 			let markers = new Array();
 			let defaultMarkerIcon = <?php echo !$defaultMarkerURL ? 'null;' : '{
-				url: \'' . $defaultMarkerURL . '\'' .
+				url: ' . $_js_string($defaultMarkerURL) .
 			// Unlike Openstreet Map (which position top-left) Google maps will position bottom-middle, so we may have skipped calculating these ...)
 			($wS_dMU && $hS_dMU ? ',
-					size: new google.maps.Size(' . $wS_dMU . ', ' . $hS_dMU . '),
+					size: new google.maps.Size(' . (float) $wS_dMU . ', ' . (float) $hS_dMU . '),
 					origin: new google.maps.Point(0, 0),
-					anchor:  new google.maps.Point(' . $wA_dMU . ', ' . $hA_dMU . ')'
+					anchor:  new google.maps.Point(' . (float) $wA_dMU . ', ' . (float) $hA_dMU . ')'
 				: '') . '
 			}
 			'; ?>
@@ -599,7 +613,7 @@ CSS;
 				oms.addMarker(marker);
 
 				marker._location_info = locations[i][0];
-				marker._icon_url = locations[i][3] == '__default__' ? '<?php echo $defaultMarkerURL ?: $defaut_icon_url; ?>' : locations[i][3];
+				marker._icon_url = locations[i][3] == '__default__' ? <?php echo $_js_string($defaultMarkerURL ?: $defaut_icon_url); ?> : locations[i][3];
 				marker._map_ref = map;
 
 				marker._fcContentLink = mapItems[i].content_link;
@@ -659,9 +673,9 @@ CSS;
 					gridSize:$gridsize,
 					maxZoom:$maxzoom,
 					styles: [{
-						url: '$imgcluster_url',
-						width: $imgcluster_w,
-						height: $imgcluster_h
+						url: " . $_js_string($imgcluster_url) . ",
+						width: " . (int) $imgcluster_w . ",
+						height: " . (int) $imgcluster_h . "
 					}]
 				};
 				window.clusterManager_" . $module->id ." = new MarkerClusterer(map, markers, mcOptions);
@@ -752,7 +766,8 @@ CSS;
 			if (!!!ol) return;
 
 			let li = document.createElement("li");
-			li.innerHTML = '<img class="fc_module_marker_list_icon" src="' + marker._icon_url + '" /> ' + marker._location_info;
+			li.innerHTML = '<img class="fc_module_marker_list_icon" /> ' + marker._location_info;
+			li.querySelector('img.fc_module_marker_list_icon').src = marker._icon_url;
 
 			let btn_div        = document.createElement("div");
 			let btn_link       = document.createElement("a");
@@ -807,7 +822,7 @@ CSS;
 
 		function fc_MapMod_initialize_<?= $module->id; ?>() {
 			let locations = [<?php echo implode(",",  $renderedMapLocations); ?>];
-			let mapItems = <?php echo json_encode($mapItemData); ?>;
+			let mapItems = <?php echo json_encode($mapItemData, $_js_flags); ?>;
 
 			let markerClusters;
 			let markers = [];
@@ -823,18 +838,18 @@ CSS;
 		}
 			?>
 			// Title display
-			L.tileLayer('<?php echo $os_tile_server_url; ?>', {
+			L.tileLayer(<?php echo $_js_string($os_tile_server_url); ?>, {
 				// Datas sources
-				attribution: '<?php echo Text::_('OPENSTREETMAP_ATTRIBUTION_TXT'); ?>',
+				attribution: <?php echo $_js_string(Text::_('OPENSTREETMAP_ATTRIBUTION_TXT')); ?>,
 				minZoom: 1,
 				maxZoom: <?php echo $maxzoom; ?>
 			})
 				.addTo(map);
 
 			let defaultMarkerIcon = <?php echo !$defaultMarkerURL ? 'null' : 'L.icon({
-				iconUrl: \'' . $defaultMarkerURL . '\',
-				iconSize: [' . $wS_dMU . ', ' . $hS_dMU . '],
-				iconAnchor: [' . $wA_dMU . ', ' . $hA_dMU . ']
+				iconUrl: ' . $_js_string($defaultMarkerURL) . ',
+				iconSize: [' . (float) $wS_dMU . ', ' . (float) $hS_dMU . '],
+				iconAnchor: [' . (float) $wA_dMU . ', ' . (float) $hA_dMU . ']
 			});
 			'; ?>
 
@@ -857,7 +872,7 @@ CSS;
 				}
 
 				marker._location_info = locations[i][0];
-				marker._icon_url = locations[i][3] == '__default__' ? '<?php echo $defaultMarkerURL ?: $defaut_icon_url; ?>' : locations[i][3];
+				marker._icon_url = locations[i][3] == '__default__' ? <?php echo $_js_string($defaultMarkerURL ?: $defaut_icon_url); ?> : locations[i][3];
 				marker._map_ref = map;
 				//marker.setOpacity(<?php echo $marker_opacity; ?>);
 

@@ -25,7 +25,7 @@ foreach ($values as $n => $value)
 
 	if (!empty($usemediaurl) && !empty($value['mediaurl']))
 	{
-		$attribs = 'href="' . $value['mediaurl'] . '"  ';
+		$attribs = 'href="' . htmlspecialchars($value['mediaurl'], ENT_QUOTES, 'UTF-8') . '"  ';
 
 		// Video providers natively supported by this JS gallery
 		if (strpos($value['mediaurl'], 'youtube') !== false || strpos($value['mediaurl'], 'vimeo') !== false)

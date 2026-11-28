@@ -133,7 +133,7 @@ window.fcfield_sharemedia = (() => {
     }
     const { provider, id:clip } = use_native_apis[config] ? FlexiMediaMetadata.video(source) : {};
     try {
-      const data = await FlexiMediaMetadata.load(input, providerRequest(source, provider, clip, config), true);
+      const data = await FlexiMediaMetadata.load(input, providerRequest(source, provider, clip, config));
       if (!data) return;
       const result = parseMetadata(data, provider, clip);
       setEmbedData(id, result.type, result.clip);

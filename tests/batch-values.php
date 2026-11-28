@@ -28,9 +28,16 @@ foreach(['language','state']as $property){
     }
 }
 $copy=substr($source,strpos($source,'function copyitems('),strpos($source,'function moveitem(')-strpos($source,'function copyitems('));
-if(!preg_match('/\$row->state\s*=\s*[^;]+;/',$copy,$match))throw new RuntimeException('Batch copy state assignment missing');
-foreach([[null,1],['',1],[false,1],[0,0],['0','0'],[-2,-2],[1,1]]as[$state,$expected]){
-    $row=(object)['state'=>1];eval($match[0]);
-    if($row->state!==$expected)throw new RuntimeException('Omitted copy state changed stored data');$count++;
+// A copy takes the state that was resolved and authorised beforehand: the task turns an omitted state into null,
+// getBatchTargets() then keeps the state of the original item.
+if(!preg_match('/\$row->state\s*=\s*\$target->state;/',$copy))throw new RuntimeException('Batch copy state assignment missing');
+$task=file_get_contents(__DIR__.'/../admin/controllers/items.php');
+$task=substr($task,strpos($task,'function batchprocess('));
+if(!preg_match('/\$state\s*=\s*\$state\s*===\s*\'\'\s*\?[^;]+;/',$task,$posted))throw new RuntimeException('Batch state request handling missing');
+$targets=substr($source,strpos($source,'function getBatchTargets('));
+if(!preg_match('/\$target_state\s*=\s*[^;]+;/',$targets,$resolved))throw new RuntimeException('Batch copy target state missing');
+foreach([['',1],['0',0],['-2',-2],['1',1],['2',2]]as[$state,$expected]){
+    $item=(object)['state'=>1];eval($posted[0]);eval($resolved[0]);
+    if($target_state!==$expected)throw new RuntimeException('Omitted copy state changed stored data');$count++;
 }
 restore_error_handler();echo $count." batch value checks passed\n";

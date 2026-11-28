@@ -58,9 +58,7 @@ class FlexicontentlinksItems extends \Joomla\CMS\Object\CMSObject {
 
 	public function getList()
 	{
-		$wf = WFEditorPlugin::getInstance();
-
-		if ($wf->checkAccess('links.joomlalinks.content', 1)) {
+		if (WFLinkBrowser_Flexicontentlinks::contentAllowed()) {
 			return '
 			<li id="index.php?option=com_flexicontent_items&view=category" class="folder fccats nolink">
 				<div class="uk-tree-row">
@@ -76,8 +74,6 @@ class FlexicontentlinksItems extends \Joomla\CMS\Object\CMSObject {
 
 	public function getLinks($args)
 	{
-		$wf = WFEditorPlugin::getInstance();
-
 		require_once(JPATH_SITE . DIRECTORY_SEPARATOR. 'components' .DIRECTORY_SEPARATOR. 'com_flexicontent' .DIRECTORY_SEPARATOR. 'helpers' .DIRECTORY_SEPARATOR. 'route.php');
 
 		$items = array();
@@ -88,18 +84,41 @@ class FlexicontentlinksItems extends \Joomla\CMS\Object\CMSObject {
 		$categoryId = $categoryId ?: 1;
 
 		if ($view && $view!='category') return array();
+		if (!WFLinkBrowser_Flexicontentlinks::contentAllowed()) return array();
+
+		require_once(JPATH_SITE . DIRECTORY_SEPARATOR. 'components' .DIRECTORY_SEPARATOR. 'com_flexicontent' .DIRECTORY_SEPARATOR. 'classes' .DIRECTORY_SEPARATOR. 'helpers' .DIRECTORY_SEPARATOR. 'security.php');
 
 		$db = \Joomla\CMS\Factory::getDbo();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+
+		// Only list what the user can view, like the category and item views do
+		$levels = implode(',', array_unique(array_merge(array(0), array_map('intval', $user->getAuthorisedViewLevels()))));
+		$viewAll = $user->authorise('core.admin');
+
+		$query	= $db->getQuery(true);
+
+		// The category that was asked for, and its parents, must be published and viewable
+		if ($categoryId !== 1)
+		{
+			$query
+				->select('c.id')
+				->from('#__categories AS c')
+				->where('c.id = ' . $categoryId . ' AND c.extension = \'com_content\'')
+				->where('NOT EXISTS (SELECT 1 FROM #__categories AS p WHERE p.lft <= c.lft AND p.rgt >= c.rgt AND p.id <> 1'
+					. ' AND (p.published <> 1' . ($viewAll ? '' : ' OR p.access NOT IN (' . $levels . ')') . '))');
+			$db->setQuery($query);
+			if (!$db->loadResult()) return array();
+		}
 
 		// Add categories
-		$query	= $db->getQuery(true);
 		$query->clear();
 		$query
 			->select('id, title, lft')
 			->select('CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug')
 			->from('#__categories')
-			->where('published = 1 AND extension = \'com_content\' AND parent_id = '.$categoryId)
-			->order('lft ASC');
+			->where('published = 1 AND extension = \'com_content\' AND parent_id = '.$categoryId);
+		if (!$viewAll) $query->where('access IN (' . $levels . ')');
+		$query->order('lft ASC');
 		$db->setQuery($query);
 		$categories = $db->loadObjectList();
 
@@ -118,19 +137,24 @@ class FlexicontentlinksItems extends \Joomla\CMS\Object\CMSObject {
 		$query->clear();
 		$query
 			->select(' i.id as id, i.title AS ititle, c.id as catid, i.access, i.language,'
+				. ' i.state, i.publish_up, i.publish_down, i.created_by,'
 				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug')
 			->from('#__content AS i')
 			->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id')
 			->join('LEFT', '#__categories AS c ON c.id = rel.catid')
-			->where('c.id = ' . $categoryId)
-			->order('i.title ASC');
+			->where('c.id = ' . $categoryId);
+		if (!$viewAll) $query->where('i.access IN (' . $levels . ')');
+		$query->order('i.title ASC');
 
 		$db->setQuery($query);
 		$contents = $db->loadObjectList();
 
 		foreach ($contents as $content)
 		{
+			// Unpublished, scheduled and expired items are listed only for users that can edit them
+			if (!flexicontent_security::canViewItemState($content, $user)) continue;
+
 			$url = FlexicontentHelperRoute::getItemRoute($content->slug, $content->catslug, 0, $content);
 			$items[] = array(
 				'id'	=>  'index.php?option=com_flexicontent&view=item&cid='.$content->catslug.'&id='.$content->slug,
@@ -146,12 +170,6 @@ class FlexicontentlinksItems extends \Joomla\CMS\Object\CMSObject {
 
 	private static function route($url)
 	{
-		$wf = WFEditorPlugin::getInstance();
-
-		if ($wf->getParam('links.joomlalinks.sef_url', 0)) {
-			$url = WFLinkExtension::route($url);
-		}
-
-		return $url;
+		return WFLinkBrowser_Flexicontentlinks::route($url);
 	}
 }

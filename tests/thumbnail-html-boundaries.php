@@ -1,5 +1,7 @@
 <?php
 define('_JEXEC',1);
+define('JPATH_SITE',dirname(__DIR__));
+eval('namespace Joomla\CMS\Uri; final class Uri { public static function root($pathOnly = false) { return $pathOnly ? "" : "https://fixture.invalid/"; } }');
 error_reporting(E_ALL);
 set_error_handler(static function($s,$m,$f,$l){throw new ErrorException($m,0,$s,$f,$l);});
 require __DIR__.'/../site/classes/helpers/images.php';

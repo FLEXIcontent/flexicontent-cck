@@ -200,6 +200,27 @@ if (empty($phpThumb->config_disable_pathinfo_parsing) && (empty($_GET) || isset(
 	}
 }
 
+// FLEXIcontent: refuse the request shapes that the component never issues, see phpThumb.flexi_guard.php
+require_once __DIR__ . '/phpThumb.flexi_guard.php';
+if (($flexi_refusal = flexicontent_phpthumb_refusal($_GET)) === null) {
+	// An image of a protected folder is served to a signed request only, also when high security is off
+	$flexi_refusal = flexicontent_phpthumb_protected_refusal($_GET, isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '', array(
+		'document_root'               => $phpThumb->config_document_root,
+		'high_security_password'      => $phpThumb->config_high_security_password,
+		'high_security_url_separator' => $phpThumb->config_high_security_url_separator,
+	));
+}
+// A remote source is fetched only from a host name of the site that FLEXIcontent wrote to the configuration
+$GLOBALS['PHPTHUMB_FLEXI_REMOTE_HOSTS'] = is_array($phpThumb->config_nohotlink_valid_domains) ? $phpThumb->config_nohotlink_valid_domains : array();
+if ($flexi_refusal === null) {
+	$flexi_refusal = flexicontent_phpthumb_remote_refusal($_GET, $GLOBALS['PHPTHUMB_FLEXI_REMOTE_HOSTS']);
+}
+if ($flexi_refusal !== null) {
+	$phpThumb->config_disable_debug = true;
+	$phpThumb->ErrorImage('Request refused: ' . $flexi_refusal);
+	exit;
+}
+
 if (!empty($phpThumb->config_high_security_enabled)) {
 	if (empty($_GET['hash'])) {
 		$phpThumb->config_disable_debug = false; // otherwise error message won't print
@@ -207,7 +228,7 @@ if (!empty($phpThumb->config_high_security_enabled)) {
 	} elseif (phpthumb_functions::PasswordStrength($phpThumb->config_high_security_password) < 20) {
 		$phpThumb->config_disable_debug = false; // otherwise error message won't print
 		$phpThumb->ErrorImage('ERROR: $PHPTHUMB_CONFIG[high_security_password] is not complex enough');
-	} elseif ($_GET['hash'] != hash_hmac('sha256', str_replace($phpThumb->config_high_security_url_separator.'hash='.$_GET['hash'], '', $_SERVER['QUERY_STRING']), $phpThumb->config_high_security_password)) {
+	} elseif (!is_string($_GET['hash']) || !hash_equals(hash_hmac('sha256', str_replace($phpThumb->config_high_security_url_separator.'hash='.$_GET['hash'], '', $_SERVER['QUERY_STRING']), $phpThumb->config_high_security_password), $_GET['hash'])) {
 		header('HTTP/1.0 403 Forbidden');
 		$phpThumb->ErrorImage('ERROR: invalid hash');
 	}
@@ -269,7 +290,7 @@ if (!empty($_GET['src']) && isset($_GET['md5s']) && empty($_GET['md5s'])) {
 	}
 }
 
-if (!empty($_GET['src']) && empty($phpThumb->config_allow_local_http_src) && preg_match('#^http://'.@$_SERVER['HTTP_HOST'].'(.+)#i', $_GET['src'], $matches)) {
+if (!empty($_GET['src']) && empty($phpThumb->config_allow_local_http_src) && preg_match('#^http://'.preg_quote((string) @$_SERVER['HTTP_HOST'], '#').'(.+)#i', $_GET['src'], $matches)) {
 	$phpThumb->ErrorImage('It is MUCH better to specify the "src" parameter as "'.$matches[1].'" instead of "'.$matches[0].'".'."\n\n".'If you really must do it this way, enable "allow_local_http_src" in phpThumb.config.php');
 }
 
@@ -682,6 +703,8 @@ if (!empty($phpThumb->config_high_security_enabled) && !empty($_GET['nocache']))
 	phpthumb_functions::EnsureDirectoryExists(dirname($phpThumb->cache_filename));
 	if (is_writable(dirname($phpThumb->cache_filename)) || (file_exists($phpThumb->cache_filename) && is_writable($phpThumb->cache_filename))) {
 
+		// FLEXIcontent: apply the cache limits more often than once per hour, see phpThumb.config.php
+		flexicontent_phpthumb_cache_cleanup_due($phpThumb->config_cache_directory, isset($PHPTHUMB_FLEXI_CACHE_CLEANUP_INTERVAL) ? $PHPTHUMB_FLEXI_CACHE_CLEANUP_INTERVAL : 0);
 		$phpThumb->CleanUpCacheDirectory();
 		if ($phpThumb->RenderToFile($phpThumb->cache_filename) && is_readable($phpThumb->cache_filename)) {
 			chmod($phpThumb->cache_filename, 0644);

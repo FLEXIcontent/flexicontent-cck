@@ -235,15 +235,6 @@ class FlexicontentModelReview extends FCModelAdmin
 			}
 		}
 
-		// Only allow email to guests to admins
-		if ((!$isNew || $isLogged) && !$this->canManage)
-		{
-			$readonlyFields[]= 'email';
-			$hiddenFields[]  = 'email';
-			$readonlyFields[]= 'name';
-			$hiddenFields[]  = 'name';
-		}
-
 		if (!$this->canManage)
 		{
 			$readonlyFields = array_merge($readonlyFields,
@@ -277,6 +268,13 @@ class FlexicontentModelReview extends FCModelAdmin
 		// Trigger the default form events.
 		$plugins_group = $plugins_group ?: $this->plugins_group;
 		parent::preprocessForm($form, $data, $plugins_group);
+
+		// Managers can see reviewer details. Guests enter them when submitting a new review.
+		if ((!$isNew || $isLogged) && !$this->canManage)
+		{
+			$form->removeField('email');
+			$form->removeField('name');
+		}
 	}
 
 
@@ -323,17 +321,16 @@ class FlexicontentModelReview extends FCModelAdmin
 		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$app     = \Joomla\CMS\Factory::getApplication();
 
-		$isOwner = $record && $record->user_id == $user->id;
+		$isOwner = $record && (int) $user->id > 0 && (int) $record->user_id === (int) $user->id;
 		$isSite  = $app->isClient('site');
 
-		// Get per field's per type configuration if possible
-		$item  = (object) array('type_id' => empty($record->item_type_id) ? 0 : $record->item_type_id);
-		$field = $this->getVotingReviewsField($item, $setAsDefault = true);
-
-		$allow_submit_review_by = (int) $field->parameters->get('allow_submit_review_by', 0);
-
-		if ($isSite && !$record->id)
+		if ($isSite && empty($record->id))
 		{
+			// The voting field controls new submissions. Existing reviews use ownership and ACL.
+			$item = (object) array('type_id' => empty($record->item_type_id) ? 0 : $record->item_type_id);
+			$field = $this->getVotingReviewsField($item, $setAsDefault = true);
+			$allow_submit_review_by = (int) $field->parameters->get('allow_submit_review_by', 0);
+
 			switch ($allow_submit_review_by)
 			{
 				case 0:

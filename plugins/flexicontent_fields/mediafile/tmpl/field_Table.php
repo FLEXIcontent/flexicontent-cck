@@ -62,14 +62,17 @@ foreach ($field->value as $file_id)
 				$img_path = \Joomla\CMS\Uri\Uri::root(true) . '/' . (empty($file_data->secure) ? $mediapath : $docspath) . '/' . $file_data->filename;
 				break;
 			case 1:
-				$img_path = $file_data->filename;
+				// A URL or path registered by a user: a (signed) thumbnail URL is built for public images only
+				$img_path = flexicontent_images::phpThumbPublicImage($file_data->filename, true) ? $file_data->filename : '';
 				break;
 			case 2:
 			default:
 				$img_path = \Joomla\CMS\Uri\Uri::root(true) . '/' . $file_data->filename;
 				break;
 		}
-		$preview_src = flexicontent_images::phpThumbURL(array('src' => $img_path, 'w' => 100, 'h' => 100, 'zc' => 1, 'q' => 95, 'ar' => 'x'), true, true);
+		$preview_src = $img_path === ''
+			? $image_placeholder
+			: flexicontent_images::phpThumbURL(array('src' => $img_path, 'w' => 100, 'h' => 100, 'zc' => 1, 'q' => 95, 'ar' => 'x'), true, true);
 		$preview_text = '';
 		$has_preview = true;
 	}
@@ -262,8 +265,8 @@ HTML;
 
 	$field->html[] = '
 
-		<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
-		<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$file_data->filename.'<br/>'.$file_data->altname.'</div>
+		<span class="fc_filedata_storage_name" style="display:none;">'.htmlspecialchars((string) $file_data->filename, ENT_QUOTES, 'UTF-8').'</span>
+		<div class="fc_filedata_txt_nowrap nowrap_hidden">'.htmlspecialchars((string) $file_data->filename, ENT_QUOTES, 'UTF-8').'<br/>'.htmlspecialchars((string) $file_data->altname, ENT_QUOTES, 'UTF-8').'</div>
 		<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" style="'.(($use_myfiles == 4 && !$use_quantum) || !in_array($form_info_header, [1,3]) ? 'display:none' : '').'"
 			data-fc-media-key="'.$field_name_js.'" data-fc-media-type="mediafile" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.'
 			value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'"
@@ -362,7 +365,7 @@ HTML;
 				</td>
 				<td class="inlinefile-desc-data-cell">
 					<span class="inlinefile-desc-data">
-						<textarea id="'.$elementid_n.'_file-desc" cols="24" rows="3" name="'.$fieldname_n.'[file-desc]" class="fc_filedesc">'.(!isset($form_data[$file_id]) ? $file_data->description : $form_data[$file_id]['file-desc']).'</textarea>
+						<textarea id="'.$elementid_n.'_file-desc" cols="24" rows="3" name="'.$fieldname_n.'[file-desc]" class="fc_filedesc">'.htmlspecialchars((string) (!isset($form_data[$file_id]) ? $file_data->description : $form_data[$file_id]['file-desc']), ENT_QUOTES, 'UTF-8').'</textarea>
 					</span>
 				</td>
 			</tr>' : '').

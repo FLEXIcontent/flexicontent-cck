@@ -42,7 +42,7 @@ class modFlexigooglemapHelper
 		/**
 		 * Check field ID configured in module configuration
 		 */
-		$fieldAddressId = $params->get('fieldaddressid');
+		$fieldAddressId = (int) $params->get('fieldaddressid');
 
 		if (empty($fieldAddressId)) {
 			if ($print_error) echo '<div class="alert alert-warning">' . Text::_('MOD_FLEXIGOOGLEMAP_ADDRESSFORGOT') . '</div>';
@@ -79,7 +79,7 @@ class modFlexigooglemapHelper
 		if (!static::_checkConfiguration($params, $print_error = true)) return [];
 
 		// Get field ID configured in module configuration
-		$fieldAddressId = $params->get('fieldaddressid');
+		$fieldAddressId = (int) $params->get('fieldaddressid');
 
 		/**
 		 * First, get the categories that have the items
@@ -88,15 +88,19 @@ class modFlexigooglemapHelper
 		$treeInclude = $params->get('treeinclude', 1);
 		$catIds      = $params->get('catid');
 		$catIds      = is_array($catIds) ? $catIds : [$catIds];
+		$catIds      = array_values(array_filter(array_map('intval', array_filter($catIds, 'is_scalar'))));
 
 		/**
 		 * Retrieve extra categories, such children or parent categories
 		 * - Check if zero allowed categories
 		 */
 		$catIdsArr = flexicontent_cats::getExtraCats($catIds, $treeInclude, array());
+		$catIdsArr = array_values(array_unique(array_map('intval', (array) $catIdsArr)));
 		if (empty($catIdsArr)) return [];
 
+		// The module form offers only "DESC LIMIT <number>", any other stored value is ignored
 		$count = $params->get('count');
+		$count = is_string($count) && preg_match('/^DESC LIMIT [1-9][0-9]{0,5}$/D', $count) ? $count : '';
 
 		/**
 		 * Include : 1 or Exclude : 0 categories
@@ -110,6 +114,18 @@ class modFlexigooglemapHelper
 		 * Retrieve the items having the map locations (for the given field and the given categories)
 		 */
 		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		$show_noauth = (int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('show_noauth', 0);
+		$levels      = implode(',', array_map('intval', (array) \Joomla\CMS\Factory::getApplication()->getIdentity()->getAuthorisedViewLevels())) ?: '0';
+
+		// The locations are values of the address field: nothing is listed for a user who may not view that field
+		$addressField = static::getField($fieldAddressId);
+
+		if (!$show_noauth && is_object($addressField) && isset($addressField->access) && !in_array((int) $addressField->access, array_map('intval', explode(',', $levels)), true))
+		{
+			return [];
+		}
+
 		$queryLoc = 'SELECT a.*, b.field_id, b.value, b.valueorder '
 			. ', CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as itemslug'
 			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
@@ -120,9 +136,23 @@ class modFlexigooglemapHelper
 			. ' JOIN #__categories AS c ON c.id = a.catid'
 			. ' LEFT JOIN #__flexicontent_fields_item_relations AS b ON a.id = b.item_id'
 			. ' LEFT JOIN #__flexicontent_items_ext AS ext ON a.id = ext.item_id'
+			. ' LEFT JOIN #__flexicontent_types AS ty ON ty.id = ext.type_id'
 			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON a.id = rel.itemid'
 			. ' LEFT JOIN #__categories AS cc ON cc.id = rel.catid'
 			. ' WHERE b.field_id = ' . $fieldAddressId . ' AND ' . $catWhere . ' AND a.state = 1';
+
+		// The same rules as the item lists of the component: publish dates, a published main category and, unless
+		// the listing of unauthorised content is enabled, the access levels of the item, its main category and its type
+		$nowDate  = $db->quote(\Joomla\CMS\Factory::getDate()->toSql());
+		$nullDate = $db->quote($db->getNullDate());
+		$queryLoc .= ' AND (a.publish_up IS NULL OR a.publish_up = ' . $nullDate . ' OR a.publish_up <= ' . $nowDate . ')'
+			. ' AND (a.publish_down IS NULL OR a.publish_down = ' . $nullDate . ' OR a.publish_down >= ' . $nowDate . ')'
+			. ' AND c.published = 1';
+
+		if (!$show_noauth)
+		{
+			$queryLoc .= ' AND a.access IN (' . $levels . ') AND c.access IN (' . $levels . ') AND (ty.id IS NULL OR ty.access IN (' . $levels . '))';
+		}
 
 		/**
 		 * Intersect with the item IDs of the current view's filtered item list,
@@ -207,7 +237,9 @@ class modFlexigooglemapHelper
 	 */
 	public static function renderMapLocations($params, &$mapItems, $module)
 	{
+		// The layout name becomes part of an include path: a plain name only
 		$layout               = $params->get('layout', 'default');
+		$layout               = is_string($layout) && preg_match('/^[A-Za-z0-9_-]+$/D', $layout) ? $layout : 'default';
 		$renderedMapLocations = [];
 		file_exists(dirname(__FILE__) . '/tmpl/' . $layout . '_mapLocations.php')
 			? include(dirname(__FILE__) . '/tmpl/' . $layout . '_mapLocations.php')
@@ -235,7 +267,9 @@ class modFlexigooglemapHelper
 	public static function renderLocation($params, $locationItem, $locationCoords, &$mapLocations, &$mapItems, $module, $valueOrder)
 	{
 		//echo $valueOrder . '<br>';
+		// The layout name becomes part of an include path: a plain name only
 		$layout               = $params->get('layout', 'default');
+		$layout               = is_string($layout) && preg_match('/^[A-Za-z0-9_-]+$/D', $layout) ? $layout : 'default';
 		file_exists(dirname(__FILE__) . '/tmpl/' . $layout . '_mapLocation.php')
 			? include(dirname(__FILE__) . '/tmpl/' . $layout . '_mapLocation.php')
 			: include(dirname(__FILE__) . '/tmpl/default_mapLocation.php');

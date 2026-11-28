@@ -51,7 +51,7 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		
 		// Get session information
 		$conf  = $session->get('appsman_config', "", 'flexicontent');
-		$conf  = unserialize( $conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "" );
+		$conf  = $conf ? unserialize($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf), array('allowed_classes' => false)) : null;
 
 		// This is the flag if XML file has been parsed (import form already submitted), thus to display the imported data
 		$session->set('appsman_parse_log', null, 'flexicontent');
@@ -120,9 +120,8 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		
 		
 		// Execute the import task, load the log-like AJAX-based layout (import_process.php), to display results including any warnings
-		if ( !empty($conf) && $task=='processxml' )
+		if (is_string($task) && strcasecmp($task, 'processxml') === 0)
 		{
-			$this->conf    = $conf;
 			$this->cparams = $cparams;
 			parent::display('process');
 			return;

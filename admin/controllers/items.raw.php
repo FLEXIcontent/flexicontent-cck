@@ -53,17 +53,17 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	var $exitSuccess  = true;
 
 	/**
-	 * Constructor
-	 *
-	 * @param   array   $config    associative array of configuration settings.
-	 *
-	 * @since 3.3
+	 * Restrict the task dispatched through the site RAW proxy.
 	 */
-	public function __construct($config = array())
+	public function execute($task)
 	{
-		parent::__construct($config);
+		if (\Joomla\CMS\Factory::getApplication()->isClient('site')
+			&& !in_array(strtolower((string) $task), array('getversionlist', 'setversionkeep'), true))
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 403);
+		}
 
-		// Register task aliases
+		return parent::execute($task);
 	}
 
 
@@ -83,40 +83,24 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Load it explicitly so frontend RAW requests get translated labels too.
 		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
 
-		@ob_end_clean();
-		$id     = $this->input->getInt('id', 0);
-		$active = $this->input->getInt('active', 0);
-		$compare_mode = $this->input->getCmd('compare_mode') === 'popup' ? 'popup' : 'inline';
-
-		if (!$id)
+		$id = $this->input->getInt('id', 0);
+		$item = $id > 0 ? \FLEXIUtilities::getVersionRecord($id) : null;
+		$model = $item ? $this->getModel($this->record_name) : null;
+		if (!$item || !$model || !$model->canEdit($item))
 		{
-			return;
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS_EDIT'), 403);
 		}
 
-		$model = $this->getModel($this->record_name);
 		$model->setId($id);
-		$item = \FLEXIUtilities::getVersionRecord($id);
-
-		if (!$item)
-		{
-			return;
-		}
-
+		@ob_end_clean();
+		$compare_mode = $this->input->getCmd('compare_mode') === 'popup' ? 'popup' : 'inline';
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$versionsperpage = $cparams->get('versionsperpage', 10);
+		$versionsperpage = max(1, (int) $cparams->get('versionsperpage', 10));
 		$currentversion = isset($item->current_version) ? $item->current_version : $item->version;
 		$page = $this->input->getInt('page', 0);
 		$versioncount = $model->getVersionCount();
-		$numpage = ceil($versioncount / $versionsperpage);
-
-		if ($page > $numpage)
-		{
-			$page = $numpage;
-		}
-		elseif ($page < 1)
-		{
-			$page = 1;
-		}
+		$numpage = (int) ceil($versioncount / $versionsperpage);
+		$page = max(1, min($page, $numpage));
 
 		$limitstart = ($page - 1) * $versionsperpage;
 		$versions	= $model->getVersionList($limitstart, $versionsperpage);
@@ -605,6 +589,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	function getOrphansItems()
 	{
+		$this->requireMaintenancePermission();
+
 		$model  = $this->getModel($this->record_name_pl);
 		$status = $model->getUnboundedItems($limit = 1000000, $count_only = true, $checkNoExtData = true, $checkInvalidCat = false);
 		echo $status;
@@ -619,6 +605,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	function getBadCatItems()
 	{
+		$this->requireMaintenancePermission();
+
 		$model  = $this->getModel($this->record_name_pl);
 		$status = $model->getUnboundedItems($limit = 1000000, $count_only = true, $checkNoExtData = false, $checkInvalidCat = true);
 		echo $status;
@@ -635,6 +623,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	function bindextdata()
 	{
+		$this->requireMaintenancePermission();
+
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
@@ -666,6 +656,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	function fixmaincat()
 	{
+		$this->requireMaintenancePermission();
+
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
@@ -1091,6 +1083,15 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	}
 
 
+	private function requireMaintenancePermission()
+	{
+		if (!\Joomla\CMS\Factory::getApplication()->isClient('administrator') || !FlexicontentHelperPerm::getPerm()->CanConfig)
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 403);
+		}
+	}
+
+
 	/**
 	 * Method to check session token, item exists, is editable
 	 *
@@ -1187,7 +1188,15 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$query = $db->getQuery(true)
 			->select(array('f.id', 'f.altname', 'f.filename'))
 			->from($db->quoteName('#__flexicontent_files', 'f'))
-			->where('(' . $db->quoteName('f.altname') . ' LIKE ' . $like . ' OR ' . $db->quoteName('f.filename') . ' LIKE ' . $like . ')')
+			->where('(' . $db->quoteName('f.altname') . ' LIKE ' . $like . ' OR ' . $db->quoteName('f.filename') . ' LIKE ' . $like . ')');
+
+		// As in the file manager: files of other uploaders are listed only for users who may view all files
+		if (!$user->authorise('flexicontent.viewallfiles', 'com_flexicontent'))
+		{
+			$query->where($db->quoteName('f.uploaded_by') . ' = ' . (int) $user->id);
+		}
+
+		$query
 			->order($db->quoteName('f.altname') . ' ASC')
 			->setLimit(30);
 

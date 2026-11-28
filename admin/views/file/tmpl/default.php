@@ -421,7 +421,7 @@ HTML;
 				</label>
 			</td>
 			<td>
-				<input type="text" id="hits" name="hits" value="<?php echo $this->row->hits; ?>" maxlength="10" class="input-<?php echo $fc_atum_control; ?>" />
+				<input type="text" id="hits" name="hits" value="<?php echo $fc_editor_escape($this->row->hits); ?>" maxlength="10" class="input-<?php echo $fc_atum_control; ?>" />
 			</td>
 		</tr>
 
