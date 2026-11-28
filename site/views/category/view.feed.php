@@ -79,6 +79,10 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		// ***********************
 
 		$items   = $this->get('Data');
+		$user = $app->getIdentity();
+		$aid = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+		$field_data = null;
+		FlexicontentFields::getItemFields($items, $field_data, 'category', $aid);
 
 		$feed_summary = $params->get('feed_summary', 0);
 		$feed_summary_cut = $params->get('feed_summary_cut', 200);
@@ -105,7 +109,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 		// TODO render and add extra fields here ... maybe via special display function for feeds view
 		$extra_fields = $params->get('feed_extra_fields', '');
-		$extra_fields = array_unique(preg_split("/\s*,\s*/u", $extra_fields));
+		$extra_fields = array_unique(preg_split("/\s*,\s*/u", trim($extra_fields), -1, PREG_SPLIT_NO_EMPTY));
 		if ($extra_fields) {
 			foreach($extra_fields as $fieldname) {
 				// Render given field for ALL ITEMS
@@ -119,7 +123,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		foreach ($items as $item)
 		{
 			// strip html from feed item title
-			$title = $this->escape( $item->title );
+			$title = $this->escape(!empty($item->fields['title']->has_access) ? $item->title : '');
 			$title = html_entity_decode( $title );
 
 			// url link to article
@@ -127,21 +131,25 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			$link = $domain . \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 
 			// strip html from feed item description text
-			$description	= $feed_summary ? $item->introtext.$item->fulltext : $item->introtext;
+			$can_view_text = !empty($item->fields['text']->has_access);
+			$description = $can_view_text ? $item->introtext : '';
+			$fulltext = $can_view_text ? $item->fulltext : '';
+			if ($feed_summary) $description .= $fulltext;
 			$item_desc_cut = StringHelper::strlen($description) > $feed_summary_cut;
 			$description = flexicontent_html::striptagsandcut( $description, $feed_summary_cut);
 
 			if ($feed_use_image) :
-				if (!empty($img_field_name)) {
+				$src = '';
+				if (!empty($img_field_name) && !empty($item->fields[$img_field_name]->has_access)) {
 					// render method 'display_NNNN_src' to avoid CSS/JS being added to the page
 					/* $src = */FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src');
 					$img_field = $item->fields[$img_field_name];
 					$src = str_replace(\Joomla\CMS\Uri\Uri::root(), '', ($img_field->thumbs_src[$img_field_size][0] ?? '') );
-				} else {
+				} elseif (empty($img_field_name) && $can_view_text) {
 					$src = flexicontent_html::extractimagesrc($item);
 				}
 
-				$RESIZE_FLAG = !$feed_image_source || !$img_field_size;
+				$RESIZE_FLAG = !$feed_image_source || empty($img_field_size);
 				if ( $src && $RESIZE_FLAG ) {
 					// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
 					$thumb = flexicontent_images::phpThumbURL(array(
@@ -165,7 +173,8 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 				if ($thumb) {
 					$thumb = (!preg_match("#^http|^https|^ftp#i", $thumb) ?  $domain : '') . $thumb;  // Prepend site 's URL protocol, domain and port
-					$_img = '<img src="'.$thumb.'" alt="'.$title.'" title="'.$title.'" align="left" style="margin-left: 12px;"/>';
+					$_title_attr = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+					$_img = '<img src="'.$thumb.'" alt="'.$_title_attr.'" title="'.$_title_attr.'" align="left" style="margin-left: 12px;"/>';
 					if ($feed_link_image) $_img = '<a class="feed-readmore" target="_blank" href="'.$link.'">'.$_img.'</a>';
 					$description = '
 					<div class="feed-description">
@@ -177,7 +186,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 			if ($extra_fields) {
 				foreach($extra_fields as $fieldname) {
-					if ( isset($item->fields[$fieldname]->display) ) {
+					if (!empty($item->fields[$fieldname]->has_access) && isset($item->fields[$fieldname]->display)) {
 						$description .= '<br/><b>'.$item->fields[$fieldname]->label .":</b> ". $item->fields[$fieldname]->display;
 					}
 				}
@@ -185,15 +194,14 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 
 			// Add readmore link to description if introtext is shown, show_readmore is true and fulltext exists
-			$more_text_exists = (!$feed_summary && $item->fulltext) || $item_desc_cut;
+			$more_text_exists = (!$feed_summary && $fulltext) || $item_desc_cut;
 			if ($params->get('feed_show_readmore', 0) && $more_text_exists)
 			{
 				$description .= '<p class="feed-readmore"><a target="_blank" href ="' . $link . '">' .  \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $title) . '</a></p>';
 			}
 
 
-			$author = !empty($item->created_by_alias)  ?  $item->created_by_alias  :  (!empty($item->author) ? $item->author : '');
-			$date = $item->publish_up ? $item->publish_up : $item->created;
+			$date = $item->publish_up ?: (!empty($item->fields['created']->has_access) ? $item->created : '');
 			@ $date = ( $date ? date( 'r', strtotime($date) ) : '' );
 
 			// load individual item creator class
@@ -203,7 +211,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			//$JF_item->image     = $thumb;  // Currently unused by Joomla, since browser support is incomplete
 			$JF_item->description = $description;
 			$JF_item->date			  = $date;
-			//$JF_item->author    = $author;
 			$JF_item->category    = $this->escape( $category->title );
 
 			// add item data into FEEDs array

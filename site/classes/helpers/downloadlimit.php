@@ -432,6 +432,21 @@ class flexicontent_downloadlimit
 			. $db->quote(gmdate('Y-m-d H:i:s', $now)) . ', ' . $db->quote(gmdate('Y-m-d H:i:s', $now + $settings['window'])) . ')'
 		)->execute();
 
+		/**
+		 * Count again, now that this download is recorded. Requests that arrive together all pass the check above,
+		 * but here each one sees the rows of the others, so together they can not take more than the limit:
+		 * a request that finds the limit exceeded takes its row back and is refused.
+		 * Requests that come one after the other never exceed the limit here, the check above already refused them
+		 */
+		$row_id = (int) $db->insertid();
+
+		if ($row_id && self::isOverLimit($db, $settings, $id, $state['limit']))
+		{
+			$db->setQuery('DELETE FROM ' . $db->quoteName('#__flexicontent_download_log') . ' WHERE id = ' . $row_id)->execute();
+
+			return false;
+		}
+
 		// Rows are useless once their window has passed: purge now and then, a few at a time
 		if (mt_rand(1, 20) === 1)
 		{
@@ -439,6 +454,17 @@ class flexicontent_downloadlimit
 		}
 
 		return true;
+	}
+
+	/** Do the recorded downloads of the identity exceed the limit (guests: also the ceiling of their IP) */
+	protected static function isOverLimit($db, array $settings, array $id, $limit)
+	{
+		if (self::countRows($db, $settings, self::identityWhere($db, $id)) > $limit)
+		{
+			return true;
+		}
+
+		return !$id['user_id'] && self::countRows($db, $settings, self::identityWhere($db, $id, 'ip')) > $limit * $settings['ip_factor'];
 	}
 
 	public static function purge($db = null)

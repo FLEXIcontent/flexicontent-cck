@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<extension type="plugin" group="jce" method="upgrade">
+
+	<name>JCE - FLEXIcontent Links</name>
+	<author>Emmanuel Danan, Georgios Papadakis, Ryan Demmer</author>
+	<creationDate>November 2026</creationDate>
+	<copyright>Copyright (C) 2014 FLEXIcontent project. All rights reserved.</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>flexicontentcck@gmail.com</authorEmail>
+	<authorUrl>https://www.flexicontent.org</authorUrl>
+	<version>3.0.0</version>
+	<description>FLEXIcontent categories, items, tags and authors in the link dialog of the JCE editor (JCE 2.9 and JCE 3). Installed and removed by FLEXIcontent.</description>
+
+	<files>
+		<filename plugin="links_flexicontentlinks">links_flexicontentlinks.php</filename>
+		<filename>index.html</filename>
+	</files>
+
+</extension>

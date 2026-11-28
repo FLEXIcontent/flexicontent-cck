@@ -1,5 +1,6 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
+require_once __DIR__ . '/security.php';
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
@@ -711,43 +712,35 @@ class flexicontent_html
 
 	static function is_safe_url($url, $baseonly=false)
 	{
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
-		$allowed_redirecturls = $cparams->get('allowed_redirecturls', 'internal_base');  // Parameter does not exist YET
-
-		// prefix the URL if needed so that parse_url will work
-		$has_prefix = preg_match("#^http|^https|^ftp|^ftps#i", $url ?? '');
-
-		if (!$has_prefix) 
+		if (!is_string($url) || preg_match('/[\x00-\x20\x7f\\\\]/', $url))
 		{
-			$is_abs_noproto = strpos($url ?? '', "//" ) === 0;
-			$is_abs_urlpath = strpos($url ?? '', "/" ) === 0;
-
-			if ($is_abs_noproto)
-			{
-				$url = 'http:' . $url;
-			}
-			elseif (!$is_abs_urlpath)
-			{
-				$url = \Joomla\CMS\Uri\Uri::base() . $url;
-			}
-			else
-			{
-				$url = 'https://' . $url;
-			}
+			return false;
 		}
 
-		// Require baseonly internal url: (HOST only)
-		if ( $baseonly || $allowed_redirecturls == 'internal_base' )
-			return flexicontent_html::get_basedomain($url) == flexicontent_html::get_basedomain(\Joomla\CMS\Uri\Uri::base());
+		$checked = flexicontent_security::safeUrl($url);
+		if ($checked === '' || $checked !== html_entity_decode($url, ENT_QUOTES | ENT_HTML5, 'UTF-8'))
+		{
+			return false;
+		}
 
-		// Require full internal url: (HOST + this JOOMLA folder)
-		else // if ( $allowed_redirecturls == 'internal_full' )
-			return parse_url($url, PHP_URL_HOST) == parse_url(\Joomla\CMS\Uri\Uri::base(), PHP_URL_HOST);
+		$networkUrl = '~^(?:https?:)?//~i';
+		if (!preg_match($networkUrl, $url))
+		{
+			return !preg_match($networkUrl, $checked) && !preg_match('~^[^/?#]*:~', $url);
+		}
 
-		// Allow any URL, (external too) this may be considered a vulnerability for unlogged/logged users, since
-		// users may be redirected to an offsite URL despite clicking an internal site URL received e.g. by an email
-		//else
-		//	return true;
+		$siteHost = parse_url(\Joomla\CMS\Uri\Uri::base(), PHP_URL_HOST);
+		if (!$siteHost) return false;
+
+		// Check the original redirect target as well as the HTML-decoded form.
+		foreach (array($url, $checked) as $target)
+		{
+			$parts = parse_url($target);
+			if (empty($parts['host']) || isset($parts['user']) || isset($parts['pass'])
+				|| strcasecmp($parts['host'], $siteHost) !== 0) return false;
+		}
+
+		return true;
 	}
 
 
@@ -995,7 +988,8 @@ class flexicontent_html
 
 		$default_orderby = $params->get( 'orderby'.$sfx );
 		$orderby = $app->input->get('orderby'.$sfx, '', 'string');
-		$orderby = $orderby ? $orderby : $default_orderby;
+		$options = array_replace(array_map(array(\Joomla\CMS\Language\Text::class, '_'), $extra_order_types), self::getOrderbyOptions($params, $sfx));
+		$orderby = is_string($orderby) && $orderby !== '' && array_key_exists($orderby, $options) ? $orderby : $default_orderby;
 
 		flexicontent_html::loadFramework('select2');
 		$classes  = "fc_field_filter use_select2_lib";
@@ -1014,6 +1008,23 @@ class flexicontent_html
 		$attribs['list.attr']['class'] = $classes;
 		$attribs['list.attr']['form'] = $formname;
 
+		$ordering = array();
+		foreach ($options as $value => $text)
+		{
+			$ordering[] = array(
+				'value' => $value,
+				'text' => $text,
+				'attr' => $default_orderby == $value ? array('data-is-default-value' => '1') : array(),
+			);
+		}
+
+		return \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $ordering, 'orderby'.$sfx, $attribs);
+	}
+
+
+	/** The configured ordering choices available to the current viewer. */
+	static function getOrderbyOptions($params, $sfx = '', $includeCustom = true)
+	{
 		$orderby_options = $params->get(
 			'orderby_options'.$sfx,
 			array('_preconfigured_','date','rdate','modified','alpha','ralpha','author','rauthor','hits','rhits','id','rid','order','jorder')
@@ -1038,80 +1049,56 @@ class flexicontent_html
 			'commented'=>'FLEXI_ORDER_MOST_COMMENTED',
 			'rated'=>'FLEXI_ORDER_BEST_RATED',
 			'order'=>'FLEXI_ORDER_CONFIGURED_ORDER',
+			'rorder'=>'FLEXI_ORDER_CONFIGURED_ORDER_REVERSE',
 			'jorder'=>'FLEXI_ORDER_CONFIGURED_ORDER_JOOMLA',
+			'rjorder'=>'FLEXI_ORDER_CONFIGURED_ORDER_JOOMLA_REVERSE',
 			'random'=>'FLEXI_ORDER_RANDOM',
 			'alias'=>'FLEXI_ORDER_ALIAS',
 			'ralias'=>'FLEXI_ORDER_ALIAS_REVERSE'
 		);
 
-		$ordering = array();
-		foreach ($extra_order_types as $value => $text)
-		{
-			$text = \Joomla\CMS\Language\Text::_( $text );
-			//$ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  $value,  $text);
-			$attr_arr = $default_orderby == $value ? array('data-is-default-value' => '1') : array();
-			$ordering[] = array(
-				'value' => $value,
-				'text'  => $text,
-				'attr'  => $attr_arr
-			);
-		}
+		$options = array();
 		foreach ($orderby_options as $orderby_option)
 		{
-			if ($orderby_option=='__SAVED__') continue;
-			$value = ($orderby_option!='_preconfigured_') ? $orderby_option : '';
-			$text = \Joomla\CMS\Language\Text::_( $orderby_names[$orderby_option] );
-			//$ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  $value,  $text);
-			$attr_arr = $default_orderby == $value ? array('data-is-default-value' => '1') : array();
-			$ordering[] = array(
-				'value' => $value,
-				'text'  => $text,
-				'attr'  => $attr_arr
-			);
+			if (!is_string($orderby_option) || !isset($orderby_names[$orderby_option])) continue;
+			$value = $orderby_option === '_preconfigured_' ? '' : $orderby_option;
+			$options[$value] = \Joomla\CMS\Language\Text::_($orderby_names[$orderby_option]);
 		}
 
+		if (!$includeCustom) return $options;
 
-		// Add custom field orderings
-		$orderby_custom = $params->get('orderby_custom'.$sfx, '');
-		$orderby_custom = preg_split("/\s*,\s*/u", $orderby_custom);
-		$custom_order_types = array('int'=>1, 'decimal'=>1, 'date'=>1, 'file_hits'=>1);
-
+		$orderby_custom = preg_split('/\s*,\s*/u', trim((string) $params->get('orderby_custom'.$sfx, ''))) ?: array();
+		$custom_order_types = array('alpha', 'int', 'decimal', 'date', 'file_hits');
 		$field_ids = array();
 		$custom_ops = array();
-		$n = 0;
+
 		foreach ($orderby_custom as $custom_option)
 		{
-			$order_parts = preg_split("/:/", $custom_option);
-			if (count($order_parts)!=3 && count($order_parts)!=4) continue;  // ignore order with wrong number parts
-			$_field_id = (int) @ $order_parts[0];
-			if (!$_field_id) continue;  // ignore order with bad fieldid
-			if (!isset($custom_order_types[@ $order_parts[1]]))  continue;  // ignore order with bad type
-			$field_ids[$_field_id] = 1;
-			$custom_ops[$n] = $order_parts;
-			$n++;
+			$order_parts = explode(':', $custom_option);
+			if (count($order_parts) < 3 || count($order_parts) > 4) continue;
+
+			list($fieldId, $type, $direction) = $order_parts;
+			if (!ctype_digit($fieldId) || (int) $fieldId < 1 || !in_array($type, $custom_order_types, true)
+				|| !in_array(strtoupper($direction), array('ASC', 'DESC'), true)) continue;
+
+			$field_ids[(int) $fieldId] = true;
+			$custom_ops[] = $order_parts;
 		}
+
+		if (!$custom_ops) return $options;
 
 		$fields = FlexicontentFields::getFieldsByIds(array_keys($field_ids));
-		foreach($custom_ops as $op)
+		foreach ($custom_ops as $op)
 		{
-			$field_id = $op[0];
-			$field    = $fields[$field_id];
-			$value = 'custom:'.$op[0].':'.$op[1].':'.$op[2];
-			if (count($op)==4) {
-				$text = \Joomla\CMS\Language\Text::_( $op[3] );
-			} else {
-				$text = \Joomla\CMS\Language\Text::_( $field->label ) .' '. \Joomla\CMS\Language\Text::_(strtolower($op[2])=='asc' ? 'FLEXI_INCREASING' : 'FLEXI_DECREASING');
-			}
-			//$ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $value,  $text);
-			$attr_arr = $default_orderby == $value ? array('data-is-default-value' => '1') : array();
-			$ordering[] = array(
-				'value' => $value,
-				'text'  => $text,
-				'attr'  => $attr_arr
-			);
+			$field = $fields[(int) $op[0]] ?? null;
+			if (!$field || empty($field->has_access) || (int) $field->published !== 1) continue;
+
+			$value = 'custom:' . $op[0] . ':' . $op[1] . ':' . $op[2];
+			$options[$value] = isset($op[3]) ? \Joomla\CMS\Language\Text::_($op[3])
+				: \Joomla\CMS\Language\Text::_($field->label) . ' ' . \Joomla\CMS\Language\Text::_(strcasecmp($op[2], 'ASC') === 0 ? 'FLEXI_INCREASING' : 'FLEXI_DECREASING');
 		}
 
-		return \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $ordering, 'orderby'.$sfx, $attribs);
+		return $options;
 	}
 
 
@@ -1352,11 +1339,26 @@ class flexicontent_html
 		) : null;
 
 		$JQUERY_UI_VER = FLEXI_J40GE ? '1.13.1' : $params->get('jquery_ui_ver', $flexiparams->get('jquery_ui_ver', '1.9.2'));
+
+		// Hashes of the jQuery UI files of the fixed version above, for the copies of code.jquery.com.
+		// When the version is changed the hashes must be changed with it.
+		$JQUERY_UI_VER_URL_ATTRS = FLEXI_J40GE ? array(
+			'integrity' => 'sha384-tc3TMXCcTCib89yECEQXI4e6DhhlwNrqzYpvyeSqBD2vB/KugQH7o3p+/UtKuS5L',
+			'crossorigin' => 'anonymous',
+		) : array();
+		$JQUERY_UI_CSS_HASHES = array(
+			'ui-lightness' => 'sha384-HG5zP42GoRuf0kkcbWqxrO6/qvHj0PW7UAl0cPTyaSm4If2hcnGTSIShly0+YoET',
+			'smoothness'   => 'sha384-1O/Ea+UHoX8+zUg3pZwYjiQ2ghQi0q3aK9bEDHA21sd/7+6IL5NO2bVfOpSBxTAK',
+		);
 		$JQUERY_UI_THEME = $params->get('jquery_ui_theme', $flexiparams->get('jquery_ui_theme', 'ui-lightness'));   // FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness'
 		if (!in_array($JQUERY_UI_THEME, array('ui-lightness', 'smoothness')))
 		{
 			$JQUERY_UI_THEME = 'ui-lightness';
 		}
+		$JQUERY_UI_CSS_URL_ATTRS = FLEXI_J40GE ? array(
+			'integrity' => $JQUERY_UI_CSS_HASHES[$JQUERY_UI_THEME],
+			'crossorigin' => 'anonymous',
+		) : array();
 		\Joomla\CMS\Language\Text::script("FLEXI_FORM_IS_BEING_SUBMITTED", true);
 		\Joomla\CMS\Language\Text::script("FLEXI_AJAX_SAVE_UNCONFIRMED", true);
 		\Joomla\CMS\Language\Text::script("FLEXI_LOADING", true);
@@ -1370,7 +1372,7 @@ class flexicontent_html
 			if ($add_remote_forced_jquery)
 			{
 				\Joomla\CMS\HTML\HTMLHelper::_('jquery.framework');   // add and "override" it
-				$document->addScript('//code.jquery.com/jquery-'.$JQUERY_VER.'.min.js', null, $JQUERY_VER_URL_ATTRS);
+				$document->addScript('https://code.jquery.com/jquery-'.$JQUERY_VER.'.min.js', array(), (array) $JQUERY_VER_URL_ATTRS);
 			}
 			else
 			{
@@ -1400,7 +1402,7 @@ class flexicontent_html
 				!FLEXI_J40GE
 					? \Joomla\CMS\HTML\HTMLHelper::_('jquery.ui', array())
 					: false;
-				$document->addScript('//code.jquery.com/ui/'.$JQUERY_UI_VER.'/jquery-ui.min.js');
+				$document->addScript('https://code.jquery.com/ui/'.$JQUERY_UI_VER.'/jquery-ui.min.js', array(), $JQUERY_UI_VER_URL_ATTRS);
 			}
 			else
 			{
@@ -1430,7 +1432,7 @@ class flexicontent_html
 		{
 			// FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness', ...
 			$add_remote_forced_jquery_ui
-				? $document->addStyleSheet('//code.jquery.com/ui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css')
+				? $document->addStyleSheet('https://code.jquery.com/ui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css', array(), $JQUERY_UI_CSS_URL_ATTRS)
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
 			$jquery_ui_css_added = 1;
 		}
@@ -1602,7 +1604,9 @@ class flexicontent_html
 				$url_grapjs_css = 'https://unpkg.com/grapesjs@' . $grapjs_vers . '/dist/css/grapes.min.css';
 				$url_grapjs_js = 'https://unpkg.com/grapesjs@' . $grapjs_vers . '/dist/grapes.min.js';
 
-				$document->addStyleSheet($url_grapjs_css);
+				// Files of a fixed version from a public CDN carry the hash of their content (also below: CKEditor, the marker
+				// library of Google Maps, Pannellum). When a version is changed its hash must be changed with it.
+				$document->addStyleSheet($url_grapjs_css, array(), array('integrity' => 'sha384-NgYkviF1QYt5u7JTDH4F5cjuuD66x03ziu7A7IUB8VIFQKZgFDRaQIjdTlg1EGis', 'crossorigin' => 'anonymous'));
 				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-preset-webpage.min.css?0.1.10');
 				$document->addStyleSheet($framework_path.'/stylesheets/tooltip.css');
 				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-plugin-filestack.css');
@@ -1610,7 +1614,7 @@ class flexicontent_html
 
 				$document->addScript('https://static.filestackapi.com/v3/filestack.js');
 				flexicontent_html::loadFramework('flexi-lib');
-				$document->addScript($url_grapjs_js);
+				$document->addScript($url_grapjs_js, array(), array('integrity' => 'sha384-M913B9OGq8BuWWzEcBN1aDy7AU5/NrlBJqlH3ECKJ4iLC3uQD3SL1B49B7lSh9SX', 'crossorigin' => 'anonymous'));
 
 
 				// GrapesJS Plugins
@@ -1626,7 +1630,7 @@ class flexicontent_html
 				//$document->addScript('https://unpkg.com/grapesjs-shape-divider');  
 				//ckeditor for graps
 				$document->addScript($framework_path.'/js/grapesjs-plugin-ckeditor.min.js?0.0.9');
-				$document->addScript('https://cdn.ckeditor.com/4.14.1/standard-all/ckeditor.js');
+				$document->addScript('https://cdn.ckeditor.com/4.14.1/standard-all/ckeditor.js', array(), array('integrity' => 'sha384-NpiXKpOhtQoSrIoZJ7h0E022OikCppWFWwremUigC1T5qx4slbuNkailUR0qETeo', 'crossorigin' => 'anonymous'));
 				//bs4
 				//$document->addScript($framework_path.'/js/grapesjs-blocks-bootstrap4.min');
 				break;
@@ -1729,7 +1733,7 @@ class flexicontent_html
 				// Add map link 
 				$document->addScript('https://maps.google.com/maps/api/js?libraries=geometry,places' . ($apikey ? '&key=' . $apikey : '') . $force_language_param);
 				// Add JS library for markers at the same location
-				$document->addScript('https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier/1.0.3/oms.min.js');
+				$document->addScript('https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier/1.0.3/oms.min.js', array(), array('integrity' => 'sha384-KT28B74TXc0QCOqUUQHuoE0AC0uwd+ssHjV3Wh0BXeNJGxLGormf+6wEzoVJs+/g', 'crossorigin' => 'anonymous'));
 				break;
 
 			case 'openstreetmap' :
@@ -1743,8 +1747,8 @@ class flexicontent_html
 
 
 			case 'pannellum' :
-				$document->addStyleSheet('https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css');
-				$document->addScript('https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js');
+				$document->addStyleSheet('https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css', array(), array('integrity' => 'sha384-02yn80EH0cF+s23taAmuhEZ04p3CTbQvV0QZMr2reUxajpfvcLNKlzsPkZwx14mf', 'crossorigin' => 'anonymous'));
+				$document->addScript('https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js', array(), array('integrity' => 'sha384-S5+w/JlcNAOymqXGNrvzn2F++XsaHTJdex6KE5VbKryfFgqJiRUJOgOkUqaiOZTf', 'crossorigin' => 'anonymous'));
 				break;
 
 			case 'select2':
@@ -2439,10 +2443,17 @@ class flexicontent_html
 
 		$image = !empty($matches) ? $matches[2] : '';
 
-		// Case of local file, check that file exists
-		if (!preg_match("#^http|^https|^ftp#i", $image))
+		// Case of local file, check that file exists and that it is a public image: the path was written by the author
+		// and the callers build a (signed) thumbnail URL for it, see flexicontent_images::phpThumbPublicImage()
+		if (!preg_match("#^(?:https?|ftp)://#i", $image))
 		{
-			$image = file_exists( JPATH_SITE . DS . $image ) ? $image : '';
+			$image = flexicontent_images::phpThumbPublicImage($image) && file_exists( JPATH_SITE . DS . $image ) ? $image : '';
+		}
+
+		// Case of URL, its path must not lead into a protected folder of this site either
+		elseif (!flexicontent_images::phpThumbPublicImage($image, true))
+		{
+			$image = '';
 		}
 
 		return $image;

@@ -5,7 +5,7 @@
  */
 $field->{$prop} =
 	$pretext
-		. $item->title .
+		. ($prop === 'csv_export' ? $item->title : htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8')) .
 	$posttext;
 
 /*
@@ -17,7 +17,7 @@ if ($field->parameters->get('useogp', 1) && $field->{$prop})
 	if (static::$isHtmlViewFE && $isMatchedItemView)
 	{
 		$ogpmaxlen = $field->parameters->get('ogpmaxlen', 300);
-		$content_val = flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen);
+		$content_val = flexicontent_html::striptagsandcut($pretext . $item->title . $posttext, $ogpmaxlen);
 
 		$document->addCustomTag('<meta property="og:title" content="'.$content_val.'" />');
 	}

@@ -317,19 +317,38 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 			? \Joomla\CMS\Mail\MailHelper::cleanSubject($params->get('mailsubject_owner'))
 			: \Joomla\CMS\Language\Text::_('FLEXI_SUBJECT_DEFAULT');
 
-		$body = $params->get('mailbody_owner', '')
-			? \Joomla\CMS\Mail\MailHelper::cleanSubject($params->get('mailsubject_owner'))
-			: \Joomla\CMS\Language\Text::_('FLEXI_SUBJECT_DEFAULT');
-
-		$message = \Joomla\CMS\Language\Text::sprintf('FLEXI_NOTIFICATION_MESSAGE_OWNER',
+		// The message is sent as HTML: encode the values that are placed into it
+		$message_values = array(
 			$subname,
 			$itemid,
-			$title,
-			$maincat,
+			htmlspecialchars((string) $title, ENT_QUOTES, 'UTF-8'),
+			htmlspecialchars((string) $maincat, ENT_QUOTES, 'UTF-8'),
 			$itemStateName,
 			'<a href="'.$item_url.'">'.$item_url.'</a>',
-			$site_info
+			htmlspecialchars((string) $site_info, ENT_QUOTES, 'UTF-8'),
 		);
+
+		// Use custom message body if this is set (same placeholders as the default text), but not a body that the placeholders do not fit
+		$message = '';
+		$body    = trim((string) $params->get('mailbody_owner', ''));
+
+		if ($body !== '')
+		{
+			try
+			{
+				$message = (string) @vsprintf($body, $message_values);
+			}
+			catch (\Throwable $e)
+			{
+				$message = '';
+			}
+		}
+
+		if ($message === '')
+		{
+			$message = \Joomla\CMS\Language\Text::sprintf('FLEXI_NOTIFICATION_MESSAGE_OWNER', ...$message_values);
+		}
+
 		$message  = nl2br($message);
 
 
@@ -342,7 +361,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		$to = \Joomla\CMS\Mail\MailHelper::cleanAddress($owner->email);
 		$to_arr[] = $to;
 		$_message = $message;
-		$_message = str_replace('__OWNER_NAME__', $owner->name, $_message);
+		$_message = str_replace('__OWNER_NAME__', htmlspecialchars((string) $owner->name, ENT_QUOTES, 'UTF-8'), $_message);
 
 		$from      = $sendermail;
 		$fromname  = $sendername;
@@ -455,13 +474,14 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 			? \Joomla\CMS\Mail\MailHelper::cleanSubject($params->get('mailsubject'))
 			: \Joomla\CMS\Language\Text::_('FLEXI_SUBJECT_DEFAULT');
 
+		// The message is sent as HTML: encode the values that are placed into it
 		$message = \Joomla\CMS\Language\Text::sprintf('FLEXI_NOTIFICATION_MESSAGE',
 			$subname,
 			$itemid,
-			$title,
-			$maincat,
+			htmlspecialchars((string) $title, ENT_QUOTES, 'UTF-8'),
+			htmlspecialchars((string) $maincat, ENT_QUOTES, 'UTF-8'),
 			'<a href="'.$item_url.'">'.$item_url.'</a>',
-			$site_info
+			htmlspecialchars((string) $site_info, ENT_QUOTES, 'UTF-8')
 		);
 		$message  = nl2br($message);
 
@@ -481,7 +501,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 				$to = \Joomla\CMS\Mail\MailHelper::cleanAddress($subscriber->email);
 				$to_arr[] = $to;
 				$_message = $message;
-				if ($include_fullname) $_message = str_replace('__SUBSCRIBER_NAME__', $subscriber->name, $_message);
+				if ($include_fullname) $_message = str_replace('__SUBSCRIBER_NAME__', htmlspecialchars((string) $subscriber->name, ENT_QUOTES, 'UTF-8'), $_message);
 
 				$from      = $sendermail;
 				$fromname  = $sendername;

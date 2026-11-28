@@ -2403,7 +2403,7 @@ class FlexicontentFields
 		$sql_mode = (int) $field->parameters->get('sql_mode', 0);
 		$canCache = ! $field->parameters->get('nocache');
 
-		if ($canCache && isset($_elements_cache[$field->id][$iLang][$is_filter]))
+		if ($canCache && !$and_clause && isset($_elements_cache[$field->id][$iLang][$is_filter]))
 		{
 			return $_elements_cache[$field->id][$iLang][$is_filter];
 		}
@@ -2449,12 +2449,13 @@ class FlexicontentFields
 			$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 			// Get/verify query string, check if item properties and other replacements are allowed and replace them
-			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
-			$query = FlexicontentFields::doQueryReplacements($field_elements, $field, $item, $item_pros, $canCache);
+			$query = preg_match('/^SELECT\b/i', ltrim($field_elements)) ? $field_elements : '';
 
 			if ($query)
 			{
-				$query = preg_replace('/_valgrp_in_/ui', ($and_clause ? $and_clause : ' 1 '), $query);
+				$query = FlexicontentFields::doQueryReplacements($query, $field, $item, $item_pros, $canCache);
+				// Replace the marker literally so the database driver's quoting stays intact.
+				$query = $query ? str_ireplace('_valgrp_in_', $and_clause ?: ' 1 ', $query) : '';
 			}
 
 			// Execute SQL query to retrieve the field value - label pair, and any other extra properties
@@ -2606,8 +2607,18 @@ class FlexicontentFields
 
 
 	// Helper method to replace item properties for the SQL value mode for various fields
-	static function doQueryReplacements(&$query, &$field, &$item, &$item_pros=true, &$canCache=null)
+	static function doQueryReplacements(&$query, &$field, &$item, &$item_pros=true, &$canCache=null, $is_sql=true)
 	{
+		// Inside an SQL query a replaced value is escaped, so it stays data wherever the query places it inside quotes
+		$_db = $is_sql ? \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class) : null;
+		$_propValue = static function ($object, $tag, $prefix_len) use ($_db)
+		{
+			$prop  = substr($tag, $prefix_len, -1);
+			$value = is_object($object) && isset($object->$prop) && is_scalar($object->$prop) ? (string) $object->$prop : '';
+
+			return $_db ? $_db->escape($value) : $value;
+		};
+
 		// ***
 		// *** Replace item properties
 		// ***
@@ -2644,9 +2655,8 @@ class FlexicontentFields
 
 		foreach ($matches[0] as $replacement_tag)
 		{
-			$replacement_value = '$'.substr($replacement_tag, 1, -1);
-			eval ("\$replacement_value = \"$replacement_value\";");
-			$query = str_replace($replacement_tag, $replacement_value, $query);
+			// {item->property}
+			$query = str_replace($replacement_tag, $_propValue($item, $replacement_tag, 7), $query);
 		}
 
 
@@ -2659,9 +2669,8 @@ class FlexicontentFields
 			preg_match_all("/{field->[0-9a-zA-Z_]+}/", $query, $matches);
 			foreach ($matches[0] as $replacement_tag)
 			{
-				$replacement_value = '$'.substr($replacement_tag, 1, -1);
-				eval ("\$replacement_value = \" $replacement_value\";");
-				$query = str_replace($replacement_tag, $replacement_value, $query);
+				// {field->property}, the value has always been inserted with a space in front
+				$query = str_replace($replacement_tag, ' ' . $_propValue($field, $replacement_tag, 8), $query);
 			}
 		}
 
@@ -6066,7 +6075,10 @@ class FlexicontentFields
 
 			// b. Replace item properties, e.g. {item->id}, (item->title}, etc
 			$null_field = null;
-			FlexicontentFields::doQueryReplacements($curr_relitem_html, $null_field, $result);
+			// An HTML template, not a query
+			$_item_pros = true;
+			$_can_cache = null;
+			FlexicontentFields::doQueryReplacements($curr_relitem_html, $null_field, $result, $_item_pros, $_can_cache, false);
 
 			// c. Replace HTML display of various item fields
 			$err_mssg = 'Cannot replace field: "%s" because it is of not allowed field type: "%s", which can cause loop or other problem';

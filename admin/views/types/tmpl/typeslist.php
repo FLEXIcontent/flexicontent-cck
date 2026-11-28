@@ -17,6 +17,11 @@ $returnURL = $isAdmin ? '' : $refererURL;
 $types = flexicontent_html::getTypesList( $_type_ids=false, $_check_perms = false, $_published=true);
 $types = is_array($types) ? $types : array();
 
+// On the site this list opens from the "add" button, which can be shown to guests too (guest submission, add button for
+// unauthorized visitors), so it has no login check. It lists what the visitor may use: types of the visitor's access
+// levels (0: no level set, as in the item lists), or types that their own ACL lets the visitor create
+$view_levels = $isAdmin ? null : array_map('intval', (array) $user->getAuthorisedViewLevels());
+
 $ctrl_task = 'items.add';
 $icon = "components/com_flexicontent/assets/images/layout_add.png";
 $btn_class = 'choose_type';
@@ -47,6 +52,14 @@ echo '
 		foreach($types as $type)
 		{
 			$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
+
+			/*
+			 * Site: the type is outside the access levels of the visitor and no ACL rule of the type grants its creation
+			 */
+			if ($view_levels !== null && !empty($type->access) && !in_array((int) $type->access, $view_levels, true) && !($allowed && $type->itemscreatable))
+			{
+				continue;
+			}
 
 			/*
 			 * Creation not allowed, and item type is not visible

@@ -742,19 +742,20 @@ class FCIndexedField extends FCField
 			$valgrps = $ajax || $single_master ? $field->valgrps : (isset($field->valgrps[$i]) ? $field->valgrps[$i] : null);
 
 			// If using a multi-value per value field (checkbox / multi-select) then account for the fact that every of its values can be an array
-			if ($valgrps)
+			$_valgrps = array();
+			foreach ((array) $valgrps as $vg)
 			{
-				$_valgrps = array();
-				foreach($valgrps as $vg)
+				$vg = is_array($vg) ? reset($vg) : $vg;
+				if (is_string($vg) || is_int($vg))
 				{
-					$_valgrps[] = is_array($vg) ? reset($vg) : $vg;
+					$_valgrps[] = $vg;
 				}
-				if ($_valgrps && !strlen($_valgrps[0]))
-				{
-					unset($_valgrps[0]);
-				}
-				$valgrps = $_valgrps;
 			}
+			if (isset($_valgrps[0]) && $_valgrps[0] === '')
+			{
+				unset($_valgrps[0]);
+			}
+			$valgrps = $_valgrps;
 
 			if (empty($valgrps))
 			{
@@ -984,7 +985,11 @@ class FCIndexedField extends FCField
 
 		// Load field
 		$_fields = FlexicontentFields::getFieldsByIds(array($field_id), array($item_id));
-		$field = $_fields[$field_id];
+		$field = isset($_fields[$field_id]) ? $_fields[$field_id] : null;
+		if (!$field)
+		{
+			throw new \RuntimeException('Field not available', 403);
+		}
 		$field->item_id = $item_id;
 		$field->valgrps = $valgrps;
 		$field->valindex = $valindex;
@@ -1003,7 +1008,11 @@ class FCIndexedField extends FCField
 			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
 			$item = new $__tblClass($__tblDb);
 		}
-		$item->load( $item_id );
+		$type_ids = (array) $__tblDb->setQuery('SELECT type_id FROM #__flexicontent_fields_type_relations WHERE field_id = ' . (int) $field_id)->loadColumn();
+		if (($item_id && !$item->load($item_id)) || !$this->canGetCascadedField($field, $item, $type_ids))
+		{
+			throw new \RuntimeException('Field not available', 403);
+		}
 
 		// Get field configuration
 		FlexicontentFields::loadFieldConfig($field, $item);
@@ -1019,6 +1028,71 @@ class FCIndexedField extends FCField
 		// Output the field
 		echo $field->html;
 		exit;
+	}
+
+
+	/**
+	 * Options are given to the form of an item that the user may edit or create,
+	 * otherwise only for a field (and an item) that the user may view
+	 *
+	 * @param   object  $field     The field, with its 'has_access' flag
+	 * @param   object  $item      The item, not loaded (no id) for a new item
+	 * @param   array   $type_ids  The types that the field is assigned to
+	 *
+	 * @return  boolean
+	 */
+	protected function canGetCascadedField($field, $item, $type_ids)
+	{
+		$app     = \Joomla\CMS\Factory::getApplication();
+		$user    = $app->getIdentity();
+		$session = $app->getSession();
+
+		if ((int) $field->published !== 1 || !in_array($field->field_type, static::$field_types))
+		{
+			return false;
+		}
+
+		// Same rule that the item form uses to render the field as editable
+		$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
+
+		// New item: the form is given to users that can create items, or that opened a submission menu of a type having the field
+		if (empty($item->id))
+		{
+			$canCreate = FlexicontentHelperPerm::getPermAny('core.create');
+			foreach ((array) $session->get('item_submit_conf', array(), 'flexicontent') as $submit_conf)
+			{
+				if (is_array($submit_conf) && !empty($submit_conf['type_ids']) && array_intersect((array) $submit_conf['type_ids'], $type_ids))
+				{
+					$canCreate = true;
+				}
+			}
+
+			return ($is_editable && $canCreate) || !empty($field->has_access);
+		}
+
+		// Existing item: edit rights of the item form, including an item that is editable until the session ends
+		$rendered_uneditable = (array) $session->get('rendered_uneditable', array(), 'flexicontent');
+		$asset   = 'com_content.article.' . $item->id;
+		$canEdit = !empty($rendered_uneditable[$item->id])
+			|| $user->authorise('core.edit', $asset)
+			|| ($user->authorise('core.edit.own', $asset) && $item->created_by && $item->created_by == $user->id);
+
+		if ($is_editable && $canEdit && in_array($item->type_id, $type_ids))
+		{
+			return true;
+		}
+
+		// Not an editor: item, its type and categories, and the field must all be viewable
+		try
+		{
+			flexicontent_security::loadItemField($item->id, $field->id, $field->field_type);
+		}
+		catch (\RuntimeException $e)
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 

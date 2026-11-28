@@ -51,6 +51,12 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 	function getlineno()
 	{
+		if (!FlexicontentHelperPerm::getPerm()->CanImport)
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 403);
+		}
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
 		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$has_zlib = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
 

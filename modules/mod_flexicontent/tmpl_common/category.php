@@ -94,7 +94,7 @@ else :
 			<div class="catimage">
 				<?php
 				if ($catdata->image) {
-					$catimage_thumb = '<img class="catimage_thumb" src="'.$catdata->image.'" alt="'.addslashes($catdata->title).'" title="'.addslashes($catdata->title).'"/>';
+					$catimage_thumb = '<img class="catimage_thumb" src="'.$catdata->image.'" alt="'.htmlspecialchars((string) $catdata->title, ENT_QUOTES, 'UTF-8', false).'" title="'.htmlspecialchars((string) $catdata->title, ENT_QUOTES, 'UTF-8', false).'"/>';
 				} else { // DEFAULT IMAGE or empty image place holder
 					//$catimage_thumb = '<div class="fccat_image" style="height:'.$catdata->conf->image_height.'px;width:'.$catdata->conf->image_width.'px;" ></div>';
 				}

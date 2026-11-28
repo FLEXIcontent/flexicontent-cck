@@ -78,6 +78,8 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 				unset($item->$property);
 			}
 
+			flexicontent_security::redactCoreFields($item);
+
 			$allowed_field_ids = array();
 			if (isset($item->fields) && is_array($item->fields))
 			{
@@ -111,13 +113,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 					}
 				}
 			}
-		}
-
-		// Use &test=1 to test / preview item data of first item
-		if ($jinput->getInt('test', 0) === 1)
-		{
-			$item = reset($items);
-			die('<pre>' . print_r($item, true) . '');
 		}
 
 		// Output items in JSON FORMAT

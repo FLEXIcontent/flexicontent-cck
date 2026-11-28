@@ -554,6 +554,9 @@ if ($js)
 					}
 
 					$pcpath = implode(' / ', $pcpath);
+
+					// The title as a JavaScript string literal, encoded for the onclick attribute it is printed in
+					$title_js = htmlspecialchars(json_encode((string) $row->title, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_INVALID_UTF8_SUBSTITUTE), ENT_QUOTES, 'UTF-8');
 				?>
 
 					<?php if ($isXtdBtn): ?>
@@ -580,11 +583,11 @@ if ($js)
 						<?php if(true): /* Always allow */ ?>
 							<a class="btn" style="cursor: pointer;" href="javascript:;"
 								data-assocs="<?php echo str_replace('"', '_QUOTE_', json_encode($assoc_data, JSON_UNESCAPED_UNICODE)); ?>"
-								onclick="window.parent.fcSelectItem('<?php echo $row->id; ?>', '<?php echo $this->filter_cats ?: $row->catid; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>', this, 1);">
+								onclick="window.parent.fcSelectItem('<?php echo $row->id; ?>', '<?php echo $this->filter_cats ?: $row->catid; ?>', <?php echo $title_js; ?>, this, 1);">
 							All</a>
 
 							<a class="btn" style="cursor: pointer;" href="javascript:;"
-								onclick="window.parent.fcSelectItem('<?php echo $row->id; ?>', '<?php echo $this->filter_cats ?: $row->catid; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');">
+								onclick="window.parent.fcSelectItem('<?php echo $row->id; ?>', '<?php echo $this->filter_cats ?: $row->catid; ?>', <?php echo $title_js; ?>);">
 							1</a>
 
 							<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
@@ -598,7 +601,7 @@ if ($js)
 
 					<?php else: ?>
 
-						<a style="cursor: pointer;" href="javascript:;" onclick="window.parent.fcSelectItem('<?php echo $row->id; ?>', '<?php echo $this->filter_cats ?: $row->catid; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');">
+						<a style="cursor: pointer;" href="javascript:;" onclick="window.parent.fcSelectItem('<?php echo $row->id; ?>', '<?php echo $this->filter_cats ?: $row->catid; ?>', <?php echo $title_js; ?>);">
 							<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 						</a>
 

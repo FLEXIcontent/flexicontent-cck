@@ -35,7 +35,7 @@ if ($field->prev)
 	<span class="fc-pagenav-prev' . ($use_tooltip ? ' '.$tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . '>
 		<a class="btn" href="'. $field->prevurl .'">
 			<i class="icon-previous"></i>
-			' . ( $use_title ? $field->prevtitle : htmlspecialchars($prev_label, ENT_NOQUOTES, 'UTF-8') ).'
+			' . ( $use_title ? htmlspecialchars((string) $field->prevtitle, ENT_QUOTES, 'UTF-8') : htmlspecialchars($prev_label, ENT_NOQUOTES, 'UTF-8') ).'
 			' . ( $item_use_image ? ($field->prevThumb ? '
 				<br/><img src="'.$field->prevThumb.'" alt="Previous" style="'.$img_size.'" />' : '
 				<br/><span class="fc-pagenav-noimg" style="display:inline-block; '.$img_size.'"></span>
@@ -65,7 +65,7 @@ if ($field->next)
 	<span class="fc-pagenav-next' . ($use_tooltip ? ' '.$tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . '>
 		<a class="btn" href="'. $field->nexturl .'">
 			<i class="icon-next"></i>
-			' . ( $use_title ? $field->nexttitle : htmlspecialchars($next_label, ENT_NOQUOTES, 'UTF-8') ).'
+			' . ( $use_title ? htmlspecialchars((string) $field->nexttitle, ENT_QUOTES, 'UTF-8') : htmlspecialchars($next_label, ENT_NOQUOTES, 'UTF-8') ).'
 			' . ( $item_use_image ? ($field->nextThumb ? '
 				<br/><img src="'.$field->nextThumb.'" alt="Next" style="'.$img_size.'" />' : '
 				<br/><span class="fc-pagenav-noimg" style="display:inline-block; '.$img_size.'"></span>

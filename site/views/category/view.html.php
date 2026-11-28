@@ -302,7 +302,8 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			{
 				case ''        :  $default_heading = $category->title;  break;
 				case 'myitems' :  $default_heading =Text::_('FLEXI_MY_CONTENT');  break;
-				case 'author'  :  $default_heading =Text::sprintf('FLEXI_ITEMS_OF_USER', \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $authorid)->get('name'));  break;
+				// The name is given only for an author with at least one item listed for the current visitor, see getAuthorName()
+				case 'author'  :  $default_heading = ($author_name = $model->getAuthorName()) !== '' ? Text::sprintf('FLEXI_ITEMS_OF_USER', $author_name) : Text::_('FLEXI_AUTHOR');  break;
 				case 'tags'    :  $default_heading =Text::_('FLEXI_TAG') .': '. $tag->name;  break;
 				case 'favs'    :  $default_heading =Text::_('FLEXI_MY_FAVOURITES');  break;
 				default        :  $default_heading =Text::_('FLEXI_CONTENT_IN_CATEGORY');

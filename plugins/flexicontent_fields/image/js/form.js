@@ -75,7 +75,7 @@ var fcfield_image = {
     }
     FlexiMediaMetadata.notice(box);
     try {
-      const data = await FlexiMediaMetadata.load(input, FlexiMediaMetadata.noembed(url), true);
+      const data = await FlexiMediaMetadata.load(input, FlexiMediaMetadata.noembed(url));
       if (!data) return;
       const thumb = FlexiMediaMetadata.webURL(data.thumbnail_url);
       if (!thumb) {

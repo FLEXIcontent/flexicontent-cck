@@ -97,6 +97,7 @@ foreach (preg_split('/\s*,\s*/', $search_ac_info_fields) as $_ac_field)
 	}
 }
 $search_ac_info_fields = implode(',', array_unique($_ac_info_fields));
+$search_ac_info_signature = flexicontent_security::autocompleteInfoSignature($search_ac_info_source, $search_ac_info_fields);
 
 $rich_attrs = '';
 if ((int) $search_autocomplete === 1 && $search_ac_rich)
@@ -111,6 +112,7 @@ if ((int) $search_autocomplete === 1 && $search_ac_rich)
 		. ' data-fc_ac_title_maxlen="' . $search_ac_title_maxlen . '"'
 		. ' data-fc_ac_info_source="' . $search_ac_info_source . '"'
 		. ' data-fc_ac_info_fields="' . htmlspecialchars($search_ac_info_fields, ENT_QUOTES, 'UTF-8') . '"'
+		. ' data-fc_ac_info_signature="' . $search_ac_info_signature . '"'
 		. ' data-fc_ac_info_labels="' . $search_ac_info_labels . '"'
 		. ' data-fc_ac_info_maxlen="' . $search_ac_info_maxlen . '"';
 }
@@ -398,7 +400,7 @@ if (!empty($js)) {
 
 <div class="mod_flexiadvsearch_wrapper mod_flexiadvsearch_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexiadvsearch_default<?php echo $module->id ?>">
 
-<form class="mod_flexiadvsearch<?php echo $params->get('moduleclass_sfx'); ?>" name="<?php echo $form_name; ?>" id="<?php echo $form_id; ?>" action="<?php echo $action; ?>" method="post" role="search">
+<form class="mod_flexiadvsearch<?php echo htmlspecialchars((string) $params->get('moduleclass_sfx'), ENT_QUOTES, 'UTF-8'); ?>" name="<?php echo $form_name; ?>" id="<?php echo $form_id; ?>" action="<?php echo $action; ?>" method="post" role="search">
 
 	<?php if ($params->get('canseltypes', 1) && isset($lists['contenttypes'])) : ?>
 	<fieldset id="modfcadvsearch_fc_advsearch_options_set_<?php echo $module->id;?>" class="fc_search_set">
@@ -440,7 +442,7 @@ if (!empty($js)) {
 		<?php endforeach;?>
 	<?php endif; ?>
 
-	<div class="search<?php echo $params->get('moduleclass_sfx') ?>">
+	<div class="search<?php echo htmlspecialchars((string) $params->get('moduleclass_sfx'), ENT_QUOTES, 'UTF-8') ?>">
 		<input name="option" type="hidden" value="com_flexicontent" />
 		<input name="view" type="hidden" value="search" />
 		<span class="fc_filter_html fc_text_search">

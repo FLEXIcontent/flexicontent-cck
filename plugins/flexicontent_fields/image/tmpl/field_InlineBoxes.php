@@ -52,6 +52,7 @@ foreach ($field->value as $index => $value)
 		}
 		$field->value[$index] = $value;
 	}
+	unset($value['default_image'], $value['image_path'], $value['image_size']);
 	$i++;
 
 	$fieldname_n = $fieldname.'['.$n.']';
@@ -113,7 +114,7 @@ foreach ($field->value as $index => $value)
 	}
 	else
 	{
-		$fc_preview_msg_text = $value['isURL'] ? Text::_('FLEXI_FIELD_MEDIA_URL') : $image_subpath;
+		$fc_preview_msg_text = $value['isURL'] ? Text::_('FLEXI_FIELD_MEDIA_URL') : htmlspecialchars((string) $image_subpath, ENT_QUOTES, 'UTF-8');
 		$fc_preview_msg = $fc_preview_msg_text !== ''
 			? '<span class="fc_preview_msg" id="'.$elementid_n.'_fc_preview_msg" name="'.$elementid_n.'_fc_preview_msg" title="'.htmlspecialchars(($value['isURL'] ? $image_subpath : ''), ENT_COMPAT, 'UTF-8').'">' . $fc_preview_msg_text . '</span>'
 			: '';
@@ -273,7 +274,7 @@ foreach ($field->value as $index => $value)
 	// $image_source >= 0, if 'existingname' is set then it is propably a form reload
 	elseif ($value['isURL'])
 	{
-		$img_link = $image_subpath;
+		$img_link = htmlspecialchars((string) $image_subpath, ENT_QUOTES, 'UTF-8');
 	}
 	elseif ($image_subpath)
 	{

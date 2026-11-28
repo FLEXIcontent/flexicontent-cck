@@ -29,8 +29,14 @@ foreach ($values as $value)
 		);
 	}
 
+	// The term title is text. It is encoded here unless the field is configured to encode its output already;
+	// character references typed in a title are kept. The term description follows the field's HTML configuration.
+	$title_html = !empty($encode_output)
+		? $value['title']
+		: htmlspecialchars((string) $value['title'], ENT_QUOTES, 'UTF-8', false);
+
 	$html = '
-		<label class="fc_termtitle label text-white bg-success label-success">' . $value['title'] . '</label>
+		<label class="fc_termtitle label text-white bg-success label-success">' . $title_html . '</label>
 		<div class="fc_termdesc">' . $value['text'] . '</div>';
 
 	// Add prefix / suffix

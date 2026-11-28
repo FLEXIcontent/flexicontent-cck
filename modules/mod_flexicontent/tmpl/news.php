@@ -435,7 +435,7 @@ if ($std_builder_layout_num)
 				{
 					echo $item_placement_feat === 2
 						? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addTab', $itemset_tagid, $itemset_tagid . '_' . $item->id, $item->title)
-						: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', $itemset_tagid, $item->title, $itemset_tagid . '_' . $item->id);
+						: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', $itemset_tagid, htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'), $itemset_tagid . '_' . $item->id);
 				}
 
 				$img_force_dims_css_feat = $img_auto_dims_css_feat;
@@ -474,9 +474,9 @@ if ($std_builder_layout_num)
 						<div class="fcitem_title_box">
 							<span class="fcitem_title">
 							<?php if ($link_title_feat) : ?>
-								<a href="<?php echo $item->link; ?>"><h3><?php echo $item->title; ?></h3></a>
+								<a href="<?php echo $item->link; ?>"><h3><?php echo htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'); ?></h3></a>
 							<?php else : ?>
-								<h3><?php echo $item->title; ?></h3>
+								<h3><?php echo htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'); ?></h3>
 							<?php endif; ?>
 							</span>
 						</div>
@@ -704,7 +704,7 @@ if ($std_builder_layout_num)
 				{
 					echo $item_placement_std === 2
 						? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addTab', $itemset_tagid, $itemset_tagid . '_' . $item->id, $item->title)
-						: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', $itemset_tagid, $item->title, $itemset_tagid . '_' . $item->id);
+						: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', $itemset_tagid, htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'), $itemset_tagid . '_' . $item->id);
 				}
 
 				$img_force_dims_css = $img_auto_dims_css;
@@ -746,9 +746,9 @@ if ($std_builder_layout_num)
 						<div class="fcitem_title_box">
 							<span class="fcitem_title">
 							<?php if ($link_title) : ?>
-								<a href="<?php echo $item->link; ?>"><h3><?php echo $item->title; ?></h3></a>
+								<a href="<?php echo $item->link; ?>"><h3><?php echo htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'); ?></h3></a>
 							<?php else : ?>
-								<h3><?php echo $item->title; ?></h3>
+								<h3><?php echo htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'); ?></h3>
 							<?php endif; ?>
 							</span>
 						</div>

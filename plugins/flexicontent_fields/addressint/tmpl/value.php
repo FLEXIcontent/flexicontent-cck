@@ -146,10 +146,32 @@ $list_states = array(
  */
 $js_perValue = array();
 
+// Stored values are printed in HTML and inside scripts: text is encoded, coordinates are plain decimal numbers, script values are JSON literals
+$_text  = static function ($v) { return htmlspecialchars(is_scalar($v) ? (string) $v : '', ENT_QUOTES, 'UTF-8'); };
+$_coord = static function ($v)
+{
+	$f = is_scalar($v) ? (float) $v : 0.0;
+
+	return is_finite($f) ? rtrim(rtrim(sprintf('%.10F', $f), '0'), '.') : '0';
+};
+$_js_flags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE;
+
+// Country names are language strings that hold character references: only a two letter code selects one
+$_country = static function ($cc) use ($_text)
+{
+	return is_string($cc) && preg_match('/^[A-Za-z]{2}$/D', $cc)
+		? \Joomla\CMS\Language\Text::_('PLG_FC_ADDRESSINT_CC_' . $cc)
+		: $_text('PLG_FC_ADDRESSINT_CC_' . (is_scalar($cc) ? $cc : ''));
+};
+
 foreach ($this->values as $n => $value)
 {
-	$value['lat'] = isset($value['lat']) ? $value['lat'] : '';
-	$value['lon'] = isset($value['lon']) ? $value['lon'] : '';
+	$value['lat'] = isset($value['lat']) && is_scalar($value['lat']) ? (string) $value['lat'] : '';
+	$value['lon'] = isset($value['lon']) && is_scalar($value['lon']) ? (string) $value['lon'] : '';
+
+	$lat_num  = $_coord($value['lat']);
+	$lon_num  = $_coord($value['lon']);
+	$zoom_num = !empty($value['zoom']) && is_scalar($value['zoom']) && (int) $value['zoom'] ? (int) $value['zoom'] : $map_zoom;
 
 	// Skip value if both address and formated address are empty
 	if (
@@ -208,7 +230,7 @@ foreach ($this->values as $n => $value)
 
 	if ($addr_display_mode === 'plaintext' && !empty($value['addr_display']))
 	{
-		$addr = '<div class="address">' . str_replace("\n", '<br />', $value['addr_display']) . '</div>';
+		$addr = '<div class="address">' . str_replace("\n", '<br />', $_text($value['addr_display'])) . '</div>';
 	}
 
 	// prefer addr_display if available
@@ -253,7 +275,7 @@ foreach ($this->values as $n => $value)
 			}
 			else
 				$prop_val = @ $value[$match];
-			$addr = str_replace('{{'.$match.'}}', ($match === 'country' ? (!empty($value['country']) ? \Joomla\CMS\Language\Text::_('PLG_FC_ADDRESSINT_CC_'.$value['country']) : '') : $prop_val), $addr);
+			$addr = str_replace('{{'.$match.'}}', ($match === 'country' ? (!empty($value['country']) ? $_country($value['country']) : '') : $_text($prop_val)), $addr);
 		}
 
 		$addr = '<div class="address">' . $addr . '</div>';
@@ -298,10 +320,10 @@ foreach ($this->values as $n => $value)
 				$map .= '
 				<div class="fc_addressint_map">
 					<div class="fc_addressint_map_canvas"
-						data-maplatlon="{lat: ' . ($value['lat'] ? $value['lat'] : '0') . ', lng: ' . ($value['lon'] ? $value['lon'] : '0') . '}"
-						data-mapzoom="' . ($value['zoom'] ? $value['zoom'] : $map_zoom) . '"
-						data-mapaddr="' . htmlspecialchars(json_encode($value['addr1']), ENT_COMPAT, 'UTF-8') . '"
-						data-maptype="google.maps.MapTypeId.'.strtoupper($map_type_view).'"
+						data-maplatlon="{lat: ' . $lat_num . ', lng: ' . $lon_num . '}"
+						data-mapzoom="' . $zoom_num . '"
+						data-mapaddr="' . htmlspecialchars(json_encode($value['addr1'] ?? ''), ENT_COMPAT, 'UTF-8') . '"
+						data-maptype="google.maps.MapTypeId.'.preg_replace('/[^A-Z_]/', '', strtoupper((string) $map_type_view)).'"
 						data-mapcontent="' . htmlspecialchars(json_encode($addr . $map_directions), ENT_COMPAT, 'UTF-8') . '"
             ' . ($value['custom_marker'] ? '
 							data-mapicon="' . htmlspecialchars(json_encode($marker_url), ENT_COMPAT, 'UTF-8') . '"
@@ -321,19 +343,19 @@ foreach ($this->values as $n => $value)
 			// default or case: googlemap with $map_embed_type === 'img'
 			else
 			{
-				$imageMap_URL = "https://maps.google.com/maps/api/staticmap?center=".$value['lat'].",".$value['lon']
-					."&amp;zoom=".($value['zoom'] ? $value['zoom'] : $map_zoom)
+				$imageMap_URL = "https://maps.google.com/maps/api/staticmap?center=".$lat_num.",".$lon_num
+					."&amp;zoom=".$zoom_num
 					."&amp;size=".$map_width."x".$map_height
-					."&amp;maptype=".$map_type_view
-					."&amp;markers=size:".$marker_size."%7Ccolor:".$marker_color."%7C|".$value['lat'].",".$value['lon']
+					."&amp;maptype=".$_text($map_type_view)
+					."&amp;markers=size:".$_text($marker_size)."%7Ccolor:".$_text($marker_color)."%7C|".$lat_num.",".$lon_num
 					."&amp;sensor=false"
-					.($google_maps_static_api_key ? '&amp;key=' . $google_maps_static_api_key : '')
+					.($google_maps_static_api_key ? '&amp;key=' . $_text($google_maps_static_api_key) : '')
 					;
 
 				$map .= '
 					<div class="map">
 						<div class="image">
-							' . ($link_map === 1 ? '<a href="'.$map_link.'" target="_blank">' : '') . '
+							' . ($link_map === 1 ? '<a href="'.htmlspecialchars($map_link, ENT_QUOTES, 'UTF-8').'" target="_blank">' : '') . '
 							<img src="'.$imageMap_URL.'" '.($map_width || $map_height  ?  'style="min-width:'.$map_width.'px; min-height:'.$map_height.'px;"' : '').' alt="Map" />
 							' . ($link_map === 1 ? '</a>' : '') . '
 						</div>
@@ -358,8 +380,8 @@ foreach ($this->values as $n => $value)
 			}
 
 			$js_perValue[] = '
-				theMap = L.map("' . $map_tagid . '").setView(['.($value['lat'] ? $value['lat'] : '0').','.($value['lon'] ? $value['lon'] : '0').'], '.($value['zoom'] ? $value['zoom'] : $map_zoom).');
-				L.tileLayer(\'' . $os_tile_server_url . '\',
+				theMap = L.map(' . json_encode((string) $map_tagid, $_js_flags) . ').setView(['.$lat_num.','.$lon_num.'], '.$zoom_num.');
+				L.tileLayer(' . json_encode((string) $os_tile_server_url, $_js_flags) . ',
 				{
 					attribution: \'données © <a href="//osm.org/copyright">OpenStreetMap</a>/ODbL - rendu <a href="//openstreetmap.fr">OSM France</a>\',
 					minZoom: 1,
@@ -371,13 +393,13 @@ foreach ($this->values as $n => $value)
 				});
 
 				var mapIcon = new LeafIcon({
-					iconUrl: \''.$marker_url.'\',
+					iconUrl: ' . json_encode((string) $marker_url, $_js_flags) . ',
 					iconSize: [' . $wS . ', ' . $hS . '],
 					iconAnchor: [' . $wA . ', ' . $hA . ']
 				});
-				var contentPopup = ' . json_encode($addr . $map_directions) . ';
+				var contentPopup = ' . json_encode($addr . $map_directions, $_js_flags) . ';
 
-				theMarker = L.marker(['.($value['lat'] ? $value['lat'] : '0').','.($value['lon'] ? $value['lon'] : '0').'], {icon: mapIcon}).addTo(theMap);
+				theMarker = L.marker(['.$lat_num.','.$lon_num.'], {icon: mapIcon}).addTo(theMap);
 				theMarker.bindPopup(contentPopup);
 			';
 		}

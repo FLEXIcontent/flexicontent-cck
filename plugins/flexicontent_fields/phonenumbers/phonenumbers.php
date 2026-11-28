@@ -289,7 +289,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 				<div class="fc-phone-row">
 					<label class="fc-phone-lbl phonelabel-lbl" for="'.$elementid_n.'_label">' . \Joomla\CMS\Language\Text::_( 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_LABEL' ) . '</label>
 					<div class="fc-phone-fields">
-						<input class="fcfield_textval phonelabel" name="'.$fieldname_n.'[label]" id="'.$elementid_n.'_label" type="text" value="'.@$value['label'].'" '.$label_attribs.' />
+						<input class="fcfield_textval phonelabel" name="'.$fieldname_n.'[label]" id="'.$elementid_n.'_label" type="text" value="'.htmlspecialchars((string) ($value['label'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8').'" '.$label_attribs.' />
 					</div>
 				</div>');
 

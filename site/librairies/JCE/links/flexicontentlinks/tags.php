@@ -110,12 +110,6 @@ class FlexicontentlinksTags extends \Joomla\CMS\Object\CMSObject {
 
 	private static function route($url)
 	{
-		$wf = WFEditorPlugin::getInstance();
-
-		if ($wf->getParam('links.joomlalinks.sef_url', 0)) {
-			$url = WFLinkExtension::route($url);
-		}
-
-		return $url;
+		return WFLinkBrowser_Flexicontentlinks::route($url);
 	}
 }

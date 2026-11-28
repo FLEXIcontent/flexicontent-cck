@@ -75,6 +75,10 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 
 		// Can manage ACL
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanCats;
+		if (!$this->canManage)
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 403);
+		}
 
 		// Error messages
 		$this->err_locked_recs_changestate = 'FLEXI_ROW_STATE_NOT_MODIFIED_DUE_ASSOCIATED_DATA';

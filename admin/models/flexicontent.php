@@ -708,66 +708,11 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// Handle JCE integration
 		// **********************
 
-		$pathDestName   = Path::clean(JPATH_ROOT.'/components/com_jce/editor/extensions/links');
-		$pathSourceName = Path::clean(JPATH_ROOT.'/components/com_flexicontent/librairies/JCE/links');
+		// JCE 2.9 and JCE 3 load the link browser of FLEXIcontent as a plugin of their "jce" plugin group.
+		// It is installed (and enabled) if JCE is installed and active, and updated when its files have changed
+		require_once JPATH_ROOT . '/components/com_flexicontent/librairies/JCE/installer.php';
 
-		// Check if JCE installed and active
-		if (!is_dir($pathDestName) || !\Joomla\CMS\Plugin\PluginHelper::isEnabled('editors', 'jce'))
-		{
-			return true; // Nothing to do, JCE not installed
-		}
-
-		$plg_exists = file_exists($pathDestName.'/flexicontentlinks.php');
-		if ($plg_exists && filemtime(__FILE__) < filemtime($pathDestName.'/flexicontentlinks.php'))
-		{
-			return true; // Nothing to do, already up-to-date
-		}
-
-		// 2. Copy all files
-		$files = glob($pathSourceName."/*.*");
-		foreach ($files as $file)
-		{
-			$file_dest = $pathDestName .DS. basename($file);
-			\Joomla\Filesystem\File::copy($file, $file_dest);
-		}
-
-		// Check DESTINATION folder
-		$pathSourceName = Path::clean($pathSourceName.'/flexicontentlinks');
-		$pathDestName   = Path::clean($pathDestName.'/flexicontentlinks');
-		if ( !is_dir($pathDestName) && !mkdir($pathDestName) )
-		{
-			Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('JLIB_INSTALLER_ABORT_PLG_INSTALL_CREATE_DIRECTORY', 'JCE Links plugin for FLEXIcontent', $pathDestName), 'warning');
-		}
-
-		// Copy all files
-		$files = glob($pathSourceName."/*.*");
-		foreach ($files as $file)
-		{
-			$file_dest = $pathDestName .DS. basename($file);
-			\Joomla\Filesystem\File::copy($file, $file_dest);
-		}
-
-		$folders = array('css', 'images');
-		foreach ($folders as $folder)
-		{
-			// Check DESTINATION folder
-			$sub_pathSourceName = Path::clean($pathSourceName.'/'.$folder);
-			$sub_pathDestName   = Path::clean($pathDestName.'/'.$folder);
-			if ( !is_dir($sub_pathDestName) && !mkdir($sub_pathDestName) )
-			{
-				Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('JLIB_INSTALLER_ABORT_PLG_INSTALL_CREATE_DIRECTORY', 'JCE Links plugin for FLEXIcontent', $sub_pathDestName), 'warning');
-			}
-
-			// Copy all files
-			$files = glob($sub_pathSourceName."/*.*");
-			foreach ($files as $file)
-			{
-				$file_dest = $sub_pathDestName .DS. basename($file);
-				\Joomla\Filesystem\File::copy($file, $file_dest);
-			}
-		}
-
-		Factory::getApplication()->enqueueMessage('<span class="badge">' . \Joomla\CMS\Language\Text::_(!$plg_exists ? 'FLEXI_INSTALLED' : 'FLEXI_UPDATED') . '</span> JCE Links plugin for FLEXIcontent', 'message');
+		FlexicontentJceLinks::install();
 	}
 
 
@@ -1836,8 +1781,36 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		}*/
 	}
 
+	public static function assertInstalledLanguageTag($code)
+	{
+		if (!is_string($code) || strlen($code) > 63 || !preg_match('/^[a-z]{2,8}(?:-[a-z0-9]{1,8})*$/iD', $code))
+		{
+			throw new \InvalidArgumentException('Invalid language tag', 400);
+		}
+
+		$adminRoot = realpath(JPATH_ADMINISTRATOR . '/language');
+		$adminDir = $adminRoot ? realpath($adminRoot . '/' . $code) : false;
+		if (!$adminDir || !is_dir($adminDir) || dirname($adminDir) !== $adminRoot)
+		{
+			throw new \InvalidArgumentException('Administrator language is not installed', 400);
+		}
+
+		// An administrator-only language is valid, but an existing site directory must stay within its language root.
+		$sitePath = JPATH_SITE . '/language/' . $code;
+		if (file_exists($sitePath) || is_link($sitePath))
+		{
+			$siteDir = realpath($sitePath);
+			if (!$siteDir || !is_dir($siteDir) || dirname($siteDir) !== realpath(JPATH_SITE . '/language'))
+			{
+				throw new \InvalidArgumentException('Invalid site language directory', 400);
+			}
+		}
+	}
+
+
 	function createLanguagePack($code = 'en-GB', $method = '', $params = array())
 	{
+		self::assertInstalledLanguageTag($code);
 
 		$prefix 	= $code . '.';
 		$suffix 	= '.ini';
@@ -1874,7 +1847,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			'plg_flexicontent_fields_relation_reverse',
 			'plg_flexicontent_fields_select',
 			'plg_flexicontent_fields_selectmultiple',
-			'plg_flexicontent_fields_sharemedia',
+			'plg_flexicontent_fields_sharedmedia',
 			'plg_flexicontent_fields_text',
 			'plg_flexicontent_fields_textarea',
 			'plg_flexicontent_fields_textselect',
@@ -1906,9 +1879,13 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			'mod_flexitagcloud',
 			'mod_flexifilter'
 		);
-		$targetfolder = JPATH_SITE.DS.'tmp'.DS.$code."_".time();
+		if ($method === 'create' && !is_dir($sitepath) && !\Joomla\Filesystem\Folder::create($sitepath))
+		{
+			throw new \RuntimeException('Could not create site language directory', 500);
+		}
 
 		if ($method == 'zip') {
+			$targetfolder = JPATH_SITE.DS.'tmp'.DS.$code.'_'.time().'_'.bin2hex(random_bytes(8));
 			if (count($adminfiles))
 				mkdir($targetfolder.DS.'admin', 0755, true);
 			if (count($sitefiles))

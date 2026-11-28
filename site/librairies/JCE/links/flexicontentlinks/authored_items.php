@@ -59,9 +59,7 @@ class FlexicontentlinksAuthored_items extends \Joomla\CMS\Object\CMSObject {
 
 	public function getList()
 	{
-		$wf = WFEditorPlugin::getInstance();
-
-		if ($wf->checkAccess('links.joomlalinks.content', 1))
+		if (WFLinkBrowser_Flexicontentlinks::contentAllowed())
 		{
 			return '
 			<li id="index.php?option=com_flexicontent_authored_items&view=category&layout=author" class="folder fcauthors nolink">
@@ -78,22 +76,24 @@ class FlexicontentlinksAuthored_items extends \Joomla\CMS\Object\CMSObject {
 
 	public function getLinks($args)
 	{
-		$wf = WFEditorPlugin::getInstance();
-
 		require_once(JPATH_SITE . DIRECTORY_SEPARATOR. 'components' .DIRECTORY_SEPARATOR. 'com_flexicontent' .DIRECTORY_SEPARATOR. 'helpers' .DIRECTORY_SEPARATOR. 'route.php');
 
 		$items = array();
 		$layout = isset($args->layout) ? $args->layout : '';
 
 		if ($layout && $layout!='author') return array();
+		if (!WFLinkBrowser_Flexicontentlinks::contentAllowed()) return array();
 
 		$db = \Joomla\CMS\Factory::getDbo();
+
+		// The login name is shown only to users that can manage users
+		$showUsername = \Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.manage', 'com_users');
 
 		// Add authored items
 		$query	= $db->getQuery(true);
 		$query->clear();
 		$query
-			->select('id, name, username')
+			->select($showUsername ? 'id, name, username' : 'id, name')
 			->from('#__users')
 			->where('block = 0')
 			->order('name ASC');
@@ -106,7 +106,7 @@ class FlexicontentlinksAuthored_items extends \Joomla\CMS\Object\CMSObject {
 			$items[] = array(
 				'id'    => 'index.php?option=com_flexicontent_authored_items&view=category&layout=author&authorid='.$user->id,
 				'url'   => self::route($url),
-				'name'	=> $user->name . ' [' . $user->username . ']',
+				'name'	=> $user->name . ($showUsername ? ' [' . $user->username . ']' : ''),
 				'class'	=> 'file flexiauthor'
 			);
 		}
@@ -117,12 +117,6 @@ class FlexicontentlinksAuthored_items extends \Joomla\CMS\Object\CMSObject {
 
 	private static function route($url)
 	{
-		$wf = WFEditorPlugin::getInstance();
-
-		if ($wf->getParam('links.joomlalinks.sef_url', 0)) {
-			$url = WFLinkExtension::route($url);
-		}
-
-		return $url;
+		return WFLinkBrowser_Flexicontentlinks::route($url);
 	}
 }

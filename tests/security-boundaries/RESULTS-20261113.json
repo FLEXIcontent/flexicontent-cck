@@ -1,0 +1,176 @@
+{
+  "date": "2026-11-13",
+  "private_base": "d637ee7d98ea589dce9813fbd8f1d6114560e989",
+  "public_comparison": "1f2d3aacac59e03ef83a4b2b2676ab3ae2f82215",
+  "server_assertions": 143,
+  "chromium_assertions": 17,
+  "php_lint_targets": 28,
+  "negative_control_suites": 9,
+  "live_deployment": false,
+  "site_database_changed": false,
+  "source_encoding": "After hashes cover staged Git bytes.",
+  "tested_source": [
+    {
+      "path": "admin/access.xml",
+      "sha256": "4ca26022283bfdfda9b0c3ca6e53a7f136f6f01fa23fd511be66179567b68166"
+    },
+    {
+      "path": "admin/controllers/filemanager.php",
+      "sha256": "beb8fe5a2f6f6effb853b9a24d721d1dbd46ccf958970702a9e9fc48fbd43086"
+    },
+    {
+      "path": "admin/controllers/items.php",
+      "sha256": "4c5c659b4456996a77da51d3cb837d498b2a54d52de9d75fffafbcd0f0c538b5"
+    },
+    {
+      "path": "admin/controllers/search.php",
+      "sha256": "10090f326b1dacad654f081b7db702c58a9d2d02d1f132287cb0b61188f1f226"
+    },
+    {
+      "path": "admin/language/en-GB/en-GB.com_flexicontent.ini",
+      "sha256": "e32e1d4bc367f723535235bb5c1fdb586bf38b633a056372166c7a149edc9d87"
+    },
+    {
+      "path": "admin/models/items.php",
+      "sha256": "1c3e6fcb4473b2587cd8107a6595e9129e7c0e1153b7daeb674d3e49ca246c84"
+    },
+    {
+      "path": "admin/views/file/tmpl/default.php",
+      "sha256": "541002d906840b5d2ece49153f8642696521f1b0c8098a0b456b97e8caacdf86"
+    },
+    {
+      "path": "admin/views/filemanager/tmpl/default.php",
+      "sha256": "13a15b578634a195fd73cdfb894faf1341e84f0d41e7b15910d31dabaf963f22"
+    },
+    {
+      "path": "plugins/flexicontent_fields/addressint/addressint.php",
+      "sha256": "44abde9516db8765d9c60486a0b51fbb9725ca61e2398de588ad15bbbbb301db"
+    },
+    {
+      "path": "plugins/flexicontent_fields/addressint/tmpl/value.php",
+      "sha256": "3641f4df997ac48bc27513e2d27a330bfc078de55482be34f9486342609b984d"
+    },
+    {
+      "path": "plugins/flexicontent_fields/file/file.php",
+      "sha256": "09f8a32da576450784545f9fdf543b9655f61ed138309aed00c10f684b39d9b0"
+    },
+    {
+      "path": "plugins/flexicontent_fields/mediafile/mediafile.php",
+      "sha256": "bdd628d737bc923c1b0bd5efab6263277f019502bf86698bc8dc580ff0fefff1"
+    },
+    {
+      "path": "site/classes/helpers/html.php",
+      "sha256": "0cb0ab09f48390254014f9f016c8affd3b6c1ed1c06d7790a4e491245f3144ca"
+    },
+    {
+      "path": "site/classes/helpers/security.php",
+      "sha256": "91c523dce7c656e2f28ade74ba583484630933572ca4853236a9b2015cf80244"
+    },
+    {
+      "path": "site/controller.php",
+      "sha256": "02ffb20e510feb875944ca889b229144c6fff8cac28f849edb5769633fb3844d"
+    },
+    {
+      "path": "site/controllers/filemanager.php",
+      "sha256": "04a032d8484dada87e05e134a96de9be2a48d20953a2b3c066b3aec56e7f1d7b"
+    },
+    {
+      "path": "site/helpers/permission.php",
+      "sha256": "66c5fae43e35c3000a395a70de0d81e5aec40970acaa3ac4bef2e6f773798ac5"
+    },
+    {
+      "path": "site/tasks/core.php",
+      "sha256": "cf6053ccbcf65ca0987100dbada9d0e401ce1e47c22f33093f8f4af27f4ff389"
+    }
+  ],
+  "case_results": [
+    {
+      "test": "admin",
+      "exit": 0,
+      "expected_result": true,
+      "checks": 17
+    },
+    {
+      "test": "download",
+      "exit": 0,
+      "expected_result": true,
+      "checks": 12
+    },
+    {
+      "test": "cache",
+      "exit": 0,
+      "expected_result": true,
+      "checks": 7
+    },
+    {
+      "test": "properties",
+      "exit": 0,
+      "expected_result": true,
+      "checks": 22
+    },
+    {
+      "test": "render",
+      "exit": 0,
+      "expected_result": true,
+      "checks": 26
+    },
+    {
+      "test": "origin",
+      "exit": 0,
+      "expected_result": true,
+      "checks": 20
+    },
+    {
+      "test": "inline",
+      "exit": 0,
+      "expected_result": true,
+      "checks": 8
+    },
+    {
+      "test": "frontend",
+      "exit": 0,
+      "expected_result": true,
+      "checks": 31
+    }
+  ],
+  "transcripts": [
+    {
+      "file": "run-after-01.txt",
+      "sha256": "768da489952b261c4a7054c6d792db3f8778cfb5b71d19429725576bd9762917"
+    },
+    {
+      "file": "run-before-02.txt",
+      "sha256": "30e9e88d1539a1c1ab19b3548b319bfdc58fed608c8bfaba48844c0d5c8edc32"
+    },
+    {
+      "file": "browser-after-02.txt",
+      "sha256": "37cfb757b255179c62117a647b8a5b3128e562638a056331d67dac3f39760062",
+      "checks": 17,
+      "failed_assertions": 0
+    },
+    {
+      "file": "browser-before-01.txt",
+      "sha256": "17ce28207bd9e2253b316d502e67c17da7266f44d13a97aed49319ee2a3c2fbe",
+      "checks": 17,
+      "failed_assertions": 9
+    },
+    {
+      "file": "lint-after-02.txt",
+      "sha256": "1db89451255b96eb989b157ab813d8e63ea71b67cef8b713952f80ccc3e3c25c",
+      "checks": 28,
+      "failed_assertions": 0
+    },
+    {
+      "file": "origin-after-02.txt",
+      "sha256": "babc81d6142fa478e7980d5a8727e2df343747d3cc6b8de4b946c118bea61cdd",
+      "checks": 20,
+      "failed_assertions": 0
+    }
+  ],
+  "limits": "Network none, readonly source/toolchain/root, empty allowlisted env, scratch-only tmpfs, nonroot, cap-drop/no-new-privileges, bounded CPU/memory/process/file-size/descriptors/time.",
+  "limitations": [
+    "Framework/context/routing/model/table/cache doubles; SQLite memory only",
+    "No full Joomla install/update/editor lifecycle certification",
+    "No public publication or remote deployment"
+  ]
+}

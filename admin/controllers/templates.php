@@ -92,7 +92,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		$original_task = $this->task;
 
 		$type    = $this->input->getWord('type', 'items');
-		$folder  = $this->input->getString('folder', 'table');
+		// A plain folder name, as the model reads it
+		$folder  = $this->input->getCmd('folder', 'table');
 		$cfgname = $this->input->getString('cfgname');
 
 		$isnew = 0;

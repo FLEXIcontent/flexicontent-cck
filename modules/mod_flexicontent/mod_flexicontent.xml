@@ -572,14 +572,6 @@
 
 			<field name="bdate" type="fcdate" size="50" label="FLEXI_UMOD_BDATE_FROM" description="FLEXI_UMOD_BDATE_FROM_DESC" placeholder="No limit" class="method_dates_ops cDateLims" />
 			<field name="edate" type="fcdate" size="50" label="FLEXI_UMOD_EDATE_TO" description="FLEXI_UMOD_EDATE_TO_DESC" placeholder="No limit" class="method_dates_ops cDateLims" />
-			<field name="raw_bdate" type="radio" default="0" label="FLEXI_TREAT_BDATE_AS" description="FLEXI_TREAT_XDATE_AS_DESC" class="method_dates_ops dateStatic btn-group group-fcinfo">
-				<option value="0">FLEXI_SPECIFIC_DATE</option>
-				<option value="1">FLEXI_SQL_DATE_EXPRESSION</option>
-			</field>
-			<field name="raw_edate" type="radio" default="0" label="FLEXI_TREAT_EDATE_AS" description="FLEXI_TREAT_XDATE_AS_DESC" class="method_dates_ops dateStatic btn-group group-fcinfo">
-				<option value="0">FLEXI_SPECIFIC_DATE</option>
-				<option value="1">FLEXI_SQL_DATE_EXPRESSION</option>
-			</field>
 			<field name="date_compare" type="radio" default="0" label="FLEXI_UMOD_COMPARE_DATE_DATA_WITH_DYNAMIC_DATE" description="FLEXI_UMOD_COMPARE_DATE_DATA_WITH_DYNAMIC_DATE_DESC" class="dateDynamic btn-group group-fcinfo">
 				<option value="0">FLEXI_CURRENT_SERVER_TIME</option>
 				<option value="1">FLEXI_CURRENT_ITEM_DATE_ABOVE</option>

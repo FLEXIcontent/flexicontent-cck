@@ -135,6 +135,13 @@ class Flexicontent extends _Flexicontent
     protected $autoloadLanguage = true;
 
     /**
+     * The access level of a content type before save.
+     *
+     * @var    integer
+     */
+    protected $old_typeaccess;
+
+    /**
      * Returns an array of events this subscriber will listen to.
      *
      * @return  array
@@ -280,6 +287,15 @@ class Flexicontent extends _Flexicontent
             }
         }
 
+        // Check for access changes in the content type.
+        if ($context === 'com_flexicontent.type')
+        {
+            if (!$isNew && $this->old_typeaccess != $row->access)
+            {
+                $this->typeAccessChange($row);
+            }
+        }
+
         return true;
     }
 
@@ -319,6 +335,17 @@ class Flexicontent extends _Flexicontent
             // Query the database for the old access level if the item isn't new.
             if (!$isNew) {
                 $this->checkCategoryAccess($row);
+            }
+        }
+
+        // Store the access level of the content type, to determine if it changes
+        if ($context === 'com_flexicontent.type') {
+            if (!$isNew) {
+                $this->old_typeaccess = $this->db->setQuery($this->db->getQuery(true)
+                    ->select('access')
+                    ->from('#__flexicontent_types')
+                    ->where('id = ' . (int) $row->id)
+                )->loadResult();
             }
         }
 
@@ -431,6 +458,10 @@ class Flexicontent extends _Flexicontent
         {
             $item->type_state = $itemType ? $itemType->published : 0;
         }
+
+        // Smart Search filters its results only by the access level of the link,
+        // so this must also carry the levels of the main category and of the type
+        $item->access = max((int) $item->access, (int) $item->cat_access, $itemType ? (int) $itemType->access : 0);
 
         $item->setLanguage();
 
@@ -686,6 +717,44 @@ class Flexicontent extends _Flexicontent
 
         // Update the item.
         $this->change((int) $row->id, 'access', $temp);
+    }
+
+
+    // override ... the parent method combines only the item and category levels, dropping the level of the type
+    protected function categoryAccessChange($row)
+    {
+        $sql = clone($this->getStateQuery());
+        $sql->where('c.id = ' . (int) $row->id);
+
+        $this->db->setQuery($sql);
+        $items = $this->db->loadObjectList();
+
+        foreach ($items as $item)
+        {
+            $this->change((int) $item->id, 'access', max((int) $item->access, (int) $row->access, (int) $item->type_access));
+        }
+    }
+
+
+    /**
+     * Method to update index data on type access level changes
+     *
+     * @param   Table  $row  A Table object
+     *
+     * @return  void
+     */
+    protected function typeAccessChange($row)
+    {
+        $sql = clone($this->getStateQuery());
+        $sql->where('ie.type_id = ' . (int) $row->id);
+
+        $this->db->setQuery($sql);
+        $items = $this->db->loadObjectList();
+
+        foreach ($items as $item)
+        {
+            $this->change((int) $item->id, 'access', max((int) $item->access, (int) $item->cat_access, (int) $row->access));
+        }
     }
 
 }

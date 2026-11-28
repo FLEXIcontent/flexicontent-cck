@@ -3,8 +3,6 @@ var fcfield_file = {
   use_native_apis: [],
   dialog_handle: [],
 
-  pdf_thumb_url: '',
-
   toggleFields(id) {
     const panel = Array.from(document.querySelectorAll('.fc-file-value-props[data-name]'))
       .find(element => element.dataset.name === id);
@@ -169,11 +167,7 @@ var fcfield_file = {
   },
 
   assignFile(id, file, keepModal, key) {
-    const thumb = FlexiMediaField.row(document.getElementById(id))?.querySelector('img.fc_preview_thumb');
-    const isPdf = String(file?.ext).toLowerCase() === 'pdf' || /\.pdf$/i.test(file?.filename || '');
-    if (thumb && isPdf && !file.preview && Number(file.url) !== 1 && /^[1-9]\d*$/.test(file.id) && fcfield_file.pdf_thumb_url) {
-      file = {...file, preview: fcfield_file.pdf_thumb_url.replace('__ID__', file.id)};
-    }
+    if (!file?.preview && file?.pdf_preview) file = {...file, preview: file.pdf_preview};
     const done = FlexiMediaField.assignFile(id, file, keepModal, key, fcfield_file.dialog_handle);
     if (done) {
       const decode = value => { try { return decodeURIComponent(value); } catch (e) { return value; } };

@@ -19,8 +19,11 @@ $show_cat_image    = $params->get('show_description_image', 0);
 $cat_image_source  = $params->get('cat_image_source', 2);
 $cat_link_image    = $params->get('cat_link_image', 1);
 $cat_image_method  = $params->get('cat_image_method', 1);
+// Sizes are printed in a style attribute and in the thumbnail URL: integers only (an empty size stays empty)
 $cat_image_width   = $params->get('cat_image_width', 24);
 $cat_image_height  = $params->get('cat_image_height', 24);
+$cat_image_width   = is_numeric($cat_image_width) ? (int) $cat_image_width : '';
+$cat_image_height  = is_numeric($cat_image_height) ? (int) $cat_image_height : '';
 $cat_default_image = $params->get('cat_default_image', '');
 $cat_image_webp    = (bool) $params->get('cat_image_webp', 0);
 

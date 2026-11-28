@@ -23,6 +23,30 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
 	var $task_callable = null;  // Field's methods allowed to be called via AJAX
 
+	private const PROVIDER_EMBED_URLS = array(
+		'youtube' => '//www.youtube.com/embed/',
+		'vimeo' => '//player.vimeo.com/video/',
+		'dailymotion' => '//www.dailymotion.com/embed/video/',
+	);
+
+	private static function normalizeEmbedUrl($value, $allowProtocolRelative = true)
+	{
+		$url = flexicontent_security::safeUrl($value, $allowProtocolRelative);
+		$prefix = $allowProtocolRelative ? '~^(?:https?:)?//~i' : '~^https?://~i';
+
+		return preg_match($prefix, $url) ? $url : '';
+	}
+
+	private static function normalizeMediaId($apiType, $value)
+	{
+		$value = is_string($value) || is_int($value) ? (string) $value : '';
+		if ($value === '' || strlen($value) > 1000) return '';
+
+		return isset(self::PROVIDER_EMBED_URLS[$apiType])
+			? (preg_match('/^[a-z0-9_-]+$/iD', $value) ? $value : '')
+			: self::normalizeEmbedUrl($value, false);
+	}
+
 	// ***
 	// *** CONSTRUCTOR
 	// ***
@@ -268,31 +292,18 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 
-			if (!empty($value['api_type']) && !empty($value['media_id']))
+			$value['api_type'] = is_string($value['api_type']) ? $value['api_type'] : '';
+			$preview_url = $value['embed_url'] ?? '';
+			$media_id = self::normalizeMediaId($value['api_type'], $value['media_id']);
+			if ($value['api_type'] !== '' && $value['media_id'] !== '')
 			{
-				$content_id = $value['media_id'];
-				switch($value['api_type'])
-				{
-					case 'youtube':
-						$value['embed_url'] = '//www.youtube.com/embed/' . $content_id;
-						break;
-					case 'vimeo':
-						$value['embed_url'] = '//player.vimeo.com/video/' . $content_id;
-						break;
-					case 'dailymotion':
-						$value['embed_url'] = '//www.dailymotion.com/embed/video/' . $content_id;
-						break;
-					default:
-						// For embed.ly , the full URL is inside content ID
-						$value['embed_url'] = $content_id;
-						break;
-				}
+				$preview_url = $media_id === '' ? '' : (self::PROVIDER_EMBED_URLS[$value['api_type']] ?? '') . $media_id;
 			}
-			if (!isset($value['embed_url'])) $value['embed_url'] = '';
-			$embed_html = '<iframe class="sharedmedia seamless" src="'.($value['embed_url'] ? $value['embed_url'] : 'about:blank').'" style="width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden;" allowFullScreen></iframe>';
+			$value['media_id'] = $media_id;
+			$value['embed_url'] = $preview_url = self::normalizeEmbedUrl($preview_url);
+			$embed_html = '<iframe class="sharedmedia seamless" src="'.htmlspecialchars($preview_url ?: 'about:blank', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8').'" style="width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden;" allowFullScreen></iframe>';
 
 			if (!isset($value['url']))         $value['url'] = '';
-			if (!isset($value['embed_url']))   $value['embed_url'] = '';
 			if (!isset($value['title']))       $value['title'] = '';
 			if (!isset($value['author']))      $value['author'] = '';
 			if (empty($value['duration']))     $value['duration'] = '';
@@ -749,9 +760,14 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			$newpost[$new]['url'] = $url;
 
 			// Validate other value properties
-			$newpost[$new]['api_type']    = flexicontent_html::dataFilter(@$v['api_type'], 0, 'STRING', 100);
-			$newpost[$new]['media_id']    = flexicontent_html::dataFilter(@$v['media_id'], 0, 'STRING', 1000);
-			$newpost[$new]['embed_url']   = flexicontent_security::safeUrl(flexicontent_html::dataFilter(@$v['embed_url'], 1000, 'STRING', 0));  // 'URL' strips needed characters ?
+			$api_type = $v['api_type'] ?? '';
+			$api_type = is_string($api_type) ? flexicontent_html::dataFilter($api_type, 100, 'STRING', 0) : '';
+			$newpost[$new]['api_type'] = $api_type;
+			$newpost[$new]['media_id'] = self::normalizeMediaId($api_type, $v['media_id'] ?? '');
+			$embed_url = $v['embed_url'] ?? '';
+			$newpost[$new]['embed_url'] = is_string($embed_url)
+				? self::normalizeEmbedUrl(flexicontent_html::dataFilter($embed_url, 1000, 'STRING', 0))
+				: '';
 			$newpost[$new]['thumb']       = flexicontent_html::dataFilter(@$v['thumb'], 0, 'STRING', 1000);  // 'URL' strips needed characters ?
 			$newpost[$new]['title']       = flexicontent_html::dataFilter(@$v['title'], 0, 'STRING', 1000);
 			$newpost[$new]['author']      = flexicontent_html::dataFilter(@$v['author'], 0, 'STRING', 1000);

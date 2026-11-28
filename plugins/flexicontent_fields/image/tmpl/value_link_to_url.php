@@ -19,6 +19,12 @@ foreach ($values as $n => $value)
 	if ($result === _FC_CONTINUE_) continue;
 	if ($result === _FC_BREAK_) break;
 
+	// The link was already limited to http(s) and site-relative URLs by the common code above.
+	// Encode it for each context it is printed in: HTML attribute, or JavaScript string inside an HTML attribute / script.
+	$urllink      = self::safeLinkUrl($urllink);
+	$urllink_attr = htmlspecialchars($urllink, ENT_QUOTES, 'UTF-8');
+	$fc_js_flags  = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_INVALID_UTF8_SUBSTITUTE;
+
 	// CASE: Just image thumbnail since url link is empty
 	if (!$urllink)
 	{
@@ -32,12 +38,14 @@ foreach ($values as $n => $value)
 	// CASE: Link to URL that opens inside a popup via multibox
 	elseif ($url_target === 'multibox')
 	{
+		// Every piece of markup is a JSON-encoded JavaScript string, a stored value cannot end the string or the script element
+		$mb_open = '<a style="'.$style.'" href="'.$urllink_attr.'" id="mb'.$uniqueid.'" class="fc_image_thumb mb field_' . (int) $field->id . '" data-rel="width:';
 		$field->{$prop}[] = $pretext.'
-		<script>document.write(\'<a style="'.$style.'" href="'.$urllink.'" id="mb'.$uniqueid.'" class="fc_image_thumb mb field_' . $field->id . '" data-rel="width:\'+(jQuery(window).width()-150)+\',height:\'+(jQuery(window).height()-150)+\'">\')</script>
+		<script>document.write(' . json_encode($mb_open, $fc_js_flags) . '+(jQuery(window).width()-150)+",height:"+(jQuery(window).height()-150)+' . json_encode('">', $fc_js_flags) . ')</script>
 			'.$img_legend.'
-		<script>document.write(\'</a>\')</script>
+		<script>document.write(' . json_encode('</a>', $fc_js_flags) . ')</script>
 		<div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">
-			' . ($desc ? $desc : $title) . '
+			' . ($desc_encoded ? $desc_encoded : $title_encoded) . '
 		</div>'
 		. $inline_info
 		. $posttext;
@@ -46,9 +54,12 @@ foreach ($values as $n => $value)
 	// CASE: Link to URL that opens inside a popup via fancybox
 	elseif ($url_target === 'fancybox')
 	{
+		$fb_js = 'jQuery.fancybox.open([{ type: "iframe", src: ' . json_encode($urllink, $fc_js_flags)
+			. ', topRatio: 0.9, leftRatio: 0.9, title: ' . json_encode($desc_encoded ? $title_encoded . ': ' . $desc_encoded : $title_encoded, $fc_js_flags)
+			. ' }], { padding : 0});';
 		$field->{$prop}[] = $pretext.'
 		<span class="fc_image_thumb" style="'.$style.'; cursor: pointer;"
-			onclick="jQuery.fancybox.open([{ type: \'iframe\', src: \''.$urllink.'\', topRatio: 0.9, leftRatio: 0.9, title: \''.($desc_encoded ? $title_encoded . ': ' . $desc_encoded : $title_encoded).'\' }], { padding : 0});"
+			onclick="' . htmlspecialchars($fb_js, ENT_QUOTES, 'UTF-8') . '"
 		>
 			'.$img_legend.'
 		</span>
@@ -59,7 +70,7 @@ foreach ($values as $n => $value)
 	else
 	{
 		$field->{$prop}[] = $pretext.'
-		<a href="'.$urllink.'" target="'.$url_target.'">
+		<a href="'.$urllink_attr.'" target="'.htmlspecialchars((string) $url_target, ENT_QUOTES, 'UTF-8').'">
 			'.$img_legend.'
 		</a>
 		'.$inline_info.$posttext;

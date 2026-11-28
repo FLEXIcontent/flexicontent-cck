@@ -61,12 +61,15 @@ foreach ($values as $n => $value)
 	if ($result === _FC_BREAK_) break;
 
 
-	$size_w_s = isset($value['size_w_s']) ? $value['size_w_s'] : 0;
-	$size_h_s = isset($value['size_h_s']) ? $value['size_h_s'] : 0;
-	$size_w_m = isset($value['size_w_m']) ? $value['size_w_m'] : 0;
-	$size_h_m = isset($value['size_h_m']) ? $value['size_h_m'] : 0;
-	$size_w_l = isset($value['size_w_l']) ? $value['size_w_l'] : 0;
-	$size_h_l = isset($value['size_h_l']) ? $value['size_h_l'] : 0;
+	// Sizes stored with the value are printed in attributes: integers only
+	$_int_size = static function ($v) { return is_scalar($v) ? (int) $v : 0; };
+
+	$size_w_s = $_int_size($value['size_w_s'] ?? 0);
+	$size_h_s = $_int_size($value['size_h_s'] ?? 0);
+	$size_w_m = $_int_size($value['size_w_m'] ?? 0);
+	$size_h_m = $_int_size($value['size_h_m'] ?? 0);
+	$size_w_l = $_int_size($value['size_w_l'] ?? 0);
+	$size_h_l = $_int_size($value['size_h_l'] ?? 0);
 
 	$group_str = $group_name ? 'data-fancybox="' . $group_name . '"' : '';
 

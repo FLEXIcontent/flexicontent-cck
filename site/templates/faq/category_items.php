@@ -270,10 +270,10 @@ foreach ($cat_items as $catid => $items) :
 									<span class="fc_item_title" itemprop="name">
 									<?php if ($this->params->get('link_titles', 0)) : ?>
 						   			<a href="<?php echo \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" itemprop="url">
-											<?php echo $item->title; ?>
+											<?php echo htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'); ?>
 										</a>
 					   			<?php else : ?>
-										<?php echo $item->title; ?>
+										<?php echo htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'); ?>
 									<?php endif; ?>
 									</span>
 									<!-- EOF item title -->

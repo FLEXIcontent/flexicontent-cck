@@ -1,10 +1,14 @@
 /** Keep ESL's AMD globals away from Joomla's initial script loading. */
 (function () {
 	'use strict';
-	function loadScript(url) {
+	function loadScript(url, integrity) {
 		return new Promise(function (resolve, reject) {
 			var script = document.createElement('script');
 			script.src = url;
+			if (integrity) {
+				script.integrity = integrity;
+				script.crossOrigin = 'anonymous';
+			}
 			script.onload = resolve;
 			script.onerror = function () { reject(new Error('Statistics chart script could not be loaded.')); };
 			document.head.appendChild(script);
@@ -16,7 +20,7 @@
 		loadScript(options.loader).then(function () {
 			if (typeof window.require !== 'function' || typeof window.require.config !== 'function') throw new Error('Statistics chart loader is unavailable.');
 			if (options.packages.length) window.require.config({ packages: options.packages });
-			return options.scripts.reduce(function (ready, url) { return ready.then(function () { return loadScript(url); }); }, Promise.resolve());
+			return options.scripts.reduce(function (ready, url) { return ready.then(function () { return loadScript(url, (options.integrity || {})[url]); }); }, Promise.resolve());
 		}).then(function () {
 			document.dispatchEvent(new CustomEvent('flexicontent:stats-ready'));
 		}).catch(function () {

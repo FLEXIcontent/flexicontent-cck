@@ -145,6 +145,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		{
 			return $this->_abortFileSave($app, \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
+		$is_local_copy = $original_task === 'save2copy' && $authorised_id > 0
+			&& (int) $record->id === $authorised_id && (int) $record->url === 0;
 
 		// The save2copy task needs to be handled slightly differently.
 		if ($this->task === 'save2copy')
@@ -239,7 +241,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		if (!$user->authorise('flexicontent.editfileproperties', 'com_flexicontent'))
 		{
 			$data['language'] = !$isnew ? $record->language : '*';
-			$data['access']   = !$isnew ? (int) $record->access : 1;
+			$data['access']   = !$isnew || $is_local_copy ? (int) $record->access : 1;
 			$data['stamp']    = !$isnew ? (int) $record->stamp : 1;
 			$data['hits']     = !$isnew ? (int) $record->hits : 0;
 		}
@@ -250,9 +252,14 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		unset($data['custom1'], $data['custom2']);
 		foreach (flexicontent_fileeditor::filterCustomPost($this->input->post) as $cname => $cvalue) $data[$cname] = $cvalue;
 		$data['hits'] = (int) $data['hits'];
-		$data['secure'] = $data['secure'] ? 1 : 0;   // Only allow 1 or 0
+		$data['secure'] = empty($data['secure']) ? 0 : 1;
 		$data['stamp']  = $data['stamp'] ? 1 : 0;   // only allow 1 or 0
-		$data['url']    = in_array((int) $data['url'], array(0, 1, 2)) ? (int) $data['url'] : 0;   // only allow 2 or 1 or 0
+		$data['url']    = (int) ($data['url'] ?? 0);
+		$data['url']    = in_array($data['url'], array(1, 2), true) && !$is_local_copy ? $data['url'] : 0;
+		if ($isnew && $data['url'] === 0 && !$is_local_copy)
+		{
+			return $this->_abortFileSave($app, Text::_('FLEXI_PLEASE_INPUT_A_FILE'), '400 Bad Request');
+		}
 
 		// Check if we are replacing the file with a new one
 		$Filedata = $this->input->files->get('file_replacement');
@@ -314,9 +321,11 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			}
 
 			$oldFilepath_temp = $oldFilepath . '__temp.old';
+			$db = Factory::getContainer()->get(DatabaseInterface::class);
+			$oldFileIsShared = flexicontent_upload::hasLocalFileReference($db, $record, array($authorised_id));
 
 			// Rename the old file to a temporary name, to avoid conflicts with the new file
-			$existingWasRenamed = file_exists($oldFilepath) && !file_exists($oldFilepath_temp);
+			$existingWasRenamed = !$oldFileIsShared && file_exists($oldFilepath) && !file_exists($oldFilepath_temp);
 			if ($existingWasRenamed) rename($oldFilepath, $oldFilepath_temp);
 
 			// Handle the uploaded file but without creating a new file record in the database ($Fobj (= File object) is not NULL)
@@ -348,7 +357,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				}
 
 				// Delete the old file path
-				if ($newFilepath != $oldFilepath || $existingWasRenamed)
+			if (!$oldFileIsShared && ($newFilepath != $oldFilepath || $existingWasRenamed))
 				{
 					try {
 						$path_to_delete = $existingWasRenamed ? $oldFilepath_temp : $oldFilepath;
@@ -375,7 +384,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			// CASE local file
 			case 0:
 				// The filename of an existing local file can only change via the file replacement upload (handled above)
-				if (!$isnew && (int) $record->url === 0 && empty($__file_id))
+				if (empty($__file_id))
 				{
 					$data['filename'] = $record->filename;
 					$data['secure']   = (int) $record->secure;
@@ -524,7 +533,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		if (!$user->authorise('flexicontent.editfileproperties', 'com_flexicontent'))
 		{
 			$data['language'] = !$isnew ? $record->language : '*';
-			$data['access']   = !$isnew ? (int) $record->access : 1;
+			$data['access']   = !$isnew || $is_local_copy ? (int) $record->access : 1;
 			$data['stamp']    = !$isnew ? (int) $record->stamp : 1;
 			$data['hits']     = !$isnew ? (int) $record->hits : 0;
 		}
@@ -824,6 +833,20 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$file_mode = 'db_mode';
 		}
 
+		/**
+		 * Folder-mode files go into the folder of one content item. As for their removal, the user must be able to edit that item,
+		 * and an item that is not saved yet needs the temporary id that was issued to this user. The right to upload is not enough
+		 */
+		if ($file_mode === 'folder_mode' && !flexicontent_security::canUseItemUploadFolder($app, (string) $u_item_id, $user))
+		{
+			$this->exitHttpHead = array( 0 => array('status' => '403 Forbidden') );
+			$this->exitMessages = array( 0 => array('error' => 'FLEXI_ALERTNOTAUTH_TASK') );
+			$this->exitLogTexts = array();
+			$this->exitSuccess  = false;
+
+			return $this->terminate($file_id, $exitMessages);
+		}
+
 		$estorage_mode = $field
 			? $field->parameters->get('estorage_mode', '0')
 			: '0';
@@ -1051,10 +1074,20 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$filename     = $custom_filename ?:
 			flexicontent_upload::sanitize($path, $file['name']);    // Sanitize the file name (filesystem-safe, (this should have been done above already)) and also return an unique filename for the given folder
 		$filepath 	  = \Joomla\Filesystem\Path::clean($path . $filename);
-
-		// Check if the uploaded file is valid
-		if (!$upload_check)
+		if ($upload_check && $custom_filename && (file_exists($filepath) || is_link($filepath)))
 		{
+			$upload_check = false;
+			$err_text = 'FLEXI_UNABLE_TO_UPLOAD_FILE';
+		}
+
+		// Check the final name and assembled contents before either storage path.
+		if (!$upload_check || !flexicontent_upload::isSafeUpload($filename, $file['tmp_name']))
+		{
+			if ($chunks)
+			{
+				unlink($file['tmp_name']);
+			}
+			$err_text = $err_text ?: 'FLEXI_WARNFILETYPE';
 			$this->exitHttpHead = array( 0 => array('status' => '415 Unsupported Media Type') );
 			$this->exitMessages = array( 0 => array('error' => $err_text) );
 			$this->exitLogTexts = array( 0 => array(\Joomla\CMS\Log\Log::ERROR => 'Invalid: ' . $filepath . ': ' . \Joomla\CMS\Language\Text::_($err_text)) );
@@ -1073,10 +1106,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		else
 		{
 			$move_success = \Joomla\Filesystem\File::upload($file['tmp_name'], $filepath, false, false,
-				// - Valid extensions are checked by our helper function
-				// - also we allow all extensions and php inside content, FLEXIcontent will never execute "include" files evening when doing "in-browser viewing"
-				array('null_byte' => true, 'forbidden_extensions' => array('_fake_ext_'), 'php_tag_in_content' => true, 'shorttag_in_content' => true, 'shorttag_extensions' => array(), 'fobidden_ext_in_content' => false, 'php_ext_content_extensions' => array() )
-			);
+				array('fobidden_ext_in_content' => false));
 		}
 
 		// Check of upload failed
@@ -1118,6 +1148,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$fileObj->secure      = $secure;
 		$fileObj->stamp       = $stamp;
 		$fileObj->ext         = $ext;
+		$fileObj->published   = 1;
 
 		$fileObj->description = $filedesc;
 		foreach (flexicontent_fileeditor::filterCustomPost($this->input) as $cname => $cvalue) $fileObj->$cname = $cvalue;
@@ -1197,6 +1228,10 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$this->exitLogTexts = array();
 		$this->exitSuccess  = true;
 
+		if ($field && $field->field_type === 'file')
+		{
+			$fileObj->pdf_preview = flexicontent_security::pdfThumbnailUrl($fileObj, (bool) $field->parameters->get('limit_by_uploader', 0));
+		}
 		return $this->terminate($file_id, $exitMessages, $fileObj);
 	}
 
@@ -2054,10 +2089,36 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		static $imported_files = array();
 		$file_ids = array();
+		$this->runMode = $Fobj ? 'interactive' : $this->runMode;
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		if (!$user->authorise('flexicontent.uploadfiles', 'com_flexicontent'))
+		{
+			$this->exitHttpHead = array(array('status' => '403 Forbidden'));
+			$this->exitMessages = array(array('error' => 'FLEXI_YOUR_ACCOUNT_CANNOT_UPLOAD'));
+			$this->exitLogTexts = array();
+			$this->exitSuccess = false;
+			return $this->terminate($file_ids, $exitMessages);
+		}
+
+		$filesdir = $Fobj ? $Fobj->file_dir_path : $this->input->get('file-dir-path', '', 'string');
+		$filesdir = str_replace('\\', '/', (string) $filesdir);
+		// The file manager and CSV import accept site-relative paths with leading separators.
+		$relative_dir = ltrim($filesdir, '/');
+		if ($filesdir !== '' && $relative_dir === '') $relative_dir = '.';
+		$site_root = realpath(JPATH_SITE);
+		$directory = $site_root !== false ? $this->_getSafeLocalFilePath($site_root, $relative_dir) : false;
+		$filesdir = $directory !== false ? realpath($directory) : false;
+		if ($filesdir === false || !is_dir($filesdir) || !$this->_isPathInside($filesdir, $site_root))
+		{
+			$this->exitHttpHead = array(array('status' => '400 Bad Request'));
+			$this->exitMessages = array(array('error' => 'FLEXI_WARN_NO_FILE_DIR'));
+			$this->exitLogTexts = array();
+			$this->exitSuccess = false;
+			return $this->terminate($file_ids, $exitMessages);
+		}
 
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$db 		= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user		= \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 		$is_importcsv = $this->task === 'importcsv';
@@ -2074,8 +2135,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$fileaccess = $this->input->get('file-access', 1, 'int');
 		$fileaccess = flexicontent_html::dataFilter($fileaccess, 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
 
-		// Get folder path and filename regexp
-		$filesdir = $Fobj ? $Fobj->file_dir_path : $this->input->get('file-dir-path', '', 'string');
+		// Get the filename regexp
 		$regexp   = $Fobj ? $Fobj->file_filter_re : $this->input->get('file-filter-re', '.', 'string');
 
 		// Delete after adding flag
@@ -2097,8 +2157,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 
 		// Get files
-		$filesdir = \Joomla\Filesystem\Path::clean(JPATH_SITE . $filesdir . DS);
-		$filenames = is_dir($filesdir) ? \Joomla\Filesystem\Folder::files($filesdir, $regexp) : array();
+		$filenames = \Joomla\Filesystem\Folder::files($filesdir, $regexp);
 
 		// Create the folder if it does not exists
 		$destpath = ($secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS;
@@ -2116,17 +2175,6 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			}
 		}
 
-		// Check if the form fields are not empty
-		if (!$filesdir)
-		{
-			$this->exitHttpHead = array( 0 => array('status' => '400 Bad Request') );
-			$this->exitMessages = array( 0 => array('error' => 'FLEXI_WARN_NO_FILE_DIR') );
-			$this->exitLogTexts = array();
-			$this->exitSuccess  = false;
-
-			return $this->terminate($file_ids, $exitMessages);
-		}
-
 		$added = array();
 		$excluded = array();
 
@@ -2142,7 +2190,17 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 					continue;
 				}
 
-				$source 		= $filesdir . $filenames[$n];
+				$source_path = $filesdir . DS . $filenames[$n];
+				$source = realpath($source_path);
+				// Copy only resolved files inside the site. A move must remove a regular source entry.
+				if ($source === false || !$this->_isPathInside($source, $site_root) || !is_file($source)
+					|| !isset($allowed_exts[strtolower(flexicontent_upload::getExt($source))])
+					|| (!$keep && is_link($source_path)))
+				{
+					$excluded[] = $filenames[$n];
+					continue;
+				}
+
 				$filename		= flexicontent_upload::sanitize($destpath, $filenames[$n]);
 				$destination 	= $destpath . $filename;
 
@@ -2150,6 +2208,12 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				if ($is_importcsv && isset($imported_files[$source]))
 				{
 					$file_ids[$filename] = $imported_files[$source];
+					continue;
+				}
+
+				if (!flexicontent_upload::isSafeUpload($filename, $source))
+				{
+					$excluded[] = $filenames[$n];
 					continue;
 				}
 
@@ -2207,7 +2271,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			}
 		}
 
-		else
+
+		if (!$file_ids)
 		{
 			$this->exitHttpHead = array( 0 => array('status' => '400 Bad Request') );
 			$this->exitMessages = array( 0 => array('error' => 'FLEXI_WARN_NO_FILES_IN_DIR') );

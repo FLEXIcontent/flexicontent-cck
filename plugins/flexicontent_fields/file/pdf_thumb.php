@@ -5,6 +5,7 @@
  */
 
 define('_JEXEC', 1);
+header('Cache-Control: private, no-store');
 
 // The plugin directory may be a symlink into the repo, so walk up to the real Joomla root
 $joomla_root = __DIR__;
@@ -26,36 +27,33 @@ define('JPATH_BASE', $joomla_root);
 require_once JPATH_BASE . '/includes/defines.php';
 require_once JPATH_BASE . '/includes/framework.php';
 
-$container = \Joomla\CMS\Factory::getContainer();
+require_once JPATH_ROOT . '/components/com_flexicontent/classes/helpers/security.php';
 
-// Shared key derived from the Joomla site secret (built by the field)
-$expected_key = md5($container->get('config')->get('secret') . 'fc_pdf_thumb');
-if (empty($_GET['k']) || !hash_equals($expected_key, (string) $_GET['k']))
+$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, array('options' => array('min_range' => 1)));
+$expires = filter_input(INPUT_GET, 'exp', FILTER_VALIDATE_INT);
+$key = $_GET['k'] ?? '';
+$now = time();
+if (!$id || !$expires || $expires <= $now || $expires > $now + 900
+	|| !is_string($key) || !preg_match('/^[a-f0-9]{64}$/D', $key))
 {
 	http_response_code(403);
 	exit('Invalid token');
 }
 
-$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
-$w  = isset($_GET['w']) ? max(100, min(800, (int) $_GET['w'])) : 400;
-if (!$id)
-{
-	http_response_code(400);
-	exit('Missing file id');
-}
-
-$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+$container = \Joomla\CMS\Factory::getContainer();
+$secret = (string) $container->get('config')->get('secret');
+$db = $container->get(\Joomla\Database\DatabaseInterface::class);
 $query = $db->getQuery(true)
-	->select($db->quoteName(array('filename', 'ext', 'url', 'secure')))
+	->select($db->quoteName(array('id', 'filename', 'ext', 'url', 'secure', 'access', 'uploaded_by', 'published')))
 	->from($db->quoteName('#__flexicontent_files'))
-	->where($db->quoteName('id') . ' = ' . (int) $id);
-$db->setQuery($query);
-$file = $db->loadObject();
+	->where($db->quoteName('id') . ' = ' . $id);
+$file = $db->setQuery($query)->loadObject();
 
-if (!$file || strtolower((string) $file->ext) !== 'pdf' || (int) $file->url === 1)
+if ($secret === '' || !flexicontent_security::isPreviewablePdf($file)
+	|| !hash_equals(flexicontent_security::pdfThumbnailSignature($file, $expires, $secret), $key))
 {
-	http_response_code(404);
-	exit('PDF file not found');
+	http_response_code(403);
+	exit('Invalid token');
 }
 
 // Only local files are rendered (no remote URL fetching)
@@ -70,15 +68,21 @@ $base_path = (int) $file->secure
 	? (!empty($params['file_path']) ? $params['file_path'] : 'components/com_flexicontent/uploads')
 	: (!empty($params['media_path']) ? $params['media_path'] : 'components/com_flexicontent/medias');
 
-$path = (int) $file->url === 2
-	? JPATH_ROOT . '/' . ltrim((string) $file->filename, '/')
-	: JPATH_ROOT . '/' . trim((string) $base_path, '/') . '/' . basename((string) $file->filename);
-
-$path = realpath($path);
-if (!$path || !is_file($path) || strtolower(pathinfo($path, PATHINFO_EXTENSION)) !== 'pdf')
+$root = realpath((int) $file->url === 2 ? JPATH_ROOT : JPATH_ROOT . '/' . trim((string) $base_path, '/'));
+$filename = ltrim((string) $file->filename, '/');
+$path = $root ? realpath($root . '/' . $filename) : false;
+if (!$path || !flexicontent_security::isContainedPath($path, $root)
+	|| !is_file($path) || strtolower(pathinfo($path, PATHINFO_EXTENSION)) !== 'pdf')
 {
 	http_response_code(404);
 	exit('PDF file not found');
+}
+
+// The name says ".pdf", the content decides what a decoder would do with it: only a file that starts as a PDF is rendered
+if (!flexicontent_security::isPdfFile($path))
+{
+	http_response_code(415);
+	exit('Not a PDF file');
 }
 
 if (!class_exists('Imagick'))
@@ -87,38 +91,13 @@ if (!class_exists('Imagick'))
 	exit('Imagick is not available');
 }
 
-$modified = filemtime($path);
-$etag     = md5($path . '|' . $w . '|' . $modified);
-$cacheDir = JPATH_ROOT . '/cache/com_flexicontent';
-$cacheFile = $cacheDir . '/pdfthumb_' . $etag . '.png';
-
-$sendHeaders = function () use ($etag, $modified)
-{
-	header('Content-Type: image/png');
-	header('Cache-Control: public, max-age=86400');
-	header('ETag: "' . $etag . '"');
-	header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $modified) . ' GMT');
-};
-
-if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && trim((string) $_SERVER['HTTP_IF_NONE_MATCH'], '"') === $etag)
-{
-	http_response_code(304);
-	exit;
-}
-
-// Serve an already generated thumbnail (regenerated only if the PDF changes)
-if (is_file($cacheFile))
-{
-	$sendHeaders();
-	readfile($cacheFile);
-	exit;
-}
-
 try
 {
 	$image = new \Imagick();
 	$image->setResolution(72, 72);
-	$image->readImage($path . '[0]');
+
+	// Name the PDF decoder, so that the content can not select another one
+	$image->readImage('pdf:' . $path . '[0]');
 	$image->setImageBackgroundColor('#ffffff');
 	if (defined('Imagick::ALPHACHANNEL_REMOVE'))
 	{
@@ -126,16 +105,12 @@ try
 	}
 	$image = $image->mergeImageLayers(\Imagick::LAYERMETHOD_FLATTEN);
 	$image->setImageFormat('png');
-	$image->thumbnailImage($w, $w, true, false);
+	$image->thumbnailImage(400, 400, true, false);
 
 	$blob = $image->getImagesBlob();
-	if (!is_dir($cacheDir))
-	{
-		@mkdir($cacheDir, 0755, true);
-	}
-	@file_put_contents($cacheFile, $blob, LOCK_EX);
 
-	$sendHeaders();
+	header('Content-Type: image/png');
+	header('X-Content-Type-Options: nosniff');
 	echo $blob;
 }
 catch (\Throwable $e)

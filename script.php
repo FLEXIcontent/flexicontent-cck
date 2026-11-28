@@ -1495,6 +1495,45 @@ class com_flexicontentInstallerScript
 				</tr>
 
 		<?php
+		// Download links recorded for articles before a link had to pass a rights check: review them once.
+		// This runs after the table above exists, see flexicontent_security::reviewRecordedFileLinks()
+		?>
+				<tr class="row0">
+					<td class="key" style="font-size:11px;">Review download links recorded by earlier versions: </td>
+					<td>
+					<?php
+					try {
+						require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/security.php';
+						$review = flexicontent_security::reviewRecordedFileLinks($db);
+
+						if ($review === null) {
+							echo '<span class="badge bg-info badge-info">nothing to do</span>';
+						}
+						else {
+							echo '<span class="badge bg-success badge-success">links reviewed: ' . (int) $review['reviewed'] . ', no longer granting a download: ' . count($review['removed']) . '</span>';
+
+							if ($review['removed']) {
+								// Keep a record: a link that is wanted is recorded again when a user who may use the file removes it, saves, and adds it again
+								$pairs = array_map(function ($pair) { return 'item ' . (int) $pair[0] . ' / file ' . (int) $pair[1]; }, $review['removed']);
+								echo '<br/><small>' . htmlspecialchars(implode(', ', array_slice($pairs, 0, 50)) . (count($pairs) > 50 ? ', ...' : ''), ENT_QUOTES, 'UTF-8') . '</small>';
+
+								try {
+									\Joomla\CMS\Log\Log::addLogger(array('text_file' => 'flexicontent.file_links_review.php'), \Joomla\CMS\Log\Log::ALL, array('flexicontent_file_links'));
+									\Joomla\CMS\Log\Log::add('Recorded download links removed by the review: ' . implode(', ', $pairs), \Joomla\CMS\Log\Log::NOTICE, 'flexicontent_file_links');
+								}
+								catch (\Throwable $e) {}
+							}
+						}
+					}
+					catch (\Throwable $e) {
+						// Nothing was marked as done, the next update reviews again
+						echo '<span class="badge badge-error">Error</span> ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
+					}
+					?>
+					</td>
+				</tr>
+
+		<?php
 		// Create layouts_conf table if it does not exist
 		?>
 				<tr class="row1">
@@ -1859,6 +1898,28 @@ class com_flexicontentInstallerScript
 
 			if ($extension['id'] > 0 && $extension['installer']->uninstall($extension['type'], $extension['id'], $extension['client_id'])) {
 				$extension['status'] = true;
+			}
+		}
+
+		// The link browser for the JCE editor is not named in the manifest: the dashboard installs it on sites that have JCE
+		$jce_links_installer = JPATH_SITE . '/components/com_flexicontent/librairies/JCE/installer.php';
+
+		if (is_file($jce_links_installer))
+		{
+			require_once $jce_links_installer;
+
+			try
+			{
+				$jce_links_removed = FlexicontentJceLinks::uninstall();
+			}
+			catch (\Throwable $e)
+			{
+				$jce_links_removed = false;
+			}
+
+			if ($jce_links_removed !== null)
+			{
+				$extensions[] = array('name' => 'JCE - FLEXIcontent Links', 'type' => 'plugin', 'status' => $jce_links_removed);
 			}
 		}
 

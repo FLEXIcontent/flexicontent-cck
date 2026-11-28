@@ -651,6 +651,12 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		// Currently we only handle image_source '1'
 		if ($image_source===1)
 		{
+			// The id becomes a folder name: item ids and the temporary ids of unsaved items have only these characters
+			if (is_array($itemid) || is_object($itemid) || !preg_match('/^[A-Za-z0-9_]*$/D', (string) $itemid))
+			{
+				die(__FUNCTION__.'(): invalid item id');
+			}
+
 			$field_folder_arr = array(
 				'item_' . $itemid,
 				'field_' . $fieldid
@@ -1451,7 +1457,8 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 		if (!empty($ignored))
 		{
-			$where[] = ' (i.id NOT IN (' . implode(',', ArrayHelper::toInteger($ignored)) . ') AND i.context = \'com_content.article\')';
+			// Only the links inside the ignored content items are left out, links of every other context still count
+			$where[] = ' NOT (i.id IN (' . implode(',', ArrayHelper::toInteger($ignored)) . ') AND i.context = \'com_content.article\')';
 		}
 
 		$where = count($where)
@@ -2011,7 +2018,11 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	public function candelete($cid, & $cid_noauth = null, & $cid_wassocs = null)
 	{
-		$authorizing_ignored = $cid_noauth ? array_flip($cid_noauth) : array();
+		/**
+		 * The ids of content items whose use of the files is not counted. They are passed on as a list of ids:
+		 * a flipped list (id => position) made every query ignore item 0 only, so the given items always counted
+		 */
+		$authorizing_ignored = $cid_noauth ? array_values(ArrayHelper::toInteger((array) $cid_noauth)) : array();
 		$assignments_ignored = $cid_wassocs ? array_flip($cid_wassocs) : array();
 
 		$cid_noauth  = array();
@@ -2145,40 +2156,6 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 		$files = $this->_db->setQuery($query)->loadObjectList();
 
-		$imageFields = $this->_db->setQuery("SELECT id, attribs FROM #__flexicontent_fields WHERE field_type = 'image'")->loadObjectList();
-
-		foreach($files as $file)
-		{
-			if ($file->url != 1)
-			{
-				$basepath	= $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-				$path 		= \Joomla\Filesystem\Path::clean($basepath.DS.DS.$file->filename);
-
-				// A file that does not exist (anymore) is not an error, the record is deleted anyway
-				if (is_file($path) && !\Joomla\Filesystem\File::delete($path)) {
-					$this->delete_warnings[] = \Joomla\CMS\Language\Text::_( 'FLEXI_UNABLE_TO_DELETE' ) . $path;
-					\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_( 'FLEXI_UNABLE_TO_DELETE' ) . $path, 'warning');
-				}
-				if (!is_file($path))
-				{
-					// Different originals can share the stem of a generated WebP. Keep
-					// those variants while a surviving record could still own them.
-					$stem = pathinfo($file->filename, PATHINFO_FILENAME);
-					$others = $this->_db->setQuery('SELECT filename FROM #__flexicontent_files WHERE id NOT IN (' . $cid_list . ')'
-						. ' AND secure = ' . (int) $file->secure . ' AND filename LIKE ' . $this->_db->quote($this->_db->escape($stem, true) . '.%', false))->loadColumn();
-					if (!in_array($file->filename, $others, true)) foreach (flexicontent_upload::getImageThumbnails($file, $imageFields, !$others) as $thumbnail)
-					{
-						if (!\Joomla\Filesystem\File::delete($thumbnail))
-						{
-							$this->delete_warnings[] = \Joomla\CMS\Language\Text::_('FLEXI_UNABLE_TO_DELETE') . $thumbnail;
-							\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_UNABLE_TO_DELETE') . $thumbnail, 'warning');
-						}
-					}
-				}
-			}
-		}
-
-
 		/**
 		 * Get records using the model, we need an array of records to use for calling the events
 		 */
@@ -2218,7 +2195,46 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$query = 'DELETE FROM #__flexicontent_files'
 		. ' WHERE id IN ('. $cid_list .')';
 
-		$this->_db->setQuery($query)->execute();
+		if (!$this->_db->setQuery($query)->execute())
+		{
+			return false;
+		}
+
+		$imageFields = $this->_db->setQuery("SELECT id, attribs FROM #__flexicontent_fields WHERE field_type = 'image'")->loadObjectList();
+
+		foreach($files as $file)
+		{
+			// Only owned uploads can be removed, after the last local reference is gone.
+			if ((int) $file->url === 0 && !flexicontent_upload::hasLocalFileReference($this->_db, $file))
+			{
+				$basepath	= $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
+				$path 		= \Joomla\Filesystem\Path::clean($basepath.DS.DS.$file->filename);
+
+				// A file that does not exist (anymore) is not an error, the record is deleted anyway
+				if (is_file($path) && !\Joomla\Filesystem\File::delete($path)) {
+					$this->delete_warnings[] = \Joomla\CMS\Language\Text::_( 'FLEXI_UNABLE_TO_DELETE' ) . $path;
+					\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_( 'FLEXI_UNABLE_TO_DELETE' ) . $path, 'warning');
+				}
+				if (!is_file($path))
+				{
+					// Different originals can share the stem of a generated WebP. Keep
+					// those variants while a surviving record could still own them.
+					$stem = pathinfo($file->filename, PATHINFO_FILENAME);
+					$others = $this->_db->setQuery('SELECT filename FROM #__flexicontent_files WHERE id NOT IN (' . $cid_list . ')'
+						. ' AND secure = ' . (int) $file->secure . ' AND filename LIKE ' . $this->_db->quote($this->_db->escape($stem, true) . '.%', false))->loadColumn();
+					if (!in_array($file->filename, $others, true)) foreach (flexicontent_upload::getImageThumbnails($file, $imageFields, !$others) as $thumbnail)
+					{
+						if (!\Joomla\Filesystem\File::delete($thumbnail))
+						{
+							$this->delete_warnings[] = \Joomla\CMS\Language\Text::_('FLEXI_UNABLE_TO_DELETE') . $thumbnail;
+							\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_UNABLE_TO_DELETE') . $thumbnail, 'warning');
+						}
+					}
+				}
+			}
+		}
+
+
 
 		/**
 		 * Trigger onAfterDelete event

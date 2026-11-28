@@ -214,7 +214,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		{
 			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$rated = $db->setQuery(
-				'SELECT id, content_id, average_rating, custom_ratings FROM #__' . $this->records_dbtbl
+				'SELECT * FROM #__' . $this->records_dbtbl
 				. ' WHERE id IN (' . implode(',', $cid) . ') AND content_id > 0 AND average_rating > 0'
 			)->loadObjectList('id');
 		}
@@ -224,6 +224,8 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		// Remove the votes of the reviews that were actually deleted (permissions / locks may skip some records)
 		if (count($rated))
 		{
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_reviews.php';
+
 			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$existing = $db->setQuery(
 				'SELECT id FROM #__' . $this->records_dbtbl . ' WHERE id IN (' . implode(',', array_keys($rated)) . ')'
@@ -231,13 +233,20 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 			foreach ($rated as $id => $row)
 			{
-				if (!in_array($id, $existing))
+				// A rating that was not added to the votes of the item is not removed from them
+				if (!in_array($id, $existing) && flexicontent_reviews::isVoteCounted(isset($row->attribs) ? $row->attribs : null))
 				{
 					$this->_applyRatingChange((int) $row->content_id, (int) $row->average_rating, 0);
 
 					if (trim((string) $row->custom_ratings) !== '')
 					{
-						$this->_applyCompositeChange((int) $row->content_id, (array) json_decode((string) $row->custom_ratings, true), array());
+						$this->_applyCompositeChange(
+							(int) $row->content_id,
+							(array) json_decode((string) $row->custom_ratings, true),
+							array(),
+							null,
+							!flexicontent_reviews::hasCharVotes(isset($row->attribs) ? $row->attribs : null)
+						);
 					}
 				}
 			}
@@ -737,10 +746,13 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			}
 		}
 
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_reviews.php';
+
 		/**
-		 * The rating of the review is also a vote of the item, update the item's rating
+		 * The rating of the review is also a vote of the item, update the item's rating. A rating that was not added
+		 * to the votes of the item (see flexicontent_reviews::isVoteCounted) stays out of them when it is changed here
 		 */
-		if ($this->canManage && isset($validated_data['average_rating']))
+		if ($this->canManage && isset($validated_data['average_rating']) && ($isNew || flexicontent_reviews::isVoteCounted($model->get('attribs'))))
 		{
 			$_content_id = $isNew ? (int) $validated_data['content_id'] : (int) $model->get('content_id');
 
@@ -756,8 +768,18 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 				$this->_applyCompositeChange(
 					$_content_id,
 					$isNew ? array() : (array) json_decode((string) $model->get('custom_ratings'), true),
-					(array) json_decode((string) $validated_data['custom_ratings'], true)
+					(array) json_decode((string) $validated_data['custom_ratings'], true),
+					null,
+					!$isNew && !flexicontent_reviews::hasCharVotes($model->get('attribs'))
 				);
+
+				// The votes of all characteristics of a new review were stored just now
+				if ($isNew)
+				{
+					$new_review = (object) array('attribs' => null);
+					flexicontent_reviews::setCharVotes($new_review, true);
+					$validated_data['attribs'] = $new_review->attribs;
+				}
 			}
 		}
 
@@ -820,7 +842,11 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			$fail($review->getError());
 		}
 
-		$this->_applyRatingChange((int) $review->content_id, $old_percent, $percent);
+		// A rating that was not added to the votes of the item stays out of them
+		if (flexicontent_reviews::isVoteCounted(isset($review->attribs) ? $review->attribs : null))
+		{
+			$this->_applyRatingChange((int) $review->content_id, $old_percent, $percent);
+		}
 
 		jexit(json_encode(array('error' => 0, 'rating' => $percent)));
 	}
@@ -897,15 +923,21 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	 * @param   int    $content_id    The reviewed item
 	 * @param   array  $old_percents  xid => old rating (percent), empty if there was no rating
 	 * @param   array  $new_percents  xid => new rating (percent), empty if the ratings are removed
+	 * @param   object $field         The voting field, if it was loaded already
+	 * @param   bool   $legacy        The review is not known to have a vote in every characteristic (it was saved by an older version)
 	 *
 	 * @return  void
 	 *
 	 * @since   3.3
 	 */
-	protected function _applyCompositeChange($content_id, $old_percents, $new_percents)
+	protected function _applyCompositeChange($content_id, $old_percents, $new_percents, $field = null, $legacy = false)
 	{
-		$model = $this->getModel($this->record_name);
-		$field = $model->getVotingReviewsField((object) array('type_id' => 0), true);
+		if (!$field)
+		{
+			$model = $this->getModel($this->record_name);
+			$field = $model->getVotingReviewsField((object) array('type_id' => 0), true);
+		}
+
 		$chars = flexicontent_html::getVotingCharacteristics($field);
 
 		if (!$content_id || !$chars)
@@ -958,8 +990,6 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		{
 			$old_votes[$xid] = $to_vote(isset($old_percents[$xid]) ? (int) $old_percents[$xid] : 0);
 			$new_votes[$xid] = $to_vote(isset($new_percents[$xid]) ? (int) $new_percents[$xid] : 0);
-
-			$apply('#__flexicontent_items_extravote', ' AND field_id = ' . (int) $xid, ', field_id = ' . (int) $xid, $old_votes[$xid], $new_votes[$xid]);
 		}
 
 		// Overall rating (a vote of the item) exists only if all characteristics are rated
@@ -968,10 +998,69 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			return count($votes) && !in_array(0, $votes, true) ? max(1, (int) round(array_sum($votes) / count($votes))) : 0;
 		};
 
-		$apply('#__content_rating', '', '', $main($old_votes), $main($new_votes));
+		$main_old = $main($old_votes);
+		$main_new = $main($new_votes);
+
+		/**
+		 * Older versions stored only the vote of the last characteristic (and the average) if the item already had votes, so a
+		 * review saved by them may have no vote in the other characteristics, and it is not known in which. The votes of the
+		 * average are the complete votes of the item: a characteristic is changed only if it keeps at least as many votes
+		 * as there are complete votes, otherwise it already misses votes and the vote of another voter would be removed
+		 */
+		$char_counts = array();
+		$main_count  = 0;
+
+		if ($legacy)
+		{
+			$main_count = (int) $db->setQuery('SELECT rating_count FROM #__content_rating WHERE content_id = ' . (int) $content_id)->loadResult();
+			$main_count = max(0, $main_count + ($main_new > 0 ? 1 : 0) - ($main_old > 0 ? 1 : 0));
+
+			$char_counts = $db->setQuery(
+				'SELECT field_id, rating_count FROM #__flexicontent_items_extravote WHERE content_id = ' . (int) $content_id
+			)->loadObjectList('field_id');
+		}
+
+		foreach ($chars as $xid => $char)
+		{
+			if ($legacy)
+			{
+				$char_count = (isset($char_counts[$xid]) ? (int) $char_counts[$xid]->rating_count : 0) + ($new_votes[$xid] > 0 ? 1 : 0) - ($old_votes[$xid] > 0 ? 1 : 0);
+
+				if ($char_count < $main_count)
+				{
+					continue;
+				}
+			}
+
+			$apply('#__flexicontent_items_extravote', ' AND field_id = ' . (int) $xid, ', field_id = ' . (int) $xid, $old_votes[$xid], $new_votes[$xid]);
+		}
+
+		$apply('#__content_rating', '', '', $main_old, $main_new);
 
 		// The ratings of the item changed, clean item-related caches
 		FLEXIUtilities::getCache($group = '', 0)->clean('com_flexicontent');
+	}
+
+
+	/**
+	 * Method to apply a change of the ratings of an existing review with composite voting to the votes of the reviewed item.
+	 * The review is the vote record of its author, so its counted ratings are changed (or removed), they are not voted again.
+	 * Works only in the internal voting mode (called by PHP code that saves or deletes the review)
+	 *
+	 * @param   int     $content_id    The reviewed item
+	 * @param   array   $old_percents  xid => old rating (percent)
+	 * @param   array   $new_percents  xid => new rating (percent), empty to remove the votes
+	 * @param   object  $field         The voting field
+	 * @param   bool    $legacy        The review is not known to have a vote in every characteristic, see _applyCompositeChange()
+	 *
+	 * @return  void
+	 */
+	public function changeReviewVotes($content_id = 0, $old_percents = array(), $new_percents = array(), $field = null, $legacy = false)
+	{
+		if ($this->voteInternal && $field)
+		{
+			$this->_applyCompositeChange((int) $content_id, (array) $old_percents, (array) $new_percents, $field, (bool) $legacy);
+		}
 	}
 
 
@@ -1363,15 +1452,23 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		$currip = $_SERVER['REMOTE_ADDR'];
 		$result	= new stdClass();
 
-		foreach($vote_history[$cid] as $xid_n => $rating_n)
+		// Composite voting was completed just now: the votes given before the last one were not stored yet, they are added now
+		$first_complete = $xid !== 'main' && $voteIsComplete && !$old_ratings['main'];
+
+		// Handle the current vote first: if it is refused (already voted) then nothing is stored
+		$xid_order = array_merge(array($xid), array_diff(array_keys($vote_history[$cid]), array($xid)));
+
+		foreach($xid_order as $xid_n)
 		{
+			$rating_n = $vote_history[$cid][$xid_n];
+
 			// Update only current characteristic
 			if (!$voteIsComplete && $xid_n != $xid)
 			{
 				continue;
 			}
 
-			$old_rating = $old_ratings[$xid_n];
+			$old_rating = $first_complete && $xid_n !== 'main' ? 0 : $old_ratings[$xid_n];
 			$rating_diff = $rating_diffs[$xid_n];
 
 
@@ -1437,12 +1534,12 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 				 * If voting is completed, Either add all sub-votes into DB when voting is completed for the very first time
 				 * -OR- if user has updated an existing voting set (update in DB only the current sub-vote and the main vote)
 				 */
-				if ($voteIsComplete && ($xid_n === 'main' || $xid_n == $xid))
+				if ($voteIsComplete && ($xid_n === 'main' || $xid_n == $xid || $first_complete))
 				{
 					// vote accepted update DB
 					$query = 'UPDATE ' . $dbtbl
 					. ' SET rating_count = rating_count + ' . ($old_rating ? 0 : 1)
-					. '  , rating_sum = rating_sum + ' . ($old_rating ? $rating_diff : $rating_n)
+					. '  , rating_sum = GREATEST(CAST(rating_sum AS SIGNED) + ' . (int) ($old_rating ? $rating_diff : $rating_n) . ', 0)'
 					. '  , lastip = ' . $db->Quote($currip)
 					. ' WHERE content_id = ' . (int) $cid
 					. ' ' . $and_extra_id;
@@ -1551,6 +1648,9 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 		if ($this->voteInternal)
 		{
+			// False: composite voting is not complete yet, the votes are kept in the session and they are not votes of the item yet
+			$result->vote_complete = $voteIsComplete;
+
 			return $result;
 		}
 		elseif ($no_ajax)
@@ -1588,6 +1688,12 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		}
 
 		if (!$trashed && (int) $review->state === -2)
+		{
+			return null;
+		}
+
+		// The rating of the review was not added to the votes of the item: there is no old vote to change
+		if ((int) $review->state !== -2 && !flexicontent_reviews::isVoteCounted(isset($review->attribs) ? $review->attribs : null))
 		{
 			return null;
 		}
@@ -1648,6 +1754,9 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		}
 
 		$review->average_rating = (int) round(100 * $rating / $resolution);
+
+		// This is called for a vote that was accepted, so the rating is a vote of the item
+		flexicontent_reviews::setVoteCounted($review, true);
 		$review->check();
 
 		return $review->store();

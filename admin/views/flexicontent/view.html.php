@@ -185,6 +185,20 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 
 		if($perms->CanConfig)
 		{
+			// Remote file checks need to know the site's own host: without 'live_site', keep the one that this administrator uses
+			// A host that is stored now is also a host the thumbnail script may fetch remote images from
+			if (flexicontent_remote::rememberSiteHost() !== '')
+			{
+				try
+				{
+					flexicontent_images::phpThumbSyncConfig();
+				}
+				catch (\Throwable $e)
+				{
+					// The file is written with the next thumbnail URL of a remote image
+				}
+			}
+
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');

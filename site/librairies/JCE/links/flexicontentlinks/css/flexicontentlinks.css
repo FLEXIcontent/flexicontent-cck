@@ -12,14 +12,8 @@ div.tree ul li div.tree-row span.file.flexitag     {background: url(../images/ta
 div.tree ul li div.tree-row span.file.flexitagged  {background: url(../images/tag_green.png) no-repeat 0 2px;}
 div.tree ul li div.tree-row span.file.flexiitem    {background: url(../images/page_white.png) no-repeat 2px 2px;}
 
-li.folder.fcauthors.nolink .uk-icon-folder:before {content: "\f0c0";}
-li.folder.fccats.nolink    .uk-icon-folder:before {content: "\f0e8";}
-li.folder.fctags.nolink    .uk-icon-folder:before {content:"\f02c";}
-li.folder.fctagged.nolink  .uk-icon-folder:before {content:"\f02c";}
-
-li.folder.fccats.nolink  li.folder.flexicat .uk-icon-folder:before {content: "\f07b";}
-
-li.file.flexiauthor .uk-icon-file-text-o:before {content: "\f007";}
-li.file.flexiitem   .uk-icon-file-text-o:before {content: "\f1ea";}
-li.file.flexitag    .uk-icon-file-text-o:before {content:"\f02b";}
-li.file.flexitagged .uk-icon-file-text-o:before {content:"\f02b";}
+/*
+ * JCE 2.9 and JCE 3 draw the icons of the tree with their own icon font: the folders and files of FLEXIcontent
+ * use the icons of JCE. (The Font Awesome characters that were set here for JCE 2.6 are not part of that font,
+ * they left the icon of a closed folder empty.)
+ */

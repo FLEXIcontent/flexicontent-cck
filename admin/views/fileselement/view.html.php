@@ -247,6 +247,26 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 		$u_item_id = $view === 'fileselement' ? $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id', 'u_item_id', 0, 'string' ) : null;
 
+		/**
+		 * The id names the upload folder of an item (folder mode: the folder is created and listed) and it is printed into the page.
+		 * Accept only the id of an item that the user may edit, or the temporary id issued to the user for an unsaved item.
+		 * A field in folder mode can not be used without such an id
+		 */
+		if ($view === 'fileselement')
+		{
+			$u_item_id = is_scalar($u_item_id) ? (string) $u_item_id : '';
+			$has_item  = $u_item_id !== '' && $u_item_id !== '0';
+
+			if ($has_item ? !flexicontent_security::canUseItemUploadFolder($app, $u_item_id, $user) : $folder_mode)
+			{
+				$app->setUserState($option.'.'.$_view.'.u_item_id', 0);
+				http_response_code(403);
+				jexit('<div class="alert alert-warning">' . \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK') . '</div>');
+			}
+
+			$u_item_id = $has_item ? $u_item_id : 0;
+		}
+
 		// *** BOF FILESELEMENT view specific ***
 		if (!$u_item_id && $filter_item)   $u_item_id   = $filter_item;
 

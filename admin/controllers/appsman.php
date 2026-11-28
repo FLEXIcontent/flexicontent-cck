@@ -24,6 +24,7 @@ spl_autoload_register(static function ($class) {
 
 // Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
 require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'appsman.php';
+require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/security.php';
 
 /**
  * FLEXIcontent Apps manager Controller
@@ -103,6 +104,8 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 	 */
 	function addtoexport()
 	{
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$model = $this->getModel($this->record_name);
 		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
@@ -148,6 +151,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 		}
 
 		$conf = $session->get('appsman_export', array(), 'flexicontent');
+		if (!is_array($conf)) $conf = array();
 
 		$count_new = 0;
 		$count_old = 0;
@@ -211,6 +215,8 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 	 */
 	public function exportclear()
 	{
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
@@ -226,7 +232,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 			$app->redirect($this->returnURL);
 		}
 
-		$session->set('appsman_export', "", 'flexicontent');
+		$session->set('appsman_export', array(), 'flexicontent');
 
 		$app->enqueueMessage('Export list cleared', 'notice');
 		$this->setRedirect($this->returnURL);
@@ -242,6 +248,16 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 	 */
 	public function import()
 	{
+		$task = strtolower($this->input->get('task', '', 'cmd'));
+		if (in_array($task, array('initxml', 'processxml'), true))
+		{
+			flexicontent_security::requirePostToken();
+		}
+		else
+		{
+			\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		}
+
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
@@ -275,8 +291,6 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 			$app->redirect($this->returnURL);
 		}
 
-		$task = strtolower($this->input->get('task', '', 'cmd'));
-
 		/**
 		 * Execute according to task
 		 */
@@ -290,9 +304,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 			case 'clearxml':
 
 				// Clear any import data from session
-				$conf = $has_zlib ? base64_encode(zlib_encode(serialize(null), -15)) : base64_encode(serialize(null));
-
-				$session->set('appsman_config', $conf, 'flexicontent');
+				$session->set('appsman_config', '', 'flexicontent');
 
 				// Set a message that import task was cleared and redirect
 				$app->enqueueMessage('Import task cleared', 'notice');
@@ -306,7 +318,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 			case 'processxml':
 
 				$conf   = $session->get('appsman_config', "", 'flexicontent');
-				$conf		= unserialize($conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "");
+				$conf = $conf ? unserialize($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf), array('allowed_classes' => false)) : null;
 
 				if (empty($conf))
 				{
@@ -333,6 +345,40 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 				$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 				$nullDate = $db->getNullDate();
 
+				$corePropsFields = array();
+				if ($xml->xpath('./rows[@table="flexicontent_fields"]/row'))
+				{
+					$corePropsFields = $db->setQuery($db->getQuery(true)
+						->select('*')
+						->from('#__flexicontent_fields')
+						->where('field_type = ' . $db->quote('coreprops'))
+						->where('name LIKE ' . $db->quote('form_%'))
+					)->loadObjectList('name');
+				}
+
+				// Import writes directly to the database, so check executable settings before any insert.
+				if (!$user->authorise('core.admin'))
+				{
+					foreach ($xml->rows as $table)
+					{
+						$tableName = (string) $table['table'];
+						if ($tableName !== 'flexicontent_fields' && $tableName !== 'flexicontent_types') continue;
+						foreach ($table->row as $row)
+						{
+							if ($tableName === 'flexicontent_fields' && ((int) trim((string) $row->iscore, '"')
+								|| isset($corePropsFields[trim((string) $row->name, '"')]))) continue;
+							foreach ($row as $column => $value)
+							{
+								if (strcasecmp($column, 'attribs') !== 0) continue;
+								$attribs = stripslashes(trim((string) $value, '"'));
+								flexicontent_security::assertTrustedConfigurationChange('', $attribs, $user);
+							}
+						}
+					}
+				}
+
+				// Consume the prepared import before writes so a failed or refreshed request cannot replay it.
+				$session->set('appsman_config', '', 'flexicontent');
 				$remap = array();
 
 				foreach ($xml->rows as $table)
@@ -362,17 +408,6 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 					echo "Doing table: " . $table_name . "<br/>";
 
 					$id_colname = self::$table_idcols[$table_name];
-
-					if ($table_name === 'flexicontent_fields')
-					{
-						$corePropsFields = $db->setQuery($db->getQuery(true)
-							->select('*')
-							->from('#__flexicontent_fields')
-							->where('field_type = ' . $db->quote('coreprops'))
-							->where('name LIKE ' . $db->quote('form_%'))
-						)->loadObjectList('name');
-						//echo '<pre>'; print_r($corePropsFields); exit;
-					}
 
 					foreach ($rows as $row)
 					{
@@ -474,12 +509,12 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 			case 'initxml':
 
 				// Retrieve the temporary path of the uploaded file
-				$xmlfile = @$_FILES["xmlfile"]["tmp_name"];
+				$xmlfile = $_FILES['xmlfile']['tmp_name'] ?? '';
 
-				if (!is_file($xmlfile))
+				if (!is_string($xmlfile) || !is_file($xmlfile))
 				{
 					$app->enqueueMessage('Upload file error!', 'error');
-					$app->redirect($link);
+					$app->redirect($this->returnURL);
 				}
 
 				$zip = new ZipArchive;
@@ -496,7 +531,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 				else
 				{
 					$app->enqueueMessage('Error reading file', 'error');
-					$app->redirect($link);
+					$app->redirect($this->returnURL);
 				}
 
 				// Set import configuration into session
@@ -538,6 +573,8 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 	 */
 	public function export()
 	{
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();

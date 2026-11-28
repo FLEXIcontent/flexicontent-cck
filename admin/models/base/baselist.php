@@ -524,6 +524,14 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 			}
 		}
 
+		// Reached from the site (the record pickers): a user without the backend manager right sees published records and own records
+		if (\Joomla\CMS\Factory::getApplication()->isClient('site') && property_exists($table, $this->state_col ?? '') && !$user->authorise('core.manage', 'com_flexicontent'))
+		{
+			$where[] = '(a.' . $this->state_col . ' IN (1, -5)'
+				. (property_exists($table, $this->created_by_col ?? '') && (int) $user->id ? ' OR a.' . $this->created_by_col . ' = ' . (int) $user->id : '')
+				. ')';
+		}
+
 		// Filter by language
 		if (strlen($filter_lang))
 		{
@@ -1037,6 +1045,15 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		// off, refused (Column 'access' cannot be null) with strict mode on
 		$accesses = is_array($access) ? $access : array_fill_keys($cid, $access);
 
+		// Smart Search stores an access level with every indexed item, taken from the item, its category and its type.
+		// A record form save tells it about a change, this list task has to do the same
+		$finder_contexts = array(
+			'flexicontent_items'      => 'com_flexicontent.form',
+			'flexicontent_categories' => 'com_categories.category',
+			'flexicontent_types'      => 'com_flexicontent.type',
+		);
+		$finder_context = isset($finder_contexts[$this->records_jtable]) ? $finder_contexts[$this->records_jtable] : null;
+
 		foreach ($cid as $id)
 		{
 			$table->load($id);
@@ -1050,15 +1067,59 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 				return false;
 			}
 
+			if ($finder_context)
+			{
+				$this->_triggerFinderSaveEvent('onFinderBeforeSave', $finder_context, $table);
+			}
+
 			if (!$table->store())
 			{
 				$this->setError($table->getError());
 
 				return false;
 			}
+
+			if ($finder_context)
+			{
+				$this->_triggerFinderSaveEvent('onFinderAfterSave', $finder_context, $table);
+			}
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Tell the Smart Search plugins that an existing record is saved, the way Joomla's "Content - Smart Search" plugin does
+	 *
+	 * @param   string  $name     onFinderBeforeSave or onFinderAfterSave
+	 * @param   string  $context  The context the Smart Search plugins know the record by
+	 * @param   object  $table    The record
+	 *
+	 * @return  void
+	 */
+	protected function _triggerFinderSaveEvent($name, $context, $table)
+	{
+		$app = \Joomla\CMS\Factory::getApplication();
+		\Joomla\CMS\Plugin\PluginHelper::importPlugin('finder');
+
+		$class = $name === 'onFinderBeforeSave'
+			? '\\Joomla\\CMS\\Event\\Finder\\BeforeSaveEvent'
+			: '\\Joomla\\CMS\\Event\\Finder\\AfterSaveEvent';
+
+		// Joomla 5 and later: typed events
+		if (class_exists($class))
+		{
+			$app->getDispatcher()->dispatch($name, new $class($name, array(
+				'context' => $context,
+				'subject' => $table,
+				'isNew'   => false,
+			)));
+
+			return;
+		}
+
+		$app->triggerEvent($name, array($context, $table, false));
 	}
 
 
@@ -1186,6 +1247,13 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		$filter_order     = $fcform ? $jinput->get('filter_order', $default_order, 'cmd') : $app->getUserStateFromRequest($p . 'filter_order', 'filter_order', $default_order, 'cmd');
 		$filter_order_Dir = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word') : $app->getUserStateFromRequest($p . 'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word');
+
+		// A column name, optionally with a table alias in front. Columns that hold credentials or contact data are not sort keys
+		if (!is_string($filter_order) || !preg_match('/^(?:[A-Za-z_][A-Za-z0-9_]*\.)?[A-Za-z_][A-Za-z0-9_]*$/D', $filter_order)
+			|| preg_match('/(?:^|\.)(?:password|email|username|activation|otpKey|otep|authProvider|params|registerDate|lastvisitDate)$/i', $filter_order))
+		{
+			$filter_order = '';
+		}
 
 		if (!$filter_order)
 		{

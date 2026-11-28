@@ -281,6 +281,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// IS new FLAG
 		$isnew   = ! $item->id;
+		$submit_menu = $isSite && $isnew ? flexicontent_security::getItemSubmissionMenu($app, (int) $item->type_id) : null;
+		$submit_params = $submit_menu ? $submit_menu->getParams() : null;
 
 		// Saved items retain their item id; new forms use a session-issued upload id.
 		$unique_tmp_itemid = $item->id
@@ -456,7 +458,6 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			// ***
 
 			// Component / Menu Item parameters
-			$allowunauthorize   = $page_params->get('allowunauthorize', 0);     // allow unauthorised user to submit new content
 			$unauthorized_page  = $page_params->get('unauthorized_page', '');   // page URL for unauthorized users (via global configuration)
 			$notauth_itemid     = $page_params->get('notauthurl', '');          // menu itemid (to redirect) when user is not authorized to create content
 
@@ -569,9 +570,9 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				// CREATE action
 				// Get create access, this includes check of creating in at least one category, and type's "create items"
 				$canAdd = $model->getItemAccess()->get('access-create');
-				$overrideCategoryACL = $page_params->get("overridecatperms", 1) && ($page_params->get("cid") || $page_params->get("maincatid"));
-				$canAssignToCategory = $canAdd || ($overrideCategoryACL
-					&& flexicontent_security::canUseSubmissionCategoryOverride($app->getMenu()->getActive(), $user));  // can create in any category -OR- category ACL override is enabled
+				$overrideCategoryACL = flexicontent_security::canUseSubmissionCategoryOverride($submit_menu, $user) && $submit_params && $submit_params->get("overridecatperms", 1)
+					&& ($submit_params->get("cid") || $submit_params->get("maincatid"));
+				$canAssignToCategory = $canAdd || $overrideCategoryACL;  // can create in any category -OR- category ACL override is enabled
 
 				// Check if Content Type can be created by current user
 				if ( empty($canCreateType) )
@@ -591,13 +592,10 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 					}
 				}
 
-				// Not authorized if can not assign item to category or can not create type
+				$canCreateType = $canCreateType || flexicontent_security::canOverrideItemSubmissionType($submit_menu, $user);
 				$not_authorised = !$canAssignToCategory || !$canCreateType;
 
-				// Allow item submission by unauthorized users, ... even guests ...
-				if ($allowunauthorize == 2) $allowunauthorize = ! $user->guest;
-
-				if ($not_authorised && !$allowunauthorize)
+				if ($not_authorised)
 				{
 					$msg = '';
 					if (!$canCreateType)
@@ -620,7 +618,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				}
 
 				// User isn't authorize to add ANY content
-				if ( ($not_authorised && !$allowunauthorize) || @ $content_is_limited )
+				if ($not_authorised || !empty($content_is_limited))
 				{
 					// a. custom unauthorized submission page via menu item
 					if ($notauth_menu = $app->getMenu()->getItem($notauth_itemid))
@@ -745,10 +743,10 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$placementConf = $this->_createPlacementConf($item, $fields, $page_params, $typeselected);
 
 		// Get menu overridden categories/main category fields, (FALSE IN BACKEND, no menu configuration in backend)
-		$menuCats = !$isSite ? false : $this->_getMenuCats($item, $perms, $page_params);
+		$menuCats = $submit_params ? $this->_getMenuCats($item, $perms, $submit_params) : false;
 
 		// Create submit configuration (for new items) into the session, (FALSE IN BACKEND, no menu configuration in backend)
-		$submitConf = !$isSite ? false : $this->_createSubmitConf($item, $perms, $page_params);
+		$submitConf = !$isSite ? false : $this->_createSubmitConf($item, $perms);
 
 
 		/**
@@ -2369,6 +2367,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$jinput->set('view', 'article');
 		$jinput->set('option', 'com_content');
 		$jinput->set('isflexicontent', 'yes');
+		FCModelAdmin::internalContentEvents(true);
 
 		// Needed by legacy non-updated plugins
 
@@ -2589,9 +2588,18 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 	 *
 	 * @since 1.0
 	 */
-	function _createSubmitConf( $item, & $perms, $page_params )
+	function _createSubmitConf( $item, & $perms )
 	{
 		if ( $item->id ) return '';
+
+		$app = \Joomla\CMS\Factory::getApplication();
+		$typeId = (int) $item->type_id;
+		$menu = flexicontent_security::getItemSubmissionMenu($app, $typeId);
+		if (!$menu) return '';
+		$page_params = $menu->getParams();
+
+		// A type chooser can submit only the published types the user may select.
+		$typeIds = $typeId ? array($typeId) : array_map('intval', array_keys(flexicontent_html::getTypeslist(false, true)));
 
 		// Overriden categories list
 		$cid = $page_params->get("cid");
@@ -2611,6 +2619,9 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Get menu parameters override parameters
 		$submit_conf = array(
+			'menu_id'         => (int) $menu->id,
+			'menu_params'     => hash('sha256', $page_params->toString()),
+			'type_ids'        => $typeIds,
 			'cids'            => $cids,
 			'maincatid'       => $page_params->get("maincatid"),        // Default main category out of the overriden categories
 			'maincat_show'    => $page_params->get("maincat_show", 2),
@@ -2623,7 +2634,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		);
 		$submit_conf_hash = md5(serialize($submit_conf));
 
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$session = $app->getSession();
 		$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
 		$item_submit_conf[$submit_conf_hash] = $submit_conf;
 		$session->set('item_submit_conf', $item_submit_conf, 'flexicontent');

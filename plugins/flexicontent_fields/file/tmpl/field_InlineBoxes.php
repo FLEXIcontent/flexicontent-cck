@@ -29,11 +29,13 @@ foreach ($field->value as $file_id)
 
 	if (!in_array($ext_lower, $imagesExt))
 	{
-		if ($ext_lower === 'pdf' && (int) $file_data->url !== 1 && class_exists('Imagick')
-			&& is_file(JPATH_PLUGINS . '/flexicontent_fields/file/pdf_thumb.php'))
+		// IDs recovered from a failed submission have not been accepted by the save path.
+		$pdf_preview = empty($form_data)
+			? flexicontent_security::pdfThumbnailUrl($file_data, (bool) $field->parameters->get('limit_by_uploader', 0))
+			: '';
+		if ($pdf_preview !== '')
 		{
-			// Render the first page of a local PDF via the field's thumbnail endpoint
-			$preview_src = \Joomla\CMS\Uri\Uri::root() . 'plugins/flexicontent_fields/file/pdf_thumb.php?id=' . (int) $file_id . '&w=400&k=' . md5(\Joomla\CMS\Factory::getApplication()->get('secret') . 'fc_pdf_thumb');
+			$preview_src = htmlspecialchars($pdf_preview, ENT_QUOTES, 'UTF-8');
 			$preview_text = '';
 			$has_preview = true;
 		}
@@ -58,14 +60,17 @@ foreach ($field->value as $file_id)
 				$img_path = \Joomla\CMS\Uri\Uri::root(true) . '/' . (empty($file_data->secure) ? $mediapath : $docspath) . '/' . $file_data->filename;
 				break;
 			case 1:
-				$img_path = $file_data->filename;
+				// A URL or path registered by a user: a (signed) thumbnail URL is built for public images only
+				$img_path = flexicontent_images::phpThumbPublicImage($file_data->filename, true) ? $file_data->filename : '';
 				break;
 			case 2:
 			default:
 				$img_path = \Joomla\CMS\Uri\Uri::root(true) . '/' . $file_data->filename;
 				break;
 		}
-		$preview_src = flexicontent_images::phpThumbURL(array('src' => $img_path, 'w' => 100, 'h' => 100, 'zc' => 1, 'q' => 95, 'ar' => 'x'), true, true);
+		$preview_src = $img_path === ''
+			? $image_placeholder
+			: flexicontent_images::phpThumbURL(array('src' => $img_path, 'w' => 100, 'h' => 100, 'zc' => 1, 'q' => 95, 'ar' => 'x'), true, true);
 		$preview_text = '';
 		$has_preview = true;
 	}

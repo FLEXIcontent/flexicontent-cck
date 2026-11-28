@@ -805,6 +805,8 @@ class flexicontent_cats
 			}
 			$all_cats = array_merge($all_cats, $cats);
 		}
+		// The ids come from module and menu parameters: use them as integers only
+		$all_cats = array_values(array_unique(array_filter(array_map('intval', array_filter($all_cats, 'is_scalar')))));
 		if ( empty($all_cats) ) return array();
 
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled

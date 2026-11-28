@@ -39,6 +39,7 @@ defined('_JEXEC') or die('Restricted access');
 	 */
 	if (!$locationCoords) return;
 	if (!isset($locationCoords['lat']) || !isset($locationCoords['lon'])) return;
+	if (!is_scalar($locationCoords['lat']) || !is_scalar($locationCoords['lon'])) return;
 	if (!strlen($locationCoords['lat']) || !strlen($locationCoords['lon'])) return;
 
 
@@ -151,10 +152,25 @@ defined('_JEXEC') or die('Restricted access');
 		$_options->fNamesAllGroups = $fNamesAllGroups;
 		$_options->valueOrder      = $valueOrder;
 		FlexicontentFields::getFields($_item_list);
-		$relatedItem_html = addslashes(FlexicontentFields::createItemsListHTML($_params, $_item_list, false, false, $_itemIDs, $_options));
+		$relatedItem_html = FlexicontentFields::createItemsListHTML($_params, $_item_list, false, false, $_itemIDs, $_options);
 	}
 
-	$title = addslashes($item->title);
+	/**
+	 * The popup contents are inserted as HTML by the map script (info window, popup, marker list):
+	 * - stored text is HTML-encoded here
+	 * - the whole location entry is printed as JSON literals at the end, no value is concatenated into script
+	 */
+	$_text  = static function ($v) { return htmlspecialchars(is_scalar($v) ? (string) $v : '', ENT_QUOTES, 'UTF-8'); };
+	$_label = static function ($v) { return htmlspecialchars(is_scalar($v) ? (string) $v : '', ENT_QUOTES, 'UTF-8', false); };
+	$_coord = static function ($v)
+	{
+		$f = is_scalar($v) ? (float) $v : 0.0;
+
+		return is_finite($f) ? rtrim(rtrim(sprintf('%.10F', $f), '0'), '.') : '0';
+	};
+	$_js_flags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE;
+
+	$title = $_text($item->title);
 	$link = '';
 	$addr = '';
 	$markerDirections_linkHtml = '';
@@ -166,13 +182,13 @@ defined('_JEXEC') or die('Restricted access');
 		$link = $item->link;
 		$link = '
 <div class="marker_readmore">
-	<a href="' . $link . '" target="' . $linkMode . '" class="fc-map-link btn btn-secondary">
+	<a href="' . $_label($link) . '" target="' . $_text($linkMode) . '" class="fc-map-link btn btn-secondary">
 		<span class="fc-map-link-icon"></span>
-		<span class="fc-map-link-text">' . $readMore . '</span>
+		<span class="fc-map-link-text">' . $_label($readMore) . '</span>
 	</a>
 </div>
 ';
-		$link = addslashes(str_replace(["\r\n", "\n", "\r"], ' ', $link));
+		$link = str_replace(["\r\n", "\n", "\r"], ' ', $link);
 	}
 
 	/**
@@ -180,8 +196,7 @@ defined('_JEXEC') or die('Restricted access');
 	 */
 	if ($useAddress && !empty($locationCoords['addr_display']))
 	{
-		$addr = $locationCoords['addr_display'];
-		$addr = addslashes($addr);
+		$addr = $_text($locationCoords['addr_display']);
 		$addr = preg_replace("/(\r\n|\n|\r)/", " ", $addr);
 
 		if ($infoTextMode)
@@ -198,7 +213,7 @@ defined('_JEXEC') or die('Restricted access');
 		/**
 		 * Generate link to google maps directions
 		 */
-		$markerDirections_link = empty($locationCoords['url'])  ?  false  :  $locationCoords['url'];
+		$markerDirections_link = empty($locationCoords['url'])  ?  false  :  flexicontent_security::safeUrl($locationCoords['url']);
 
 		/**
 		 * if no url, compatibility with old values
@@ -219,14 +234,14 @@ defined('_JEXEC') or die('Restricted access');
 
 		$markerDirections_linkHtml = '
 <div class="marker_directions">
-	<a href="' . $markerDirections_link . '" target="_blank" class="fc-map-link btn btn-secondary">
+	<a href="' . $_text($markerDirections_link) . '" target="_blank" class="fc-map-link btn btn-secondary">
 		<span class="fc-map-link-icon"></span>
-		<span class="fc-map-link-text">	' . $directionName . '</span>
+		<span class="fc-map-link-text">	' . $_label($directionName) . '</span>
 	</a>
 </div>
 ';
 	}
-	$markerDirections_linkHtml = addslashes(str_replace(["\r\n", "\n", "\r"], ' ', $markerDirections_linkHtml));
+	$markerDirections_linkHtml = str_replace(["\r\n", "\n", "\r"], ' ', $markerDirections_linkHtml);
 
 	/**
 	 * Popup window: custom HTML with replacements or default
@@ -239,6 +254,13 @@ defined('_JEXEC') or die('Restricted access');
 	 * Get custom marker and its anchor (= marker's placement)
 	 */
 	$add_custom_marker = $use_custom_marker && !empty($locationCoords['custom_marker']);
+
+	// The marker name becomes a file path and a URL that the map script also prints in an image tag: a plain relative path only
+	if ($add_custom_marker && (!is_string($locationCoords['custom_marker'])
+		|| preg_match('/["\'<>`\\\\\x00-\x1F\x7F]|(^|\/)\.\.(\/|$)/', $locationCoords['custom_marker'])))
+	{
+		$add_custom_marker = false;
+	}
 
 	$marker_anchor = $add_custom_marker && !empty($locationCoords['marker_anchor'])
 		? $locationCoords['marker_anchor']
@@ -325,16 +347,18 @@ defined('_JEXEC') or die('Restricted access');
 		$locationCoords['lon'] += 0.0001 * $same_coords_counter * rand(-1, 1);
 	}*/
 
+	$_js_string = static function ($v) use ($_js_flags) { return json_encode(is_scalar($v) ? (string) $v : '', $_js_flags); };
+
 	$mapLocations[] = "[
-					'<div class=\"marker-info-contents-box\">$contentWindows <div class=\"marker_actions\">$link $markerDirections_linkHtml</div></div>'," .
-		$locationCoords['lat'] . ", " .
-		$locationCoords['lon'] . ", " .
-		(!$marker_url ? "'__default__'" :
-			"'" . $marker_url . "', " .
-			"'" . $markerWidth . "', " .
-			"'" . $markerHeight . "', " .
-			"'" . $markerAnchor_x . "', " .
-			"'" . $markerAnchor_y . "'
+					" . $_js_string("<div class=\"marker-info-contents-box\">$contentWindows <div class=\"marker_actions\">$link $markerDirections_linkHtml</div></div>") . "," .
+		$_coord($locationCoords['lat']) . ", " .
+		$_coord($locationCoords['lon']) . ", " .
+		(!$marker_url ? $_js_string('__default__') :
+			$_js_string($marker_url) . ", " .
+			$_js_string($markerWidth ?? '') . ", " .
+			$_js_string($markerHeight ?? '') . ", " .
+			$_js_string($markerAnchor_x ?? '') . ", " .
+			$_js_string($markerAnchor_y ?? '') . "
 					") . "
 				]
 				";

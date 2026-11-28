@@ -209,8 +209,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// Handle SERVER Cache
 		// *******************
 
-		// SHOW RECENT FAVOURED ITEMS IMMEDIATELY: do not cache the view
-		if ($view=='favourites' || ($view=='category' && $layout=='favs')) $cachable = false;
+		// Recheck the review form's permissions on every request, and show recent favourites immediately.
+		if ($view === 'review' || $view=='favourites' || ($view=='category' && $layout=='favs')) $cachable = false;
 
 		// AVOID MAKING TOO LARGE (case 1): search view or other view with TEXT search active
 		else if ($view=='search' || $this->input->get('filter', '', 'string')) $cachable = false;
@@ -220,6 +220,18 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$cachable = true;
 			foreach($_GET as $i => $v) {
 				if (substr($i, 0, 7) === "filter_") {   $cachable = false;   break;   }
+			}
+		}
+
+		// A session edit grant (item editable till logoff, edit coupon) lets its holder view items that others can not,
+		// and it is not a part of the cache id: neither store these pages in the cache, nor serve them from it
+		if ($cachable)
+		{
+			$session = \Joomla\CMS\Factory::getApplication()->getSession();
+
+			if ($session->has('rendered_uneditable', 'flexicontent') && $session->get('rendered_uneditable', array(), 'flexicontent'))
+			{
+				$cachable = false;
 			}
 		}
 
@@ -239,43 +251,59 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// CASE: urlparams were explicitely given
 		if (!empty($urlparams)) $safeurlparams = & $urlparams;
 
-		// CASE: urlparams are empty, use the FULL URL request array (_GET)
+		// CASE: urlparams are empty, use the request variables that the views read
 		else
 		{
 			$safeurlparams = array();
 
-			// (1) Add menu URL variables
-			$menu = \Joomla\CMS\Factory::getApplication()->getMenu()->getActive();
-			if ($menu)
-			{
-				// Add menu Itemid to make sure that the menu items with --different-- parameter values, will display differently
-				$safeurlparams['Itemid'] = 'STRING';
+			/**
+			 * (1) The request variables that decide what a view of this component displays. The list is fixed:
+			 * a name chosen by the caller never becomes a part of the cache id, or every new name would store one more copy of the page.
+			 * Itemid makes sure that menu items with --different-- parameter values display differently.
+			 * The same names are used for SEF and non-SEF URLs, thus both get the same cache id (purpose: save some cache space)
+			 */
+			$_fc_view_vars = array(
+				'option', 'view', 'layout', 'format', 'type', 'tmpl', 'tpl', 'task', 'Itemid', 'lang', 'language',
+				'id', 'cid', 'catid', 'cids', 'excl_cids', 'rootcat', 'authorid', 'tagid',
+				'clayout', 'ilayout',
+				'limit', 'limitstart', 'start', 'showall', 'listall',
+				'filter', 'filter_order', 'filter_order_Dir', 'orderby', 'orderby_2nd', 'letter',
+				'print', 'pop', 'cc',
+			);
 
-				// Add menu's HTTP query variables so that we match the non-SEF URL exactly, thus we create the same cache-ID for both SEF / non-SEF urls (purpose: save some cache space)
+			foreach($_fc_view_vars as $_varname)
+			{
+				$safeurlparams[$_varname] = 'STRING';
+			}
+
+			// (2) Add the HTTP query variables of the active menu item, these are set into the request during URL routing
+			$menu = \Joomla\CMS\Factory::getApplication()->getMenu()->getActive();
+			if ($menu && !empty($menu->query) && is_array($menu->query))
+			{
 				foreach($menu->query as $_varname => $_ignore)
 				{
 					$safeurlparams[$_varname] = 'STRING';
 				}
 			}
 
-			// (2) Add real URL variables (GET)
-			foreach($_GET as $_varname => $_ignore)
-			{
-				$safeurlparams[$_varname] = 'STRING';
-			}
-
-			// (3) Add other variables added during Joomla URL routing
-			//  ... ?
-
-			/* (redo 1 and 2 but also implement 3) Add any existing URL variables
-			 * 1) menu URL variables
-			 * 2) real URL variables (GET),
-			 * 3) other variables added during Joomla URL routing
-			 * NOTE: we only need variable names, (values are ignored)
+			/**
+			 * (3) Any other variable of the request (URL, form, or one added during URL routing) may change the page too,
+			 * but it is not a part of the cache id: display such a request without the cache.
+			 * Variables that exist only as cookies do not count, these are not URL variables
+			 * (__fc_user_id__ is always replaced below with the id of the current user)
 			 */
-			foreach($this->input->getArray() as $_varname => $_ignore)
+			if ($cachable)
 			{
-				$safeurlparams[$_varname] = 'STRING';
+				$_cookie_only = array_diff_key($_COOKIE, $_GET, $_POST);
+
+				foreach($_GET + $this->input->getArray() as $_varname => $_ignore)
+				{
+					if (!isset($safeurlparams[$_varname]) && !isset($_cookie_only[$_varname]) && $_varname !== '__fc_user_id__')
+					{
+						$cachable = false;
+						break;
+					}
+				}
 			}
 		}
 
@@ -953,6 +981,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// The rating of the review is also the rating (vote) of the item (not when using composite voting)
 		$rating_percent = null;
 
+		// False: the rating is not added to the votes of the item (same visitor has already voted), the review keeps it but it is not a vote
+		$vote_counted = true;
+
+		// Composite voting: true if the votes of all characteristics are stored by this save, null if they are not voted now
+		$chars_stored = null;
+
 		if (!count($errors) && $char_votes)
 		{
 			// Composite voting: the overall rating is the average of the characteristics (as the voting does), every characteristic is a vote
@@ -965,18 +999,64 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				if ($class === 'FlexicontentControllerReviews' && is_file($f = JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'reviews.php')) require_once $f;
 			}, true, true);
 
+			// An existing review with counted ratings is the vote record of its author: its votes are changed, voting again
+			// would either be refused (same visitor) or be counted twice. Without the access level for voting, the voting refuses
+			$own_review = null;
+
+			if ($user->id && in_array((int) $field->parameters->get('submit_acclvl', 1), $user->getAuthorisedViewLevels()))
+			{
+				require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_reviews.php';
+				$own_review = new flexicontent_reviews($db);
+
+				if (!$own_review->load(array('content_id' => $content_id, 'user_id' => (int) $user->id, 'type' => $review_type))
+					|| (int) $own_review->state === -2
+					|| trim((string) $own_review->custom_ratings) === ''
+					|| !flexicontent_reviews::isVoteCounted(isset($own_review->attribs) ? $own_review->attribs : null)
+				)
+				{
+					$own_review = null;
+				}
+			}
+
 			try
 			{
-				foreach ($char_votes as $xid => $char_vote)
+				if ($own_review)
 				{
-					$this->input->set('user_rating', $char_vote);
-					$this->input->set('cid', $content_id);
-					$this->input->set('xid', (int) $xid);
-					$this->input->set('no_ajax', 0);
-
 					$rman = new FlexicontentControllerReviews();
 					$rman->setVoteInternal(true);
-					$rman->ajaxvote();
+					$rman->changeReviewVotes(
+						$content_id,
+						(array) json_decode((string) $own_review->custom_ratings, true),
+						$char_percents,
+						$field,
+						!flexicontent_reviews::hasCharVotes(isset($own_review->attribs) ? $own_review->attribs : null)
+					);
+
+					// The votes kept in the session are the old ratings of a later vote via the stars
+					$session = \Joomla\CMS\Factory::getApplication()->getSession();
+					$vote_history = $session->get('vote_history', array(), 'flexicontent');
+					$vote_history[$content_id] = $char_votes + array('main' => $vote_value);
+					$session->set('vote_history', $vote_history, 'flexicontent');
+				}
+				else
+				{
+					$vote = null;
+
+					foreach ($char_votes as $xid => $char_vote)
+					{
+						$this->input->set('user_rating', $char_vote);
+						$this->input->set('cid', $content_id);
+						$this->input->set('xid', (int) $xid);
+						$this->input->set('no_ajax', 0);
+
+						$rman = new FlexicontentControllerReviews();
+						$rman->setVoteInternal(true);
+						$vote = $rman->ajaxvote();
+					}
+
+					// The votes are stored when the last one is accepted, and only if none of them was refused
+					$vote_counted = $vote !== null && !empty($vote->vote_complete);
+					$chars_stored = $vote_counted;
 				}
 			}
 			catch (\Exception $e)
@@ -1007,12 +1087,20 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				{
 					$rman = new FlexicontentControllerReviews();
 					$rman->setVoteInternal(true);
-					$rman->ajaxvote();
+
+					// Null: the vote was refused without an error (same visitor has already voted)
+					$vote_counted = $rman->ajaxvote() !== null;
 				}
 				catch (\Exception $e)
 				{
 					$errors[] = htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
 				}
+			}
+
+			// Composite voting without characteristics: there is no voting
+			else
+			{
+				$vote_counted = false;
 			}
 		}
 
@@ -1082,6 +1170,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$review->user_id = $user->id;
 			$review->text  = $text;
 			$review->average_rating = $rating_percent;
+			flexicontent_reviews::setVoteCounted($review, $vote_counted);
+
+			if ($chars_stored !== null)
+			{
+				flexicontent_reviews::setCharVotes($review, $chars_stored);
+			}
 
 			// Composite voting: the ratings of the characteristics (percent)
 			if ($char_percents)
@@ -1220,20 +1314,24 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			else
 			{
 				$old_percent = (int) $review->average_rating;
+				$old_attribs = isset($review->attribs) ? $review->attribs : null;
+				$vote_counted = flexicontent_reviews::isVoteCounted($old_attribs);
 
 				// The review is moved to the trash (it can be seen / restored in the backend), its rating is removed
 				$review->state = -2;
 				$review->average_rating = 0;
+				flexicontent_reviews::setVoteCounted($review, true);
+				flexicontent_reviews::setCharVotes($review, false);
 
 				if (!$review->store())
 				{
 					$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', htmlspecialchars((string) $review->getError(), ENT_QUOTES, 'UTF-8'));
 				}
 
-				// The rating of the review is also the user's vote, remove it from the item's rating
-				else
+				// The rating of the review is also the user's vote, remove it from the item's rating (if it was added to it)
+				elseif ($vote_counted)
 				{
-					$this->revertReviewVote($field, $content_id, $old_percent, $is_own = true);
+					$this->revertReviewVote($field, $content_id, $old_percent, $is_own = true, $review->custom_ratings, $old_attribs);
 				}
 			}
 		}
@@ -1876,6 +1974,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		if (!count($errors))
 		{
 			$old_percent = (int) $review->average_rating;
+			$old_attribs = isset($review->attribs) ? $review->attribs : null;
+			$vote_counted = flexicontent_reviews::isVoteCounted($old_attribs);
 
 			if ($action === 'approve')
 			{
@@ -1886,16 +1986,18 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				// Moved to the trash (it can be seen / restored in the backend), its rating is removed
 				$review->state = -2;
 				$review->average_rating = 0;
+				flexicontent_reviews::setVoteCounted($review, true);
+				flexicontent_reviews::setCharVotes($review, false);
 			}
 
 			if (!$review->store())
 			{
 				$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', htmlspecialchars((string) $review->getError(), ENT_QUOTES, 'UTF-8'));
 			}
-			elseif ($action === 'trash')
+			elseif ($action === 'trash' && $vote_counted)
 			{
-				// The rating of the review is also a vote, remove it from the item's rating
-				$this->revertReviewVote($field, (int) $review->content_id, $old_percent, $is_own = ((int) $review->user_id === (int) $user->id));
+				// The rating of the review is also a vote, remove it from the item's rating (if it was added to it)
+				$this->revertReviewVote($field, (int) $review->content_id, $old_percent, $is_own = ((int) $review->user_id === (int) $user->id), $review->custom_ratings, $old_attribs);
 			}
 		}
 
@@ -1919,29 +2021,65 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	 * @param   int      $content_id   The reviewed item
 	 * @param   int      $old_percent  The rating of the review as percentage
 	 * @param   boolean  $is_own       True if the review is of the current user (then session data of the vote are also cleared)
+	 * @param   string   $custom_ratings  Composite voting: the ratings of the voting characteristics of the review (JSON)
+	 * @param   mixed    $attribs         Composite voting: the attributes of the review before it was trashed
 	 *
 	 * @return  void
 	 *
 	 * @since   3.3.0
 	 */
-	private function revertReviewVote($field, $content_id, $old_percent, $is_own = false)
+	private function revertReviewVote($field, $content_id, $old_percent, $is_own = false, $custom_ratings = '', $attribs = null)
 	{
-		// Composite voting calculates the rating from the voting characteristics
-		if ($old_percent < 1 || (int) $field->parameters->get('enable_extra_votes', 0))
+		if ($old_percent < 1)
 		{
 			return;
 		}
 
 		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$old_vote = max(1, (int) round($old_percent * $this->getReviewResolution($field) / 100));
 
-		$db->setQuery(
-			'UPDATE #__content_rating'
-			. ' SET rating_sum = GREATEST(CAST(rating_sum AS SIGNED) - ' . (int) $old_vote . ', 0),'
-			. '     rating_count = GREATEST(CAST(rating_count AS SIGNED) - 1, 0)'
-			. ($is_own ? ', lastip = IF(lastip = ' . $db->Quote($_SERVER['REMOTE_ADDR']) . ', ' . $db->Quote('') . ', lastip)' : '')
-			. ' WHERE content_id = ' . (int) $content_id
-		)->execute();
+		// Composite voting: the ratings of the characteristics and their average are the votes, remove what the backend removes when it deletes the review
+		if ((int) $field->parameters->get('enable_extra_votes', 0))
+		{
+			$old_percents = trim((string) $custom_ratings) !== '' ? (array) json_decode((string) $custom_ratings, true) : array();
+
+			if (!$old_percents)
+			{
+				return;
+			}
+
+			// Lazy class loading (was JLoader::register): loaded only if/when used.
+			spl_autoload_register(static function ($class) {
+				if ($class === 'FlexicontentControllerReviews' && is_file($f = JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'reviews.php')) require_once $f;
+			}, true, true);
+
+			$rman = new FlexicontentControllerReviews();
+			$rman->setVoteInternal(true);
+			$rman->changeReviewVotes($content_id, $old_percents, array(), $field, !flexicontent_reviews::hasCharVotes($attribs));
+
+			// The votes of the user were removed, so the address of the user is no longer the last voter
+			if ($is_own)
+			{
+				foreach (array('#__content_rating', '#__flexicontent_items_extravote') as $votes_tbl)
+				{
+					$db->setQuery(
+						'UPDATE ' . $votes_tbl . ' SET lastip = ' . $db->Quote('')
+						. ' WHERE content_id = ' . (int) $content_id . ' AND lastip = ' . $db->Quote($_SERVER['REMOTE_ADDR'])
+					)->execute();
+				}
+			}
+		}
+		else
+		{
+			$old_vote = max(1, (int) round($old_percent * $this->getReviewResolution($field) / 100));
+
+			$db->setQuery(
+				'UPDATE #__content_rating'
+				. ' SET rating_sum = GREATEST(CAST(rating_sum AS SIGNED) - ' . (int) $old_vote . ', 0),'
+				. '     rating_count = GREATEST(CAST(rating_count AS SIGNED) - 1, 0)'
+				. ($is_own ? ', lastip = IF(lastip = ' . $db->Quote($_SERVER['REMOTE_ADDR']) . ', ' . $db->Quote('') . ', lastip)' : '')
+				. ' WHERE content_id = ' . (int) $content_id
+			)->execute();
+		}
 
 		if ($is_own)
 		{
@@ -2252,8 +2390,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			die('unknown download method:' . $method);
 		}
 
-		// Get a target path for the creating the zip file for tasks that require it
-		$tmp_ffname = 'fcmd_uid_'.$user->id.'_'.date('Y-m-d__H-i-s');
+		// Get a target path for the creating the zip file for tasks that require it (the random part makes its name not guessable)
+		$tmp_ffname = 'fcmd_uid_'.$user->id.'_'.date('Y-m-d__H-i-s').'_'.bin2hex(random_bytes(8));
 		$targetpath = \Joomla\Filesystem\Path::clean($app->get('tmp_path') .DS. $tmp_ffname);
 
 		/**
@@ -2287,7 +2425,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					jexit('Cart with ID: ' . $cart_id . ', was not found');
 				}
 
-				$cart_token_matches = $cart_token==$cart->token;  // no access will be checked
+				// A match means that no access is checked, so it needs a real token on both sides
+				$cart_token_matches = is_string($cart_token) && isset($cart->token) && is_string($cart->token)
+					&& strlen($cart->token) >= 16 && hash_equals($cart->token, $cart_token);
 				$nodes = json_decode($cart->json);
 			}
 
@@ -2322,7 +2462,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 			if ($coupon_id)
 			{
-				$_nowDate = 'UTC_TIMESTAMP()';
+				// The expiration date of a coupon is written with NOW() (file and media file fields), so it is compared
+				// with the same clock: CURRENT_TIMESTAMP is the standard name of NOW(), not the UTC time
+				$_nowDate = 'CURRENT_TIMESTAMP';
 				$_nullDate = $db->Quote($db->getNullDate());
 				$query = ' SELECT *'
 					.', CASE WHEN '
@@ -2417,6 +2559,30 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$content_id = (int) $file_node->contentid;
 			$file_id    = (int) $file_node->fileid;
 
+			/**
+			 * The download settings (limits, PDF stamping, notifications) are those of a field that holds the file,
+			 * a request must not choose them by naming another field. $dl_rebind: replace the named field (done below)
+			 */
+			$dl_rebind     = false;
+			$dl_assignment = null;
+
+			// No access checks (coupon, download cart): use the field and the item that the file is assigned to
+			if (!$using_access)
+			{
+				$dl_assignment = $this->_getFileAssignment($file_id, $field_id, $content_id);
+
+				if ($dl_assignment)
+				{
+					list($field_id, $content_id) = $dl_assignment;
+					$file_node->fieldid   = $field_id;
+					$file_node->contentid = $content_id;
+				}
+				else
+				{
+					$dl_rebind = true;
+				}
+			}
+
 			// Try to load field configuration if a field id was given
 			if ($field_id && !isset($fields_conf[$field_id]))
 			{
@@ -2469,11 +2635,14 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			 */
 			if (!empty($file) && $using_access)
 			{
+				// Not requested via the file field that holds it: the settings of the assignment that gives access to the file will apply
+				$dl_rebind = $task === 'download_file' || $task === 'download_files' || !in_array($field_type, array('file', 'mediafile'), true);
+
 				if ($task === 'download_file' || $task === 'download_files')
 				{
-					$file->has_content_access = $this->_checkDirectFileAccess($file, $user) ? 1 : 0;
+					$file->has_content_access = $this->_checkDirectFileAccess($file, $user, $dl_assignment) ? 1 : 0;
 				}
-				elseif (!in_array($field_type, array('file', 'mediafile'), true) && !$this->_checkDirectFileAccess($file, $user))
+				elseif (!in_array($field_type, array('file', 'mediafile'), true) && !$this->_checkDirectFileAccess($file, $user, $dl_assignment))
 				{
 					// A different field kind cannot lend its item's ACL to an
 					// unrelated file. Use the ordinary direct-file policy instead.
@@ -2637,6 +2806,28 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 
 			/**
+			 * Replace the field named in the request with the field (and item) that the file is assigned to,
+			 * none means that only the component's download settings apply
+			 */
+
+			if ($dl_rebind)
+			{
+				list($field_id, $content_id) = $dl_assignment ?: array(0, 0);
+				$file_node->fieldid   = $field_id;
+				$file_node->contentid = $content_id;
+
+				if ($field_id && !isset($fields_conf[$field_id]))
+				{
+					$q = 'SELECT attribs, name, field_type FROM #__flexicontent_fields WHERE id = '.(int) $field_id;
+					$db->setQuery($q);
+					$fld = $db->loadObject();
+					$fields_conf[$field_id] = new \Joomla\Registry\Registry($fld->attribs);
+					$fields_props[$field_id] = $fld;
+				}
+			}
+
+
+			/**
 			 * Get item and field \Joomla\CMS\Table\Table records, and then load field's configuration
 			 */
 
@@ -2676,6 +2867,16 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			 */
 
 			if ($method === 'download')
+			{
+				$dl_counted = true;
+			}
+			else
+			{
+				// Viewing is not counted only where the field that holds the file offers it (view button), an archive of files is always a download
+				$dl_counted = $task === 'download_tree' || $task === 'download_files' || !(int) $field->parameters->get('allowview', 0);
+			}
+
+			if ($dl_counted)
 			{
 				require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/downloadlimit.php';
 				$dl_settings = flexicontent_downloadlimit::getSettings($field->parameters);
@@ -2744,6 +2945,28 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 
 			/**
+			 * Count the download on the download coupon that gave access. The coupon was valid when it was read above, but its
+			 * limit is checked again in the statement that counts: of several requests that arrive together only as many are
+			 * served as the coupon has downloads left. (A coupon that had expired or was used up was deleted above)
+			 */
+
+			if (!empty($file_node->coupon) && !$file_node->coupon->has_reached_limit && !$file_node->coupon->has_expired
+				&& !flexicontent_security::claimDownloadCouponHit($db, $file_node->coupon->id))
+			{
+				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH') . \Joomla\CMS\Language\Text::_('FLEXI_FDC_COUPON_REACHED_USAGE_LIMIT'), 'warning');
+
+				// Abort for single file download, for multi-file downloads skip the file
+				if ($task !== 'download_tree' && $task !== 'download_files')
+				{
+					$this->setRedirect('index.php', '');
+					return;
+				}
+
+				continue;
+			}
+
+
+			/**
 			 * Increment hits counter of file, and hits counter of file-user history
 			 */
 
@@ -2769,23 +2992,6 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					;
 			}
 			$db->setQuery($query)->execute();
-
-
-			/**
-			 * Increment hits on download coupon or delete the coupon if it has expired due to date or hits limit
-			 */
-
-			if (!empty($file_node->coupon))
-			{
-				if (!$file_node->coupon->has_reached_limit && !$file_node->coupon->has_expired)
-				{
-					$query = ' UPDATE #__flexicontent_download_coupons'
-						.' SET hits = hits + 1'
-						.' WHERE id='. $file_node->coupon->id
-						;
-					$db->setQuery($query)->execute();
-				}
-			}
 
 
 			/**
@@ -2920,7 +3126,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				 */
 				$per_downloads = !empty($per_downloads) && $per_downloads > 0 ? $per_downloads : 1;
 				
-				if ($task !== 'download_file' && $task !== 'download_files' && $fields_conf[$field_id]->get('send_notifications') && ($file->hits % $per_downloads == 0) )
+				if ($task !== 'download_file' && $task !== 'download_files' && !$dl_rebind && $fields_conf[$field_id]->get('send_notifications') && ($file->hits % $per_downloads == 0) )
 				{
 					// Calculate (once per file) some text used for notifications
 					$file->__file_title__ = $file->altname && $file->altname != $file->filename
@@ -3128,6 +3334,15 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			}
 			$za->addDir($targetpath, "");
 			$za->close();
+
+			// The archive is a copy of access-controlled files: remove it when the request ends, also if the client aborts the download
+			register_shutdown_function(static function () use ($archivepath)
+			{
+				if (is_file($archivepath))
+				{
+					@unlink($archivepath);
+				}
+			});
 
 
 			/**
@@ -3412,9 +3627,16 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				.' AND rel.field_id = ' . $field_id
 				.' AND rel.valueorder = ' . $value_order
 				.' AND fi.field_type = ' . $db->Quote('weblink')
+				.' AND fi.published = 1'
 				. $access_clauses['and']
 				;
 		$link_data = $db->setQuery($query)->loadObject();
+
+		// The item must also be in a viewable state and inside a published and accessible category (unless user can edit it), as for file downloads
+		if (!empty($link_data) && $link_data->has_content_access && !$this->_canViewAssignedItem($content_id, 0, $user))
+		{
+			$link_data->has_content_access = 0;
+		}
 
 
 		/**
@@ -3872,12 +4094,15 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	 *
 	 * @param   object  $file  The file record (needs properties: id, uploaded_by)
 	 * @param   object  $user  The user object
+	 * @param   array   $assignment  Returns array(field id, item id) if the file is reachable via a file / mediafile field of a viewable item, otherwise null
 	 *
 	 * @return  boolean
 	 */
-	protected function _checkDirectFileAccess($file, $user)
+	protected function _checkDirectFileAccess($file, $user, &$assignment = null)
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
+		$assignment = null;
 
 		// File managers and the uploader of the file always have access
 		if ($user->authorise('core.admin', 'com_flexicontent')
@@ -3900,7 +4125,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			. ' OR rel.value LIKE CONCAT(' . $db->Quote('%"existingname";s:%:"') . ', ' . $quoted_filename . ', ' . $db->Quote('"%') . ')'
 			. ')';
 
-		$query = 'SELECT rel.item_id, fi.access AS field_access'
+		$query = 'SELECT rel.item_id, fi.access AS field_access, rel.field_id, fi.field_type'
 			. ' FROM #__flexicontent_fields_item_relations AS rel'
 			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
 			. ' WHERE ('
@@ -3908,7 +4133,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			. '   OR (fi.field_type = ' . $db->Quote('image') . ' AND fi.attribs LIKE ' . $db->Quote('%"image_source":"0"%') . ' AND ' . $image_match . ')'
 			. ' )'
 			. ' UNION ALL'
-			. ' SELECT usage_row.id AS item_id, 0 AS field_access'
+			. ' SELECT usage_row.id AS item_id, 0 AS field_access, 0 AS field_id, ' . $db->Quote('') . ' AS field_type'
 			. ' FROM #__flexicontent_file_usage AS usage_row'
 			. ' WHERE usage_row.file_id = ' . (int) $file->id
 			. ' AND usage_row.context = ' . $db->Quote('com_content.article');
@@ -3920,15 +4145,49 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			return true;
 		}
 
+		$allowed = false;
+
 		foreach ($items as $item)
 		{
 			if ($this->_canViewAssignedItem($item->item_id, $item->field_access, $user))
 			{
-				return true;
+				$allowed = true;
+
+				// Keep looking for an assignment via a file field: its download settings apply to the file
+				if (in_array($item->field_type, array('file', 'mediafile'), true))
+				{
+					$assignment = array((int) $item->field_id, (int) $item->item_id);
+					break;
+				}
 			}
 		}
 
-		return false;
+		return $allowed;
+	}
+
+
+	/**
+	 * Get a file / mediafile field and a content item that the given file is assigned to
+	 *
+	 * @param   integer  $file_id     The file id
+	 * @param   integer  $field_id    A field id, this field is preferred if the file is assigned to it
+	 * @param   integer  $content_id  An item id, this item is preferred if the file is assigned to it
+	 *
+	 * @return  array|boolean  array(field id, item id), false if the file is not assigned via such a field
+	 */
+	protected function _getFileAssignment($file_id, $field_id, $content_id)
+	{
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+
+		$query = 'SELECT rel.field_id, rel.item_id'
+			. ' FROM #__flexicontent_fields_item_relations AS rel'
+			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
+			. ' WHERE fi.field_type IN (' . $db->Quote('file') . ', ' . $db->Quote('mediafile') . ')'
+			. ' AND rel.value = ' . $db->Quote((string) (int) $file_id)
+			. ' ORDER BY (rel.field_id = ' . (int) $field_id . ') DESC, (rel.item_id = ' . (int) $content_id . ') DESC, rel.field_id, rel.item_id';
+		$row = $db->setQuery($query, 0, 1)->loadObject();
+
+		return $row ? array((int) $row->field_id, (int) $row->item_id) : false;
 	}
 
 

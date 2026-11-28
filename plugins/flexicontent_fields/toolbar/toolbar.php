@@ -153,7 +153,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			// OPEN GRAPH: site name
 			if ($field->parameters->get('add_og_site_name') && $view == 'item')
 			{
-				$document->addCustomTag("<meta property=\"og:site_name\" content=\"".\Joomla\CMS\Factory::getApplication()->get('sitename')."\" />");
+				$document->addCustomTag("<meta property=\"og:site_name\" content=\"".htmlspecialchars((string) \Joomla\CMS\Factory::getApplication()->get('sitename'), ENT_QUOTES, 'UTF-8')."\" />");
 			}
 
 			// OPEN GRAPH: title
@@ -166,7 +166,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			if ($field->parameters->get('add_og_descr') && $view == 'item')
 			{
 				if ( $item->metadesc ) {
-					$document->addCustomTag('<meta property="og:description" content="'.$item->metadesc.'" />');
+					$document->addCustomTag('<meta property="og:description" content="'.htmlspecialchars($item->metadesc, ENT_QUOTES, 'UTF-8').'" />');
 				} else {
 					$text = flexicontent_html::striptagsandcut($item->text);
 					$document->addCustomTag("<meta property=\"og:description\" content=\"{$text}\" />");

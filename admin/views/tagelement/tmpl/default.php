@@ -283,7 +283,7 @@ if ($js)
 			</td>
 
 			<td align="left">
-					<a style="cursor:pointer" onclick="window.parent.qfSelectTag('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->name ); ?>');">
+					<a style="cursor:pointer" onclick="window.parent.qfSelectTag('<?php echo $row->id; ?>', <?php echo htmlspecialchars(json_encode((string) $row->name, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_INVALID_UTF8_SUBSTITUTE), ENT_QUOTES, 'UTF-8'); ?>);">
 					<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>
 					</a>
 			</td>

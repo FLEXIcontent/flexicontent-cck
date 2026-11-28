@@ -915,7 +915,6 @@ class flexicontent_db
 	{
 		// Use global params ordering if parameters were not given
 		if (!$params) $params = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
-		$app = \Joomla\CMS\Factory::getApplication();
 
 		$order_fallback = 'rdate';  // Use as default or when an invalid ordering is requested
 		$orderbycustomfield   = (int) $params->get('orderbycustomfield'.$sfx, 1);    // Backwards compatibility, defaults to enabled *
@@ -928,8 +927,7 @@ class flexicontent_db
 		}
 
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
-		$request_order = $app->input->get($request_var.$sfx, '', 'string');
-		$order = $params->get('orderby_override') && $request_order ? $request_order : $order;
+		$order = self::getRequestedItemOrder($params, $request_var, $sfx, $order);
 
 		// 3. Check various cases of invalid order, print warning, and reset ordering to default
 		if ($order=='field' && !$orderbycustomfieldid )
@@ -949,7 +947,7 @@ class flexicontent_db
 		$order_col_1st = $default_order_col_1st;
 		$order_dir_1st = $default_order_dir_1st;
 		flexicontent_db::_getOrderByClause($params, $order, $i_as, $rel_as, $order_col_1st, $order_dir_1st, $sfx);
-		$order_arr[1] = $order;
+		$order_arr = array(1 => $order, 2 => '');
 		$orderby = ' ORDER BY '.$order_col_1st.' '.$order_dir_1st;
 
 
@@ -960,7 +958,6 @@ class flexicontent_db
 		if ($sfx!='' || !$support_2nd_lvl)
 		{
 			$orderby .= $order_col_1st != $i_as.'.title'  ?  ', '.$i_as.'.title'  :  '';
-			$order_arr[2] = '';
 			$order = $order_arr;
 			return $orderby;
 		}
@@ -978,8 +975,7 @@ class flexicontent_db
 		}
 
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
-		$request_order = $app->input->get($request_var.$sfx, '', 'string');
-		$order = $request_var && $request_order ? $request_order : $order;
+		$order = self::getRequestedItemOrder($params, $request_var, $sfx, $order);
 
 		// 3. Check various cases of invalid order, print warning, and reset ordering to default
 		if ($order=='field' && !$orderbycustomfieldid )
@@ -1010,6 +1006,17 @@ class flexicontent_db
 		$orderby .= ($order_col_1st != $i_as.'.title' && $order_col_2nd != $i_as.'.title')  ?  ', '.$i_as.'.title'  :  '';
 		$order = $order_arr;
 		return $orderby;
+	}
+
+	private static function getRequestedItemOrder($params, $requestVar, $sfx, $fallback)
+	{
+		if (!$requestVar || !$params->get('orderby_override' . $sfx, 0)) return $fallback;
+
+		$requested = \Joomla\CMS\Factory::getApplication()->getInput()->get($requestVar . $sfx, '', 'string');
+		if (!is_string($requested) || $requested === '') return $fallback;
+
+		$options = flexicontent_html::getOrderbyOptions($params, $sfx, str_starts_with($requested, 'custom:'));
+		return array_key_exists($requested, $options) ? $requested : $fallback;
 	}
 
 
@@ -1174,8 +1181,15 @@ class flexicontent_db
 						$order_col = 'ISNULL('.$cf.'.value), ' . $order_col;
 					}
 				} else {
-					$order_col	= $order_col ? $order_col : $i_as.'.title';
-					$order_dir	= $order_dir ? $order_dir : 'ASC';
+					$sortable = array('id', 'title', 'alias', 'created', 'modified', 'publish_up', 'publish_down',
+						'hits', 'ordering', 'state', 'catid', 'created_by', 'featured', 'access', 'language');
+					$prefix = $i_as . '.';
+					if (!is_string($order_col) || !str_starts_with($order_col, $prefix)
+						|| !in_array(substr($order_col, strlen($prefix)), $sortable, true))
+					{
+						$order_col = $prefix . 'title';
+					}
+					$order_dir = is_string($order_dir) && strcasecmp($order_dir, 'DESC') === 0 ? 'DESC' : 'ASC';
 				}
 				break;
 		}
@@ -1753,11 +1767,13 @@ class flexicontent_db
 	 * Copy the main and/or secondary categories of an item to the items it is associated with (according to the non-translatable flags)
 	 * If a category has an associated category in the language of the target item, then that category is used, otherwise the same category
 	 *
-	 * @param   int  $item_id  The item having the categories to be copied
+	 * @param   int         $item_id       The item having the categories to be copied
+	 * @param   int[]|null  $allowed_cats  Categories the batch user may newly assign, or null for the regular item save
+	 * @param   int[]       $excluded_items  Items with their own authorization and update in the batch selection
 	 *
 	 * @return  int[]  IDs of items that were updated
 	 */
-	static function propagateCategoriesToAssocs($item_id)
+	static function propagateCategoriesToAssocs($item_id, ?array $allowed_cats = null, array $excluded_items = array())
 	{
 		$item_id = (int) $item_id;
 		$updated = array();
@@ -1771,7 +1787,7 @@ class flexicontent_db
 		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$assocs = static::getLangAssocs(array($item_id));
-		$assoc_ids = isset($assocs[$item_id]) ? array_diff(array_keys($assocs[$item_id]), array($item_id)) : array();
+		$assoc_ids = isset($assocs[$item_id]) ? array_diff(array_keys($assocs[$item_id]), array($item_id), $excluded_items) : array();
 
 		if (!$assoc_ids)
 		{
@@ -1841,6 +1857,18 @@ class flexicontent_db
 			}
 
 			$t_cats = array_values(array_unique($t_cats));
+			if ($allowed_cats !== null)
+			{
+				$added_cats = array_diff($t_cats, $t_old);
+				if ($t_catid !== $t_catid_old)
+				{
+					$added_cats[] = $t_catid;
+				}
+				if (array_diff($added_cats, $allowed_cats))
+				{
+					continue;
+				}
+			}
 
 			if ($flags['main'])
 			{

@@ -1211,9 +1211,18 @@ return $html;
 		// featured items scope parameters
 		$method_featured = (int) $params->get('method_featured', 0);
 
+		$integerList = static function ($values)
+		{
+			$values = is_array($values) ? $values : explode(',', (string) $values);
+			$values = array_filter($values, static function ($value) {
+				return is_scalar($value) && preg_match('/^-?\d+$/D', trim((string) $value));
+			});
+			return array_values(array_unique(array_map('intval', $values)));
+		};
+
 		// featured items scope parameters
 		$method_states = (int) $params->get('method_states', 0);
-		$item_states   = $params->get('item_states');
+		$item_states   = implode(',', $integerList($params->get('item_states')));
 
 		$show_nocontent_msg = (int) $params->get('show_nocontent_msg', 1);
 
@@ -1221,7 +1230,7 @@ return $html;
 
 		// categories scope parameters
 		$method_cat 		= (int) $params->get('method_cat', 1);
-		$catids 				= $params->get('catids', array());
+		$catids 				= $integerList($params->get('catids', array()));
 		$behaviour_cat 	= (int) $params->get('behaviour_cat', 0);
 		$link_via_main  = (int) $params->get('link_via_main', 0);
 		$treeinclude 		= (int) $params->get('treeinclude');
@@ -1229,27 +1238,26 @@ return $html;
 
 		// types scope parameters
 		$method_types 	= (int) $params->get('method_types', 1);
-		$types 					= $params->get('types');
+		$types 					= implode(',', $integerList($params->get('types')));
 		$behaviour_types= (int) $params->get('behaviour_types', 0);
 
 		// authors scope parameters
 		$method_auth 		= (int) $params->get('method_auth', 1);
-		$authors 				= trim($params->get('authors', ''));
+		$authors 				= implode(',', $integerList($params->get('authors', '')));
 		$behaviour_auth	= (int) $params->get('behaviour_auth');
 
 		// items scope parameters
 		$method_items 		= (int) $params->get('method_items', 1);
-		$items	 					= trim($params->get('items', ''));
+		$items	 					= implode(',', $integerList($params->get('items', '')));
 		$items_use_order  = (int) $params->get('items_use_order', 0);
 		$behaviour_items 	= (int) $params->get('behaviour_items', 0);
 		$excluded_tags		= $params->get('excluded_tags', array());
 		$excluded_tags		= !is_array($excluded_tags) ? array($excluded_tags) : $excluded_tags;
-		$relitems_fields	= $params->get('relitems_fields', array());
-		$relitems_fields	= !is_array($relitems_fields) ? array($relitems_fields) : $relitems_fields;
+		$relitems_fields	= $integerList($params->get('relitems_fields', array()));
 
 		// tags scope parameters
 		$method_tags	= (int) $params->get('method_tags', 1);
-		$tag_ids			= $params->get('tag_ids', array());
+		$tag_ids			= $integerList($params->get('tag_ids', array()));
 		$tag_combine	= (int) $params->get('tag_combine', 0);
 
 		// date scope parameters
@@ -1258,8 +1266,6 @@ return $html;
 		$nulldates		= (int) $params->get('nulldates', 0);
 		$bdate 				= $params->get('bdate', '');
 		$edate 				= $params->get('edate', '');
-		$raw_bdate		= $params->get('raw_bdate', 0);
-		$raw_edate		= $params->get('raw_edate', 0);
 		$behaviour_dates 	= (int) $params->get('behaviour_dates', 0);
 		$date_compare 		= (int) $params->get('date_compare', 0);
 		$datecomp_field		= (int) $params->get('datecomp_field', 0);
@@ -1554,9 +1560,6 @@ return $html;
 		 * Item states scope
 		 */
 
-		$item_states = is_array($item_states)
-			? implode(',', $item_states)
-			: $item_states;
 
 		if ($method_states === 0)
 		{
@@ -1572,7 +1575,7 @@ return $html;
 			// Exclude trashed
 			$where .= ' AND i.state <> -2';
 
-			if ($item_states)
+			if ($item_states !== '')
 			{
 				// Exclude method  ---  exclude specified item states
 		  	if ($method_states === 1)
@@ -1630,11 +1633,6 @@ return $html;
 					</div>';
 				return;
 			}
-
-			// Make sure categories is an array
-			$catids = is_array($catids)
-				? $catids
-				: array($catids);
 
 			// Retrieve extra categories, such children or parent categories
 			$catids_arr = flexicontent_cats::getExtraCats($catids, $treeinclude, array());
@@ -1813,7 +1811,6 @@ return $html;
 			}
 
 			// Make types a comma separated string of ids
-			$types = is_array($types) ? implode(',', $types) : $types;
 
 			// Exclude method
 			if ($method_types === 2)
@@ -2033,7 +2030,6 @@ return $html;
 			}
 
 			// Make sure tag_ids is an array
-			$tag_ids = !is_array($tag_ids) ? array($tag_ids) : $tag_ids;
 
 			// Require ALL is meant only for "include" method
 			if ($method_tags === 2)
@@ -2076,7 +2072,7 @@ return $html;
 		{
 			$negate_op = $method_dates === 2 ? 'NOT' : '';
 
-			if (!$raw_edate && $edate && !FLEXIUtilities::isSqlValidDate($edate))
+			if ($edate && !FLEXIUtilities::isSqlValidDate($edate))
 			{
 				echo '
 					<div class="alert alert-warning">
@@ -2087,12 +2083,12 @@ return $html;
 			elseif ($edate)
 			{
 				$where .= ' AND ( '
-					.$negate_op.' ( '.$comp.' <= '.(!$raw_edate ? $db->Quote($edate) : $edate).' )'
+					.$negate_op.' ( '.$comp.' <= '.$db->quote($edate).' )'
 					.($nulldates ? ' OR '.$comp.' IS NULL OR '.$comp.'="" ' : '')
 				.' )';
 			}
 
-			if (!$raw_bdate && $bdate && !FLEXIUtilities::isSqlValidDate($bdate))
+			if ($bdate && !FLEXIUtilities::isSqlValidDate($bdate))
 			{
 				echo '
 					<div class="alert alert-warning">
@@ -2103,7 +2099,7 @@ return $html;
 			elseif ($bdate)
 			{
 				$where .= ' AND ( '
-					.$negate_op.' ( '.$comp.' >= '.(!$raw_bdate ? $db->Quote($bdate) : $bdate).' )'
+					.$negate_op.' ( '.$comp.' >= '.$db->quote($bdate).' )'
 					.($nulldates ? ' OR '.$comp.' IS NULL OR '.$comp.'="" ' : '')
 				.' )';
 			}
@@ -2465,6 +2461,13 @@ return $html;
 			// These field filters apply a STATIC filtering, regardless of current item being displayed.
 			// Static Field Filters (These are a string that MAPs filter ID TO filter VALUES)
 			$static_filters_data = FlexicontentFields::setFilterValues( $params, 'static_filters', $is_persistent=1, $set_method="array");
+			$rangeOperand = static function ($value) use ($db) {
+				$number = trim($value);
+				// A complete numeric literal preserves numeric comparisons against the text column.
+				return preg_match('/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/D', $number)
+					? $number
+					: $db->quote($value);
+			};
 
 			// Dynamic Field Filters (THIS is filter IDs list)
 			// These field filters apply a DYNAMIC filtering, that depend on current item being displayed. The items that have same value as currently displayed item will be included in the list.
@@ -2472,6 +2475,7 @@ return $html;
 
 			foreach ($static_filters_data as $filter_id => $filter_values)
 			{
+				$filter_id = (int) $filter_id;
 				$relation_field_id = 0;  // Set if current Field is a relation / relation reverse field
 				$ritem_field_id = 0;     // The field of items related via 'relation_field_id' to apply limitation
 
@@ -2496,8 +2500,9 @@ return $html;
 						$ri_field = reset($_fields);
 						$ri_item = null;
 						FlexicontentFields::loadFieldConfig($ri_field, $ri_item);
-						$is_relation = $ri_field->parameters->get('reverse_field', 0, 'INT') === 0;
-						$relation_field_id = $ri_field->parameters->get('reverse_field', 0, 'INT') ?: $filter_id;
+						$reverse_field_id = (int) $ri_field->parameters->get('reverse_field', 0);
+						$is_relation = $reverse_field_id === 0;
+						$relation_field_id = $reverse_field_id ?: $filter_id;
 					}
 				}
 
@@ -2553,14 +2558,16 @@ return $html;
 				// Range value filter
 				else
 				{
+					$range_min = $filter_values[1] ?? '';
+					$range_max = $filter_values[2] ?? '';
 					// Special case only one part of range provided ... must MATCH/INCLUDE empty values or NULL values ...
-					$value_empty = !strlen(@ $filter_values[1]) && strlen(@ $filter_values[2]) ? ' OR ' . $val_tbl . '.value="" OR ' . $val_tbl . '.value IS NULL ' : '';
+					$value_empty = $range_min === '' && $range_max !== '' ? ' OR ' . $val_tbl . '.value="" OR ' . $val_tbl . '.value IS NULL ' : '';
 
-					if ( strlen(@ $filter_values[1]) || strlen(@ $filter_values[2]) )
+					if ($range_min !== '' || $range_max !== '')
 					{
 						$join_field_filters .= ' AND '.$negate_op.' ( 1 ';
-						if ( strlen(@ $filter_values[1]) ) $join_field_filters .= ' AND (' . $val_tbl . '.value >=' . $filter_values[1] . ') ';
-						if ( strlen(@ $filter_values[2]) ) $join_field_filters .= ' AND (' . $val_tbl . '.value <=' . $filter_values[2] . $value_empty . ') ';
+						if ($range_min !== '') $join_field_filters .= ' AND (' . $val_tbl . '.value >= ' . $rangeOperand($range_min) . ') ';
+						if ($range_max !== '') $join_field_filters .= ' AND (' . $val_tbl . '.value <= ' . $rangeOperand($range_max) . $value_empty . ') ';
 						$join_field_filters .= ' )';
 					}
 				}
@@ -2844,7 +2851,7 @@ return $html;
 			$dynamic_cids = $params->get('dynamic_catids', false);
 			$static_cids  = $params->get('catids', array());
 
-			$cids = $dynamic_cids ? unserialize($dynamic_cids) : $static_cids;
+			$cids = $dynamic_cids && is_string($dynamic_cids) ? @unserialize($dynamic_cids, array('allowed_classes' => false)) : $static_cids;
 			$cids = (!is_array($cids)) ? array($cids) : $cids;
 
 			$catconf->orderby    = $params->get('cats_orderby', 'alpha');
@@ -2881,6 +2888,8 @@ return $html;
 			. ' FROM #__categories AS c'
 			. ' LEFT JOIN #__users AS u ON u.id = c.created_user_id'
 			. ' WHERE c.id IN (' . implode(',', $cids) . ')'
+			. ' AND c.published = 1'
+			. ($params->get('show_noauth', 0) ? '' : ' AND c.access IN (' . implode(',', array_map('intval', \Joomla\CMS\Factory::getApplication()->getIdentity()->getAuthorisedViewLevels())) . ')')
 			. $orderby
 			;
 		$catdata_arr = $db->setQuery($query)->loadObjectList('id');

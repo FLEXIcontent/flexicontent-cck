@@ -231,7 +231,7 @@ foreach($values as $file_id)
 		// As inline text
 		elseif ($display_descr==2)
 		{
-			$descr_inline = ' <div class="fcfile_descr_inline alert alert-info">'. nl2br($file_data->description) . '</div>';
+			$descr_inline = ' <div class="fcfile_descr_inline alert alert-info">'. nl2br(htmlspecialchars((string) $file_data->description, ENT_QUOTES, 'UTF-8')) . '</div>';
 		}
 
 		if ($descr_icon)
@@ -474,7 +474,7 @@ if ($prop !== 'display_properties_only') :
 			$actions_arr[] =
 				($filename_shown && $link_filename ? $icon.' ' : '')
 				.'<a href="' . $dl_link . '" class="' . $file_classes . ' fcfile_downloadFile"' . $dl_attr . ' title="' . htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8') . '" ' . ($non_file_url ? 'target="_blank"' : '') . '>'
-				.($filename_shown && $link_filename ? $name_str : $downloadstext)
+				.($filename_shown && $link_filename ? htmlspecialchars((string) $name_str, ENT_QUOTES, 'UTF-8') : $downloadstext)
 				.'</a>';
 		}
 

@@ -463,7 +463,7 @@ class plgFlexicontent_fieldsCore extends FCField
 							$ogpmaxlen = $field->parameters->get('ogpmaxlen', 300);
 
 							$item->metadesc
-								? $document->addCustomTag('<meta property="og:description" content="' . $item->metadesc . '" />')
+								? $document->addCustomTag('<meta property="og:description" content="' . htmlspecialchars($item->metadesc, ENT_QUOTES, 'UTF-8') . '" />')
 								: $document->addCustomTag('<meta property="og:description" content="' . flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen) . '" />');
 						}
 					}

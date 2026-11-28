@@ -12,6 +12,7 @@
 	<description>FLEXI_FIELD_FILE</description>
 	<files>
 		<filename plugin="file">file.php</filename>
+		<filename>pdf_thumb.php</filename>
 		<filename>index.html</filename>
 		<folder>file</folder>
 		<folder>tmpl</folder>

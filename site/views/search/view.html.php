@@ -920,6 +920,12 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 			});
 
 			$w_regexp_highlight = count($w_regexp_alts) ? '#(?:' . implode('|', $w_regexp_alts) . ')#iu' : '';
+			// Use markers that cannot already be present in the indexed text.
+			$highlight_marker = '_fc_' . bin2hex(random_bytes(16));
+			$highlight_start = $highlight_marker . '_start_';
+			$highlight_end = $highlight_marker . '_end_';
+			$adjacent_highlights = '/' . $highlight_end . '((?:\s|&nbsp;)+)' . $highlight_start . '/u';
+			$like_search = flexicontent_db::useLikeSearch($filter_word_like_any, $searchword);
 
 			for ($i=0; $i < count($results); $i++)
 			{
@@ -952,19 +958,19 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 
 						if ($word_found && $w_regexp_highlight)
 						{
-							$part = preg_replace_callback($w_regexp_highlight, function ($m) {
-								return '_fc_highlight_start_' . $m[0] . '_fc_highlight_end_';
+							$part = preg_replace_callback($w_regexp_highlight, function ($m) use ($highlight_start, $highlight_end) {
+								return $highlight_start . $m[0] . $highlight_end;
 							}, $part);
 
 							// Merge highlights of adjacent words, so that a matched phrase is highlighted as a whole
-							$part = preg_replace('/_fc_highlight_end_((?:\s|&nbsp;)+)_fc_highlight_start_/u', '$1', $part);
+							$part = preg_replace($adjacent_highlights, '$1', $part);
 						}
 
 						$unique_parts[$word_found] = $part;
 					}
 
 					$parts = $unique_parts;
-					$result->text = implode(' <br/> ', $parts);
+					$result->text = implode("\n", $parts);
 
 					$replace_count_total = 0;
 
@@ -973,18 +979,15 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 					 * (1) Skip / Ignore this for languages with spaces,
 					 * (2) Skip / Ignore this if current language supports splitting via dictionary
 					 */
-					if (flexicontent_db::useLikeSearch($filter_word_like_any, $searchword))
+					if ($like_search)
 					{
-						// Do not highlight too small words, since we do not consider spaces
-						if (strlen($word_found) <= 2)
-						{
-							continue;
-						}
-
 						foreach ($searchwords as $_word)
 						{
+							// Skip short terms while still encoding this result below.
+							if (strlen($_word) <= 2) continue;
+
 							$searchRegex = '#('. preg_quote($_word, '#') .'[^\s]*)#iu';
-							$result->text = preg_replace($searchRegex, '_fc_highlight_start_\0_fc_highlight_end_', $result->text, 1, $replace_count );
+							$result->text = preg_replace($searchRegex, $highlight_start . '\\0' . $highlight_end, $result->text, 1, $replace_count );
 
 							if ($replace_count)
 							{
@@ -992,9 +995,6 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 							}
 						}
 					}
-
-					$result->text = str_replace('_fc_highlight_start_', '<span class="highlight">', $result->text );
-					$result->text = str_replace('_fc_highlight_end_', '</span>', $result->text );
 
 					// Add some message about matches
 					/*if ( $state->get('match')=='any' ) {
@@ -1011,7 +1011,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 					$result->text = $text_search_header . $result->text;*/
 				} else {
 					$parts = FLEXIadvsearchHelper::prepareSearchContent( $result->text, $params->get('text_chars', 200), array() );
-					$result->text = implode(' <br/> ', $parts);
+					$result->text = implode("\n", $parts);
 				}
 
 				/*if ( !empty($result->fields_text) ) {
@@ -1021,8 +1021,12 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 					$result->fields_text = str_replace('[br /]', '<br />', $result->fields_text);
 					$result->text .= $result->fields_text;
 				}*/
-				$result->text = str_replace('[[[', '<', $result->text);
-				$result->text = str_replace(']]]', '>', $result->text);
+				$result->text = htmlspecialchars($result->text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
+				$result->text = strtr($result->text, array(
+					$highlight_start => '<span class="highlight">',
+					$highlight_end => '</span>',
+					"\n" => ' <br/> ',
+				));
 
 				$result->created	= $result->created ? HTMLHelper::Date( $result->created ) : '';
 				$result->count		= $i + 1;

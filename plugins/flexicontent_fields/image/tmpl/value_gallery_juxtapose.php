@@ -93,11 +93,13 @@ if ($result !== _FC_RETURN_)
 	$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
 }
 
+// A fixed version with the hash of its files: the browser refuses a file that the CDN serves with other content.
+// When the version is changed the hashes must be changed with it.
 if ( !isset(static::$js_added['juxtapose']) )
 {
 	static::$js_added['juxtapose'] = true;
 	$field->{$prop} .= '
-		<script src="https://cdn.knightlab.com/libs/juxtapose/latest/js/juxtapose.min.js"></script>
-		<link rel="stylesheet" href="https://cdn.knightlab.com/libs/juxtapose/latest/css/juxtapose.css">
+		<script src="https://cdn.knightlab.com/libs/juxtapose/1.2.5/js/juxtapose.min.js" integrity="sha384-hyQbYggopL5ZGItSD9lBfTEVchc9jxTxKQUNRxoGuXEijpsW2Ft6chNLTEOXQ++v" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="https://cdn.knightlab.com/libs/juxtapose/1.2.5/css/juxtapose.css" integrity="sha384-C8zS0wnmECnEHBKNDm+/sMLSggLjfEbZIi0SqlhgdnW3sNQLUEsQsJOiyCP6ZjWI" crossorigin="anonymous">
 	';
 }

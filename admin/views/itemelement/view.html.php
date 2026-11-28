@@ -56,6 +56,12 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 		$assocs_id= $jinput->getInt('assocs_id', 0);
 
 		$isAdmin  = $app->isClient('administrator');
+
+		// Reached from the site this picker is for users who write content, a login alone is not enough
+		if (!$isAdmin && !flexicontent_security::isContentAuthor($user))
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'), 403);
+		}
 		$isCtmpl  = $jinput->getCmd('tmpl') === 'component';
 
 		// Some flags & constants

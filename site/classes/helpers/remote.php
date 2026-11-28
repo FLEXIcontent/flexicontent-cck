@@ -16,7 +16,10 @@ defined('_JEXEC') or die('Restricted access');
  *
  * Every server-side request to a user supplied URL must go through this class:
  *  - only http / https, no credentials inside the URL, only default ports (unless the host is trusted)
- *  - the host must resolve (IPv4 and IPv6) to public addresses only, unless it is the site's own host or a trusted host
+ *  - the host must resolve (IPv4 and IPv6) to public addresses only, unless it is the site's own host or a trusted host.
+ *    The site's own host is the host of the configured 'live_site', otherwise the site host stored in the component
+ *    configuration ('remote_site_host', filled in from a backend request of a configuration administrator)
+ *  - an IDN host is used in its ASCII (punycode) form, a host that is not a plain hostname or IP literal is refused
  *  - the connection is pinned to the validated address (CURLOPT_RESOLVE), redirects are never followed automatically,
  *    at most MAX_REDIRECTS redirects are followed manually and every redirect target is validated and pinned again
  *  - connect and total timeouts are applied, TLS verification is kept, and without cURL no request is made at all
@@ -57,7 +60,7 @@ class flexicontent_remote
 	 */
 	public static function setSiteHost($host)
 	{
-		self::$site_host = strtolower(trim((string) $host, '.'));
+		self::$site_host = self::idnToAscii(strtolower(trim((string) $host, '.')));
 	}
 
 
@@ -94,7 +97,7 @@ class flexicontent_remote
 	/**
 	 * Get the site's own hostname (exempted from the public address requirement, like in addurl() before)
 	 *
-	 * @return  string
+	 * @return  string  Empty when neither 'live_site' nor the site host of the component configuration is set: no host gets the exception then
 	 */
 	public static function getSiteHost()
 	{
@@ -102,15 +105,20 @@ class flexicontent_remote
 		{
 			$host = '';
 
-			// Prefer an administrator-configured canonical URL. Uri::root() is based
-			// on request data on many servers, so it must not define an SSRF trust
-			// exception by itself.
+			// Use only a stored, administrator-level value: the 'live_site' URL, otherwise the site host of the component
+			// configuration (see rememberSiteHost()). Uri::root() and SERVER_NAME of the current request are based on
+			// request data (the Host header) on many servers, so they must not define an SSRF trust exception.
 			if (class_exists('\Joomla\CMS\Factory'))
 			{
 				try
 				{
 					$live_site = (string) \Joomla\CMS\Factory::getApplication()->get('live_site', '');
 					$host = $live_site ? (string) parse_url($live_site, PHP_URL_HOST) : '';
+
+					if ($host === '' && class_exists('\Joomla\CMS\Component\ComponentHelper'))
+					{
+						$host = self::cleanSiteHost(\Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('remote_site_host', ''));
+					}
 				}
 				catch (\Throwable $e)
 				{
@@ -118,15 +126,108 @@ class flexicontent_remote
 				}
 			}
 
-			if ($host === '' && !empty($_SERVER['SERVER_NAME']))
-			{
-				$host = (string) $_SERVER['SERVER_NAME'];
-			}
-
-			self::$site_host = strtolower(trim($host, '.[]'));
+			self::$site_host = self::idnToAscii(strtolower(trim($host, '.[]')));
 		}
 
 		return self::$site_host;
+	}
+
+
+	/**
+	 * Reduce a configured or requested site address to its hostname (scheme, port and path are dropped)
+	 *
+	 * @param   mixed  $value
+	 *
+	 * @return  string  Empty if the value has no plain hostname or IP address
+	 */
+	protected static function cleanSiteHost($value)
+	{
+		$host = is_string($value) ? strtolower(trim($value)) : '';
+		$host = preg_replace('#^[a-z][a-z0-9+.-]*://#', '', $host);
+		$host = preg_replace('#[/?\#].*$#', '', $host);
+		$host = preg_match('/^\[([0-9a-f:.]+)\]/', $host, $m) ? $m[1] : preg_replace('/:\d+$/', '', $host);
+		$host = self::idnToAscii(trim($host, '.'));
+
+		return filter_var($host, FILTER_VALIDATE_IP) || preg_match('/^[a-z0-9_.-]+$/', $host) ? $host : '';
+	}
+
+
+	/**
+	 * Store the hostname of the current request as the site host of the component configuration, if none is set yet
+	 *
+	 * The hostname of a request is chosen by its sender. It is therefore taken only from a backend request of a user
+	 * that may change the component configuration, and it is stored, so that later requests can not replace it.
+	 * Nothing is stored when 'live_site' is set, that is used instead.
+	 *
+	 * @return  string  The hostname that was stored, empty if nothing was stored
+	 */
+	public static function rememberSiteHost()
+	{
+		try
+		{
+			$app  = \Joomla\CMS\Factory::getApplication();
+			$user = $app->getIdentity();
+
+			if (!$app->isClient('administrator') || !$user || !$user->authorise('core.admin', 'com_flexicontent')
+				|| (string) $app->get('live_site', '') !== '')
+			{
+				return '';
+			}
+
+			$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+			$host   = self::cleanSiteHost(\Joomla\CMS\Uri\Uri::getInstance()->getHost());
+
+			if ($host === '' || trim((string) $params->get('remote_site_host', '')) !== '')
+			{
+				return '';
+			}
+
+			$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$row = $db->setQuery($db->getQuery(true)
+				->select($db->qn(array('extension_id', 'params')))
+				->from($db->qn('#__extensions'))
+				->where($db->qn('type') . ' = ' . $db->q('component'))
+				->where($db->qn('element') . ' = ' . $db->q('com_flexicontent'))
+			)->loadObject();
+
+			if (!$row)
+			{
+				return '';
+			}
+
+			$stored = new \Joomla\Registry\Registry($row->params);
+
+			if (trim((string) $stored->get('remote_site_host', '')) !== '')
+			{
+				return '';
+			}
+
+			$stored->set('remote_site_host', $host);
+			$db->setQuery($db->getQuery(true)
+				->update($db->qn('#__extensions'))
+				->set($db->qn('params') . ' = ' . $db->q($stored->toString()))
+				->where($db->qn('extension_id') . ' = ' . (int) $row->extension_id)
+			)->execute();
+
+			// Component parameters are cached, also update the ones of the current request
+			$params->set('remote_site_host', $host);
+			self::$site_host = null;
+
+			try
+			{
+				\Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)
+					->createCacheController('callback', array('defaultgroup' => '_system'))->clean();
+			}
+			catch (\Throwable $e)
+			{
+			}
+
+			return $host;
+		}
+		catch (\Throwable $e)
+		{
+			return '';
+		}
 	}
 
 
@@ -193,6 +294,14 @@ class flexicontent_remote
 			$h = preg_replace('#/.*$#', '', $h);
 			$h = trim($h, '.');
 
+			// An IDN entry is compared in its ASCII (punycode) form, like the host of a validated URL
+			if (preg_match('/[\x80-\xff]/', $h))
+			{
+				$port = preg_match('/:\d+$/', $h, $m) ? $m[0] : '';
+				$h    = self::idnToAscii(substr($h, 0, strlen($h) - strlen($port)));
+				$h    = $h !== '' ? $h . $port : '';
+			}
+
 			if ($h !== '')
 			{
 				$out[$h] = $h;
@@ -200,6 +309,51 @@ class flexicontent_remote
 		}
 
 		return array_values($out);
+	}
+
+
+	/**
+	 * Get the ASCII (punycode) form of a hostname that has non-ASCII characters, other hostnames are returned as they are
+	 *
+	 * @param   string  $host
+	 *
+	 * @return  string  Empty when the hostname can not be converted
+	 */
+	protected static function idnToAscii($host)
+	{
+		if (!preg_match('/[\x80-\xff]/', $host))
+		{
+			return $host;
+		}
+
+		$ascii = '';
+
+		try
+		{
+			// Same conversion as when a URL is stored, the intl extension is not always installed
+			if (class_exists('\Joomla\CMS\String\PunycodeHelper'))
+			{
+				$labels = explode('.', $host);
+
+				foreach ($labels as $i => $label)
+				{
+					$labels[$i] = preg_match('/[\x80-\xff]/', $label) ? \Joomla\CMS\String\PunycodeHelper::toPunycode($label) : $label;
+				}
+
+				$ascii = implode('.', $labels);
+			}
+			elseif (function_exists('idn_to_ascii'))
+			{
+				$ascii = idn_to_ascii($host, IDNA_NONTRANSITIONAL_TO_ASCII, INTL_IDNA_VARIANT_UTS46);
+			}
+		}
+		catch (\Throwable $e)
+		{
+			$ascii = '';
+		}
+
+		// A converter can leave characters unconverted, never return such a result
+		return is_string($ascii) && !preg_match('/[^\x21-\x7e]/', $ascii) ? strtolower(trim($ascii, '.')) : '';
 	}
 
 
@@ -462,12 +616,18 @@ class flexicontent_remote
 			return false;
 		}
 
-		$host_literal = strtolower(trim($parts['host'], '.'));
+		// libcurl converts an IDN or percent-encoded host by itself before its lookup and then does not use the address pin.
+		// Use the ASCII (punycode) form everywhere, and refuse a host that is not a plain hostname or an IP literal
+		$host_literal = self::idnToAscii(strtolower(trim($parts['host'], '.')));
 		$host         = trim($host_literal, '[]');
 		$default_port = $scheme === 'https' ? 443 : 80;
 		$port         = isset($parts['port']) ? (int) $parts['port'] : $default_port;
 
-		if ($host === '' || $port < 1 || $port > 65535)
+		$host_valid = filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)
+			? $host_literal === '[' . $host . ']'
+			: $host_literal === $host && preg_match('/^[a-z0-9_.-]+$/', $host);
+
+		if (!$host_valid || $port < 1 || $port > 65535)
 		{
 			$error = 'URL is not valid';
 

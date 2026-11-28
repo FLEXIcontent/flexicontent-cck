@@ -28,9 +28,44 @@ class flexicontent_images
 	const PHPTHUMB_MIN_KEY_STRENGTH = 20;
 
 	/**
+	 * Image types that phpThumb is given as source when the path comes from content (item text, a registered URL,
+	 * a hand written thumbnail URL)
+	 */
+	const PHPTHUMB_SOURCE_TYPES = array('png', 'gif', 'jpeg', 'jpg', 'webp', 'avif', 'wbmp', 'bmp', 'ico');
+
+	/**
+	 * Parameters of hand written thumbnail URLs that phpThumbSignHtml() signs: they resize, crop or recolour the image.
+	 * Not signed: md5s, new, down, sia, phpThumbDebug, nocache and anything else
+	 */
+	const PHPTHUMB_LEGACY_PARAMS = array('src', 'w', 'h', 'wp', 'hp', 'wl', 'hl', 'ws', 'hs', 'q', 'zc', 'aoe', 'ar', 'f', 'far', 'iar', 'bg', 'sx', 'sy', 'sw', 'sh', 'fltr');
+
+	/**
+	 * Filters of hand written thumbnail URLs that phpThumbSignHtml() signs, none of them reads a file
+	 */
+	const PHPTHUMB_LEGACY_FILTERS = array(
+		'brit', 'cont', 'ds', 'sat', 'gray', 'clr', 'sep', 'gam', 'neg', 'th', 'rcd', 'flip', 'edge', 'emb', 'bvl', 'lvl', 'wb',
+		'fram', 'drop', 'elip', 'ric', 'crop', 'bord', 'blur', 'gblr', 'sblr', 'mean', 'smth', 'usm', 'rot', 'stc',
+	);
+
+	/**
+	 * Secure file folder of a new installation, relative to the site root ('file_path' of the component configuration)
+	 */
+	const PHPTHUMB_DEFAULT_FILE_PATH = 'components/com_flexicontent/uploads';
+
+	/**
 	 * Snapshot of the effective phpThumb configuration ($PHPTHUMB_CONFIG after the managed and override files)
 	 */
 	private static $phpthumb_config = null;
+
+	/**
+	 * Whether the managed configuration file was already brought up to date for a protected image in this request
+	 */
+	private static $phpthumb_protection_synced = false;
+
+	/**
+	 * Whether the host names of the managed configuration file were already checked for a remote image in this request
+	 */
+	private static $phpthumb_remote_synced = false;
 
 
 	/**
@@ -196,6 +231,249 @@ class flexicontent_images
 
 
 	/**
+	 * Folders of the component configuration whose images phpThumb.php serves to signed URLs only: the secure file
+	 * folder. They are written to the managed configuration file, see phpThumbSyncConfig()
+	 *
+	 * @return  array  Paths relative to the site root
+	 */
+	static function phpThumbProtectedFolders()
+	{
+		// Without the Joomla application (this helper loaded on its own) only the folder of a new installation is known
+		$folder = class_exists(ComponentHelper::class)
+			? (string) ComponentHelper::getParams('com_flexicontent')->get('file_path', self::PHPTHUMB_DEFAULT_FILE_PATH)
+			: self::PHPTHUMB_DEFAULT_FILE_PATH;
+		$folder = trim(str_replace('\\', '/', trim($folder)), '/');
+
+		return array($folder !== '' ? $folder : self::PHPTHUMB_DEFAULT_FILE_PATH);
+	}
+
+
+	/**
+	 * Whether an image lies in a folder that FLEXIcontent keeps away from the public: the secure file folder
+	 * or the 'original' folder of an image field. phpThumb.php serves such an image to signed URLs only, also when
+	 * high security is off (same rule and same code as its request guard, phpThumb.flexi_guard.php)
+	 *
+	 * @param   string  $src  Image path as given to phpThumb (relative to the site root, root-relative, absolute) or a URL
+	 *
+	 * @return  bool
+	 */
+	static function phpThumbProtectedSource($src)
+	{
+		$src = str_replace('\\', '/', trim((string) $src));
+
+		// Of a URL only the path matters here
+		if (preg_match('#^(?:[a-z][a-z0-9+.\-]*:)?//[^/?\#]*(.*)$#i', $src, $m))
+		{
+			$src = rawurldecode(preg_replace('/[?#].*$/', '', $m[1]));
+		}
+
+		if ($src === '')
+		{
+			return false;
+		}
+
+		require_once dirname(__DIR__, 2) . '/librairies/phpthumb/phpThumb.flexi_guard.php';
+
+		$site   = rtrim(str_replace('\\', '/', JPATH_SITE), '/');
+		$root   = rtrim(Uri::root(true), '/');
+		$config = self::phpThumbConfig();
+
+		// Relative to the site root, with or without the path of the site in front
+		$files = array($site . '/' . ltrim($src, '/'));
+
+		if ($root !== '' && strpos($src, $root . '/') === 0)
+		{
+			$files[] = $site . substr($src, strlen($root));
+		}
+
+		// As phpThumb.php resolves it
+		if ($src[0] === '/' || preg_match('#^[a-z]:#i', $src))
+		{
+			$files = array_merge($files, flexicontent_phpthumb_candidates($src, isset($config['document_root']) ? $config['document_root'] : '', self::phpThumbDir()));
+		}
+
+		$dirs = array(dirname(__DIR__, 2) . '/uploads');
+
+		foreach (self::phpThumbProtectedFolders() as $folder)
+		{
+			$dirs[] = $site . '/' . $folder;
+		}
+
+		$originals = '#(/item_[^/]+_field_\d+/original)/.*$#i';
+		$missing   = (bool) preg_match($originals, '/' . $src);
+
+		foreach ($files as $file)
+		{
+			if (flexicontent_phpthumb_is_protected($file, $dirs))
+			{
+				return true;
+			}
+
+			$missing = $missing && !is_dir(preg_replace($originals, '$1', $file));
+		}
+
+		// The 'original' folder of an image field that does not exist (yet): a URL signed now would open it later
+		return $missing;
+	}
+
+
+	/**
+	 * Whether an image path that comes from content (the text of an item, a URL registered as file, a thumbnail URL
+	 * written by hand in a template) may be given to phpThumb, which would sign the URL: a path inside the site,
+	 * of an image type, outside the folders that FLEXIcontent keeps away from the public
+	 *
+	 * @param   string  $src        Image path relative to the site root, or root-relative
+	 * @param   bool    $allow_url  Also accept an http(s) URL of a host name of this site (see phpThumbRemoteHosts())
+	 *                              whose path does not lead into such a folder: phpThumb.php fetches it from the web server
+	 *
+	 * @return  bool
+	 */
+	static function phpThumbPublicImage($src, $allow_url = false)
+	{
+		$src = str_replace('\\', '/', trim((string) $src));
+
+		require_once dirname(__DIR__, 2) . '/librairies/phpthumb/phpThumb.flexi_guard.php';
+
+		if ($allow_url && preg_match('#^https?://#i', $src))
+		{
+			return flexicontent_phpthumb_file_refusal($src) === null
+				&& flexicontent_phpthumb_url_refusal($src, self::phpThumbRemoteHosts()) === null
+				&& !self::phpThumbProtectedSource($src);
+		}
+
+		// No scheme (nor a drive letter), no network path, no parent folder segment
+		if ($src === '' || preg_match('#^[a-z][a-z0-9+.\-]*:#i', $src) || flexicontent_phpthumb_file_refusal($src) !== null)
+		{
+			return false;
+		}
+
+		if (!in_array(strtolower(pathinfo($src, PATHINFO_EXTENSION)), self::PHPTHUMB_SOURCE_TYPES, true))
+		{
+			return false;
+		}
+
+		return !self::phpThumbProtectedSource($src);
+	}
+
+
+	/**
+	 * Host names that phpThumb.php may fetch a remote source from: the host of the site address of the Joomla
+	 * configuration ('live_site'), otherwise the site host stored in the component configuration, and the trusted
+	 * remote hosts of the component configuration that have no port. Never the host name of the current request,
+	 * which its sender chooses. They are written to the managed configuration file, see phpThumbSyncConfig()
+	 *
+	 * @return  array  Lower case host names, empty when none is known (no remote source is fetched then)
+	 */
+	static function phpThumbRemoteHosts()
+	{
+		$hosts = array();
+
+		if (class_exists('flexicontent_remote'))
+		{
+			$hosts[] = (string) flexicontent_remote::getSiteHost();
+
+			foreach (flexicontent_remote::getTrustedHosts() as $host)
+			{
+				// 'host:port' entries name another service, the thumbnail script fetches from the port of the scheme only
+				$hosts[] = preg_match('/:\d+$/', (string) $host) ? '' : (string) $host;
+			}
+		}
+
+		$clean = array();
+
+		foreach ($hosts as $host)
+		{
+			$host = strtolower(trim($host, " .[]"));
+
+			if ($host !== '' && preg_match('/^[a-z0-9._:\-]+$/', $host))
+			{
+				$clean[$host] = $host;
+			}
+		}
+
+		return array_values($clean);
+	}
+
+
+	/**
+	 * Before the URL of a remote image is built make sure that phpThumb.php knows the host names of the site:
+	 * rewrite the managed configuration file if a host name is missing from it
+	 *
+	 * @param   string  $src
+	 *
+	 * @return  void
+	 */
+	private static function phpThumbPrepareRemote($src)
+	{
+		if (self::$phpthumb_remote_synced || !preg_match('#^\s*https?://#i', (string) $src))
+		{
+			return;
+		}
+
+		self::$phpthumb_remote_synced = true;
+
+		$state = self::phpThumbManagedState();
+		$hosts = self::phpThumbRemoteHosts();
+
+		// A file without the list, or no file at all, stands for an empty list
+		if ((array) $state['hosts'] === $hosts)
+		{
+			return;
+		}
+
+		try
+		{
+			self::phpThumbSyncConfig();
+		}
+		catch (\Throwable $e)
+		{
+			// phpThumb.php keeps the list it has and refuses a host that is not in it
+		}
+	}
+
+
+	/**
+	 * Before the URL of a protected image is built make sure that it can be signed and that phpThumb.php knows the
+	 * secure file folder: create the signing key if there is none yet, and rewrite the managed configuration file
+	 * if the folder of the component configuration is not in it
+	 *
+	 * @param   string  $src
+	 *
+	 * @return  void
+	 */
+	private static function phpThumbPrepareProtected($src)
+	{
+		if (self::$phpthumb_protection_synced)
+		{
+			return;
+		}
+
+		// Loads the configuration, the managed file sets the list of folders
+		$key   = self::phpThumbKey();
+		$known = isset($GLOBALS['PHPTHUMB_FLEXI_PROTECTED_DIRS']) ? (array) $GLOBALS['PHPTHUMB_FLEXI_PROTECTED_DIRS'] : array();
+
+		// The uploads folder of the component is always protected by phpThumb.php
+		$known[] = self::PHPTHUMB_DEFAULT_FILE_PATH;
+
+		if (($key !== '' && !array_diff(self::phpThumbProtectedFolders(), $known)) || !self::phpThumbProtectedSource($src))
+		{
+			return;
+		}
+
+		self::$phpthumb_protection_synced = true;
+
+		try
+		{
+			self::phpThumbSyncConfig();
+		}
+		catch (\Throwable $e)
+		{
+			// The URL is built without a signature and phpThumb.php refuses it
+		}
+	}
+
+
+	/**
 	 * Build a phpThumb URL, signed when a key is available
 	 *
 	 * Example:
@@ -232,7 +510,9 @@ class flexicontent_images
 
 	/**
 	 * Build the query string of a phpThumb URL and append the signature, using the same encoding
-	 * as phpThumbURL() of phpThumb.config.php, so that phpThumb.php accepts it when high security is on
+	 * as phpThumbURL() of phpThumb.config.php, so that phpThumb.php accepts it when high security is on.
+	 * A query without 'src' is returned unsigned. For an image of a protected folder (see phpThumbProtectedSource())
+	 * the signing key is created if there is none yet, because phpThumb.php serves such an image to signed URLs only.
 	 *
 	 * @param   array  $params
 	 *
@@ -267,11 +547,72 @@ class flexicontent_images
 		}
 
 		$query = implode($separator, $parts);
-		$key   = self::phpThumbKey();
+		$src   = isset($params['src']) && is_scalar($params['src']) ? (string) $params['src'] : '';
+
+		// Without a source there is nothing to serve and nothing to sign: a signature of an empty query is not tied to any image
+		if ($src === '')
+		{
+			return $query;
+		}
+
+		// An image of a protected folder is served to signed URLs only, also when high security is off
+		self::phpThumbPrepareProtected($src);
+
+		// A remote image is fetched only from a host name that the managed configuration file lists
+		self::phpThumbPrepareRemote($src);
+
+		$key = self::phpThumbKey();
 
 		return $key === ''
 			? $query
 			: $query . $separator . 'hash=' . hash_hmac('sha256', $query, $key);
+	}
+
+
+	/**
+	 * Whether the parameters of a thumbnail URL that was not built by phpThumbURL() may be signed: a public image of
+	 * this site as source (see phpThumbPublicImage()), and nothing but parameters and filters that resize, crop or
+	 * recolour it. Whoever can place such a URL in a page (an author, or a visitor whose input is shown as a link)
+	 * gets a signature for it, so it must not be worth more than the thumbnail of an image that is public anyway.
+	 *
+	 * @param   array  $params  Parsed query of the URL, without 'hash'
+	 *
+	 * @return  bool
+	 */
+	static function phpThumbSignable(array $params)
+	{
+		if (empty($params['src']) || !is_string($params['src']) || !self::phpThumbPublicImage($params['src']))
+		{
+			return false;
+		}
+
+		foreach ($params as $name => $value)
+		{
+			if (!in_array((string) $name, self::PHPTHUMB_LEGACY_PARAMS, true))
+			{
+				return false;
+			}
+
+			if ($name !== 'fltr')
+			{
+				if (!is_string($value))
+				{
+					return false;
+				}
+
+				continue;
+			}
+
+			foreach ((array) $value as $filter)
+			{
+				if (!is_string($filter) || !in_array(explode('|', $filter)[0], self::PHPTHUMB_LEGACY_FILTERS, true))
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 
@@ -285,6 +626,11 @@ class flexicontent_images
 	 * values) can never be used to obtain a signature. Textarea contents (edit forms) are never modified.
 	 * URLs that already carry a valid signature are left untouched, URLs with a stale signature (key
 	 * regenerated) are re-signed.
+	 *
+	 * A URL is signed only if it is a URL of the thumbnail script of this site (not a page URL that contains one)
+	 * and only if phpThumbSignable() accepts its parameters: a URL with a remote or protected source, with a
+	 * parameter such as md5s, new, down, sia, phpThumbDebug or nocache, or with a filter that reads a file
+	 * (watermark, overlay, mask) stays unsigned. Build such URLs with phpThumbURL().
 	 *
 	 * @param   string  $html
 	 *
@@ -327,8 +673,9 @@ class flexicontent_images
 			}
 
 			parse_str($raw, $params);
+			unset($params['hash']);
 
-			if (empty($params['src']) || !is_string($params['src']))
+			if (!self::phpThumbSignable($params))
 			{
 				return $query;
 			}
@@ -338,23 +685,29 @@ class flexicontent_images
 			return $encoded ? str_replace('&', '&amp;', $signed) : $signed;
 		};
 
-		$marker = 'phpThumb.php?';
+		$marker   = 'phpThumb.php?';
+		$endpoint = self::PHPTHUMB_REL_DIR . '/phpThumb.php';
+		$root     = rtrim(Uri::root(true), '/');
 
 		/**
-		 * Sign a single URL that may contain unencoded spaces (everything after the marker is the query)
+		 * Sign a single URL that may contain unencoded spaces. Only a URL of the thumbnail script of this site is
+		 * signed: an optional host, the path of the script, the first '?' of the URL, the parameters. A URL that
+		 * carries the marker anywhere else (a page URL with a thumbnail URL in its path or query, as in a link
+		 * built from the request URI) is left alone.
 		 */
-		$sign_url = function ($url) use ($sign_query, $marker)
+		$sign_url = function ($url) use ($sign_query, $endpoint, $root)
 		{
-			$pos = strpos($url, $marker);
-
-			if ($pos === false)
+			if (!preg_match('#^(\s*(?:(?:https?:)?//[^/?\#\s]+)?)([^?\#]*)\?(.*)$#is', $url, $m))
 			{
 				return $url;
 			}
 
-			$pos += strlen($marker);
+			if ($m[2] !== $root . '/' . $endpoint && (trim($m[1]) !== '' || $m[2] !== $endpoint))
+			{
+				return $url;
+			}
 
-			return substr($url, 0, $pos) . $sign_query(trim(substr($url, $pos)));
+			return $m[1] . $m[2] . '?' . $sign_query(trim($m[3]));
 		};
 
 		/**
@@ -476,17 +829,19 @@ HTML_PATTERN;
 	/**
 	 * Read the configuration file generated by FLEXIcontent, without loading the phpThumb configuration
 	 *
-	 * @return  array  exists, writable, enabled (null when the file does not exist), key
+	 * @return  array  exists, writable, enabled (null when the file does not exist), key, protected (folders, null when not in the file)
 	 */
 	static function phpThumbManagedState()
 	{
 		$file  = self::phpThumbManagedFile();
 		$state = array(
-			'file'     => $file,
-			'exists'   => is_file($file),
-			'writable' => is_file($file) ? is_writable($file) : is_writable(dirname($file)),
-			'enabled'  => null,
-			'key'      => '',
+			'file'      => $file,
+			'exists'    => is_file($file),
+			'writable'  => is_file($file) ? is_writable($file) : is_writable(dirname($file)),
+			'enabled'   => null,
+			'key'       => '',
+			'protected' => null,
+			'hosts'     => null,
 		);
 
 		// Parse instead of include: including it here would satisfy the include_once() of phpThumb.config.php,
@@ -497,6 +852,25 @@ HTML_PATTERN;
 
 			$state['enabled'] = preg_match("/\\\$PHPTHUMB_CONFIG\\['high_security_enabled'\\]\\s*=\\s*true\\s*;/", $content) === 1;
 			$state['key']     = preg_match("/\\\$PHPTHUMB_CONFIG\\['high_security_password'\\]\\s*=\\s*'([^']*)'\\s*;/", $content, $m) ? $m[1] : '';
+
+			// A list of single-quoted strings, as written by var_export()
+			if (preg_match('/\$GLOBALS\[\'PHPTHUMB_FLEXI_PROTECTED_DIRS\'\]\s*=\s*array\((.*)\)\s*;/', $content, $m))
+			{
+				preg_match_all('/\'((?:[^\'\\\\]|\\\\.)*)\'/s', $m[1], $folders);
+
+				$state['protected'] = array_map(function ($folder)
+				{
+					return preg_replace('/\\\\(.)/s', '$1', $folder);
+				}, $folders[1]);
+			}
+
+			// Host names: letters, digits, dots, hyphens and colons only, see phpThumbRemoteHosts()
+			if (preg_match('/\$PHPTHUMB_CONFIG\[\'nohotlink_valid_domains\'\]\s*=\s*array\(([^)]*)\)\s*;/', $content, $m))
+			{
+				preg_match_all('/\'([^\']*)\'/', $m[1], $hosts);
+
+				$state['hosts'] = $hosts[1];
+			}
 		}
 
 		return $state;
@@ -539,7 +913,10 @@ HTML_PATTERN;
 			$key = self::phpThumbGenerateKey();
 		}
 
-		if ($state['exists'] && $state['enabled'] === $enabled && $state['key'] === $key)
+		$folders = self::phpThumbProtectedFolders();
+		$hosts   = self::phpThumbRemoteHosts();
+
+		if ($state['exists'] && $state['enabled'] === $enabled && $state['key'] === $key && $state['protected'] === $folders && $state['hosts'] === $hosts)
 		{
 			return null;
 		}
@@ -554,12 +931,26 @@ HTML_PATTERN;
 			' * high_security_enabled : when true phpThumb.php only serves URLs signed with the key below,' . "\n" .
 			' *                         FLEXIcontent signs the URLs it generates via flexicontent_images::phpThumbURL()' . "\n" .
 			' * high_security_password: secret signing key, keep it private (regenerate it from the FLEXIcontent configuration)' . "\n" .
+			' * PHPTHUMB_FLEXI_PROTECTED_DIRS: secure file folder of the FLEXIcontent configuration, relative to the site root.' . "\n" .
+			' *                         Its images, those of the uploads folder of the component and the originals of image' . "\n" .
+			' *                         fields are served to signed URLs only, also when high_security_enabled is false' . "\n" .
+			' * nohotlink_valid_domains: host names of this site that a remote image may be fetched from: the site address' . "\n" .
+			' *                         of the Joomla configuration, or the site host and the trusted remote hosts of the' . "\n" .
+			' *                         FLEXIcontent configuration. Never the host name of a request' . "\n" .
 			' *' . "\n" .
 			' * Generated: ' . gmdate('Y-m-d H:i:s') . ' UTC' . "\n" .
 			' */' . "\n" .
 			"\n" .
 			'$PHPTHUMB_CONFIG[\'high_security_enabled\']  = ' . ($enabled ? 'true' : 'false') . ';' . "\n" .
-			'$PHPTHUMB_CONFIG[\'high_security_password\'] = \'' . $key . '\';' . "\n";
+			'$PHPTHUMB_CONFIG[\'high_security_password\'] = \'' . $key . '\';' . "\n" .
+			'$GLOBALS[\'PHPTHUMB_FLEXI_PROTECTED_DIRS\'] = array(' . implode(', ', array_map(function ($folder)
+			{
+				return var_export($folder, true);
+			}, $folders)) . ');' . "\n" .
+			'$PHPTHUMB_CONFIG[\'nohotlink_valid_domains\'] = array(' . implode(', ', array_map(function ($host)
+			{
+				return "'" . $host . "'";
+			}, $hosts)) . ');' . "\n";
 
 		$file = $state['file'];
 		$tmp  = $file . '.' . uniqid('', true) . '.tmp';
@@ -582,10 +973,19 @@ HTML_PATTERN;
 		// The configuration snapshot (if any) is now stale
 		self::$phpthumb_config = null;
 
+		$GLOBALS['PHPTHUMB_FLEXI_PROTECTED_DIRS'] = $folders;
+
 		if (isset($GLOBALS['PHPTHUMB_CONFIG']) && is_array($GLOBALS['PHPTHUMB_CONFIG']))
 		{
 			$GLOBALS['PHPTHUMB_CONFIG']['high_security_enabled']  = $enabled;
 			$GLOBALS['PHPTHUMB_CONFIG']['high_security_password'] = $key;
+
+			// The override file is loaded after the managed file and wins: keep a list that differs from the one written before
+			if (!isset($GLOBALS['PHPTHUMB_CONFIG']['nohotlink_valid_domains']) || $GLOBALS['PHPTHUMB_CONFIG']['nohotlink_valid_domains'] === (array) $state['hosts'])
+			{
+				$GLOBALS['PHPTHUMB_CONFIG']['nohotlink_valid_domains'] = $hosts;
+			}
+
 			self::$phpthumb_config = $GLOBALS['PHPTHUMB_CONFIG'];
 		}
 

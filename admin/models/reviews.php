@@ -332,6 +332,32 @@ class FlexicontentModelReviews extends FCModelAdminList
 
 
 	/**
+	 * Method to find which reviews can not have the given action (state change or deletion) performed
+	 *
+	 * Reviews have no asset: the component-level core.edit.state / core.delete (.own) rules are defaults for
+	 * items, they are not rights over reviews. Only reviews managers can change the state of reviews or delete
+	 * them via the list tasks, in every client (the frontend proxy of this controller included). Item moderators
+	 * use the moderation tasks, which check core.edit.state of the reviewed item.
+	 *
+	 * @param		array        $cid      Array of record ids to check
+	 * @param		int|string   $action   Either an ACL rule action, or a new state
+	 *
+	 * @return	array     The non-authorized record ids
+	 */
+	public function filterByPermission($cid, $action)
+	{
+		$cid = ArrayHelper::toInteger($cid);
+
+		if (!$this->canManage)
+		{
+			return $cid;
+		}
+
+		return parent::filterByPermission($cid, $action);
+	}
+
+
+	/**
 	 * START OF MODEL SPECIFIC METHODS
 	 */
 

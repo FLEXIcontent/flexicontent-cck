@@ -2,7 +2,7 @@
 defined('_JEXEC') or die('Restricted access'); 
 
 ?>
-<ul id="flexicloud" class="mod_flexitagcloud<?php echo $params->get('moduleclass_sfx'); ?>">
+<ul id="flexicloud" class="mod_flexitagcloud<?php echo htmlspecialchars((string) $params->get('moduleclass_sfx'), ENT_QUOTES, 'UTF-8'); ?>">
 <?php foreach ($list as $item) : ?>
 	<li>
 		<?php if (!$params->get('seo_mode', 1)) : ?>
@@ -10,7 +10,7 @@ defined('_JEXEC') or die('Restricted access');
 		<?php endif; ?>
 		<a href="<?php echo $item->link; ?>" class="tag<?php echo $item->size; ?>" 
 			<?php echo (!$item->description ? '' : ' title="' . htmlspecialchars(flexicontent_html::striptagsandcut($item->description, 200), ENT_COMPAT, 'UTF-8')) . '" ';?>
-		><?php echo $item->name; ?></a>
+		><?php echo htmlspecialchars((string) $item->name, ENT_QUOTES, 'UTF-8'); ?></a>
 	</li>
 <?php endforeach; ?>
 </ul>

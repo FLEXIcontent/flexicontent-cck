@@ -33,6 +33,11 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 		 * Initialise variables
 		 */
 
+		if (!FlexicontentHelperPerm::getPerm()->CanImport)
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 403);
+		}
+
 		global $globalcats;
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;

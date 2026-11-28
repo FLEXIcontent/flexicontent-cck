@@ -283,8 +283,16 @@ foreach ($values as $value)
 	 * — the loaded script (form.js or form_osm.js) provides the implementation.
 	 */
 
+	// Coordinates are printed inside a script: plain decimal numbers only
+	$_coord = static function ($v)
+	{
+		$f = is_scalar($v) ? (float) $v : 0.0;
+
+		return is_finite($f) ? rtrim(rtrim(sprintf('%.10F', $f), '0'), '.') : '0';
+	};
+
 	$js .= '
-	fcfield_addrint.LatLon["'.$elementid_n.'"] = {lat: '.($value['lat'] ? $value['lat'] : '0').', lng: '.($value['lon'] ? $value['lon'] : '0').'};
+	fcfield_addrint.LatLon["'.$elementid_n.'"] = {lat: '.$_coord($value['lat']).', lng: '.$_coord($value['lon']).'};
 	';
 
 	$dom_ready_js .= '

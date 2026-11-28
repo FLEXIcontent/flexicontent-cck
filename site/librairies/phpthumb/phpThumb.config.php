@@ -88,6 +88,11 @@ $PHPTHUMB_CONFIG['cache_maxsize'] = 200 * 1024 * 1024; // delete least-recently-
 //$PHPTHUMB_CONFIG['cache_maxfiles'] = null;          // never delete cached thumbnails based on number of cached files
 $PHPTHUMB_CONFIG['cache_maxfiles'] = 10000;           // delete least-recently-accessed cached thumbnails when more than [10000] cached files are present (value is maximum number of cached files to keep)
 
+// FLEXIcontent: phpThumb applies the three limits above at most once per hour, and the cache can grow past them in between.
+// Seconds between two clean-ups, used by phpThumb.php. Values of 3600 or more, and 0, keep the hourly clean-up of phpThumb.
+// Not a member of $PHPTHUMB_CONFIG because phpThumb turns every member into a property of its class.
+$PHPTHUMB_FLEXI_CACHE_CLEANUP_INTERVAL = 300;
+
 
 // * Source image cache configuration
 $PHPTHUMB_CONFIG['cache_source_enabled']   = false;                                                                                  // if true, source images obtained via HTTP are cached to $PHPTHUMB_CONFIG['cache_source_directory']
@@ -175,8 +180,13 @@ $PHPTHUMB_CONFIG['error_silent_die_on_error']   = false;    // simply die with n
 $PHPTHUMB_CONFIG['error_die_on_source_failure'] = true;     // die with error message if source image cannot be processed by phpThumb() (usually because source image is corrupt in some way). If false the source image will be passed through unprocessed, if true (default) an error message will be displayed.
 
 // * Off-server Thumbnailing Configuration:
+// FLEXIcontent: the list of valid domains is empty here and is written to phpThumb.config_FLEXI.php from the site
+// address of the Joomla configuration ('live_site'), the site host and the trusted remote hosts of the component
+// configuration. It is never the host name of the request, which the client chooses. With an empty list no remote
+// source is fetched. To set it by hand use phpThumb.config_OVERRIDE.php:
+// $PHPTHUMB_CONFIG['nohotlink_valid_domains'] = array('www.example.com');
 $PHPTHUMB_CONFIG['nohotlink_enabled']           = true;                                     // If false will allow thumbnailing from any source domain, if true then only domains in 'nohotlink_valid_domains' will be accepted
-$PHPTHUMB_CONFIG['nohotlink_valid_domains']     = array(@$_SERVER['HTTP_HOST']);            // This is the list of domains for which thumbnails are allowed to be created. Note: domain only, do not include port numbers. The default value of the current domain should be fine in most cases, but if neccesary you can add more domains in here, in the format "www.example.com"
+$PHPTHUMB_CONFIG['nohotlink_valid_domains']     = array();                                  // This is the list of domains for which thumbnails are allowed to be created. Note: domain only, do not include port numbers. The default value of the current domain should be fine in most cases, but if neccesary you can add more domains in here, in the format "www.example.com"
 $PHPTHUMB_CONFIG['nohotlink_erase_image']       = true;                                     // if true thumbnail is covered up with $PHPTHUMB_CONFIG['nohotlink_fill_color'] before text is applied, if false text is written over top of thumbnail
 $PHPTHUMB_CONFIG['nohotlink_text_message']      = 'Off-server thumbnailing is not allowed'; // text of error message
 
@@ -222,7 +232,7 @@ $PHPTHUMB_CONFIG['http_user_agent'] = @$_SERVER['HTTP_USER_AGENT'];             
 
 
 // * Compatability settings
-$PHPTHUMB_CONFIG['disable_pathinfo_parsing']        = false;  // if true, $_SERVER[PATH_INFO] is not parsed. May be needed on some server configurations to allow normal behavior.
+$PHPTHUMB_CONFIG['disable_pathinfo_parsing']        = true;   // if true, $_SERVER[PATH_INFO] is not parsed. May be needed on some server configurations to allow normal behavior.
 $PHPTHUMB_CONFIG['disable_imagecopyresampled']      = false;  // if true, imagecopyresampled is replaced with ImageCopyResampleBicubic. May be needed for buggy versions of PHP-GD.
 $PHPTHUMB_CONFIG['disable_onlycreateable_passthru'] = true;   // if true, any image that can be parsed by getimagesize() can be passed through; if false, only images that can be converted to GD by ImageCreateFrom(JPEG|GIF|PNG) functions are allowed
 $PHPTHUMB_CONFIG['disable_realpath']                = false;  // PHP realpath() function requires that "the running script must have executable permissions on all directories in the hierarchy, otherwise realpath() will return FALSE". Set config_disable_realpath=false to enable alternate filename-parsing that does not use realpath() function (but also does not resolve symbolic links)

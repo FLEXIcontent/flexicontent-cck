@@ -770,7 +770,8 @@ class phpthumb_functions {
 		while (true) {
 			$tryagain = false;
 			$rawData = self::URLreadFsock($parsed_url['host'], $parsed_url['path'].'?'.$parsed_url['query'], $errstr, true, $parsed_url['port'], $timeout);
-			if ($followredirects && preg_match('#302 [a-z ]+; Location\\: (http.*)#i', $errstr, $matches)) {
+			// FLEXIcontent: follow a redirect only to a host that phpThumb.php may fetch from
+			if ($followredirects && preg_match('#302 [a-z ]+; Location\\: (http.*)#i', $errstr, $matches) && (!function_exists('flexicontent_phpthumb_may_follow') || flexicontent_phpthumb_may_follow(trim($matches[1])))) {
 				$matches[1] = trim($matches[1]);
 				if (empty($alreadyLookedAtURLs[$matches[1]])) {
 					// loop through and examine new URL
@@ -804,9 +805,29 @@ class phpthumb_functions {
 			curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, (bool) $followredirects);
+			// FLEXIcontent: redirects are followed here one by one, each target is checked first
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
 			curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 			$rawData = curl_exec($ch);
+			for ($flexi_hops = 0; $flexi_hops < 5; $flexi_hops++) {
+				$flexi_status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+				if ($flexi_status < 300 || $flexi_status >= 400) {
+					break;
+				}
+				// The answer to a redirect is not the image
+				$rawData = '';
+				$flexi_target = (string) curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+				if (!$followredirects || $flexi_target === '' || (function_exists('flexicontent_phpthumb_may_follow') && !flexicontent_phpthumb_may_follow($flexi_target))) {
+					$error .= 'redirect not followed; ';
+					return false;
+				}
+				curl_setopt($ch, CURLOPT_URL, $flexi_target);
+				$rawData = curl_exec($ch);
+			}
+			if ((int) curl_getinfo($ch, CURLINFO_HTTP_CODE) >= 300 && (int) curl_getinfo($ch, CURLINFO_HTTP_CODE) < 400) {
+				$error .= 'too many redirects; ';
+				return false;
+			}
 			if (PHP_VERSION_ID < 80000) {
 				curl_close($ch);
 			}
@@ -826,7 +847,8 @@ class phpthumb_functions {
 			$rawData = '';
 			$error_fopen = '';
 			ob_start();
-			if ($fp = fopen($url, 'rb')) {
+			// FLEXIcontent: the stream wrapper would follow redirects to any host
+			if ($fp = fopen($url, 'rb', false, stream_context_create(array('http' => array('follow_location' => 0, 'max_redirects' => 0))))) {
 				do {
 					$buffer = fread($fp, 8192);
 					$rawData .= $buffer;

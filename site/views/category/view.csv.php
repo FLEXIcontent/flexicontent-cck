@@ -406,6 +406,13 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 	protected function _encodeCSVField($string)
 	{
 		$string = (string) $string;
+
+		// A spreadsheet runs a cell that starts with one of these characters as a formula: mark it as text. Plain numbers are left as they are
+		if ($string !== '' && strpbrk($string[0], "=+-@\t\r") !== false && !is_numeric($string))
+		{
+			$string = "'" . $string;
+		}
+
 		if (($this->csvSeparator !== '' && strpos($string, $this->csvSeparator) !== false) || strpos($string, '"') !== false || strpos($string, "\n") !== false || strpos($string, "\r") !== false)
 		{
 			$string = '"' . str_replace('"', '""', $string) . '"';

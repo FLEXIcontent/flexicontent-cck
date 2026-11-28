@@ -17,6 +17,15 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+
+$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+if (!$user->authorise('core.admin', 'com_flexicontent'))
+{
+	echo '<p>' . \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR') . '</p>';
+	return;
+}
+
+$canPublishPlugins = $user->authorise('core.manage', 'com_plugins') && $user->authorise('core.edit.state', 'com_plugins');
 ?>
 
 <script>
@@ -88,7 +97,16 @@ FlexiForm.ready(() => {
 			</td>
 			<td>
 				<div id="publishplugins-log" class="install-task">
-					<?php echo $this->allplgpublish ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="publishplugins" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+					<?php if ($this->allplgpublish) : ?>
+						<span class="install-ok"></span>
+					<?php else : ?>
+						<span class="install-notok"></span>
+						<?php if ($canPublishPlugins) : ?>
+							<span><a class="fc_button fc_simple" id="publishplugins" href="javascript:;"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_UPDATE'); ?></a></span>
+						<?php else : ?>
+							<span><?php echo \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'); ?></span>
+						<?php endif; ?>
+					<?php endif; ?>
 				</div>
 			</td>
 		</tr>

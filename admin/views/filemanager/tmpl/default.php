@@ -489,6 +489,10 @@ foreach ($this->rows as $i => $row)
 	foreach($row as $j => $d) {
 		if (!is_array($d) && !is_object($d)) $data->$j = mb_convert_encoding($d ?? '' , 'UTF-8');
 	}
+	if ($isFilesElement && !$this->folder_mode && ($this->field->field_type ?? '') === 'file')
+	{
+		$data->pdf_preview = flexicontent_security::pdfThumbnailUrl($row, (bool) $this->field->parameters->get('limit_by_uploader', 0));
+	}
 	$js .= '  _file_data[' . $i . '] = ' . json_encode($data) . ";\n";
 }
 
@@ -1245,10 +1249,13 @@ if ($js)
 									$file_is_selected = isset($this->pending_file_names[$row->filename]);
 									$file_preview = !in_array($ext, $imagesExt) ? '' : flexicontent_images::phpThumbURL(array('src' => $file_src, 'w' => $this->thumb_w, 'h' => $this->thumb_h, 'zc' => 1, 'q' => 95, 'ar' => 'x', 'f' => $file_format), true, true, !$file_inroot);
 
-									// Link to assign file value into the content form
+									// Link to assign file value into the content form. This is plain JS (the edit link helper encodes it for the attribute),
+									// so names are printed as JavaScript string literals, and the preview URL without its HTML entities
+									$fc_js_flags = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_INVALID_UTF8_SUBSTITUTE;
+									$file_preview_js = json_encode(str_replace('&amp;', '&', $file_preview), $fc_js_flags);
 									$row->file_assign_link = $this->assign_mode ?
-										"window.parent.fcfield_assignImage" . $this->fieldid . "(fcfiles_targetid, '" . $filename . "', '" . $file_preview . "', fcfiles_keep_modal, '" . $filename_original . "'); document.getElementById('file" . $row->id . "').className='striketext';" :
-										"fc_fileselement_assign_file(fcfiles_targetid, _file_data['" . $i . "'], '" . $file_preview . "');";
+										"window.parent.fcfield_assignImage" . $this->fieldid . "(fcfiles_targetid, " . json_encode((string) $row->filename, $fc_js_flags) . ", " . $file_preview_js . ", fcfiles_keep_modal, " . json_encode((string) ($row->filename_original ? $row->filename_original : $row->filename), $fc_js_flags) . "); document.getElementById('file" . $row->id . "').className='striketext';" :
+										"fc_fileselement_assign_file(fcfiles_targetid, _file_data['" . $i . "'], " . $file_preview_js . ");";
 								}
 
 								// Link to items using the file (backend only)

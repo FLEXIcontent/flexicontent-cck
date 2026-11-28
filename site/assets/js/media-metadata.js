@@ -1,7 +1,6 @@
 /** Requests shared by the fields that fetch metadata from external media providers. */
 window.FlexiMediaMetadata = (() => {
   const pending = new WeakMap();
-  let requestId = 0;
 
   function webURL(value) {
     if (typeof value !== 'string' || !/^(https?:)?\/\//i.test(value.trim())) return null;
@@ -35,36 +34,14 @@ window.FlexiMediaMetadata = (() => {
     return url;
   }
 
-  function jsonp(url, signal) {
-    return new Promise((resolve, reject) => {
-      if (signal.aborted) { reject(signal.reason); return; }
-      const script = document.createElement('script');
-      const callback = 'fcMediaMetadata' + ++requestId;
-      const source = new URL(url);
-      source.searchParams.set('callback', callback);
-      function cleanup() {
-        signal.removeEventListener('abort', abort);
-        script.remove();
-        delete window[callback];
-      }
-      function abort() {
-        cleanup();
-        reject(signal.reason);
-      }
-      window[callback] = data => { cleanup(); resolve(data); };
-      script.onerror = () => { cleanup(); reject(new Error('Metadata request failed')); };
-      signal.addEventListener('abort', abort, { once:true });
-      script.src = source.href;
-      document.head.append(script);
-    });
-  }
-
   function cancel(input) {
     pending.get(input)?.abort();
     pending.delete(input);
   }
 
-  async function load(input, url, allowJsonp = false) {
+  // The answer is read as data. A provider that sends no CORS headers is not asked through a script element
+  // (JSONP): that would run whatever the provider returns in the session of the editor.
+  async function load(input, url) {
     cancel(input);
     const request = new AbortController();
     const value = input.value;
@@ -72,15 +49,9 @@ window.FlexiMediaMetadata = (() => {
     const timeout = setTimeout(() => request.abort(new Error('Metadata request timed out')), 12000);
     const current = () => pending.get(input) === request && input.isConnected && input.value === value;
     try {
-      let response;
-      try {
-        response = await fetch(url, { signal: request.signal, credentials:'omit' });
-      } catch (error) {
-        // Some providers support JSONP when CORS is unavailable.
-        if (!allowJsonp || request.signal.aborted || !(error instanceof TypeError)) throw error;
-      }
-      if (response && !response.ok) throw new Error('HTTP ' + response.status);
-      const data = response ? await response.json() : await jsonp(url, request.signal);
+      const response = await fetch(url, { signal: request.signal, credentials:'omit' });
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      const data = await response.json();
       return current() ? data : undefined;
     } catch (error) {
       if (current()) throw error;

@@ -40,7 +40,7 @@ flexicontent_html::loadFramework('flexi-lib');
 ?>
 <script>
 FlexiForm.ready(() => FlexiAdmin.runImport(<?php echo json_encode(array(
- 'countUrl' => 'index.php?option=com_flexicontent&task=import.getlineno&format=raw',
+ 'countUrl' => 'index.php?option=com_flexicontent&task=import.getlineno&format=raw&' . \Joomla\CMS\Session\Session::getFormToken() . '=1',
  // The CSV writer is in the HTML controller; only getlineno uses the raw controller.
  'importUrl' => 'index.php?option=com_flexicontent&task=import.importcsv',
  'batch' => (int) $this->conf['items_per_step'],

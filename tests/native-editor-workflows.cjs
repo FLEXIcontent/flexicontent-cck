@@ -130,10 +130,14 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     const assign = file => page.evaluate(file => fcfield_file.assignFile('custom_docs_0_file-id', file, 1, 'docs'), file);
     const thumb = page.locator('.fc_preview_thumb').first();
     const fit = image => image.evaluate(element => getComputedStyle(element).objectFit);
-    const pdf = {id: 7, filename: 'book.pdf', ext: 'pdf', altname: 'Book'};
+    // The server issues a signed thumbnail URL per file, the form never builds one from a file id
+    const unsigned = {id: 7, filename: 'book.pdf', ext: 'pdf', altname: 'Book'};
+    const pdf = {...unsigned, pdf_preview: '/file/pdf_thumb.php?id=7&exp=1&k=signature'};
     await page.evaluate(() => { fcfield_file.pdf_thumb_url = '/file/pdf_thumb.php?id=__ID__'; });
+    assert.equal(await assign(unsigned), true);
+    assert.match(await thumb.getAttribute('src'), /^data:/);
     assert.equal(await assign(pdf), true);
-    assert.equal(await thumb.getAttribute('src'), '/file/pdf_thumb.php?id=7');
+    assert.equal(await thumb.getAttribute('src'), pdf.pdf_preview);
     assert.equal(await fit(thumb), 'contain');
     assert.equal(await page.locator('.fc_filetitle').inputValue(), 'Book');
     await page.evaluate(() => {
@@ -156,7 +160,7 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await page.evaluate(() => fcfield_file.clearField(document.getElementById('custom_docs_0_file-id'), {}, 'docs'));
     assert.match(await thumb.getAttribute('src'), /^data:/);
     assert.equal(await fit(thumb), 'cover');
-    await assign({...pdf, url: 1});
+    await assign({...unsigned, url: 1});
     assert.match(await thumb.getAttribute('src'), /^data:/);
     await page.locator('.fcfield_preview_box').first().evaluate(element => element.remove());
     let requests = 0;
@@ -967,18 +971,18 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     assert.equal(fields.get('added'), '27');
   });
 
-  await test('Web Link metadata ignores stale results and supports providers that require JSONP', async page => {
+  await test('Web Link metadata ignores stale results and never asks a provider through a script element', async page => {
+    const requests = [];
     await form(page, '<input id="link_link"><input id="link_image"><div id="fcfield_message_box_link"></div>');
     await page.route('https://noembed.com/embed?**', async route => {
       const endpoint = new URL(route.request().url());
-      const callback = endpoint.searchParams.get('callback');
+      requests.push({type: route.request().resourceType(), callback: endpoint.searchParams.get('callback')});
       const clip = new URL(endpoint.searchParams.get('url')).pathname;
-      if (callback) return route.fulfill({contentType:'text/javascript', body: callback + '({thumbnail_url:"https://fixture.invalid/thumb.png"})'});
       if (clip === '/old12345678') {
         await new Promise(resolve => setTimeout(resolve, 200));
         return route.fulfill({headers:{'Access-Control-Allow-Origin':'*'}, json:{thumbnail_url:'https://fixture.invalid/old.png'}}).catch(() => {});
       }
-      return route.abort();
+      return route.fulfill({headers:{'Access-Control-Allow-Origin':'*'}, json:{thumbnail_url:'https://fixture.invalid/thumb.png'}});
     });
     for (const file of ['site/assets/js/media-metadata.js', 'plugins/flexicontent_fields/weblink/js/form.js']) {
       await page.addScriptTag({content: source(file)});
@@ -992,6 +996,21 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     });
     assert.equal(await page.locator('#link_image').inputValue(), 'https://fixture.invalid/thumb.png');
     assert.equal(await page.evaluate(() => Object.keys(window).filter(key => /^fcMediaMetadata\d+$/.test(key)).length), 0);
+    assert.ok(requests.length >= 1 && requests.length <= 2);
+    const before = requests.length;
+    assert.deepEqual(requests.filter(request => request.type === 'script' || request.callback !== null), []);
+
+    // A provider that cannot be read as data gives an error message: its answer is never run as a script
+    await page.unroute('https://noembed.com/embed?**');
+    await page.route('https://noembed.com/embed?**', route => { requests.push({type: route.request().resourceType()}); return route.abort(); });
+    await page.evaluate(async () => {
+      document.getElementById('link_image').value = '';
+      document.getElementById('link_link').value = 'https://youtu.be/blocked4567';
+      await fcfield_weblink.fetchData('link');
+    });
+    assert.equal(await page.locator('#link_image').inputValue(), '');
+    assert.equal(requests.length, before + 1);
+    assert.equal(requests[before].type === 'script', false);
   });
 
   await test('Shared Media metadata fills native form values and clears the embed', async page => {

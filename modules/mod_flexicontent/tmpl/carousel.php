@@ -559,7 +559,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 				{
 					echo $item_placement_feat === 2
 						? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addTab', $itemset_tagid, $itemset_tagid . '_' . $item->id, $item->title)
-						: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', $itemset_tagid, $item->title, $itemset_tagid . '_' . $item->id);
+						: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', $itemset_tagid, htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'), $itemset_tagid . '_' . $item->id);
 				}
 
 				$img_force_dims_css_feat = $img_auto_dims_css_feat;
@@ -598,9 +598,9 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 						<div class="fcitem_title_box">
 							<span class="fcitem_title">
 							<?php if ($link_title_feat) : ?>
-								<a href="<?php echo $item->link; ?>"><h3><?php echo $item->title; ?></h3></a>
+								<a href="<?php echo $item->link; ?>"><h3><?php echo htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'); ?></h3></a>
 							<?php else : ?>
-								<h3><?php echo $item->title; ?></h3>
+								<h3><?php echo htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'); ?></h3>
 							<?php endif; ?>
 							</span>
 						</div>
@@ -851,9 +851,9 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 						<div class="fcitem_title_box" <?php echo !$display_title ? 'style="display:none!important;"' : ''; ?> >
 							<span class="fcitem_title">
 							<?php if ($link_title) : ?>
-								<a href="<?php echo $item->link; ?>"><h3><?php echo $item->title; ?></h3></a>
+								<a href="<?php echo $item->link; ?>"><h3><?php echo htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'); ?></h3></a>
 							<?php else : ?>
-								<h3><?php echo $item->title; ?></h3>
+								<h3><?php echo htmlspecialchars((string) $item->title, ENT_QUOTES, 'UTF-8'); ?></h3>
 							<?php endif; ?>
 							</span>
 						</div>

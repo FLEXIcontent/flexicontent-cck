@@ -25,7 +25,7 @@ foreach ($values as $n => $value)
 			'.$img_legend.'
 		</a>
 		<div class="multiBoxDesc mb'.$uniqueid.'">
-			' . ($desc ? '<b>' . $title . '</b><br> ' . $desc : $title) . '
+			' . ($desc ? '<b>' . htmlspecialchars((string) $title, ENT_QUOTES, 'UTF-8') . '</b><br> ' . htmlspecialchars((string) $desc, ENT_QUOTES, 'UTF-8') : htmlspecialchars((string) $title, ENT_QUOTES, 'UTF-8')) . '
 		</div>'
 		. $inline_info
 		. $posttext;

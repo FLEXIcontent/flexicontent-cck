@@ -693,7 +693,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	{
 		$record  = $record ?: $this->_record;
 		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
+		$asset   = $record && $record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id == $user->id;
 
 		$canDo    = $user->authorise('core.edit', $asset);
@@ -714,7 +714,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	{
 		$record  = $record ?: $this->_record;
 		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
+		$asset   = $record && $record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id == $user->id;
 
 		$canDo    = $user->authorise('core.edit.state', $asset);
@@ -735,7 +735,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	{
 		$record  = $record ?: $this->_record;
 		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
+		$asset   = $record && $record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id == $user->id;
 
 		$canDo    = $user->authorise('core.delete', $asset);

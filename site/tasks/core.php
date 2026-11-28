@@ -363,6 +363,14 @@ class FlexicontentTasksCore
 			}
 		}
 
+		$signature = $ac_str('ac_info_signature', '');
+		$expected = flexicontent_security::autocompleteInfoSignature($ac_info_source, implode(',', $ac_info_fields));
+		if (!hash_equals($expected, $signature))
+		{
+			$ac_info_source = 'module';
+			$ac_info_fields = array();
+		}
+
 		// Suggestion sources and their order (sortable option), e.g. "tags,words,titles"
 		$sources_order = array();
 		$_sources_cfg = (string) $cparams->get('search_autocomplete_sources', '');
@@ -1301,7 +1309,9 @@ class FlexicontentTasksCore
 	 */
 	private function _getInfoFieldEntries($item_ids, $names, $maxlen, $show_labels)
 	{
-		$fields = $this->_getFieldsByName($names);
+		$fields = array_filter($this->_getFieldsByName($names), function ($field) {
+			return $field->field_type !== 'email' || ($this->_decodeFieldParams($field)['viewlayout'] ?? '') !== 'form';
+		});
 
 		if (!$fields || !$item_ids)
 		{
@@ -1648,7 +1658,10 @@ class FlexicontentTasksCore
 
 			$_rel = rawurldecode(ltrim(preg_replace('/[?#].*$/', '', $_src), '/'));
 
-			if ($_rel !== '' && !preg_match('#(^|/)\.\.(/|$)#', $_rel) && is_file(JPATH_SITE . '/' . $_rel))
+			class_exists('flexicontent_images', false) || require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/images.php';
+
+			// The path was written by the author and a signed thumbnail URL is built for it: public images only
+			if ($_rel !== '' && !preg_match('#(^|/)\.\.(/|$)#', $_rel) && flexicontent_images::phpThumbPublicImage($_rel) && is_file(JPATH_SITE . '/' . $_rel))
 			{
 				return $_rel;
 			}

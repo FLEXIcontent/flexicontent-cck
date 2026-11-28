@@ -72,9 +72,15 @@ foreach ($values as $n => $value)
 		$ABS_SRC = $abs_src;
 	}
 
+	// Sizes are printed in a style attribute: integers only
 	$w = isset($value['size_w_' . $SIZE]) ? $value['size_w_' . $SIZE] : $field->parameters->get('w_' . $SIZE, self::$default_widths[$size]);
 	$h = isset($value['size_h_' . $SIZE]) ? $value['size_h_' . $SIZE] : $field->parameters->get('h_' . $SIZE, self::$default_heights[$size]);
-	
+	$w = is_scalar($w) ? (int) $w : 0;
+	$h = is_scalar($h) ? (int) $h : 0;
+
+	// The viewer inserts the title as HTML, so it is passed HTML-encoded; every value is a JSON string literal
+	$_js_flags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE;
+
 	// TODO: Check if this feature will be implemented (Params commented out in XML file too)
 	$hots_spots_list = 0;
 
@@ -114,9 +120,9 @@ foreach ($values as $n => $value)
 	<script>
 		pannellum.viewer(\'panorama_' . $uniqueid . '\', {
 			"type": "equirectangular",
-			"panorama": "' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srco . '",
-			"preview": "' . $ABS_SRC . '",
-			"title": "' . $title_encoded . '",
+			"panorama": ' . json_encode(\Joomla\CMS\Uri\Uri::root(true).'/'.$srco, $_js_flags) . ',
+			"preview": ' . json_encode((string) $ABS_SRC, $_js_flags) . ',
+			"title": ' . json_encode((string) $title_encoded, $_js_flags) . ',
 			' . $hots_spots_list . '
 		});
 	</script>	

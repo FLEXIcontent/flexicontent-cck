@@ -51,7 +51,7 @@ window.fcfield_weblink = (() => {
     }
     metadata.notice(box, '');
     try {
-      const response = await metadata.load(input, metadata.noembed(source), true);
+      const response = await metadata.load(input, metadata.noembed(source));
       if (!response) return;
       const thumbnail = metadata.webURL(response.thumbnail_url);
       if (response.error || !thumbnail) {

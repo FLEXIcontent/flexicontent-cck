@@ -62,6 +62,11 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 	{
 		$task = $this->getTask();
 
+		if (!$this->canManage)
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'), 403);
+		}
+
 		// Force URL variables for add / edit task
 		if ($task === 'add' || $task === 'edit')
 		{
@@ -102,14 +107,31 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 
 		// Create a new \Joomla\CMS\User\User object for the given user id, and calculate / retrieve some information about the user
 		$id   = $this->input->getInt('id', 0);
-		$user = new \Joomla\CMS\User\User($id);
 		$isNew = !$id;
+		$this->requireUserPermission($isNew ? 'core.create' : 'core.edit');
+		$user = new \Joomla\CMS\User\User($id);
+		if (!$isNew && ((int) $user->id !== $id
+			|| ($user->authorise('core.admin') && !$me->authorise('core.admin'))))
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'), 403);
+		}
 
-		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
-		$isSuperAdmin = $user->authorise('core.admin', 'root.1');
 		$saving_myself = $user->id == $me->id;
 
 		$data = $this->input->get('jform', array(), 'array');
+		if (array_key_exists('block', $data))
+		{
+			if (!in_array($data['block'], array(0, 1, '0', '1'), true))
+			{
+				throw new \InvalidArgumentException('Invalid user state', 400);
+			}
+			$data['block'] = (int) $data['block'];
+		}
+		$blockChanged = isset($data['block']) && $data['block'] !== (int) $user->block;
+		if ($blockChanged)
+		{
+			$this->requireUserPermission('core.edit.state');
+		}
 
 		// Merge template FIELDS-set this should include at least 'clayout' and optionally 'clayout_mobile' parameters
 		if (!empty($data['templates']))
@@ -118,15 +140,23 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		}
 
 		// Merge the parameters of the selected clayout
-		$clayout = $data['templates']['clayout'];
+		$clayout = $data['templates']['clayout'] ?? '';
 
 		if (!empty($data['layouts'][$clayout]))
 		{
 			$data['authorcatparams'] = array_merge($data['authorcatparams'], $data['layouts'][$clayout]);
 		}
 
-		// Bind posted data
-		if (!$user->bind($data))
+		// Only accept account fields from the form. The checked ID is authoritative.
+		$account = array_intersect_key($data, array_flip(array(
+			'name', 'username', 'email', 'password', 'password2', 'block', 'sendEmail', 'params', 'groups'
+		)));
+		$account['id'] = $id;
+		if ($saving_myself && !$me->authorise('core.admin'))
+		{
+			unset($account['groups']);
+		}
+		if (!$user->bind($account))
 		{
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('CANNOT SAVE THE USER INFORMATION'), 'warning');
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage($user->getError(), 'warning');
@@ -137,7 +167,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		}
 
 		// Check if we allowed to block/unblock the user
-		if (isset($data['block']))
+		if ($blockChanged)
 		{
 			$check_blocking = !$saving_myself || ($saving_myself && $data['block']);
 
@@ -231,6 +261,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 	 */
 	public function remove()
 	{
+		$this->requireUserPermission('core.delete');
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
@@ -326,6 +357,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 	 */
 	function block($check_uids=null, $check_task='block')
 	{
+		$this->requireUserPermission('core.edit.state');
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
@@ -426,11 +458,22 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 	}
 
 
+	private function requireUserPermission($action)
+	{
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		if (!$this->canManage || !$user->authorise($action, 'com_users'))
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'), 403);
+		}
+	}
+
+
 	/**
 	 * Force log out a user
 	 */
 	function logout( )
 	{
+		$this->requireUserPermission('core.edit.state');
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
@@ -449,8 +492,15 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 			return false;
 		}
 
+		$me = $app->getIdentity();
 		foreach ($cids as $cid)
 		{
+			$target = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $cid);
+			if (empty($target->id) || ($target->authorise('core.admin') && !$me->authorise('core.admin')))
+			{
+				continue;
+			}
+
 			$options = array();
 
 			if ($task === 'logout' || $task === 'block')

@@ -1,6 +1,8 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\CMS\Language\LanguageFactoryInterface;
+use Joomla\Filesystem\File;
+use Joomla\Filesystem\Path;
 
 class flexicontent_upload
 {
@@ -209,6 +211,57 @@ class flexicontent_upload
 		//return pathinfo($file, PATHINFO_EXTENSION);
 	}
 
+	/** Check every extension in the name that will be written to disk. */
+	public static function isSafeFilename($filename)
+	{
+		if (strpos($filename, "\0") !== false) return false;
+		$name = strtolower(basename(str_replace('\\', '/', $filename)));
+		$extensions = array_slice(explode('.', $name), 1);
+		return $name !== '.user.ini'
+			&& !array_intersect($extensions, File::FORBIDDEN_FILE_EXTENSIONS)
+			&& !in_array('htaccess', $extensions, true);
+	}
+
+	/** Apply Joomla's content checks to a completed upload or a local import. */
+	public static function isSafeUpload($filename, $path)
+	{
+		return self::isSafeFilename($filename) && is_file($path) && is_readable($path)
+			&& File::isSafeFile(array(
+				'name' => basename(str_replace('\\', '/', $filename)),
+				'tmp_name' => $path,
+				'type' => '',
+				'error' => 0,
+				'size' => 0,
+			), array('fobidden_ext_in_content' => false));
+	}
+
+	/** Check the stored path, including older records with different path separators. */
+	public static function hasLocalFileReference($db, $file, $excludedIds = array())
+	{
+		$roots = array(COM_FLEXICONTENT_MEDIAPATH, COM_FLEXICONTENT_FILEPATH);
+		$name = str_replace('\\', '/', $file->filename);
+		$path = Path::clean($roots[(int) (bool) $file->secure] . '/' . $name);
+		$canonical = realpath($path);
+		// Match possible aliases by basename, then compare the complete storage paths.
+		$query = 'SELECT filename, secure FROM #__flexicontent_files WHERE url = 0'
+			. ' AND LOWER(filename) LIKE ' . $db->quote('%' . $db->escape(strtolower(basename($name)), true), false);
+		if ($excludedIds)
+		{
+			$query .= ' AND id NOT IN (' . implode(',', array_map('intval', $excludedIds)) . ')';
+		}
+		foreach ($db->setQuery($query)->loadObjectList() as $other)
+		{
+			$otherPath = Path::clean($roots[(int) (bool) $other->secure] . '/' . str_replace('\\', '/', $other->filename));
+			$otherCanonical = realpath($otherPath);
+			if ($path === $otherPath || ($canonical !== false && $otherCanonical !== false
+				&& (DS === '\\' ? strcasecmp($canonical, $otherCanonical) === 0 : $canonical === $otherCanonical)))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 
 	/**
 	 * Checks uploaded file
@@ -236,6 +289,11 @@ class flexicontent_upload
 			$err = 'FLEXI_PLEASE_INPUT_A_FILE';
 			return false;
 		}
+	if (!self::isSafeFilename($file['name']))
+	{
+		$err = 'FLEXI_WARNFILETYPE';
+		return false;
+	}
 
 
 
@@ -259,7 +317,7 @@ class flexicontent_upload
 		$ignored_exts = preg_split("/[\s]*,[\s]*/", strtolower($params->get('ignore_extensions') ?? ''));
 		$ignored_exts = array_flip($ignored_exts);
 
-		if (!isset($allowed_exts[$format]) && !isset($ignored_exts[$format]))
+		if (!self::isSafeFilename($file['name']) || (!isset($allowed_exts[$format]) && !isset($ignored_exts[$format])))
 		{
 			$err = 'FLEXI_WARNFILETYPE';
 			return false;
