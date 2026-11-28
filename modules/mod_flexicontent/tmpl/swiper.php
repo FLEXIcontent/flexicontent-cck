@@ -1431,7 +1431,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 	}
 
 
-	$css = '';
+	$css = '#mod_flexicontent_swiper' . $container_id . ' { min-width: 0; max-width: 100%; }';
 
 	$css .= '/* CONTAINER of featured items */
 #mod_fcitems_box_featured_'.$uniq_ord_id.' {

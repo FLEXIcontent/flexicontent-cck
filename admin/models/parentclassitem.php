@@ -2089,7 +2089,8 @@ class ParentClassItem extends FCModelAdmin
 				$submit_conf = !empty($item_submit_conf[$h]) ? $item_submit_conf[$h] : null;
 
 				$autopublished    = $submit_conf && !empty($submit_conf['autopublished'])    ? $submit_conf['autopublished']    : null;  // Override flag for both TYPE and CATEGORY ACL
-				$overridecatperms = $submit_conf && !empty($submit_conf['overridecatperms']) ? $submit_conf['overridecatperms'] : null;  // Override flag for CATEGORY ACL
+				$overridecatperms = !empty($submit_conf['overridecatperms'])
+					&& flexicontent_security::canUseSubmissionCategoryOverride($app->getMenu()->getActive(), $user);  // Override flag for CATEGORY ACL
 
 				if ( $autopublished)
 				{
@@ -2830,6 +2831,45 @@ class ParentClassItem extends FCModelAdmin
 	}
 
 
+	/** Append an automatic link to each editable destination revision and, when approved, its live values. */
+	private function appendReverseRelation($field, $value, $useVersioning, $updateLive, &$inserted)
+	{
+		$db = $this->_db;
+		$itemId = (int) $field->use_item_id;
+		$fieldId = (int) $field->use_field_id;
+		$where = ' WHERE item_id = ' . $itemId . ' AND field_id = ' . $fieldId;
+		$quoted = $db->quote($value);
+		// Allocate from the destination set in the insert itself. A retry must keep the existing position.
+		$missing = " HAVING COUNT(CASE WHEN SUBSTRING_INDEX(value, ':', 1) = " . $db->quote((string) (int) $value) . ' THEN 1 END) = 0';
+
+		if ($useVersioning)
+		{
+			$current = (int) FLEXIUtilities::getCurrentVersions($itemId, true, true);
+			$latest = (int) FLEXIUtilities::getLastVersions($itemId, true, true);
+			foreach (array_unique(array_filter(array($current, $latest))) as $version)
+			{
+				$db->setQuery('INSERT INTO #__flexicontent_items_versions (item_id, field_id, version, valueorder, suborder, value)'
+					. ' SELECT ' . $itemId . ', ' . $fieldId . ', ' . $version . ', COALESCE(MAX(valueorder), 0) + 1, 1, ' . $quoted
+					. ' FROM #__flexicontent_items_versions' . $where . ' AND version = ' . $version . $missing)->execute();
+				if ($db->getAffectedRows())
+				{
+					$inserted[] = 'DELETE FROM #__flexicontent_items_versions' . $where . ' AND version = ' . $version . ' AND value = ' . $quoted;
+				}
+			}
+		}
+
+		if ($updateLive)
+		{
+			$db->setQuery('INSERT INTO #__flexicontent_fields_item_relations (item_id, field_id, valueorder, suborder, value, value_integer, value_decimal)'
+				. ' SELECT ' . $itemId . ', ' . $fieldId . ', COALESCE(MAX(valueorder), 0) + 1, 1, ' . $quoted . ', ' . (int) $value . ', ' . (int) $value
+				. ' FROM #__flexicontent_fields_item_relations' . $where . $missing)->execute();
+			if ($db->getAffectedRows())
+			{
+				$inserted[] = 'DELETE FROM #__flexicontent_fields_item_relations' . $where . ' AND value = ' . $quoted;
+			}
+		}
+	}
+
 	/**
 	 * Method to save field values of the item in field versioning DB table or in ..._fields_item_relations DB table
 	 *
@@ -3316,6 +3356,7 @@ class ParentClassItem extends FCModelAdmin
 			$ver_query_vals = array();
 			$rel_query_vals = array();
 			$rel_update_objs = array();
+			$reverseRelations = array();
 
 			// Add the new values to the database
 			foreach($fields as $field)
@@ -3325,6 +3366,13 @@ class ParentClassItem extends FCModelAdmin
 
 				foreach ($field->postdata as $posted_value)
 				{
+					// An automatic reverse relation belongs to the selected item's revisions.
+					if ($field->field_type === 'relation_reverse' && !empty($field->use_item_id))
+					{
+						$reverseRelations[] = array($field, $posted_value);
+						continue;
+					}
+
 					// Create field obj for DB insertion
 					$obj = new stdClass();
 					$obj->field_id 		= !empty($field->use_field_id) ? $field->use_field_id : $field->id;
@@ -3534,6 +3582,29 @@ class ParentClassItem extends FCModelAdmin
 				$obj->value = serialize($data['jfdata']);
 				$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 			}*/
+		}
+
+		if (!empty($reverseRelations))
+		{
+			// On non-transactional tables compensate only for links inserted by this save.
+			$inserted = array();
+			try
+			{
+				foreach ($reverseRelations as [$relation, $value])
+				{
+					$this->appendReverseRelation($relation, $value, $use_versioning, $isNew || $data['vstate'] == 2, $inserted);
+				}
+			}
+			catch (\RuntimeException $error)
+			{
+				foreach (array_reverse($inserted) as $undo)
+				{
+					$this->_db->setQuery($undo)->execute();
+				}
+				\Joomla\CMS\Log\Log::add($error->getMessage(), \Joomla\CMS\Log\Log::ERROR, 'com_flexicontent');
+				$this->setError(\Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED'));
+				return 'abort';
+			}
 		}
 
 		if ( $print_logging_info ) @$fc_run_times['fields_value_saving'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;

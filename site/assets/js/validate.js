@@ -120,7 +120,9 @@ var JFormValidator_FC = function () {
     while (tab) {
       const set = tab.parentElement?.closest('div.tabberlive');
       if (!set) break;
-      window.fctabber?.[set.id]?.tabShow(Array.from(tab.parentElement.children).indexOf(tab) - 1);
+      // Group tab sets put separators between their panes: take the pane's index from the tab set itself.
+      const tabber = window.fctabber?.[set.id];
+      tabber?.tabShow(tabber.tabs.findIndex(pane => pane.div === tab));
       tab = set.parentElement?.closest('div.tabbertab');
     }
     const row = el.closest('li.fcfieldval_container');

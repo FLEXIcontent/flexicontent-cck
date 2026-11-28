@@ -368,9 +368,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				$item_submit_conf = $session->get('item_submit_conf', array(), 'flexicontent');
 
 				$submit_conf      = @ $item_submit_conf[$h];
-				$allowunauthorize = $params->get('allowunauthorize', 0);
+				$allowunauthorize = (int) $params->get('allowunauthorize', 0);
+				$allowunauthorize = $allowunauthorize === 1 || ($allowunauthorize === 2 && !$user->guest);
 				$autopublished    = @ $submit_conf['autopublished'];     // Override flag for both TYPE and CATEGORY ACL
-				$overridecatperms = @ $submit_conf['overridecatperms'];  // Override flag for CATEGORY ACL
+				$overridecatperms = !empty($submit_conf['overridecatperms'])
+					&& flexicontent_security::canUseSubmissionCategoryOverride($menu, $user);  // Override flag for CATEGORY ACL
 			}
 			else
 			{

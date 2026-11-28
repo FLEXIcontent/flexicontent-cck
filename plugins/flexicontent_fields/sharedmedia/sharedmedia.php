@@ -420,6 +420,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 					<div class="sm_url_props" data-name="'.$elementid_n.'" style="display: none;">
 						<div class="fc-form-tbl fcinner fccompact">
 							<div>
+								<label class="visually-hidden" for="'.$elementid_n.'_url">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_MEDIA_URL') . '</label>
 								<input type="text" class="fcfield_textval' . $required_class . ' sm_url" inputmode="url" enterkeyhint="go" id="'.$elementid_n.'_url" name="'.$fieldname_n.'[url]" value="'.htmlspecialchars($value['url'], ENT_COMPAT, 'UTF-8').'" placeholder="' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_MEDIA_URL') . '" />
 							</div>
 

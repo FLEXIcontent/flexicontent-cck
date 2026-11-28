@@ -3464,6 +3464,13 @@ class flexicontent_html
 			$output	= $jtext['icon_sep'] .$output. $jtext['icon_sep'];
 		}
 
+		// Owners can follow moderation in My items even when they cannot change publication state.
+		elseif ($config->record_name === 'item' && !$user->guest && (int) ($record->created_by ?? 0) === (int) $user->id
+			&& Factory::getApplication()->input->getCmd('layout') === 'myitems')
+		{
+			$output = '<span class="fc-state-readonly">' . htmlspecialchars($state_text ?: $state_names[$state], ENT_QUOTES, 'UTF-8') . '</span>';
+		}
+
 		// Frontend with no permissions to edit / delete / archive
 		else
 		{

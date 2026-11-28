@@ -485,7 +485,7 @@ class flexicontent_db
 	/** Split all/any searches into ordinary words and double-quoted phrases. */
 	static function getQuotedSearchTerms($text, $phrase)
 	{
-		if (!in_array($phrase, array('all', 'any'), true) || !preg_match('/"[^"]+"/u', $text))
+		if (!in_array($phrase, array('all', 'any'), true) || !preg_match('/"[^"]+"|(?:^|\s)[^\p{L}\p{M}\p{N}_\s]+(?:\s|$)/u', $text))
 		{
 			return null;
 		}
@@ -495,28 +495,58 @@ class flexicontent_db
 	}
 
 	/** Build one boolean expression, keeping the words in a quoted phrase together. */
-	static function getQuotedFulltextCondition($column, $terms, $phrase, $prefix = '')
+	static function getQuotedFulltextCondition($column, $terms, $phrase, $prefix = '', $table = 'flexicontent_items_ext')
 	{
 		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$required = $phrase === 'all' ? '+' : '';
 		$groups = array();
+		$shortConditions = array();
+		$minLength = self::getMinWordLen($table);
 
 		foreach ($terms as $term)
 		{
-			preg_match_all('/[\p{L}\p{M}\p{N}_]+/u', $term['quoted'] ?? $term['word'], $matches);
-			$words = array_map(static fn($word) => $prefix . $word, $matches[0]);
-			if ($term['quoted'] !== null && $words)
+			// Use the same prefix boundaries as the indexer: "QA-test" is stored as "vvvQA-test".
+			$text = $term['quoted'] ?? $term['word'];
+			$text = $prefix === '' ? $text : preg_replace('/(\b[^\s,\.]+\b)/u', $prefix . '$0', $text);
+			preg_match_all('/[\p{L}\p{M}\p{N}_]+/u', $text, $matches);
+			$words = $matches[0];
+			if (!$words) continue;
+
+			if ($term['quoted'] !== null)
 			{
-				$groups[] = $required . '"' . implode(' ', $words) . '"';
+				$short = array_filter($words, static fn($word) => StringHelper::strlen($word) < $minLength);
+				if ($short)
+				{
+					$pattern = '(^|[^[:alnum:]_])' . implode('[^[:alnum:]_]+', $words) . '($|[^[:alnum:]_])';
+					$shortConditions[] = $column . ' REGEXP ' . $db->quote($pattern);
+				}
+				else
+				{
+					$groups[] = $required . '"' . implode(' ', $words) . '"';
+				}
+				continue;
 			}
-			else foreach ($words as $word)
+
+			foreach ($words as $word)
 			{
-				$groups[] = $required . $word . '*';
+				if (StringHelper::strlen($word) < $minLength)
+				{
+					// A short standalone word is absent from FULLTEXT, but a short prefix is searchable.
+					$shortConditions[] = $column . ' REGEXP ' . $db->quote('(^|[^[:alnum:]_])' . $word);
+				}
+				else
+				{
+					$groups[] = $required . $word . '*';
+				}
 			}
 		}
 
-		return $groups
-			? ' MATCH (' . $column . ') AGAINST (' . $db->quote(implode(' ', $groups)) . ' IN BOOLEAN MODE) '
+		if ($groups)
+		{
+			$shortConditions[] = 'MATCH (' . $column . ') AGAINST (' . $db->quote(implode(' ', $groups)) . ' IN BOOLEAN MODE)';
+		}
+		return $shortConditions
+			? ' (' . implode($phrase === 'all' ? ' AND ' : ' OR ', $shortConditions) . ') '
 			: ' 0=1 ';
 	}
 

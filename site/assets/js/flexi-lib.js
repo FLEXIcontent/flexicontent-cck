@@ -299,7 +299,9 @@
 		};
 		updateClasses('force_list', 0);
 		updateClasses('hide_list', 1);
-		fc_configureDependencyFields(option, field);
+		// A preset copies values only when selected. Opening the form must keep the saved values.
+		const isPreset = field.classList.contains('fccustom_revert');
+		if (!isPreset || !fc_init_hide_dependent) fc_configureDependencyFields(option, field);
 		updateClasses('show_list', -1);
 
 		const hide = option.getAttribute('data-setoff_list');
@@ -326,7 +328,7 @@
 			}
 		}
 
-		if (field.classList.contains('fccustom_revert') && option.value !== '') {
+		if (isPreset && !fc_init_hide_dependent && option.value !== '') {
 			const radio = field.matches('fieldset, .fcform_toggler_element:not(select)');
 			const current = radio ? field.querySelector('input[type="radio"]:checked') : field;
 			if (current?.value) {

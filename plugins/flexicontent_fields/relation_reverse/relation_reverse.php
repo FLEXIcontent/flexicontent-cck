@@ -187,7 +187,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		if(!is_array($post) && !strlen($post)) return;
+		if (!is_array($post) || !$post) return;
 
 		$reverse_field_id = (int) $field->parameters->get('reverse_field', 0);
 
@@ -208,17 +208,8 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 					$master_item_id = (int) reset($post);
 					if ($master_item_id)
 					{
-						$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-						$db->setQuery(
-							'SELECT MAX(valueorder) '
-							. ' FROM #__flexicontent_fields_item_relations '
-							. ' WHERE field_id = '.$reverse_field_id.' AND item_id ='. $master_item_id
-						);
-						$max_valueorder = (int)$db->loadResult();
-
 						$field->use_field_id = $reverse_field_id;
-						$field->use_item_id  = $master_item_id;
-						$field->use_valueorder  = $max_valueorder + 1;
+						$field->use_item_id = $master_item_id;
 
 						$post = array($item->id.':'.$item->catid);
 					}
